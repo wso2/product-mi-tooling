@@ -12,6 +12,7 @@ Running the Monitoring Dashboard
 3. To connect the monitoring dashboard to a WSO2 Micro Integrator instance, the instance should have the management API enabled.
    This can be done by starting the WSO2 Micro Integrator with the -DenableManagementApi property as follows.
    sh micro-integrator.sh -DenableManagementApi - Linux and Unix.
+   micro-integrator.bat -DenableManagementApi - Windows
 
 More information regarding the dashboard configurations can be found at
 (https://ei.docs.wso2.com/en/latest/micro-integrator/administer-and-observe/working-with-monitoring-dashboard/)
