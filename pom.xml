@@ -47,6 +47,10 @@
         <tag>HEAD</tag>
     </scm>
 
+    <modules>
+        <module>dashboard/monitoring-dashboard</module>
+    </modules>
+
     <profiles>
         <profile>
             <id>sign</id>
@@ -73,15 +77,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>dashboard/monitoring-dashboard</module>
-            </modules>
         </profile>
     </profiles>
 

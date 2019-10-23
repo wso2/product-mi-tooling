@@ -87,7 +87,7 @@ export default class MessageProcessorListPage extends Component {
                   if ("active" === tableMeta.rowData[2]) {
                       return(<span><ActiveIcon style={{color:"green"}}/> Active </span>);
                   } else {
-                      return(<DisableIcon style={{color:"red"}}/>);
+                      return(<span><DisableIcon style={{color:"red"}}/> Inactive </span>);
                   }
                 }
             }
