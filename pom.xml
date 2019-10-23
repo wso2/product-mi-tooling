@@ -80,7 +80,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>tooling/monitoring-dashboard</module>
+                <module>dashboard/monitoring-dashboard</module>
             </modules>
         </profile>
     </profiles>

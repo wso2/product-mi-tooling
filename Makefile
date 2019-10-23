@@ -29,11 +29,6 @@ endif
 # one of these will be set to VERSION in Jenkins Production Environment
 
 
-.PHONY: install
-install:
-	mvn clean install
-	cd cmd && ./build.sh -t mi.go -v ${VERSION} -f
-
 .PHONY: install-cli
 install-cli:
 	cd cmd && ./build.sh -t mi.go -v ${VERSION} -f
