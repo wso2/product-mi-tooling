@@ -1,7 +1,7 @@
 Monitoring Dashboard for WSO2 Micro Integrator
 ======================================================================
 
-Welcome to the Monitoring Dashboard @product.version@ for WSO2 Micro Integrator for @mi.version@
+Welcome to the Monitoring Dashboard @product.version@ for WSO2 Micro Integrator @mi.version@
 This is a lightweight UI server that hosts the React application used to implement the monitoring dashboard.
 
 
