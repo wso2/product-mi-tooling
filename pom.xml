@@ -48,7 +48,7 @@
     </scm>
 
     <modules>
-        <module>dashboard/monitoring-dashboard</module>
+        <module>monitoring-dashboard</module>
     </modules>
 
     <profiles>
