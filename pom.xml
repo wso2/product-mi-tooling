@@ -41,9 +41,9 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/wso2/micro-integrator.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/micro-integrator.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/micro-integrator.git</connection>
+        <url>https://github.com/wso2/product-mi-tooling.git</url>
+        <developerConnection>scm:git:https://github.com/wso2/product-mi-tooling.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2/product-mi-tooling.git</connection>
         <tag>HEAD</tag>
     </scm>
 
