@@ -1,24 +1,24 @@
 # Management Console for WSO2 Micro Integrator
 
-Command Line tool for managing the WSO2 Micro Integrator
+Command Line tool for managing the WSO2 Micro Integrator.
 
 ## Getting Started
 
 ### Building from source 
 
 - ### Setting up the development environment
-    1. Install [Go 1.12.x](https://golang.org/dl)
-    2. Fork the [repository](https://github.com/wso2/micro-integrator)
-    3. Clone your fork into any directory
-    5. `cd` into cloned directory and then cd into `micro-integrator/cmd`
-    6. Execute `go mod vendor` or `go mod download` to download all the dependencies
+    1. Install [Go 1.12.x](https://golang.org/dl).
+    2. Fork the [repository](https://github.com/wso2/product-mi-tooling).
+    3. Clone your fork into any directory.
+    5. Access the cloned directory and then navigate to `product-mi-tooling/cmd`.
+    6. Execute `go mod vendor` or `go mod download` to download all the dependencies.
     
 - ### Building from source
-    cd into micro-integrator home directory
+    Navigate to the product-mi-tooling home directory
 
-    Execute `make install` to build both the **Micro Integrator** and **MIcro Integrator CLI** at once.
+    Execute `make install-cli VERSION=VESION_OF_CHOICE` to build the **MIcro Integrator CLI**.
 
-    Created Command Line tool packages will be available at cmd/build directory
+    Created Command Line tool packages will be available at cmd/build directory.
 
 - ### Running
     Extract the compressed archive generated to a desired location.
@@ -35,7 +35,7 @@ Command Line tool for managing the WSO2 Micro Integrator
 ### Configuration 
 
 - ### How to Enable the Management API
-    By default the Management Api is disabled. To use the Management Api you must use the system property `-DenableManagementApi` when starting the micro integrator
+    By default the Management Api is disabled. To use the Management Api you must use the system property `-DenableManagementApi`, when starting the micro integrator
 
 - ### Management API Address and Port
     To configure the address and the port of the Management Api in the CLI use the [**remote**](#remote) command. If no configuration is done, the address and the port will have the default values
