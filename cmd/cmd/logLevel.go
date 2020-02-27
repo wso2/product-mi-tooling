@@ -24,8 +24,8 @@ import (
 
 // List APIs command related usage info
 const logLevelCmdLiteral = "log-level"
-const logLevelCmdShortDesc = "Manage log4j properties"
-const logLevelCmdLongDesc = "Update and view log4j properties in the Micro Integrator"
+const logLevelCmdShortDesc = "Manage log4j2 properties"
+const logLevelCmdLongDesc = "Update and view log4j2 properties in the Micro Integrator"
 
 // apisListCmd represents the list apis command
 var logLevelCmd = &cobra.Command{

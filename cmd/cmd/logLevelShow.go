@@ -37,7 +37,7 @@ var showLogLevelCmdUsage = "Usage:\n" +
 
 var showLogLevelCmdExamples = "Example:\n" +
 	"To get details about a specific logger\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + showLogLevelCmdLiteral + " org.apache.coyote\n\n"
+	"  " + programName + " " + logLevelCmdLiteral + " " + showLogLevelCmdLiteral + " org-apache-coyote\n\n"
 
 // loggerShowCmd represents the show logger command
 var loggerShowCmd = &cobra.Command{
@@ -94,10 +94,10 @@ func executeGetLoggerCmd(loggerName string) {
 }
 
 // Print the details of a Logger
-// Name, Parent and loglevel
+// loggerName, componentName and loglevel
 // @param logger : Logger object
 func printLoggerInfo(logger utils.Logger) {
-	fmt.Println("Name - " + logger.Name)
+	fmt.Println("LoggerName - " + logger.LoggerName)
 	fmt.Println("LogLevel - " + logger.LogLevel)
-	fmt.Println("Parent - " + logger.ParentName)
+	fmt.Println("ComponentName - " + logger.ComponentName)
 }

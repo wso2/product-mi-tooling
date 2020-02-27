@@ -41,9 +41,9 @@ type RemoteInfo struct {
 }
 
 type Logger struct {
-	Name       string `json:"name"`
-	ParentName string `json:"parent"`
-	LogLevel   string `json:"level"`
+	LoggerName    string `json:"loggerName"`
+	ComponentName string `json:"componentName"`
+	LogLevel      string `json:"level"`
 }
 
 type Service struct {

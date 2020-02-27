@@ -36,7 +36,7 @@ var updateLogLevelCmdUsage = "Usage:\n" +
 	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]\n\n"
 
 var updateLogLevelCmdExamples = "Example:\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " org.apache.coyote DEBUG\n\n"
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " org-apache-coyote DEBUG\n\n"
 
 var updateLogLevelCmdHelpString = updateLogLevelCmdLongDesc + updateLogLevelCmdUsage + updateLogLevelCmdExamples
 
