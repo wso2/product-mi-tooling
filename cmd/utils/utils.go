@@ -171,7 +171,7 @@ func UnmarshalData(url string, headers map[string]string, params map[string]stri
 	}
 }
 
-func UpdateMILogger(loggerName, loggingLevel string) string {
+func UpdateMILogger(loggerName, loggingLevel string) (interface{}, error) {
 
 	url := GetRESTAPIBase() + PrefixLogging
 	Logln(LogPrefixInfo+"URL:", url)
@@ -180,18 +180,33 @@ func UpdateMILogger(loggerName, loggingLevel string) string {
 	body["loggerName"] = loggerName
 	body["loggingLevel"] = loggingLevel
 
+	if headers[HeaderAuthorization] == "" {
+		headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+			RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+	}
+
 	resp, err := InvokeUPDATERequest(url, headers, body)
 
 	if err != nil {
-		HandleErrorAndExit("Unable to connect to host", nil)
+		HandleErrorAndExit("Unable to connect to " + url, err)
 	}
 
 	Logln(LogPrefixInfo+"Response:", resp.Status())
-	data := UnmarshalJsonToStringMap(resp.Body())
-	if resp.StatusCode() == http.StatusOK {
-		return data["message"]
+
+	if resp.StatusCode() == http.StatusUnauthorized {
+		// not logged in to MI
+		fmt.Println("User not logged in or session timed out. Please login to the current Micro Integrator instance")
+		fmt.Println("Execute '" + ProjectName + " remote login --help' for more information")
+	}
+	if len(resp.Body()) == 0 {
+		return nil, errors.New(resp.Status())
 	} else {
-		return data["Error"]
+		data := UnmarshalJsonToStringMap(resp.Body())
+		if resp.StatusCode() == http.StatusOK {
+			return data["message"], nil
+		} else {
+			return nil, errors.New(data["Error"])
+		}
 	}
 }
 
