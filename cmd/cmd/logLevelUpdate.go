@@ -79,7 +79,7 @@ func executeUpdateLoggerCmd(loggerName, logLevel string) {
 	resp, err := utils.UpdateMILogger(loggerName, logLevel)
 
 	if err != nil {
-		fmt.Println(utils.LogPrefixError+"Updating log level of the Logger", err)
+		fmt.Println(utils.LogPrefixError + "Updating log level of the Logger", err)
 	} else {
 		fmt.Println(resp)
 	}

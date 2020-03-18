@@ -188,7 +188,7 @@ func UpdateMILogger(loggerName, loggingLevel string) (interface{}, error) {
 	resp, err := InvokeUPDATERequest(url, headers, body)
 
 	if err != nil {
-		HandleErrorAndExit("Unable to connect to " + url, nil)
+		HandleErrorAndExit("Unable to connect to " + url, err)
 	}
 
 	Logln(LogPrefixInfo+"Response:", resp.Status())
