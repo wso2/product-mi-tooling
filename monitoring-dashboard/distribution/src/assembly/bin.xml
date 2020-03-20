@@ -68,7 +68,7 @@
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
-            <directory>carbon-home/resources/security</directory>
+            <directory>target/wso2carbon-core-${carbon.kernel4.version}/repository/resources/security</directory>
             <outputDirectory>resources/security</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
