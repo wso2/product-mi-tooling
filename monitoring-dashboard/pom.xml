@@ -287,5 +287,8 @@
         <maven.exec.plugin.version>1.5.0</maven.exec.plugin.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Carbon kernel4 version that is used in Micro Integrator -->
+        <carbon.kernel4.version>4.5.3</carbon.kernel4.version>
     </properties>
 </project>
