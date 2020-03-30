@@ -29,6 +29,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
@@ -82,7 +83,7 @@ func PromptForUsername() string {
 
 func PromptForPassword() string {
 	fmt.Print("Enter Password: ")
-	bytePassword, _ := terminal.ReadPassword(0)
+	bytePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
 	password := string(bytePassword)
 	fmt.Println()
 	return strings.TrimSpace(password)
