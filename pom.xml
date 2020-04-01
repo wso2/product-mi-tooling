@@ -89,6 +89,7 @@
         <!--<jacoco.maven.plugin.version>0.8.2</jacoco.maven.plugin.version>-->
         <!--<testng.version>6.11</testng.version>-->
         <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version>
+        <docker.maven.plugin.version>1.0.0</docker.maven.plugin.version>
 
     </properties>
 

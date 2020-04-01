@@ -208,7 +208,7 @@
                 <executions>
                     <execution>
                         <id>p2-repo-generation</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>generate-repo</goal>
                         </goals>
@@ -311,7 +311,7 @@
                     </execution>
                     <execution>
                         <id>publishing products</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>publish-product</goal>
                         </goals>
@@ -324,7 +324,7 @@
                     </execution>
                     <execution>
                         <id>materialize-monitoring-dashboard</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>generate-runtime</goal>
                         </goals>
@@ -338,7 +338,7 @@
                     </execution>
                     <execution>
                         <id>feature-installation-monitoring-dashboard</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>install</goal>
                         </goals>
@@ -445,6 +445,31 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>distribution</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>${basedir}/src/assembly/filter.properties</filter>
+                            </filters>
+                            <descriptors>
+                                <descriptor>${basedir}/src/assembly/bin.xml</descriptor>
+                            </descriptors>
+                            <finalName>wso2mi-monitoring-dashboard-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -462,13 +487,31 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <configuration>
                             <tasks>
                                 <replace dir="target/wso2carbon-kernel-${carbon.kernel5.version}/wso2" token="false" value="true">
                                     <include name="**/bundles.info" />
                                 </replace>
                             </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>prepare</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <skip>${docker.skip}</skip>
+                            <target>
+                                <echo message="prepare phase" />
+                                <unzip src="${project.build.directory}/wso2mi-monitoring-dashboard-${project.version}.zip" dest="${project.build.directory}/docker" />
+                                <move file="${project.build.directory}/docker/wso2mi-monitoring-dashboard-${project.version}" tofile="${project.build.directory}/docker/wso2mi-monitoring-dashboard" />
+                                <chmod file="${project.build.directory}/docker/wso2mi-monitoring-dashboard/bin/*.sh" perm="+x" />
+                                <chmod file="${project.build.directory}/docker/wso2mi-monitoring-dashboard/wso2/server/bin/*.sh" perm="+x" />
+                                <chmod file="${project.build.directory}/docker/docker-entrypoint.sh" perm="+x" />
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -501,29 +544,102 @@
 
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.2</version>
+                <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>distribution</id>
-                        <phase>package</phase>
+                        <id>docker-entry-file</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <filters>
-                                <filter>${basedir}/src/assembly/filter.properties</filter>
-                            </filters>
-                            <descriptors>
-                                <descriptor>${basedir}/src/assembly/bin.xml</descriptor>
-                            </descriptors>
-                            <finalName>wso2mi-monitoring-dashboard-${project.version}</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/docker-distribution</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>docker-entrypoint.sh</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/docker</outputDirectory>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-image-alpine</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <skipDocker>${docker.skip}</skipDocker>
+                            <imageName>wso2/micro-integrator-dashboard</imageName>
+                            <imageTags>
+                                <imageTag>${project.version}</imageTag>
+                            </imageTags>
+                            <dockerDirectory>${basedir}/src/docker-distribution/alpine</dockerDirectory>
+                            <buildArgs>
+                                <MICROESB_DASHBOARD_VERSION>${project.version}</MICROESB_DASHBOARD_VERSION>
+                            </buildArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-image-centos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <skipDocker>${docker.skip}</skipDocker>
+                            <imageName>wso2/micro-integrator-dashboard</imageName>
+                            <imageTags>
+                                <imageTag>${project.version}-centos7</imageTag>
+                            </imageTags>
+                            <dockerDirectory>${basedir}/src/docker-distribution/centos</dockerDirectory>
+                            <buildArgs>
+                                <MICROESB_DASHBOARD_VERSION>${project.version}</MICROESB_DASHBOARD_VERSION>
+                            </buildArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-image-ubuntu</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <skipDocker>${docker.skip}</skipDocker>
+                            <imageName>wso2/micro-integrator-dashboard</imageName>
+                            <imageTags>
+                                <imageTag>${project.version}-ubuntu18.04</imageTag>
+                            </imageTags>
+                            <dockerDirectory>${basedir}/src/docker-distribution/ubuntu</dockerDirectory>
+                            <buildArgs>
+                                <MICROESB_DASHBOARD_VERSION>${project.version}</MICROESB_DASHBOARD_VERSION>
+                            </buildArgs>
+                        </configuration>
+                    </execution>
+                    <!-- TODO Enable after configuring Jenkins to push docker -->
+                    <!--<execution>-->
+                    <!--<id>push-image</id>-->
+                    <!--<phase>deploy</phase>-->
+                    <!--<goals>-->
+                    <!--<goal>push</goal>-->
+                    <!--</goals>-->
+                    <!--<configuration>-->
+                    <!--<configuration>-->
+                    <!--<imageName>wso2/micro-integrator:${project.version}</imageName>-->
+                    <!--</configuration>-->
+                    <!--</execution>-->
                 </executions>
             </plugin>
         </plugins>
@@ -538,4 +654,8 @@
             </resource>
         </resources>
     </build>
+
+    <properties>
+        <docker.skip>true</docker.skip>
+    </properties>
 </project>
