@@ -19,6 +19,7 @@ import ApiIcon from '@material-ui/icons/Apps';
 import LocalEntryIcon from '@material-ui/icons/Assignment';
 import SequenceIcon from '@material-ui/icons/CompareArrows';
 import TemplateIcon from '@material-ui/icons/Description';
+import LogFilesIcon from '@material-ui/icons/Description';
 import TaskIcon from '@material-ui/icons/Today';
 import CappIcon from '@material-ui/icons/Dashboard';
 
@@ -102,6 +103,10 @@ export default function SideDrawer() {
                     <ListItem button component={Link} to="/capp">
                         <ListItemIcon><CappIcon style={{color:'#065e9b'}}/></ListItemIcon>
                         <ListItemText primary="Carbon Applications"/>
+                    </ListItem>
+                    <ListItem button component={Link} to="/logs">
+                        <ListItemIcon><LogFilesIcon style={{color:'#065e9b'}}/></ListItemIcon>
+                        <ListItemText primary="Log Files"/>
                     </ListItem>
                 </List>
                 <Divider/>
