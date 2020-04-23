@@ -71,3 +71,10 @@ type IterableStringArray interface {
 	GetCount() int32
 	GetDataIterator() <-chan []string
 }
+
+type KeyStore struct {
+	Location string
+	Type     string
+	Alias    string
+	Password string
+}

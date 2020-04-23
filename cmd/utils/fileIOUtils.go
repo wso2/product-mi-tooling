@@ -54,3 +54,13 @@ func GetFileContent(filePath string) string {
 
 	return string(data)
 }
+
+func GetConfigFilePath(configFileName string) string {
+
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		HandleErrorAndExit("Error getting user home directory: ", err)
+	}
+	configFilePath := filepath.Join(userHomeDir, configFileName)
+	return configFilePath
+}
