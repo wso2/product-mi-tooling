@@ -19,7 +19,7 @@
 package main
 
 import (
-	"github.com/wso2/micro-integrator/cmd/cmd"
+	"github.com/wso2/product-mi-tooling/cmd/cmd"
 	"log"
 	"os"
 	"path/filepath"
