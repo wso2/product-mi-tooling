@@ -20,7 +20,7 @@ package utils
 
 import (
 	"github.com/lithammer/dedent"
-	"github.com/wso2/micro-integrator/cmd/utils/artifactUtils"
+	"github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
 	"net/http"
 	"net/http/httptest"
 	"reflect"

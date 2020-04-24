@@ -20,8 +20,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/wso2/micro-integrator/cmd/utils"
-	"github.com/wso2/micro-integrator/cmd/utils/artifactUtils"
+	"github.com/wso2/product-mi-tooling/cmd/utils"
+	"github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
 )
 
 // Show connector command related usage info
