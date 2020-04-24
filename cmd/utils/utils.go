@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
@@ -170,6 +171,26 @@ func UnmarshalData(url string, headers map[string]string, params map[string]stri
 			return data["Error"], errors.New(resp.Status())
 		}
 	}
+}
+
+func UnmarshalLogFileData(url string, headers map[string]string, params map[string]string, filename string) {
+    if headers == nil {
+        headers = make(map[string]string)
+    }
+
+    if headers[HeaderAuthorization] == "" {
+        headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+            RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+    }
+
+    resp, err := InvokeGETRequest(url, headers, params)
+
+    if err != nil {
+        HandleErrorAndExit("Unable to connect to "+url, nil)
+    }
+
+    ioutil.WriteFile(filename, resp.Body(), 0644)
+    Logln(LogPrefixInfo+"Response:", resp.Status())
 }
 
 func UpdateMILogger(loggerName, loggingLevel string) (interface{}, error) {
