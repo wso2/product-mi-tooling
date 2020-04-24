@@ -66,6 +66,11 @@ export default class ResourceAPI {
         return this.getHTTPClient().get(`/apis?apiName=${name}`);
     }
 
+    getLogFileByName(name) {
+        console.log(name);
+        return this.getHTTPClient().get(`/logs?file=${name}`);
+    }
+
     getMessageProcessorByName(name) {
         return this.getHTTPClient().get(`/message-processors?name=${name}`);
     }
