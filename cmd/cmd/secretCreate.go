@@ -192,4 +192,3 @@ func validateSecrets(secret string, repeatSecret string) bool {
 	}
 	return false
 }
-

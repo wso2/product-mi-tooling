@@ -33,12 +33,14 @@ public class EncryptionTool {
 
         if (keyStoreSource == null) {
             keyStoreSource = IOUtils.getDefaultLocation(Constants.PROP_KEYSTORE_DEFAULT_SOURCE);
+            System.out.println("Using default keystore-info.properties location: " + keyStoreSource);
         }
         Cipher cipher = EncryptionUtils.initializeCipher(IOUtils.getProperties(keyStoreSource));
 
         String secretSource = System.getenv(Constants.PROP_SECRET_SOURCE);
         if (secretSource == null) {
             secretSource = IOUtils.getDefaultLocation(Constants.PROP_SECRET_DEFAULT_SOURCE);
+            System.out.println("Using default secret-info.properties location: " + secretSource);
         }
 
         Properties encryptionInformation = IOUtils.getProperties(secretSource);

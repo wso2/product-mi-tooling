@@ -76,5 +76,4 @@ private Map<String, String> encryptedSecrets = new HashMap<>();
             encryptedSecrets.put(alias, EncryptionUtils.doEncryption(cipher, secrets.getProperty(alias)));
         }
     }
-
 }

@@ -44,14 +44,14 @@ public class OutputManager {
      */
     public void setOutput() {
 
-        if (Constants.PROP_CONSOLE_OUTPUT.equals(outputType)) {
+        if (Constants.PROP_CONSOLE_OUTPUT.equalsIgnoreCase(outputType)) {
             doConsoleOutput();
-        } else if (Constants.PROP_FILE_OUTPUT.equals(outputType)) {
+        } else if (Constants.PROP_FILE_OUTPUT.equalsIgnoreCase(outputType)) {
             doFileOutput();
-        } else if (Constants.PROP_K8_OUTPUT.equals(outputType)) {
+        } else if (Constants.PROP_K8_OUTPUT.equalsIgnoreCase(outputType)) {
             doK8Output();
         } else {
-            throw new EncryptionToolException("secret output type is not supported");
+            throw new EncryptionToolException("Secret output type: "+outputType + " is not supported. Use console, file or k8.");
         }
     }
 
@@ -69,7 +69,7 @@ public class OutputManager {
 
         Properties properties = new Properties();
         properties.putAll(secrets);
-        IOUtils.setProperties(IOUtils.getOutputFilePath("mi-secrets.properties"), properties);
+        IOUtils.setProperties(IOUtils.getOutputFilePath("wso2mi-secrets.properties"), properties);
     }
 
     /**
@@ -82,6 +82,4 @@ public class OutputManager {
 
         IOUtils.writeYamlFile(IOUtils.getOutputFilePath("wso2mikube-secrets.yaml"), k8SecretYaml);
     }
-
-
 }

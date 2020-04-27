@@ -48,20 +48,10 @@ public class IOUtils {
             throw new EncryptionToolException(fileName + " file cannot be found");
         }
 
-        InputStream in = null;
-        try {
-            in = new FileInputStream(propertiesFile);
+        try (InputStream in = new FileInputStream(propertiesFile)) {
             properties.load(in);
         } catch (IOException error) {
             throw new EncryptionToolException("Error loading properties from file");
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ignored) {
-                    throw new EncryptionToolException("Error while closing input stream");
-                }
-            }
         }
         return properties;
     }
@@ -78,7 +68,7 @@ public class IOUtils {
             System.out.println("writing secrets to " + filePath);
             properties.store(outputStream, null);
         } catch (IOException error) {
-            throw new EncryptionToolException("error occurred while output file " + filePath);
+            throw new EncryptionToolException("Error occurred while output file " + filePath);
         }
     }
 
@@ -108,6 +98,8 @@ public class IOUtils {
         Yaml output = new Yaml(options);
         try (FileWriter writer = new FileWriter(filePath)) {
             output.dump(yaml, writer);
+            System.out.println("Kubernetes secret file created in " + filePath + " with default name and namespace");
+            System.out.println("You can change the default values as required before applying.");
         } catch (IOException e) {
             throw new EncryptionToolException("Error while creating " + filePath);
         }

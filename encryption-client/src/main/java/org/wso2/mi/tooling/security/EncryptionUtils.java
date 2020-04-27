@@ -41,7 +41,7 @@ import javax.xml.bind.DatatypeConverter;
 public class EncryptionUtils {
 
     /**
-     * generates a cipher based on keystore information.
+     * Generates a cipher based on keystore information.
      *
      * @param properties keystore information
      * @return cipher object
@@ -68,7 +68,7 @@ public class EncryptionUtils {
     }
 
     /**
-     * generate keystore object from a given keystore location
+     * Generate keystore object from a given keystore location
      *
      * @param location      the location of the keystore
      * @param storePassword keystore password
