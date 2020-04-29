@@ -41,9 +41,13 @@ export default class ResourceAPI {
         httpClient.interceptors.response.use(function (response) {
             return response;
         }, function (error) {
-            if (401 === error.response.status) {
-                AuthManager.discardSession();
-                window.handleSessionInvalid();
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                if (401 === error.response.status) {
+                    AuthManager.discardSession();
+                    window.handleSessionInvalid();
+                }
             }
             return Promise.reject(error);
         });

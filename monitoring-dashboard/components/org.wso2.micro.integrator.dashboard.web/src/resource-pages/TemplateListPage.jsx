@@ -32,6 +32,7 @@ export default class TemplateListPage extends Component {
         this.state = {
             templateData: []
         };
+        this.errorOccurred = false;
     }
 
     /**
@@ -64,9 +65,12 @@ export default class TemplateListPage extends Component {
             this.setState({
                 templateData: templateData
             });
-
+            this.errorOccurred = false;
         }).catch((error) => {
-            //Handle errors here
+            if (error.request) {
+                // The request was made but no response was received
+                this.errorOccurred = true;
+            }
         });
     }
 
@@ -90,6 +94,7 @@ export default class TemplateListPage extends Component {
                 data={this.state.templateData}
                 columns={columns}
                 options={options}
+                connectionError={this.errorOccurred}
             />
         );
     }
