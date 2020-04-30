@@ -102,4 +102,40 @@ export default class ResourceAPI {
     getServerMetaData() {
         return this.getHTTPClient().get(`/server`);
     }
+
+    setMessageProcessorState(processor, toState) {
+        var intendedState = "active";
+        if (!toState) {
+            intendedState = "inactive"
+        }
+        var payload = {
+            name: processor,
+            status: intendedState
+        };
+        return this.getHTTPClient().post(`/message-processors`, payload);
+    }
+
+    setProxyState(proxy, toState) {
+        var intendedState = "active";
+        if (!toState) {
+            intendedState = "inactive"
+        }
+        var payload = {
+            name: proxy,
+            status: intendedState
+        };
+        return this.getHTTPClient().post(`/proxy-services`, payload);
+    }
+
+    setEndpointState(endpoint, toState) {
+        var intendedState = "active";
+        if (!toState) {
+            intendedState = "inactive"
+        }
+        var payload = {
+            name: endpoint,
+            status: intendedState
+        };
+        return this.getHTTPClient().post(`/endpoints`, payload);
+    }
 }

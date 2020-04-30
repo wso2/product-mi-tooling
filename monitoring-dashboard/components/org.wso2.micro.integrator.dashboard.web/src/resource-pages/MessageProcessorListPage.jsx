@@ -20,10 +20,9 @@ import React, {Component} from 'react';
 import ListViewParent from '../common/ListViewParent';
 import ResourceAPI from '../utils/apis/ResourceAPI';
 import Link from '@material-ui/core/Link';
+import Switch from "react-switch";
 
 import MUIDataTable from "mui-datatables";
-import DisableIcon from '@material-ui/icons/Block';
-import ActiveIcon from '@material-ui/icons/CheckBox';
 
 export default class MessageProcessorListPage extends Component {
 
@@ -41,6 +40,19 @@ export default class MessageProcessorListPage extends Component {
      */
     componentDidMount() {
         this.retrieveMessageProcessors();
+    }
+
+    handleMessageProcessorStateChange(processor, currentState) {
+        new ResourceAPI().setMessageProcessorState(processor, !currentState).then((response) => {
+            this.retrieveMessageProcessors();
+        }).catch((error) => {
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
+        });
     }
 
     retrieveMessageProcessors() {
@@ -86,15 +98,16 @@ export default class MessageProcessorListPage extends Component {
                 }
             }
         }, "Type", {
-            name: "Status",
+            name: "State",
             options: {
                 customBodyRender: (value, tableMeta, updateValue) => {
-
+                    var isActive = false;
                   if ("active" === tableMeta.rowData[2]) {
-                      return(<span><ActiveIcon style={{color:"green"}}/> Active </span>);
+                      isActive = true;
                   } else {
-                      return(<span><DisableIcon style={{color:"red"}}/> Inactive </span>);
+                      isActive = false
                   }
+                  return(<Switch height={25} width={50} onChange={e=>this.handleMessageProcessorStateChange(tableMeta.rowData[0], isActive)} checked={isActive}/>);
                 }
             }
         }];

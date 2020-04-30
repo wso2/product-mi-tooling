@@ -26,9 +26,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
 import SourceViewComponent from '../common/SourceViewComponent';
-import Typography from '@material-ui/core/Typography';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import { Link } from "react-router-dom";
+import Switch from "react-switch";
 
 import Box from '@material-ui/core/Box';
 
@@ -65,6 +64,7 @@ export default class ProxyDetailsPage extends Component {
             tableData.push(this.createData("Service Name", response.data.name));
             tableData.push(this.createData("Statistics", response.data.stats));
             tableData.push(this.createData("Tracing", response.data.tracing));
+            tableData.push(this.createData("Service Status", response.data.isRunning));
 
             const endpoints = response.data.eprs || []
 
@@ -85,6 +85,19 @@ export default class ProxyDetailsPage extends Component {
         });
     }
 
+    handleProxyStateChange(proxy, currentState) {
+        new ResourceAPI().setProxyState(proxy, !currentState).then((response) => {
+            this.retrieveProxyInfo(proxy);
+        }).catch((error) => {
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
+        });
+    }
+
     renderProxyDetails() {
         return (
             <Box>
@@ -94,10 +107,24 @@ export default class ProxyDetailsPage extends Component {
                         <TableBody>
                             {
                                 this.state.tableData.map(row => (
-                                    <TableRow>
-                                        <TableCell>{row.name}</TableCell>
-                                        <TableCell>{row.value}</TableCell>
-                                    </TableRow>
+
+                                    row.name == "Service Status" ?
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>
+                                                    <Switch height={18} width={36}
+                                                                   onChange={e => this.handleProxyStateChange(this.state.response.name, row.value)}
+                                                                   checked={row.value}/>
+                                                </TableCell>
+                                            </TableRow>
+                                        ) :
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>{row.value}</TableCell>
+                                            </TableRow>
+                                        )
                                 ))
                             }
                         </TableBody>
