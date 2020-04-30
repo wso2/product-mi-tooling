@@ -40,7 +40,8 @@ export default class ProxyDetailsPage extends Component {
             config: " ",
             tableData: [],
             endpoints: [],
-            response: {}
+            response: {},
+            errorOccurred: false
         };
     }
 
@@ -73,9 +74,14 @@ export default class ProxyDetailsPage extends Component {
                     endpoints: endpoints,
                     response: response.data,
                 });
-
+            this.setState({errorOccurred: false});
         }).catch((error) => {
-            //Handle errors here
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
         });
     }
 
@@ -128,7 +134,8 @@ export default class ProxyDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderProxyDetails()} />
+            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderProxyDetails()}
+                connectionError={this.state.errorOccurred}/>
         );
     }
 }

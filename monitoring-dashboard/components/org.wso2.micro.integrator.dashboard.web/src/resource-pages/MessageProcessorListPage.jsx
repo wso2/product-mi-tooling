@@ -32,6 +32,7 @@ export default class MessageProcessorListPage extends Component {
         this.messageProcessors = null;
         this.state = {
             data: [],
+            errorOccurred: false
         };
     }
 
@@ -57,9 +58,14 @@ export default class MessageProcessorListPage extends Component {
 
             });
             this.setState({data: data});
-
+            this.setState({errorOccurred: false});
         }).catch((error) => {
-            //Handle errors here
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
         });
     }
 
@@ -112,6 +118,7 @@ export default class MessageProcessorListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
+                connectionError={this.state.errorOccurred}
             />
         );
     }

@@ -23,6 +23,13 @@ import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import AuthManager from '../auth/utils/AuthManager';
 
 const styles = {
     contentDiv: {
@@ -38,6 +45,32 @@ const styles = {
 
 export default class ResourceExplorerParent extends Component {
 
+    constructor(props, context) {
+        super(props, context)
+        this.state = {
+            open: false
+        };
+        this.handleClose = this.handleClose.bind(this);
+    }
+
+    componentDidUpdate(prevProps) {
+        // check previous state to avoid in-finite loop
+        if (!this.state.open) {
+            if (this.props.connectionError) {
+                this.handleClickOpen();
+            }
+        }
+    }
+
+    handleClickOpen() {
+        this.setState({ open: true });
+    };
+
+    handleClose() {
+        AuthManager.discardSession();
+        window.handleSessionInvalid();
+    };
+
     renderSourceViewContent() {
         return (
             <Box>
@@ -50,6 +83,20 @@ export default class ResourceExplorerParent extends Component {
                 <div id="content" style={styles.contentDiv}>
                     {this.props.content}
                 </div>
+                <Dialog open={this.state.open} onClose={this.handleClose}
+                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title">{"Connection failed"}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Connection with the micro-integrator failed
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleClose} color="primary" autoFocus>
+                            OK
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
         );
     }
@@ -65,7 +112,8 @@ ResourceExplorerParent.propTypes = {
     language: PropTypes.string,
     title: PropTypes.string,
     content: PropTypes.element,
-    breadcrumb: PropTypes.element
+    breadcrumb: PropTypes.element,
+    connectionError: PropTypes.bool
 };
 
 ResourceExplorerParent.defaultProps = {
@@ -74,6 +122,6 @@ ResourceExplorerParent.defaultProps = {
     language: 'xml',
     title: 'Explorer',
     content: '<span/>',
-    breadcrumb: ' '
-
+    breadcrumb: ' ',
+    connectionError: false
 };

@@ -27,7 +27,13 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
-
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import AuthManager from '../auth/utils/AuthManager';
 
 /**
  * Style constants.
@@ -58,6 +64,31 @@ const styles = {
 
 export default class ListViewParent extends Component {
 
+    constructor(props, context) {
+        super(props, context)
+        this.state = {
+            open: false
+        };
+        this.handleClose = this.handleClose.bind(this);
+    }
+
+    componentDidUpdate(prevProps) {
+        // check previous state to avoid in-finite loop
+        if (!this.state.open) {
+            if (this.props.connectionError) {
+                this.handleClickOpen();
+            }
+        }
+    }
+
+    handleClickOpen() {
+        this.setState({ open: true });
+    };
+
+    handleClose() {
+        AuthManager.discardSession();
+        window.handleSessionInvalid();
+    };
     /**
      * Render the general view of the synapse artifacts listing pages
      */
@@ -70,6 +101,20 @@ export default class ListViewParent extends Component {
                     <Box>
                         <Paper style={styles.contentPaper} id={"data-box"} square={true}>
                             {this.props.data}
+                            <Dialog open={this.state.open} onClose={this.handleClose}
+                                aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">{"Connection failed"}</DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        Connection with the micro-integrator failed
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={this.handleClose} color="primary" autoFocus>
+                                        OK
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
                         </Paper>
                     </Box>
                     <Box id={"footer-box"}>
@@ -94,11 +139,12 @@ ListViewParent.propTypes = {
     title: PropTypes.string,
     theme: PropTypes.shape({}),
     data: PropTypes.element,
-
+    connectionError: PropTypes.bool
 };
 
 ListViewParent.defaultProps = {
     title: 'MICRO INTEGRATOR',
     data: <span/>,
     theme: defaultTheme,
+    connectionError: false
 };

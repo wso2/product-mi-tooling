@@ -29,8 +29,6 @@ import Typography from '@material-ui/core/Typography';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import { Link } from "react-router-dom";
 
-import Box from '@material-ui/core/Box';
-
 export default class LocalEntryDetailsPage extends Component {
 
     constructor(props) {
@@ -39,6 +37,7 @@ export default class LocalEntryDetailsPage extends Component {
             metaData: [],
             value: "",
             response: {},
+            errorOccurred: false
         };
     }
 
@@ -67,9 +66,14 @@ export default class LocalEntryDetailsPage extends Component {
                     value: response.data.value,
                     response: response.data,
                 });
-
+            this.setState({errorOccurred: false});
         }).catch((error) => {
-            //Handle errors here
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
         });
     }
 
@@ -114,7 +118,8 @@ export default class LocalEntryDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderLocalEntryDetails()}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderLocalEntryDetails()}
+                connectionError={this.state.errorOccurred}/>
         );
     }
 }
