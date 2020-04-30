@@ -95,7 +95,6 @@ export default class EndpointListPage extends Component {
                 data={this.state.data}
                 columns={columns}
                 options={options}
-                connectionError={this.state.errorOccurred}
             />
         );
     }
@@ -104,6 +103,7 @@ export default class EndpointListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
+                connectionError={this.state.errorOccurred}
             />
         );
     }

@@ -75,14 +75,7 @@ export default class ListViewParent extends Component {
     componentDidUpdate(prevProps) {
         // check previous state to avoid in-finite loop
         if (!this.state.open) {
-            var IsError = false;
-            if (this.props.data.props.connectionError === undefined) {
-                IsError = false;
-            }
-            else {
-                IsError = this.props.data.props.connectionError;
-            }
-            if (IsError) {
+            if (this.props.connectionError) {
                 this.handleClickOpen();
             }
         }
@@ -146,11 +139,12 @@ ListViewParent.propTypes = {
     title: PropTypes.string,
     theme: PropTypes.shape({}),
     data: PropTypes.element,
-
+    connectionError: PropTypes.bool
 };
 
 ListViewParent.defaultProps = {
     title: 'MICRO INTEGRATOR',
     data: <span/>,
     theme: defaultTheme,
+    connectionError: false
 };

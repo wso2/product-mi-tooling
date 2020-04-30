@@ -123,7 +123,6 @@ export default class ProxyServiceListPage extends Component {
                 data={this.state.data}
                 columns={columns}
                 options={options}
-                connectionError={this.state.errorOccurred}
             />
         );
     }
@@ -132,6 +131,7 @@ export default class ProxyServiceListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
+                connectionError={this.state.errorOccurred}
             />
         );
     }

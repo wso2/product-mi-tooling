@@ -37,6 +37,7 @@ export default class ApiDetailsPage extends Component {
         this.state = {
             metaData: [],
             response: {},
+            errorOccurred: false
         };
     }
 
@@ -66,9 +67,14 @@ export default class ApiDetailsPage extends Component {
                     metaData: metaData,
                     response: response.data,
                 });
-
+            this.setState({errorOccurred: false});
         }).catch((error) => {
-            //Handle errors here
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
         });
     }
 
@@ -107,7 +113,8 @@ export default class ApiDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderApiDetails()}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderApiDetails()}
+                connectionError={this.state.errorOccurred}/>
         );
     }
 }

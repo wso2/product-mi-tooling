@@ -108,7 +108,6 @@ export default class LogFileListPage extends Component {
                 data={this.state.data}
                 columns={columns}
                 options={options}
-                connectionError={this.state.errorOccurred}
             />
         );
     }
@@ -117,6 +116,7 @@ export default class LogFileListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
+                connectionError={this.state.errorOccurred}
             />
         );
     }

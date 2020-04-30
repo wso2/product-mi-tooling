@@ -39,7 +39,8 @@ export default class MessageStoreDetailsPage extends Component {
         this.state = {
             metaData: [],
             parameters: {},
-            response: {}
+            response: {},
+            errorOccurred: false
         };
     }
 
@@ -69,9 +70,14 @@ export default class MessageStoreDetailsPage extends Component {
                     parameters: parameters,
                     response: response.data
                 });
-
+            this.setState({errorOccurred: false});
         }).catch((error) => {
-            //Handle errors here
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
         });
     }
 
@@ -127,7 +133,8 @@ export default class MessageStoreDetailsPage extends Component {
     render() {
         console.log(this.state.config);
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderMessageStoreDetails()}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderMessageStoreDetails()}
+                connectionError={this.state.errorOccurred}/>
         );
     }
 }

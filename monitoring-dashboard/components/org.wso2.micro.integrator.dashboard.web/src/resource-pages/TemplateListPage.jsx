@@ -94,7 +94,6 @@ export default class TemplateListPage extends Component {
                 data={this.state.templateData}
                 columns={columns}
                 options={options}
-                connectionError={this.errorOccurred}
             />
         );
     }
@@ -103,6 +102,7 @@ export default class TemplateListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
+                connectionError={this.errorOccurred}
             />
         );
     }

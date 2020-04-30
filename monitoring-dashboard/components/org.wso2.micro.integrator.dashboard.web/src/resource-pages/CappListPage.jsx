@@ -86,7 +86,6 @@ export default class CappListPage extends Component {
                 data={this.state.data}
                 columns={columns}
                 options={options}
-                connectionError={this.state.errorOccurred}
             />
         );
     }
@@ -95,6 +94,7 @@ export default class CappListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
+                connectionError={this.state.errorOccurred}
             />
         );
     }

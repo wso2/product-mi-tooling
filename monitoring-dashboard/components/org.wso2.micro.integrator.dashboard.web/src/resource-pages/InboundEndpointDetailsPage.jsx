@@ -29,7 +29,6 @@ import TableHeaderBox from '../common/TableHeaderBox';
 import Typography from '@material-ui/core/Typography';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import { Link } from "react-router-dom";
-
 import Box from '@material-ui/core/Box';
 
 export default class InboundEndpointDetailsPage extends Component {
@@ -39,7 +38,8 @@ export default class InboundEndpointDetailsPage extends Component {
         this.state = {
             metaData: [],
             parameters: [],
-            response: {}
+            response: {},
+            errorOccurred: false
         };
     }
 
@@ -73,9 +73,14 @@ export default class InboundEndpointDetailsPage extends Component {
                     parameters: response.data.parameters,
                     response: response.data,
                 });
-
+            this.setState({errorOccurred: false});
         }).catch((error) => {
-            //Handle errors here
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
         });
     }
 
@@ -130,7 +135,8 @@ export default class InboundEndpointDetailsPage extends Component {
     render() {
         console.log(this.state.config);
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderInboundEndpointDetails()}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderInboundEndpointDetails()}
+                connectionError={this.state.errorOccurred}/>
         );
     }
 }
