@@ -27,8 +27,8 @@ import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
 import SourceViewComponent from '../common/SourceViewComponent';
 import Box from '@material-ui/core/Box';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import {Link} from "react-router-dom";
+import Switch from "react-switch";
 
 export default class MessageProcessorDetailPage extends Component {
 
@@ -62,6 +62,7 @@ export default class MessageProcessorDetailPage extends Component {
             metaData.push(this.createData("Processor Name", response.data.name));
             metaData.push(this.createData("Message Store", response.data.messageStore));
             metaData.push(this.createData("Type", response.data.type));
+            metaData.push(this.createData("State", this.getMessageProcessorState(response.data.status)));
             const parameters = response.data.parameters || {};
             this.setState(
                 {
@@ -80,6 +81,26 @@ export default class MessageProcessorDetailPage extends Component {
         });
     }
 
+    handleMessageProcessorStateChange(processor, currentState) {
+        new ResourceAPI().setMessageProcessorState(processor, !currentState).then((response) => {
+            this.retrieveMessageProcessorInfo(processor);
+        }).catch((error) => {
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
+        });
+    }
+
+    getMessageProcessorState(state) {
+        if (state == "active") {
+            return true
+        }
+        return false
+    }
+
     renderMessageProcessorDetails() {
         return (
             <Box>
@@ -89,10 +110,25 @@ export default class MessageProcessorDetailPage extends Component {
                         <TableBody>
                             {
                                 this.state.metaData.map(row => (
-                                    <TableRow>
-                                        <TableCell>{row.name}</TableCell>
-                                        <TableCell>{row.value}</TableCell>
-                                    </TableRow>
+
+                                    row.name == "State" ?
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>
+                                                    <Switch height={18} width={36}
+                                                        onChange={e => this.handleMessageProcessorStateChange(this.state.response.name, row.value)}
+                                                        checked={row.value}/>
+
+                                                </TableCell>
+                                            </TableRow>
+                                        ) :
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>{row.value}</TableCell>
+                                            </TableRow>
+                                        )
                                 ))
                             }
                         </TableBody>

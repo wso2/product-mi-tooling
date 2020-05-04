@@ -22,6 +22,7 @@ import ResourceAPI from '../utils/apis/ResourceAPI';
 import Link from '@material-ui/core/Link';
 
 import MUIDataTable from "mui-datatables";
+import Switch from "react-switch";
 
 export default class EndpointListPage extends Component {
 
@@ -51,11 +52,24 @@ export default class EndpointListPage extends Component {
                 const rowData = [];
                 rowData.push(element.name);
                 rowData.push(element.type);
+                rowData.push(element.isActive);
                 data.push(rowData);
-
             });
             this.setState({data: data});
             this.setState({errorOccurred: false});
+        }).catch((error) => {
+            if (error.request) {
+                // The request was made but no response was received
+                this.setState({errorOccurred: true}, function () {
+                    // callback function to ensure state is set immediately
+                });
+            }
+        });
+    }
+
+    handleEndpointStateChange(endpoint, currentState) {
+        new ResourceAPI().setEndpointState(endpoint, !currentState).then((response) => {
+            this.retrieveEndpoints();
         }).catch((error) => {
             if (error.request) {
                 // The request was made but no response was received
@@ -82,7 +96,15 @@ export default class EndpointListPage extends Component {
                     );
                 }
             }
-        }, "Type"];
+        }, "Type",
+            {
+                name: "State",
+                options: {
+                    customBodyRender: (value, tableMeta, updateValue) => {
+                        return(<Switch height={25} width={50} onChange={e=>this.handleEndpointStateChange(tableMeta.rowData[0], tableMeta.rowData[2])} checked={tableMeta.rowData[2]}/>);
+                    }
+                }
+            }];
         const options = {
             selectableRows: 'none',
             print: false,
