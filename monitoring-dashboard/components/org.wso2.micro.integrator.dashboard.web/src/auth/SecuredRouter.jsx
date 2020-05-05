@@ -46,6 +46,8 @@ import LocalEntryDetailsPage from "../resource-pages/LocalEntryDetailsPage";
 import InboundEndpointDetailPage from "../resource-pages/InboundEndpointDetailsPage";
 import TaskListPage from "../resource-pages/TaskListPage";
 import CAppListPage from "../resource-pages/CappListPage";
+import Users from "../resource-pages/Users";
+import UserDetailsPage from "../resource-pages/UserDetailsPage";
 
 export default class SecuredRouter extends Component {
 
@@ -105,6 +107,8 @@ export default class SecuredRouter extends Component {
                 <Route path='/task/explore' component={TaskDetailsPage}/>
                 <Route exact path='/home' component={HomePage}/>
                 <Route exact path='/capp' component={CAppListPage}/>
+                <Route exact path='/users' component={Users}/>
+                <Route path='/users/explore' component={UserDetailsPage}/>
             </Switch>
         );
     }

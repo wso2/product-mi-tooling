@@ -18,10 +18,11 @@ import ConnectorIcon from '@material-ui/icons/CastConnected';
 import ApiIcon from '@material-ui/icons/Apps';
 import LocalEntryIcon from '@material-ui/icons/Assignment';
 import SequenceIcon from '@material-ui/icons/CompareArrows';
-import TemplateIcon from '@material-ui/icons/Description';
+import TemplateIcon from '@material-ui/icons/WrapText';
 import LogFilesIcon from '@material-ui/icons/Description';
 import TaskIcon from '@material-ui/icons/Today';
 import CappIcon from '@material-ui/icons/Dashboard';
+import UsersIcon from '@material-ui/icons/SupervisorAccount';
 
 const drawerWidth = 240;
 
@@ -107,6 +108,10 @@ export default function SideDrawer() {
                     <ListItem button component={Link} to="/logs">
                         <ListItemIcon><LogFilesIcon style={{color:'#065e9b'}}/></ListItemIcon>
                         <ListItemText primary="Log Files"/>
+                    </ListItem>
+                    <ListItem button component={Link} to="/users">
+                        <ListItemIcon><UsersIcon style={{color:'#065e9b'}}/></ListItemIcon>
+                        <ListItemText primary="Users"/>
                     </ListItem>
                 </List>
                 <Divider/>
