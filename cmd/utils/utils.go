@@ -38,7 +38,16 @@ import (
 )
 
 // Invoke http-post request using go-resty
-func InvokePOSTRequest(url string, headers map[string]string, body string) (*resty.Response, error) {
+func InvokePOSTRequest(url string, headers map[string]string, body map[string]string) (*resty.Response, error) {
+
+    if headers == nil {
+        headers =  make(map[string]string)
+    }
+
+    if headers[HeaderAuthorization] == "" {
+        headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+        RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+    }
 
 	AllowInsecureSSLConnection()
 	resp, err := resty.R().SetHeaders(headers).SetBody(body).Post(url)
@@ -68,6 +77,16 @@ func InvokeUPDATERequest(url string, headers map[string]string, body map[string]
 // Invoke http-delete request using go-resty
 func InvokeDELETERequest(url string, headers map[string]string) (*resty.Response, error) {
 
+    if headers == nil {
+	    headers =  make(map[string]string)
+    }
+
+    if headers[HeaderAuthorization] == "" {
+	    headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+	    RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+    }
+
+	AllowInsecureSSLConnection()
 	resp, err := resty.R().SetHeaders(headers).Delete(url)
 
 	return resp, err
@@ -257,6 +276,15 @@ func GetCmdUsage(program, cmd, subcmd, arg string) string {
 		"  " + program + " " + cmd + " " + subcmd + "\n" +
 		"  " + program + " " + cmd + " " + subcmd + " " + arg + "\n\n"
 	return showCmdUsage
+}
+
+func GetCmdUsageMultipleArgs(program, cmd, subcmd string, args []string) string {
+    var showCmdUsage = "Usage:\n" +
+	    "  " + program + " " + cmd + " " + subcmd + "\n"
+    for _, arg := range args {
+	    showCmdUsage += "  " + program + " " + cmd + " " + subcmd + " " + arg + "\n"
+    }
+    return showCmdUsage
 }
 
 func GetCmdUsageForNonArguments(program, cmd, subcmd string) string {
