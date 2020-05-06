@@ -71,7 +71,6 @@ export default class ResourceAPI {
     }
 
     getLogFileByName(name) {
-        console.log(name);
         return this.getHTTPClient().get(`/logs?file=${name}`);
     }
 
@@ -137,5 +136,23 @@ export default class ResourceAPI {
             status: intendedState
         };
         return this.getHTTPClient().post(`/endpoints`, payload);
+    }
+
+    addNewUser(userId, password, isAdmin) {
+
+        var payload = {
+            userId: userId,
+            password: password,
+            isAdmin: isAdmin
+        };
+        return this.getHTTPClient().post(`/users`, payload);
+    }
+
+    deleteUser(userId) {
+        return this.getHTTPClient().delete(`/users/${userId}`)
+    }
+
+    getUserById(userId) {
+       return this.getHTTPClient().get(`/users/${userId}`);
     }
 }
