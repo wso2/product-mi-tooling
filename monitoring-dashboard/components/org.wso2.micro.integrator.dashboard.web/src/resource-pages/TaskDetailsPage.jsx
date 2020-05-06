@@ -35,7 +35,7 @@ export default class TaskDetailsPage extends Component {
         this.state = {
             metaData: [],
             response: {},
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -65,14 +65,8 @@ export default class TaskDetailsPage extends Component {
                     metaData: metaData,
                     response: response.data,
                 });
-            this.setState({errorOccurred: false});
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.setState({errorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error});
         });
     }
 
@@ -162,8 +156,9 @@ export default class TaskDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderTaskDetails()}
-                connectionError={this.state.errorOccurred}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()}
+                                    content={this.renderTaskDetails()}
+                                    error={this.state.error}/>
         );
     }
 }

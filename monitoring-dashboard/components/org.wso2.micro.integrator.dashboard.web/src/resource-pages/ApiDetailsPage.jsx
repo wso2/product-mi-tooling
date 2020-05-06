@@ -27,7 +27,6 @@ import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
 import SourceViewComponent from '../common/SourceViewComponent';
 import Box from '@material-ui/core/Box';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import { Link } from "react-router-dom";
 
 export default class ApiDetailsPage extends Component {
@@ -37,7 +36,7 @@ export default class ApiDetailsPage extends Component {
         this.state = {
             metaData: [],
             response: {},
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -67,14 +66,8 @@ export default class ApiDetailsPage extends Component {
                     metaData: metaData,
                     response: response.data,
                 });
-            this.setState({errorOccurred: false});
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.setState({errorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error});
         });
     }
 
@@ -113,8 +106,10 @@ export default class ApiDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderApiDetails()}
-                connectionError={this.state.errorOccurred}/>
+            <ResourceExplorerParent
+                title={this.renderBreadCrumbs()}
+                content={this.renderApiDetails()}
+                error={this.state.error}/>
         );
     }
 }

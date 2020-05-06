@@ -39,7 +39,7 @@ export default class InboundEndpointDetailsPage extends Component {
             metaData: [],
             parameters: [],
             response: {},
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -73,14 +73,8 @@ export default class InboundEndpointDetailsPage extends Component {
                     parameters: response.data.parameters,
                     response: response.data,
                 });
-            this.setState({errorOccurred: false});
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.setState({errorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error});
         });
     }
 
@@ -135,8 +129,10 @@ export default class InboundEndpointDetailsPage extends Component {
     render() {
         console.log(this.state.config);
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderInboundEndpointDetails()}
-                connectionError={this.state.errorOccurred}/>
+            <ResourceExplorerParent
+                title={this.renderBreadCrumbs()}
+                content={this.renderInboundEndpointDetails()}
+                error={this.state.error}/>
         );
     }
 }

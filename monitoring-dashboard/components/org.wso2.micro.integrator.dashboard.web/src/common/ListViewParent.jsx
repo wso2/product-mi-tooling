@@ -26,7 +26,6 @@ import {MuiThemeProvider} from 'material-ui/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -65,30 +64,43 @@ const styles = {
 export default class ListViewParent extends Component {
 
     constructor(props, context) {
-        super(props, context)
+        super(props, context);
         this.state = {
-            open: false
+            connectionErrorDialogOpen: false,
+            responseErrorDialogOpen: false
         };
-        this.handleClose = this.handleClose.bind(this);
+        this.handleConnectionErrorDialogClose = this.handleConnectionErrorDialogClose.bind(this);
+        this.handlerResponseErrorDialogClose = this.handlerResponseErrorDialogClose.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
-        // check previous state to avoid in-finite loop
-        if (!this.state.open) {
-            if (this.props.connectionError) {
-                this.handleClickOpen();
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.error !== prevProps.error) {
+            if (this.props.error != null) {
+                this.handleError(this.props.error);
             }
         }
     }
 
-    handleClickOpen() {
-        this.setState({ open: true });
-    };
+    handleError(error) {
+        if (error.response) {
+            // response received with error (non 2XX SC)
+            this.setState({responseErrorDialogOpen: true});
 
-    handleClose() {
+        } else if (error.request) {
+            // response was not received, hence connection issue
+            this.setState({connectionErrorDialogOpen: true});
+        }
+    }
+
+    handleConnectionErrorDialogClose() {
         AuthManager.discardSession();
         window.handleSessionInvalid();
-    };
+    }
+
+    handlerResponseErrorDialogClose() {
+        this.setState({responseErrorDialogOpen: false});
+    }
+
     /**
      * Render the general view of the synapse artifacts listing pages
      */
@@ -101,16 +113,30 @@ export default class ListViewParent extends Component {
                     <Box>
                         <Paper style={styles.contentPaper} id={"data-box"} square={true}>
                             {this.props.data}
-                            <Dialog open={this.state.open} onClose={this.handleClose}
+                            <Dialog open={this.state.connectionErrorDialogOpen} onClose={this.handleConnectionErrorDialogClose}
                                 aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
                                 <DialogTitle id="alert-dialog-title">{"Connection failed"}</DialogTitle>
-                                <DialogContent>
+                                <DialogContent dividers>
                                     <DialogContentText id="alert-dialog-description">
-                                        Connection with the micro-integrator failed
+                                        Connection with the Micro-integrator failed
                                     </DialogContentText>
                                 </DialogContent>
                                 <DialogActions>
-                                    <Button onClick={this.handleClose} color="primary" autoFocus>
+                                    <Button onClick={this.handleConnectionErrorDialogClose} color="primary" autoFocus>
+                                        OK
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                            <Dialog open={this.state.responseErrorDialogOpen} onClose={this.handlerResponseErrorDialogClose}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">{"Error in Response"}</DialogTitle>
+                                <DialogContent dividers>
+                                    <DialogContentText id="alert-dialog-description">
+                                        Error occurred while processing request. Please check Micro-integrator server logs
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={this.handlerResponseErrorDialogClose} color="primary" autoFocus>
                                         OK
                                     </Button>
                                 </DialogActions>
@@ -139,12 +165,14 @@ ListViewParent.propTypes = {
     title: PropTypes.string,
     theme: PropTypes.shape({}),
     data: PropTypes.element,
-    connectionError: PropTypes.bool
+    connectionError: PropTypes.bool,
+    error: PropTypes.object
 };
 
 ListViewParent.defaultProps = {
     title: 'MICRO INTEGRATOR',
     data: <span/>,
     theme: defaultTheme,
-    connectionError: false
+    connectionError: false,
+    error: null
 };

@@ -25,8 +25,6 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
-import Typography from '@material-ui/core/Typography';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import { Link } from "react-router-dom";
 
 export default class LocalEntryDetailsPage extends Component {
@@ -37,7 +35,7 @@ export default class LocalEntryDetailsPage extends Component {
             metaData: [],
             value: "",
             response: {},
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -66,14 +64,8 @@ export default class LocalEntryDetailsPage extends Component {
                     value: response.data.value,
                     response: response.data,
                 });
-            this.setState({errorOccurred: false});
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.setState({errorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error});
         });
     }
 
@@ -118,8 +110,9 @@ export default class LocalEntryDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderLocalEntryDetails()}
-                connectionError={this.state.errorOccurred}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()}
+                                    content={this.renderLocalEntryDetails()}
+                                    error={this.state.error}/>
         );
     }
 }

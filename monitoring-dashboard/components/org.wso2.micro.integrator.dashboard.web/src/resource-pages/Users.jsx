@@ -57,7 +57,8 @@ export default class Users extends Component {
             dialogMessage: '',
             dialogOpen: false,
             deleteConfirmDialogOpen: false,
-            deleteUserId: ''
+            deleteUserId: '',
+            error: null
         };
         this.handleUserInput = this.handleUserInput.bind(this);
         this.handleFormSubmission = this.handleFormSubmission.bind(this);
@@ -71,17 +72,7 @@ export default class Users extends Component {
     }
 
     handleErrorResponses(error) {
-        if (!error.response) {
-            // The request was made but no response was received
-            this.setState({networkErrorOccurred: true}, function () {
-                // callback function to ensure state is set immediately
-            });
-        } else if (error.response.status) {
-            this.setState({
-                dialogMessage: 'Error Occurred while performing operation. Please check the Micro Integrator server logs.',
-                dialogOpen: true
-            });
-        }
+      this.setState({error:error});
     }
 
     retrieveAllUsers() {
@@ -297,7 +288,7 @@ export default class Users extends Component {
                 </Form>
                 <Dialog open={this.state.dialogOpen} onClose={this.handleDialogClose}
                         aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                    <DialogTitle id="alert-dialog-title">{"Message"}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">{"Action Complete"}</DialogTitle>
                     <DialogContent dividers>
                         <DialogContentText id="alert-dialog-description">
                             {this.state.dialogMessage}
@@ -318,7 +309,7 @@ export default class Users extends Component {
             <ResourceExplorerParent
             title='User Management'
             content={this.renderUsersView()}
-            connectionError={this.state.networkErrorOccurred}
+            error={this.state.error}
         />);
     }
 }

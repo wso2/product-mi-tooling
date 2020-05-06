@@ -23,9 +23,15 @@ import AuthManager from './utils/AuthManager';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap-css-only/css/bootstrap.min.css";
 import "mdbreact/dist/css/mdb.css";
-import {Snackbar, TextField} from 'material-ui';
+import {TextField} from 'material-ui';
 import {MuiThemeProvider} from 'material-ui/styles';
 import Header from '../common/Header';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
 
 import {
     MDBContainer,
@@ -33,7 +39,6 @@ import {
     MDBCol,
     MDBCard,
     MDBCardBody,
-    MDBIcon,
     MDBCardHeader,
     MDBBtn
 } from "mdbreact";
@@ -68,8 +73,11 @@ export default class Login2 extends Component {
             port: '9164',
             authenticated: false,
             rememberMe: false,
+            loginError: false,
+            loginErrorMessage: ''
         };
         this.authenticate = this.authenticate.bind(this);
+        this.handleLoginErrorDialogClose = this.handleLoginErrorDialogClose.bind(this);
     }
 
 
@@ -95,17 +103,25 @@ export default class Login2 extends Component {
         AuthManager.authenticate(host, port, username, password, rememberMe)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === 401
-                    ? 'Invalid username/password!'
-                    : 'Unknown error occurred!'
+                var errorMessage;
+                if (error.response && error.response.status === 401)  {
+                    errorMessage = 'Incorrect username or password!';
+                } else {
+                    errorMessage = 'Error occurred in communication.';
+                    window.open(`https://${host}:${port}/management`,  'sharer', 'toolbar=0,status=0,width=250,height=100');
+                }
                 this.setState({
                     username: '',
                     password: '',
-                    error: errorMessage,
-                    showError: true,
+                    loginErrorMessage: errorMessage,
+                    loginError: true,
                 });
             });
 
+    }
+
+    handleLoginErrorDialogClose() {
+        this.setState({loginError:false, loginErrorMessage:''});
     }
 
     /**
@@ -211,13 +227,21 @@ export default class Login2 extends Component {
                         </MDBCard>
                     </MDBCol>
                 </MDBRow>
-                <Snackbar
-                    message={this.state.error}
-                    open={this.state.showError}
-                    autoHideDuration="4000"
-                    onRequestClose={() => this.setState({error: '', showError: false})}
-                />
             </MDBContainer>
+                <Dialog open={this.state.loginError} onClose={this.handleLoginErrorDialogClose}
+                        aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title">{"Login Failed"}</DialogTitle>
+                    <DialogContent dividers>
+                        <DialogContentText id="alert-dialog-description">
+                            {this.state.loginErrorMessage}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleLoginErrorDialogClose} color="primary" autoFocus>
+                            OK
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </MuiThemeProvider>
         );
     }

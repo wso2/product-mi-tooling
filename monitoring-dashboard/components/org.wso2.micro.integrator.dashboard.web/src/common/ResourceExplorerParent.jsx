@@ -46,30 +46,8 @@ const styles = {
 export default class ResourceExplorerParent extends Component {
 
     constructor(props, context) {
-        super(props, context)
-        this.state = {
-            open: false
-        };
-        this.handleClose = this.handleClose.bind(this);
+        super(props, context);
     }
-
-    componentDidUpdate(prevProps) {
-        // check previous state to avoid in-finite loop
-        if (!this.state.open) {
-            if (this.props.connectionError) {
-                this.handleClickOpen();
-            }
-        }
-    }
-
-    handleClickOpen() {
-        this.setState({ open: true });
-    };
-
-    handleClose() {
-        AuthManager.discardSession();
-        window.handleSessionInvalid();
-    };
 
     renderSourceViewContent() {
         return (
@@ -83,26 +61,12 @@ export default class ResourceExplorerParent extends Component {
                 <div id="content" style={styles.contentDiv}>
                     {this.props.content}
                 </div>
-                <Dialog open={this.state.open} onClose={this.handleClose}
-                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                    <DialogTitle id="alert-dialog-title">{"Connection failed"}</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            Connection with the micro-integrator failed
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleClose} color="primary" autoFocus>
-                            OK
-                        </Button>
-                    </DialogActions>
-                </Dialog>
             </Box>
         );
     }
 
     render() {
-        return (<ListViewParent data={this.renderSourceViewContent()}/>);
+        return (<ListViewParent data={this.renderSourceViewContent()} error={this.props.error}/>);
     }
 }
 
@@ -113,7 +77,8 @@ ResourceExplorerParent.propTypes = {
     title: PropTypes.string,
     content: PropTypes.element,
     breadcrumb: PropTypes.element,
-    connectionError: PropTypes.bool
+    connectionError: PropTypes.bool,
+    error: PropTypes.object
 };
 
 ResourceExplorerParent.defaultProps = {
@@ -123,5 +88,6 @@ ResourceExplorerParent.defaultProps = {
     title: 'Explorer',
     content: '<span/>',
     breadcrumb: ' ',
-    connectionError: false
+    connectionError: false,
+    error: null
 };
