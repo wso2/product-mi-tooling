@@ -37,7 +37,7 @@ export default class SequenceDetailsPage extends Component {
         this.state = {
             response: {},
             metaData: [],
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -66,14 +66,8 @@ export default class SequenceDetailsPage extends Component {
                     response: response.data,
                     metaData: metaData,
                 });
-            this.setState({errorOccurred: false});
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.setState({errorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error});
         });
     }
 
@@ -113,8 +107,9 @@ export default class SequenceDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderMessageProcessorDetails()}
-                connectionError={this.state.errorOccurred}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()}
+                                    content={this.renderMessageProcessorDetails()}
+                                    error={this.state.error}/>
         );
     }
 }

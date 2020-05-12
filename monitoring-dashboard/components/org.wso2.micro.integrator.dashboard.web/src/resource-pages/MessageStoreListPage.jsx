@@ -30,7 +30,7 @@ export default class MessageStoreListPage extends Component {
         this.messageStores = null;
         this.state = {
             data: [],
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -53,17 +53,10 @@ export default class MessageStoreListPage extends Component {
                 rowData.push(element.type);
                 rowData.push(element.size);
                 data.push(rowData);
-
             });
             this.setState({data: data});
-            this.setState({errorOccurred: false});
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.setState({errorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error});
         });
     }
 
@@ -104,7 +97,7 @@ export default class MessageStoreListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
-                connectionError={this.state.errorOccurred}
+                error={this.state.error}
             />
         );
     }

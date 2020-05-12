@@ -41,7 +41,8 @@ export default class HomePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            response: {}
+            response: {},
+            error: null
         };
     }
 
@@ -60,7 +61,7 @@ export default class HomePage extends Component {
                     response: response.data,
                 });
         }).catch((error) => {
-            //Handle errors here
+            this.setState({error:error});
         });
     }
 
@@ -108,6 +109,10 @@ export default class HomePage extends Component {
 
 
     render() {
-        return (<ResourceExplorerParent title={"SERVER HOME"} content={this.renderHomePageView()}/>);
+        return (<ResourceExplorerParent
+            title={"SERVER HOME"}
+            content={this.renderHomePageView()}
+            error={this.state.error}
+        />);
     }
 }

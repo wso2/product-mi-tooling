@@ -40,7 +40,7 @@ export default class MessageStoreDetailsPage extends Component {
             metaData: [],
             parameters: {},
             response: {},
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -133,8 +133,9 @@ export default class MessageStoreDetailsPage extends Component {
     render() {
         console.log(this.state.config);
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderMessageStoreDetails()}
-                connectionError={this.state.errorOccurred}/>
+            <ResourceExplorerParent title={this.renderBreadCrumbs()}
+                                    content={this.renderMessageStoreDetails()}
+                                    error={this.state.error}/>
         );
     }
 }

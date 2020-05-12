@@ -30,9 +30,10 @@ export default class TemplateListPage extends Component {
         this.endpointTemplates = null;
         this.sequenceTemplates = null;
         this.state = {
-            templateData: []
+            templateData: [],
+            error: null
         };
-        this.errorOccurred = false;
+
     }
 
     /**
@@ -65,12 +66,8 @@ export default class TemplateListPage extends Component {
             this.setState({
                 templateData: templateData
             });
-            this.errorOccurred = false;
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.errorOccurred = true;
-            }
+            this.setState({error:error});
         });
     }
 
@@ -102,7 +99,7 @@ export default class TemplateListPage extends Component {
         return (
             <ListViewParent
                 data={this.renderResourceList()}
-                connectionError={this.errorOccurred}
+                error={this.state.error}
             />
         );
     }

@@ -38,7 +38,7 @@ export default class Users extends Component {
             metaData: [],
             roles:[],
             response: {},
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -61,12 +61,7 @@ export default class Users extends Component {
                     response: response.data,
                 });
         }).catch((error) => {
-            if (!error.response) {
-                // The request was made but no response was received
-                this.setState({networkErrorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error});
         });
     }
 
@@ -121,6 +116,6 @@ export default class Users extends Component {
         return(<ResourceExplorerParent
             title={this.renderBreadCrumbs()}
             content={this.renderUserDetails()}
-            connectionError={this.state.errorOccurred}/>);
+            error={this.state.error}/>);
     }
 }

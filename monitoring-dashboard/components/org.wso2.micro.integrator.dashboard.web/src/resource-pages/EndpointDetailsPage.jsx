@@ -42,7 +42,7 @@ export default class EndpointDetailsPage extends Component {
         super(props);
         this.state = {
             response: {},
-            errorOccurred: false
+            error: null
         };
     }
 
@@ -65,19 +65,12 @@ export default class EndpointDetailsPage extends Component {
                 {
                     response: response.data,
                 });
-        this.setState({errorOccurred: false});
         }).catch((error) => {
-            if (error.request) {
-                // The request was made but no response was received
-                this.setState({errorOccurred: true}, function () {
-                    // callback function to ensure state is set immediately
-                });
-            }
+            this.setState({error:error})
         });
     }
 
     renderEndpointDetails() {
-
 
         return (
             <Box>
@@ -292,8 +285,10 @@ export default class EndpointDetailsPage extends Component {
 
     render() {
         return (
-            <ResourceExplorerParent title={this.renderBreadCrumbs()} content={this.renderEndpointDetails()}
-                connectionError={this.state.errorOccurred}/>
+            <ResourceExplorerParent
+                title={this.renderBreadCrumbs()}
+                content={this.renderEndpointDetails()}
+                error={this.state.error}/>
         );
     }
 }
