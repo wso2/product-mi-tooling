@@ -34,7 +34,9 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
+	"github.com/magiconair/properties"
 	"gopkg.in/resty.v1"
+	"path"
 )
 
 // Invoke http-post request using go-resty
@@ -371,4 +373,30 @@ func CreateKeyValuePairs(mapData map[string]string) string {
 	} else {
 		return "{}"
 	}
+}
+
+func IsValidConsoleInput(inputs map[string]string) (bool) {
+	for key, input := range inputs {
+		if len(strings.TrimSpace(input)) == 0 {
+			fmt.Println("Invalid input for " + key)
+			return false
+		}
+	}
+	return true
+}
+
+func SetProperties(variables map[string]string, fileName string)  {
+	props := properties.LoadMap(variables)
+	writer, _ := os.Create(fileName)
+	props.Write(writer, properties.UTF8)
+	writer.Close()
+}
+
+func GetSecurityDirectoryPath() string {
+	workingDirectory, _ := os.Getwd()
+	return path.Join(workingDirectory, "security")
+}
+
+func GetkeyStoreInfoFileLocation() string {
+	return path.Join(GetSecurityDirectoryPath(),  "keystore-info.properties")
 }

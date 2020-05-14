@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/lithammer/dedent v1.1.0
+	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/spf13/cobra v0.0.3

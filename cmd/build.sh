@@ -175,6 +175,7 @@ do
     # set destination path for binary
     mi_bin_dir="${mi_archive_dir}/bin"
     mkdir -p $mi_bin_dir
+    cp -r "${baseDir}/../encryption-client/target/encryption-client-$build_version.jar" $mi_bin_dir  > /dev/null 2>&1
     destination="$mi_bin_dir/$output"
 
     GOOS=$goos GOARCH=$goarch go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -ldflags  \
