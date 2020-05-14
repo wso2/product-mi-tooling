@@ -24,18 +24,19 @@ import (
 	"github.com/wso2/product-mi-tooling/cmd/utils"
 )
 
-var messageProcessorState string
+var messageProcessorStateValue string
 // Show API command related usage info
 const updateMessageProcessorCmdLiteral = "update"
+const messageProcessorState = "state"
 const updateMessageProcessorCmdShortDesc = "Update state of messageprocessor"
 
 const updateMessageProcessorCmdLongDesc = "Update state of messageprocessor in Micro Integrator\n"
 
 var updateMessageProcessorCmdUsage = "Usage:\n" +
-	"  " + programName + " " + messageProcessorCmdLiteral + " " + updateMessageProcessorCmdLiteral + " [messageprocessor-name] [state]\n\n"
+	"  " + programName + " " + messageProcessorCmdLiteral + " " + updateMessageProcessorCmdLiteral + " [messageprocessor-name] " + messageProcessorState + " [state]\n\n"
 
 var updateMessageProcessorCmdExamples = "Example:\n" +
-	"  " + programName + " " + messageProcessorCmdLiteral + " " + updateMessageProcessorCmdLiteral + " TestMessageProcessor inactive\n\n"
+	"  " + programName + " " + messageProcessorCmdLiteral + " " + updateMessageProcessorCmdLiteral + " TestMessageProcessor state inactive\n\n"
 
 var updateMessageProcessorCmdHelpString = updateMessageProcessorCmdLongDesc + updateMessageProcessorCmdUsage + updateMessageProcessorCmdExamples
 
@@ -56,26 +57,32 @@ func init() {
 
 func handleUpdateMessageProcessorCmdArguments(args []string) {
 	utils.Logln(utils.LogPrefixInfo + "Update message processor called")
-	if len(args) == 2 {
-		if args[0] == "help" || args[1] == "help" {
+	if len(args) == 3 {
+		if args[0] == "help" || args[1] == "help" || args[2] == "help" {
 			printUpdateMessageProcessorHelp()
+		} else if args[1] != messageProcessorState {
+			printInvalidCommandMessage(args)
 		} else {
 			messageProcessorName = args[0]
-			messageProcessorState = args[1]
-			executeUpdateMessageProcessorCmd(messageProcessorName, messageProcessorState)
+			messageProcessorStateValue = args[2]
+			executeUpdateMessageProcessorCmd(messageProcessorName, messageProcessorStateValue)
 		}
 	} else {
-		fmt.Println(programName, "message processor update requires 2 arguments. See the usage below")
-		printUpdateMessageProcessorHelp()
+		printInvalidCommandMessage(args)
 	}
 }
 
+func printInvalidCommandMessage(args []string) {
+	fmt.Println("messageprocessor update:", args, "is not a valid command.\n" +
+		programName, "messageprocessor update requires 2 arguments. See the usage below.")
+	printUpdateMessageProcessorHelp()
+}
 func printUpdateMessageProcessorHelp() {
 	fmt.Print(updateMessageProcessorCmdHelpString)
 }
 
-func executeUpdateMessageProcessorCmd(messageProcessorName, messageProcessorState string) {
-	resp, err := utils.UpdateMIMessageProcessor(messageProcessorName, messageProcessorState)
+func executeUpdateMessageProcessorCmd(messageProcessorName, messageProcessorStateValue string) {
+	resp, err := utils.UpdateMIMessageProcessor(messageProcessorName, messageProcessorStateValue)
 
 	if err != nil {
 		fmt.Println(utils.LogPrefixError + "Updating state of message processor: ", err)

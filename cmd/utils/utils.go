@@ -375,14 +375,14 @@ func CreateKeyValuePairs(mapData map[string]string) string {
 	}
 }
 
-func UpdateMIMessageProcessor(messageProcessorName, messageProcessorState string) (interface{}, error) {
+func UpdateMIMessageProcessor(messageProcessorName, messageProcessorStateValue string) (interface{}, error) {
 
 	url := GetRESTAPIBase() + PrefixMessageProcessors
-	Logln(LogPrefixInfo+"URL:", url)
+	Logln(LogPrefixInfo + "URL:", url)
 	headers := make(map[string]string)
 	body := make(map[string]string)
 	body["name"] = messageProcessorName
-	body["status"] = messageProcessorState
+	body["status"] = messageProcessorStateValue
 
 	if headers[HeaderAuthorization] == "" {
 		headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
