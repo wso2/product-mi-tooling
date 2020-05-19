@@ -25,12 +25,12 @@ import (
 )
 
 var messageProcessorStateValue string
-// Show API command related usage info
+// Update message processor command related usage info
 const updateMessageProcessorCmdLiteral = "update"
 const messageProcessorState = "state"
-const updateMessageProcessorCmdShortDesc = "Update state of messageprocessor"
+const updateMessageProcessorCmdShortDesc = "Update state of a message processor"
 
-const updateMessageProcessorCmdLongDesc = "Update state of messageprocessor in Micro Integrator\n"
+const updateMessageProcessorCmdLongDesc = "Activate and deactivate a given message processor \n"
 
 var updateMessageProcessorCmdUsage = "Usage:\n" +
 	"  " + programName + " " + messageProcessorCmdLiteral + " " + updateMessageProcessorCmdLiteral + " [messageprocessor-name] " + messageProcessorState + " [state]\n\n"
@@ -74,7 +74,7 @@ func handleUpdateMessageProcessorCmdArguments(args []string) {
 
 func printInvalidCommandMessage(args []string) {
 	fmt.Println("messageprocessor update:", args, "is not a valid command.\n" +
-		programName, "messageprocessor update requires 2 arguments. See the usage below.")
+		programName, "messageprocessor update requires 3 arguments. See the usage below.")
 	printUpdateMessageProcessorHelp()
 }
 func printUpdateMessageProcessorHelp() {
