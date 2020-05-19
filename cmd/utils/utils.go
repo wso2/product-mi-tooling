@@ -415,6 +415,63 @@ func UpdateMIMessageProcessor(messageProcessorName, messageProcessorStateValue s
 	}
 }
 
+func handleResponse(resp *resty.Response, err error, url string) (interface{}, error) {
+	if err != nil {
+		HandleErrorAndExit("Unable to connect to " + url, err)
+	}
+
+	Logln(LogPrefixInfo+"Response:", resp.Status())
+
+	if resp.StatusCode() == http.StatusUnauthorized {
+		// not logged in to MI
+		fmt.Println("User not logged in or session timed out. Please login to the current Micro Integrator instance")
+		fmt.Println("Execute '" + ProjectName + " remote login --help' for more information")
+	}
+
+	if len(resp.Body()) == 0 {
+		return nil, errors.New(resp.Status())
+	} else {
+		data := UnmarshalJsonToStringMap(resp.Body())
+		if data["Message"] != "" {
+			return data["Message"], nil
+		} else {
+			return nil, errors.New(data["Error"])
+		}
+	}
+}
+
+func UpdateMIProxySerice(proxyServiceName string, intendedState string) (interface{}, error) {
+	url := GetRESTAPIBase() + PrefixProxyServices
+	Logln(LogPrefixInfo + "URL:", url)
+	headers := make(map[string]string)
+	body := make(map[string]string)
+	body["name"] = proxyServiceName
+	body["status"] = intendedState
+
+	if headers[HeaderAuthorization] == "" {
+		headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+			RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+	}
+	resp, err := InvokePOSTRequest(url, headers, body)
+	return handleResponse(resp, err, url)
+}
+
+func UpdateMIEndpoint(endpointName string, intendedState string) (interface{}, error) {
+	url := GetRESTAPIBase() + PrefixEndpoints
+	Logln(LogPrefixInfo + "URL:", url)
+	headers := make(map[string]string)
+	body := make(map[string]string)
+	body["name"] = endpointName
+	body["status"] = intendedState
+
+	if headers[HeaderAuthorization] == "" {
+		headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+			RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+	}
+	resp, err := InvokePOSTRequest(url, headers, body)
+	return handleResponse(resp, err, url)
+}
+
 func IsValidConsoleInput(inputs map[string]string) (bool) {
 	for key, input := range inputs {
 		if len(strings.TrimSpace(input)) == 0 {
