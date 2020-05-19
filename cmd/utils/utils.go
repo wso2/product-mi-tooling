@@ -375,6 +375,46 @@ func CreateKeyValuePairs(mapData map[string]string) string {
 	}
 }
 
+func UpdateMIMessageProcessor(messageProcessorName, messageProcessorStateValue string) (interface{}, error) {
+
+	url := GetRESTAPIBase() + PrefixMessageProcessors
+	Logln(LogPrefixInfo + "URL:", url)
+	headers := make(map[string]string)
+	body := make(map[string]string)
+	body["name"] = messageProcessorName
+	body["status"] = messageProcessorStateValue
+
+	if headers[HeaderAuthorization] == "" {
+		headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+			RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+	}
+
+	resp, err := InvokePOSTRequest(url, headers, body)
+
+	if err != nil {
+		HandleErrorAndExit("Unable to connect to " + url, err)
+	}
+
+	Logln(LogPrefixInfo + "Response:", resp.Status())
+
+	if resp.StatusCode() == http.StatusUnauthorized {
+		// not logged in to MI
+		fmt.Println("User not logged in or session timed out. Please login to the current Micro Integrator instance")
+		fmt.Println("Execute '" + ProjectName + " remote login --help' for more information")
+	}
+
+	if len(resp.Body()) == 0 {
+		return nil, errors.New(resp.Status())
+	} else {
+		data := UnmarshalJsonToStringMap(resp.Body())
+		if data["Message"] != "" {
+			return data["Message"], nil
+		} else {
+			return nil, errors.New(data["Error"])
+		}
+	}
+}
+
 func IsValidConsoleInput(inputs map[string]string) (bool) {
 	for key, input := range inputs {
 		if len(strings.TrimSpace(input)) == 0 {
