@@ -1,4 +1,4 @@
-# Management Console for WSO2 Micro Integrator
+# CLI for WSO2 Micro Integrator
 
 Command Line tool for managing the WSO2 Micro Integrator.
 
