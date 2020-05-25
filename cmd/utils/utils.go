@@ -497,3 +497,14 @@ func GetSecurityDirectoryPath() string {
 func GetkeyStoreInfoFileLocation() string {
 	return path.Join(GetSecurityDirectoryPath(),  "keystore-info.properties")
 }
+
+// ContainsString returns true iff slice contains element
+func ContainsString(slice []string, element string) bool {
+	for _ , elem := range slice {
+		// case in-sensitive comparison
+		if strings.EqualFold(elem, element) {
+			return true
+		}
+	}
+	return false
+}

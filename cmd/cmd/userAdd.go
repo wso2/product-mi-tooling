@@ -24,6 +24,10 @@ import (
     "github.com/wso2/product-mi-tooling/cmd/utils"
     "net/http"
     "strings"
+    "bufio"
+    "os"
+    "golang.org/x/crypto/ssh/terminal"
+    "syscall"
 )
 
 // Show user command related usage info
@@ -33,8 +37,8 @@ const addUserCmdLongDesc = "Add new user to the micro-integrator user store\n"
 
 var addUserCmdExamples = "Example:\n" +
     "To Add a new user\n" +
-    "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral + " [new user-id] [password] [is-admin]\n" +
-    "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral + " user1 passw0rd true\n"
+    "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral + " [new user-id]\n" +
+    "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral + " user1\n"
 
 // userAddCmd represents the add users command
 var userAddCmd = &cobra.Command{
@@ -49,7 +53,7 @@ var userAddCmd = &cobra.Command{
 func init() {
     userAddCmd.SetHelpTemplate(addUserCmdLongDesc + "Usage:\n" +
         "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral +
-        " [new user-id] [password] [is-admin]\n" +
+        " [new user-id]\n" +
         addUserCmdExamples + utils.GetCmdFlags(addUserCmdLiteral))
     usersCmd.AddCommand(userAddCmd)
 }
@@ -60,27 +64,55 @@ func handleAddUserCmdArguments(args []string) {
         if args[0] == "help" {
             printAddUserHelp()
         } else {
-            fmt.Println("Invalid arguments. See the usage below")
-            printAddUserHelp()
+            // arg[0] should be user name
+            startConsoleToAddUser(args[0])
         }
-    } else if len(args) == 3 {
-        var userId = args[0]
-        var password = args[1]
-        var isAdmin = args[2]
-        if !(isAdmin == "false" || isAdmin == "true") {
-            fmt.Println("[is-admin] parameter should be either true or false")
-        }
-        executeAddUserCmd(userId, password, isAdmin)
     } else {
         fmt.Println("Invalid number of arguments. See the usage below")
         printAddUserHelp()
     }
+
+}
+
+func startConsoleToAddUser(userId string) {
+    reader := bufio.NewReader(os.Stdin)
+
+    fmt.Printf("Is " + userId + " an admin [y/N]: ")
+    isAdmin, _ := reader.ReadString('\n')
+    isAdmin = resolveIsAdminInput(isAdmin)
+
+    fmt.Printf("Enter password for " + userId + ": ")
+    byteUserPassword, _ := terminal.ReadPassword(int(syscall.Stdin))
+    userPassword := string(byteUserPassword)
+    fmt.Println()
+
+    fmt.Printf("Re-Enter password for " + userId + ": ")
+    byteUserConfirmationPassword, _ := terminal.ReadPassword(int(syscall.Stdin))
+    userConfirmPassword := string(byteUserConfirmationPassword)
+    fmt.Println()
+
+    if userConfirmPassword == userPassword {
+        executeAddUserCmd(userId, userPassword, isAdmin)
+    } else {
+        fmt.Println("Passwords are not matching.")
+    }
+}
+
+func resolveIsAdminInput(isAdminConsoleInput string) string {
+    if len(strings.TrimSpace(isAdminConsoleInput)) == 0 {
+        return "false"
+    }
+    yesResponses := []string{"y", "yes"}
+    if utils.ContainsString(yesResponses, strings.TrimSpace(isAdminConsoleInput)) {
+        return "true"
+    }
+    return "false"
 }
 
 func printAddUserHelp() {
     fmt.Print(addUserCmdLongDesc + "Usage:\n" +
         "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral +
-        " [new user-id] [password] [is-admin]\n" +
+        " [new user-id]\n" +
         addUserCmdExamples + utils.GetCmdFlags(usersCmdLiteral))
 }
 
