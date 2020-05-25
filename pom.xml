@@ -28,7 +28,7 @@
     <groupId>org.wso2.ei</groupId>
     <artifactId>wso2-micro-integrator-tooling</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>${product.version}</version>
     <name>WSO2 Micro Integrator Tooling</name>
     <url>http://wso2.com/products/enterprise-integrator/</url>
     <description>WSO2 Micro Integrator tooling</description>
@@ -93,7 +93,7 @@
         <docker.maven.plugin.version>1.0.0</docker.maven.plugin.version>
         <org.snakeyml.version>1.26</org.snakeyml.version>
         <maven.jar.plugin.version>3.0.2</maven.jar.plugin.version>
-
+        <product.version>1.2.0-SNAPSHOT</product.version>
     </properties>
 
     <repositories>
