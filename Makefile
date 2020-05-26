@@ -31,7 +31,7 @@ endif
 
 .PHONY: install-cli
 install-cli:
-	cd encryption-client && mvn clean install -Dproduct.version=${VERSION}
+	cd encryption-client && mvn clean install
 	cd cmd && ./build.sh -t mi.go -v ${VERSION} -f
 
 .PHONY: install-cli-skip-test
