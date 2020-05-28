@@ -93,6 +93,7 @@
         <docker.maven.plugin.version>1.0.0</docker.maven.plugin.version>
         <org.snakeyml.version>1.26</org.snakeyml.version>
         <maven.jar.plugin.version>3.0.2</maven.jar.plugin.version>
+        <version.jaxb.api>2.4.0-b180830.0359</version.jaxb.api>
 
     </properties>
 
@@ -297,6 +298,11 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${org.snakeyml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${version.jaxb.api}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
