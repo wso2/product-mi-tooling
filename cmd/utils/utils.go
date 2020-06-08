@@ -508,3 +508,11 @@ func ContainsString(slice []string, element string) bool {
 	}
 	return false
 }
+
+func NormalizeFilePath(path string) string {
+	// if a windows path with \ is given, replace the file separator with /
+	if strings.Contains(path, "\\") {
+		path = strings.ReplaceAll(path, "\\", "/")
+	}
+	return strings.TrimSpace(path)
+}

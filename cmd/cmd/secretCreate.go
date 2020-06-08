@@ -90,7 +90,7 @@ func initSecretInformation() {
 	//checks if input mode is file
 	if len(strings.TrimSpace(file)) > 0 {
 		inputs["secret.input.type"] = "file"
-		inputs["secret.input.file"] = file
+		inputs["secret.input.file"] = utils.NormalizeFilePath(file)
 		consoleResult = startConsoleForSecretInfo(false)
 	} else {
 		inputs["secret.input.type"] = "console"

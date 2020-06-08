@@ -65,7 +65,7 @@ func startConsoleForKeyStore(args []string) {
 
 	fmt.Printf("Enter Key Store location: ")
 	keystore, _ := reader.ReadString('\n')
-	inputs["secret.keystore.location"] = strings.TrimSpace(keystore)
+	inputs["secret.keystore.location"] =  utils.NormalizeFilePath(keystore)
 
 	fmt.Printf("Enter Key Store type: ")
 	keystoreType, _ := reader.ReadString('\n')
