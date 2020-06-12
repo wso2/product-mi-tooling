@@ -102,6 +102,7 @@
         <outputDirectory>bin/bootstrap</outputDirectory>
         <includes>
             <include>javax.annotation:javax.annotation-api:jar</include>
+            <include>javax.xml.bind:jaxb-api:jar</include>
         </includes>
     </dependencySet>
     </dependencySets>
