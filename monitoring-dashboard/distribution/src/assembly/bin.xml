@@ -96,6 +96,15 @@
             <fileMode>744</fileMode>
         </fileSet>
     </fileSets>
+    <dependencySets>
+    <dependencySet>
+        <useProjectArtifact>false</useProjectArtifact>
+        <outputDirectory>bin/bootstrap</outputDirectory>
+        <includes>
+            <include>javax.annotation:javax.annotation-api:jar</include>
+        </includes>
+    </dependencySet>
+    </dependencySets>
     <files>
         <file>
             <source>carbon-home/updates/product.txt</source>

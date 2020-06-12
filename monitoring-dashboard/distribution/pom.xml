@@ -151,6 +151,10 @@
             <version>${project.version}</version>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
