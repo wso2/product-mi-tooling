@@ -149,6 +149,7 @@ export default class Login2 extends Component {
                                 </MDBCardHeader>
                                 <MuiThemeProvider muiTheme={lightTheme}>
                                 <TextField
+                                    id="txt-host"
                                     autoFocus
                                     fullWidth
                                     autoComplete="off"
@@ -164,6 +165,7 @@ export default class Login2 extends Component {
                                 />
 
                                 <TextField
+                                    id="txt-port"
                                     type="email"
                                     autoFocus
                                     fullWidth
@@ -180,6 +182,7 @@ export default class Login2 extends Component {
                                 />
 
                                 <TextField
+                                    id="txt-username"
                                     type="email"
                                     autoFocus
                                     fullWidth
@@ -217,6 +220,7 @@ export default class Login2 extends Component {
                                     <MDBBtn color="blue-grey"
                                             className="mb-3"
                                             type="submit"
+                                            id="btn-submit"
                                             disabled={username === '' || password === '' || host === '' || port === ''}
                                             onClick={this.authenticate}
                                     >
