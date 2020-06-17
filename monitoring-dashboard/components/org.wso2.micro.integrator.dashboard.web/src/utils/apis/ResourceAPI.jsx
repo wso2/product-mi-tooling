@@ -23,7 +23,7 @@ const https = require('https');
 import AuthManager from '../../auth/utils/AuthManager';
 import {Constants} from '../../auth/Constants';
 
-const baseURL = `https://${window.localStorage.getItem('host')}:${window.localStorage.getItem('port')}/management`;
+const baseURL = `${window.localStorage.getItem('protocol')}://${window.localStorage.getItem('host')}:${window.localStorage.getItem('port')}/management`;
 
 
 export default class ResourceAPI {

@@ -30,7 +30,7 @@ export default class AuthenticationAPI {
      * @return {AxiosInstance} Axios client
      */
     static getHttpLogoutClient() {
-        baseURL = `https://${window.localStorage.getItem('host')}:${window.localStorage.getItem('port')}/management`;
+        baseURL = `${window.localStorage.getItem('protocol')}://${window.localStorage.getItem('host')}:${window.localStorage.getItem('port')}/management`;
         const client = Axios.create({
             baseURL: baseURL,
             timeout: 300000,
@@ -47,7 +47,7 @@ export default class AuthenticationAPI {
      * @return {AxiosInstance} Axios client
      */
     static getHttpLoginClient(host, port) {
-        baseURL = `https://${host}:${port}/management`;
+        baseURL = `${window.localStorage.getItem('protocol')}://${host}:${port}/management`;
         const client = Axios.create({
             baseURL: baseURL,
             timeout: 300000,

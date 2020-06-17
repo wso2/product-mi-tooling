@@ -29,7 +29,7 @@ export default class AuthManager {
      * @param {boolean} rememberMe Remember me flag
      * @returns {Promise} Promise
      */
-    static authenticate(host, port, username, password, rememberMe) {
+    static authenticate(host, port, username, password, rememberMe, isSecure = true) {
         return new Promise((resolve, reject) => {
             AuthenticationAPI.login(host, port, username, password, rememberMe)
                 .then((response) => {
@@ -38,10 +38,9 @@ export default class AuthManager {
                     window.localStorage.setItem('port', port);
 
                     // Set user in a cookie
-                    AuthManager.setUser({
-                        username: username
-                    });
-                    AuthManager.setCookie(Constants.JWT_TOKEN_COOKIE, AccessToken, null, window.contextPath);
+                    AuthManager.setUser({username: username}, isSecure);
+                    // secure token cookie will only be set in https mode
+                    AuthManager.setCookie(Constants.JWT_TOKEN_COOKIE, AccessToken, 3600, window.contextPath, isSecure);
                     resolve();
                 })
                 .catch(error => {
@@ -83,8 +82,9 @@ export default class AuthManager {
      *
      * @param {{}} user  User object
      */
-    static setUser(user) {
-        AuthManager.setCookie(Constants.SESSION_USER_COOKIE, JSON.stringify(user), null, window.contextPath);
+    static setUser(user, isSecure) {
+        // secure user cookie will only be set in https mode
+        AuthManager.setCookie(Constants.SESSION_USER_COOKIE, JSON.stringify(user), 3000, window.contextPath, isSecure);
     }
 
     /**
