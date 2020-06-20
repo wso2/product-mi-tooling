@@ -66,16 +66,31 @@ export default class Login2 extends Component {
      */
     constructor(props) {
         super(props);
+
+        // set the underlying(management api) communication protocol and default port values based on server protocol
+        let port = '9201';
+        let protocol = 'http';
+        let isSecureMode = (location.protocol === 'https:');
+
+        if (isSecureMode) {
+            protocol = 'https';
+            port = '9164';
+        }
+        // set protocol to local storage for API usage
+        window.localStorage.setItem('protocol', protocol);
+
         this.state = {
             username: '',
             password: '',
             host: 'localhost',
-            port: '9164',
+            port: port,
             authenticated: false,
             rememberMe: false,
             loginError: false,
-            loginErrorMessage: ''
+            loginErrorMessage: '',
+            isSecure: isSecureMode
         };
+
         this.authenticate = this.authenticate.bind(this);
         this.handleLoginErrorDialogClose = this.handleLoginErrorDialogClose.bind(this);
     }
@@ -100,7 +115,8 @@ export default class Login2 extends Component {
         const { intl } = this.context;
         const {username, password, host, port, rememberMe} = this.state;
         e.preventDefault();
-        AuthManager.authenticate(host, port, username, password, rememberMe)
+
+        AuthManager.authenticate(host, port, username, password, rememberMe, this.state.isSecure)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
                 var errorMessage;
@@ -108,7 +124,6 @@ export default class Login2 extends Component {
                     errorMessage = 'Incorrect username or password!';
                 } else {
                     errorMessage = 'Error occurred in communication.';
-                    window.open(`https://${host}:${port}/management`,  'sharer', 'toolbar=0,status=0,width=250,height=100');
                 }
                 this.setState({
                     username: '',
@@ -214,7 +229,6 @@ export default class Login2 extends Component {
                                         });
                                     }}
                                 />
-
                                 </MuiThemeProvider>
                                 <div className="text-center mt-4">
                                     <MDBBtn color="blue-grey"
