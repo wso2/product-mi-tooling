@@ -32,11 +32,18 @@ const updateLogLevelCmdShortDesc = "Update log level"
 
 const updateLogLevelCmdLongDesc = "Update log level of the Loggers in Micro Integrator\n"
 
-var updateLogLevelCmdUsage = "Usage:\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]\n\n"
+var updateLogLevelCmdUsage = "Usage:\n\n" +
+	" To update the level of an existing logger\n\n" +
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]\n\n" +
+	" To add a new logger\n\n" +
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]" +
+	" [class-name]\n\n"
 
-var updateLogLevelCmdExamples = "Example:\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " org-apache-coyote DEBUG\n\n"
+var updateLogLevelCmdExamples = "Example:\n\n" +
+	" To update the level of an existing logger\n\n" +
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " org-apache-coyote DEBUG\n\n" +
+	" To add a new logger\n\n" +
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " synapse-api DEBUG org.apache.synapse.rest.API\n\n"
 
 var updateLogLevelCmdHelpString = updateLogLevelCmdLongDesc + updateLogLevelCmdUsage + updateLogLevelCmdExamples
 
@@ -57,16 +64,26 @@ func init() {
 
 func handleUpdateLoggerCmdArguments(args []string) {
 	utils.Logln(utils.LogPrefixInfo + "Update Logger called")
-	if len(args) == 2 {
+	if len(args) == 2 || len(args) == 3 {
 		if args[0] == "help" || args[1] == "help" {
 			printUpdateLoggerHelp()
 		} else {
 			loggerName = args[0]
 			logLevel = args[1]
-			executeUpdateLoggerCmd(loggerName, logLevel)
+			var logClass = ""
+			if len(args) == 3 {
+				if args[2] == "help" {
+					printUpdateLoggerHelp()
+					return
+				} else {
+					logClass = args[2]
+				}
+			}
+			executeUpdateLoggerCmd(loggerName, logLevel, logClass)
 		}
 	} else {
-		fmt.Println(programName, "log-level update requires 2 argument. See the usage below")
+		fmt.Println(programName, "log-level update accepts minimum of 2 and a maximum of 3 arguments. "+
+			"See the usage below")
 		printUpdateLoggerHelp()
 	}
 }
@@ -75,8 +92,8 @@ func printUpdateLoggerHelp() {
 	fmt.Print(updateLogLevelCmdHelpString)
 }
 
-func executeUpdateLoggerCmd(loggerName, logLevel string) {
-	resp, err := utils.UpdateMILogger(loggerName, logLevel)
+func executeUpdateLoggerCmd(loggerName, logLevel, logClass string) {
+	resp, err := utils.UpdateMILogger(loggerName, logLevel, logClass)
 
 	if err != nil {
 		fmt.Println(utils.LogPrefixError + "Updating log level of the Logger", err)
