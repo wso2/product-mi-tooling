@@ -37,11 +37,11 @@ function showUsageAndExit() {
 function detectPlatformSpecificBuild() {
     platform=$(uname -s)
     if [[ "${platform}" == "Linux" ]]; then
-        platforms="linux/386/linux/i586 linux/amd64/linux/x64"
+        platforms="linux/amd64/linux/x64"
     elif [[ "${platform}" == "Darwin" ]]; then
         platforms="darwin/amd64/macosx/x64"
     else
-        platforms="windows/386/windows/i586 windows/amd64/windows/x64"
+        platforms="windows/amd64/windows/x64"
     fi
 }
 
@@ -104,7 +104,7 @@ fi
 #platforms="darwin/amd64/macosx/x64"
 if [ "${full_build}" == "true" ]; then
     echo "Building ${filename}:${build_version} for all platforms..."
-    platforms="darwin/amd64/macosx/x64 linux/386/linux/i586 linux/amd64/linux/x64 windows/386/windows/i586 windows/amd64/windows/x64"
+    platforms="darwin/amd64/macosx/x64 linux/amd64/linux/x64 windows/amd64/windows/x64"
 else
     detectPlatformSpecificBuild
     echo "Building ${filename}:${build_version} for detected ${platform} platform..."
