@@ -214,7 +214,7 @@ func UnmarshalLogFileData(url string, headers map[string]string, params map[stri
     Logln(LogPrefixInfo+"Response:", resp.Status())
 }
 
-func UpdateMILogger(loggerName, loggingLevel string) (interface{}, error) {
+func UpdateMILogger(loggerName, loggingLevel , logClass string) (interface{}, error) {
 
 	url := GetRESTAPIBase() + PrefixLogging
 	Logln(LogPrefixInfo+"URL:", url)
@@ -222,7 +222,9 @@ func UpdateMILogger(loggerName, loggingLevel string) (interface{}, error) {
 	body := make(map[string]string)
 	body["loggerName"] = loggerName
 	body["loggingLevel"] = loggingLevel
-
+	if len(logClass) > 0 {
+		body["loggerClass"] = logClass
+	}
 	if headers[HeaderAuthorization] == "" {
 		headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
 			RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
