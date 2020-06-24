@@ -23,6 +23,7 @@ import LogFilesIcon from '@material-ui/icons/Description';
 import TaskIcon from '@material-ui/icons/Today';
 import CappIcon from '@material-ui/icons/Dashboard';
 import UsersIcon from '@material-ui/icons/SupervisorAccount';
+import LogConfigIcon from '@material-ui/icons/Create';
 
 const drawerWidth = 240;
 
@@ -108,6 +109,10 @@ export default function SideDrawer() {
                     <ListItem button component={Link} to="/logs">
                         <ListItemIcon><LogFilesIcon style={{color:'#065e9b'}}/></ListItemIcon>
                         <ListItemText primary="Log Files"/>
+                    </ListItem>
+                    <ListItem button component={Link} to="/logging">
+                        <ListItemIcon><LogConfigIcon style={{color:'#065e9b'}}/></ListItemIcon>
+                        <ListItemText primary="Log Configs"/>
                     </ListItem>
                     <ListItem button component={Link} to="/users">
                         <ListItemIcon><UsersIcon style={{color:'#065e9b'}}/></ListItemIcon>

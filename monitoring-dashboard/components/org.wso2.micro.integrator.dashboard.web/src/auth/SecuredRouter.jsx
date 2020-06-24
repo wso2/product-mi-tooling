@@ -25,6 +25,7 @@ import MessageStoreListPage from "../resource-pages/MessageStoreListPage";
 import ProxySourceViewPage from "../resource-pages/ProxySourceViewPage";
 import APIListPage from "../resource-pages/ApiListPage";
 import LogFileListPage from "../resource-pages/LogFileListPage";
+import LogConfigsPage from "../resource-pages/LogConfigsPage";
 import SequenceListPage from "../resource-pages/SequenceListPage";
 import LocalEntryListPage from "../resource-pages/LocalEntryListPage";
 import InboundEndpointListPage from "../resource-pages/InboundEndpointListPage";
@@ -91,6 +92,7 @@ export default class SecuredRouter extends Component {
                 <Route path='/message-store/explore' component={MessageStoreDetailsPage}/>
                 <Route exact path='/api' component={APIListPage}/>
                 <Route exact path='/logs' component={LogFileListPage}/>
+                <Route exact path='/logging' component={LogConfigsPage}/>
                 <Route path='/api/explore' component={APIDetailsPage}/>
                 <Route path='/proxy/sourceView' component={ProxySourceViewPage}/>
                 <Route path='/proxy/explore' component={ProxyDetailsPage}/>

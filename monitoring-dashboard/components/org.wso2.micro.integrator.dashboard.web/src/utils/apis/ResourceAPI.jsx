@@ -114,6 +114,15 @@ export default class ResourceAPI {
         return this.getHTTPClient().post(`/message-processors`, payload);
     }
 
+    updateLogLevel(loggerName, logLevel) {
+
+        let payload = {
+            loggerName: loggerName,
+            loggingLevel: logLevel
+        };
+        return this.getHTTPClient().patch(`/logging`, payload);
+    }
+
     setProxyState(proxy, toState) {
         var intendedState = "active";
         if (!toState) {
