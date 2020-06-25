@@ -24,6 +24,7 @@ import TaskIcon from '@material-ui/icons/Today';
 import CappIcon from '@material-ui/icons/Dashboard';
 import UsersIcon from '@material-ui/icons/SupervisorAccount';
 import LogConfigIcon from '@material-ui/icons/Create';
+import DSSIcon from '@material-ui/icons/DeviceHub';
 
 const drawerWidth = 240;
 
@@ -97,6 +98,10 @@ export default function SideDrawer() {
                     <ListItem button component={Link} to="/local-entry">
                         <ListItemIcon><LocalEntryIcon style={{color:'#065e9b'}}/></ListItemIcon>
                         <ListItemText primary="Local Entries"/>
+                    </ListItem>
+                    <ListItem button component={Link} to="/dataservice">
+                        <ListItemIcon><DSSIcon style={{color: '#065e9b'}}/></ListItemIcon>
+                        <ListItemText primary="Data Services"/>
                     </ListItem>
                     <ListItem button component={Link} to="/connector">
                         <ListItemIcon><ConnectorIcon style={{color:'#065e9b'}}/></ListItemIcon>
