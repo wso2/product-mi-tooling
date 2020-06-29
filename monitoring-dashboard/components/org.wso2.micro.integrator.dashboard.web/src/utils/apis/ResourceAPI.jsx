@@ -123,6 +123,15 @@ export default class ResourceAPI {
         return this.getHTTPClient().patch(`/logging`, payload);
     }
 
+    addLogger(loggerName, loggerClass, loggerLevel) {
+        let payload = {
+            loggerName: loggerName,
+            loggingLevel: loggerLevel,
+            loggerClass: loggerClass
+        };
+        return this.getHTTPClient().patch(`/logging`, payload);
+    }
+
     setProxyState(proxy, toState) {
         var intendedState = "active";
         if (!toState) {
