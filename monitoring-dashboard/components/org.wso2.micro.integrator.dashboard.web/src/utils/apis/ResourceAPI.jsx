@@ -98,6 +98,10 @@ export default class ResourceAPI {
         return this.getHTTPClient().get(`/tasks?taskName=${name}`);
     }
 
+    getDataServiceByName(name) {
+        return this.getHTTPClient().get(`/data-services?dataServiceName=${name}`)
+    }
+
     getServerMetaData() {
         return this.getHTTPClient().get(`/server`);
     }

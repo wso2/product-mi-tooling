@@ -22,7 +22,6 @@ import {Route, Redirect, Switch} from 'react-router';
 import Qs from 'qs';
 
 import MessageStoreListPage from "../resource-pages/MessageStoreListPage";
-import ProxySourceViewPage from "../resource-pages/ProxySourceViewPage";
 import APIListPage from "../resource-pages/ApiListPage";
 import LogFileListPage from "../resource-pages/LogFileListPage";
 import LogConfigsPage from "../resource-pages/LogConfigsPage";
@@ -32,7 +31,6 @@ import InboundEndpointListPage from "../resource-pages/InboundEndpointListPage";
 import EndpointListPage from "../resource-pages/EndpointListPage";
 import MessageProcessorListPage from "../resource-pages/MessageProcessorListPage";
 import ProxyServiceListPage from "../resource-pages/ProxyServiceListPage";
-import ApiSourceViewPage from "../resource-pages/APISourceViewPage";
 import ConnectorListPage from "../resource-pages/ConnectorListPage";
 import TemplateListPage from "../resource-pages/TemplateListPage";
 import SequenceDetailsPage from "../resource-pages/SequenceDetailsPage";
@@ -49,6 +47,8 @@ import TaskListPage from "../resource-pages/TaskListPage";
 import CAppListPage from "../resource-pages/CappListPage";
 import Users from "../resource-pages/Users";
 import UserDetailsPage from "../resource-pages/UserDetailsPage";
+import DataServicesListPage from "../resource-pages/DataservicesListPage"
+import DataServiceDetailsPage from "../resource-pages/DataserviceDetailsPage"
 
 export default class SecuredRouter extends Component {
 
@@ -94,7 +94,6 @@ export default class SecuredRouter extends Component {
                 <Route exact path='/logs' component={LogFileListPage}/>
                 <Route exact path='/logging' component={LogConfigsPage}/>
                 <Route path='/api/explore' component={APIDetailsPage}/>
-                <Route path='/proxy/sourceView' component={ProxySourceViewPage}/>
                 <Route path='/proxy/explore' component={ProxyDetailsPage}/>
                 <Route exact path='/connector' component={ConnectorListPage}/>
                 <Route exact path='/template' component={TemplateListPage}/>
@@ -104,13 +103,14 @@ export default class SecuredRouter extends Component {
                 <Route path='/local-entry/explore' component={LocalEntryDetailsPage}/>
                 <Route exact path='/sequence' component={SequenceListPage}/>
                 <Route path='/sequence/explore' component={SequenceDetailsPage}/>
-                <Route path='/api/sourceView' component={ApiSourceViewPage}/>
                 <Route exact path='/task' component={TaskListPage}/>
                 <Route path='/task/explore' component={TaskDetailsPage}/>
                 <Route exact path='/home' component={HomePage}/>
                 <Route exact path='/capp' component={CAppListPage}/>
                 <Route exact path='/users' component={Users}/>
                 <Route path='/users/explore' component={UserDetailsPage}/>
+                <Route exact path='/dataservice' component={DataServicesListPage}/>
+                <Route path='/dataservice/explore' component={DataServiceDetailsPage}/>
             </Switch>
         );
     }
