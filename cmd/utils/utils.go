@@ -22,12 +22,15 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -288,7 +291,19 @@ func GetCmdUsageMultipleArgs(program, cmd, subcmd string, args []string) string 
     for _, arg := range args {
 	    showCmdUsage += "  " + program + " " + cmd + " " + subcmd + " " + arg + "\n"
     }
+	showCmdUsage += "\n"
     return showCmdUsage
+}
+
+// Create a usage command for a command that always get invoked with its arguments.
+func GetCmdUsageForArgsOnly(program, cmd, subcmd string, args []string) string {
+	baseCommand := "  " + program + " " + cmd + " " + subcmd + " "
+	var showCmdUsage = "Usage:\n"
+	for _, arg := range args {
+		showCmdUsage += baseCommand + " " + arg + "\n"
+	}
+	showCmdUsage += "\n"
+	return showCmdUsage
 }
 
 func GetCmdUsageForNonArguments(program, cmd, subcmd string) string {
@@ -517,4 +532,36 @@ func NormalizeFilePath(path string) string {
 		path = strings.ReplaceAll(path, "\\", "/")
 	}
 	return strings.TrimSpace(path)
+}
+
+// Given an 2-D string array and a target filePath, write the content of the array as csv values to the file.
+func WriteLinesToCSVFile(lines [][]string, targetPath string) {
+	if _, err := os.Stat(filepath.Dir(targetPath)); os.IsNotExist(err) {
+		log.Fatal(err)
+	}
+
+	file, err := os.Create(targetPath)
+	if err != nil {
+		log.Fatal("Could not create the file " + targetPath + ". ", err)
+	}
+	defer CloseFile(file)
+
+	csvWriter := csv.NewWriter(file)
+	defer csvWriter.Flush()
+
+	for _, line := range lines {
+		err := csvWriter.Write(line)
+		if err != nil {
+			log.Fatal("Could not write to file " + targetPath, err)
+		}
+	}
+}
+
+
+func CloseFile(f *os.File) {
+	err := f.Close()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
 }
