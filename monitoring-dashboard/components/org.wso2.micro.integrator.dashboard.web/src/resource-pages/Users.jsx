@@ -274,8 +274,8 @@ export default class Users extends Component {
                         </Form.Label>
                         <Col sm="3">
                             <Form.Control as="select" onChange={this.handleUserInput} name="newUserIsAdmin">
-                                <option>true</option>
                                 <option>false</option>
+                                <option>true</option>
                             </Form.Control>
                         </Col>
                     </Form.Group>
