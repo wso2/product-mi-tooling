@@ -28,7 +28,7 @@ function showUsageAndExit() {
     echo "[OPTIONAL] Cross compile for all the list of platforms. If not specified, the specified target" \
         "file will be compiled only for the autodetected native platform."
     echo
-    echo "Ex: ./build.sh -t mi.go -v 1.0.0 -f : Builds Micro Integrator CLI" \
+    echo "Ex: ./build.sh -t ei.go -v 1.0.0 -f : Builds Micro Integrator CLI" \
         "version 1.0.0 for all platforms."
     echo
     exit 1
@@ -152,7 +152,7 @@ do
     parch=${split[3]}
 
     # ensure output file name
-    output="mi"
+    output="ei"
     test "$output" || output="$(basename ${target} | sed 's/\.go//')"
 
     # add exe to windows output
