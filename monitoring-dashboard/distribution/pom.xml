@@ -469,7 +469,7 @@
                             <descriptors>
                                 <descriptor>${basedir}/src/assembly/bin.xml</descriptor>
                             </descriptors>
-                            <finalName>wso2mi-monitoring-dashboard-${project.version}</finalName>
+                            <finalName>wso2ei-dashboard-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>

@@ -17,9 +17,9 @@
   # Carbon Configuration Parameters
 wso2.carbon:
     # value to uniquely identify a server
-  id: wso2mi-monitoring-dashboard
+  id: wso2ei-dashboard
     # server name
-  name: WSO2 Micro Integration Monitoring Dashboard
+  name: WSO2 Integrator Dashboard
     # ports used by this server
   ports:
       # port offset

@@ -118,7 +118,7 @@ export default class ListViewParent extends Component {
                                 <DialogTitle id="alert-dialog-title">{"Connection failed"}</DialogTitle>
                                 <DialogContent dividers>
                                     <DialogContentText id="alert-dialog-description">
-                                        Connection with the Micro-integrator failed
+                                        Connection with the Integrator failed
                                     </DialogContentText>
                                 </DialogContent>
                                 <DialogActions>
@@ -132,7 +132,7 @@ export default class ListViewParent extends Component {
                                 <DialogTitle id="alert-dialog-title">{"Error in Response"}</DialogTitle>
                                 <DialogContent dividers>
                                     <DialogContentText id="alert-dialog-description">
-                                        Error occurred while processing request. Please check Micro-integrator server logs
+                                        Error occurred while processing request. Please check Integrator server logs
                                     </DialogContentText>
                                 </DialogContent>
                                 <DialogActions>
@@ -170,7 +170,7 @@ ListViewParent.propTypes = {
 };
 
 ListViewParent.defaultProps = {
-    title: 'MICRO INTEGRATOR',
+    title: 'INTEGRATOR',
     data: <span/>,
     theme: defaultTheme,
     connectionError: false,
