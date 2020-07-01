@@ -33,7 +33,7 @@ func main() {
 	}
 
 	log.Println("Generating bash completions...")
-	err = cmd.RootCmd.GenBashCompletionFile(filepath.FromSlash("./shell-completions/mi_bash_completion.sh"))
+	err = cmd.RootCmd.GenBashCompletionFile(filepath.FromSlash("./shell-completions/ei_bash_completion.sh"))
 	if err != nil {
 		log.Fatal(err)
 	}
