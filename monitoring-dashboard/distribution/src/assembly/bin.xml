@@ -17,8 +17,8 @@
   -->
 <assembly>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>wso2mi-monitoring-dashboard-${project.version}</baseDirectory>
-    <id>WSO2 Micro Integration Monitoring Dashboard Distribution</id>
+    <baseDirectory>wso2ei-dashboard-${project.version}</baseDirectory>
+    <id>WSO2 Integrator Dashboard Distribution</id>
     <formats>
         <format>zip</format>
     </formats>
@@ -40,13 +40,6 @@
                 <exclude>**/*.iwr</exclude>
                 <exclude>**/*.eclipse</exclude>
             </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>../..</directory>
-            <outputDirectory>.</outputDirectory>
-            <includes>
-                <include>README.md</include>
-            </includes>
         </fileSet>
 
         <fileSet>

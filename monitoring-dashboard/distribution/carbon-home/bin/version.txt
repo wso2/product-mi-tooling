@@ -1,1 +1,1 @@
-WSO2 Micro Integration Monitoring Dashboard v${project.version}
+WSO2 Integrator Monitoring Dashboard v${project.version}

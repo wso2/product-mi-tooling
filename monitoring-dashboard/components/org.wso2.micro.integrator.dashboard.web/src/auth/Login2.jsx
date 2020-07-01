@@ -149,7 +149,7 @@ export default class Login2 extends Component {
         return (
             <MuiThemeProvider muiTheme={defaultTheme}>
                 <Header
-                    title={'MICRO INTEGRATOR'}
+                    title={'INTEGRATOR'}
                     rightElement={<span/>}
                 />
             <MDBContainer>
