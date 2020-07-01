@@ -1,12 +1,12 @@
-# product-mi-tooling
+# product-ei-tooling
 
 [![Build Status](https://wso2.org/jenkins/buildStatus/icon?job=products/product-mi-tooling)](https://wso2.org/jenkins/job/products/job/product-mi-tooling/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-This repository houses tooling components required for WSO2 Micro Integrator. Each of these components interact with 
-the Management API of the WSO2 Micro Integrator to provide the information related to a specified server instance. 
+This repository houses tooling components required for WSO2 Integrator Runtime. Each of these components interact with 
+the Management API of the WSO2 Integrator Runtime to provide the information related to a specified server instance. 
 
-# product-mi-components
+# product-ei-components
 The two main tooling artifacts included here are as follows:
 1. [Command Line Interface](https://github.com/wso2/product-mi-tooling/tree/master/cmd) for WSO2 Micro Integrator.
 2. [Monitoring Dashboard](https://github.com/wso2/product-mi-tooling/tree/master/monitoring-dashboard) for WSO2 Micro Integrator.
