@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 )
 
-const ProjectName = "mi"
+const ProjectName = "ei"
 
 // File Names and Paths
 
