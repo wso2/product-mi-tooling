@@ -26,7 +26,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
 import SourceViewComponent from '../common/SourceViewComponent';
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import Switch from "react-switch";
 
 import Box from '@material-ui/core/Box';
@@ -63,7 +63,7 @@ export default class ProxyDetailsPage extends Component {
 
             tableData.push(this.createData("Service Name", response.data.name));
             tableData.push(this.createData("Statistics", response.data.stats));
-            tableData.push(this.createData("Tracing", response.data.tracing));
+            tableData.push(this.createData("Tracing", response.data.tracing === "enabled"));
             tableData.push(this.createData("Service Status", response.data.isRunning));
 
             const endpoints = response.data.eprs || []
@@ -75,7 +75,7 @@ export default class ProxyDetailsPage extends Component {
                     response: response.data,
                 });
         }).catch((error) => {
-            this.setState({error:error});
+            this.setState({error: error});
         });
     }
 
@@ -83,7 +83,7 @@ export default class ProxyDetailsPage extends Component {
         new ResourceAPI().setProxyState(proxy, !currentState).then((response) => {
             this.retrieveProxyInfo(proxy);
         }).catch((error) => {
-            this.setState({error:error});
+            this.setState({error: error});
         });
     }
 
@@ -103,11 +103,23 @@ export default class ProxyDetailsPage extends Component {
                                                 <TableCell>{row.name}</TableCell>
                                                 <TableCell>
                                                     <Switch height={18} width={36}
-                                                                   onChange={e => this.handleProxyStateChange(this.state.response.name, row.value)}
-                                                                   checked={row.value}/>
+                                                            onChange={e => this.handleProxyStateChange(this.state.response.name, row.value)}
+                                                            checked={row.value}/>
                                                 </TableCell>
                                             </TableRow>
-                                        ) :
+                                        )
+                                        : row.name == "Tracing" ?
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>
+                                                    <Switch height={18} width={36}
+                                                            onChange={updatedState => this.handleTraceUpdate(this.state.response.name, updatedState)}
+                                                            checked={row.value}/>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                        :
                                         (
                                             <TableRow>
                                                 <TableCell>{row.name}</TableCell>
@@ -138,9 +150,25 @@ export default class ProxyDetailsPage extends Component {
         );
     }
 
+    handleTraceUpdate(proxyName, updatedState) {
+
+        let traceState = "disable";
+        if (updatedState) {
+            traceState = "enable";
+        }
+        new ResourceAPI().handleProxyTraceLevelUpdate(proxyName, traceState).then((response) => {
+            this.retrieveProxyInfo(proxyName);
+        }).catch((error) => {
+            if (error.request) {
+                this.setState({errorOccurred: true}, function () {
+                });
+            }
+        });
+    }
+
     renderBreadCrumbs() {
         return (
-            <div style={{display:"flex"}}>
+            <div style={{display: "flex"}}>
                 <Box color="inherit" component={Link} to="/proxy">Proxy Services</Box>
                 <Box color="textPrimary">&nbsp;>&nbsp;</Box>
                 <Box color="textPrimary"> {this.state.response.name}</Box>

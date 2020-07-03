@@ -22,6 +22,7 @@ import ResourceAPI from '../utils/apis/ResourceAPI';
 import Link from '@material-ui/core/Link';
 
 import MUIDataTable from "mui-datatables";
+import Switch from "react-switch";
 
 export default class ApiListPage extends Component {
 
@@ -51,6 +52,7 @@ export default class ApiListPage extends Component {
                 const rowData = [];
                 rowData.push(element.name);
                 rowData.push(element.url);
+                rowData.push(element.tracing);
                 data.push(rowData);
             });
             this.setState({data: data});
@@ -76,7 +78,22 @@ export default class ApiListPage extends Component {
                         );
                     }
                 }
-            }, "URL"];
+            }, "URL",
+            {
+                name: "Tracing",
+                options: {
+                    customBodyRender: (value, tableMeta, updateValue) => {
+                        let traceState = false;
+                        if ("enabled" === tableMeta.rowData[2]) {
+                            traceState = true;
+                        }
+                        return (<Switch height={25} width={50}
+                                        onChange={updatedState => this.handleTraceUpdate(tableMeta.rowData[0], updatedState)}
+                                        checked={traceState}/>);
+                    }
+                }
+            }
+        ];
         const options = {
             selectableRows: 'none',
             print: false,
@@ -91,6 +108,22 @@ export default class ApiListPage extends Component {
                 options={options}
             />
         );
+    }
+
+    handleTraceUpdate(apiName, updatedState) {
+
+        let traceState = "disable";
+        if (updatedState) {
+            traceState = "enable";
+        }
+        new ResourceAPI().handleApiTraceLevelUpdate(apiName, traceState).then((response) => {
+            this.retrieveApis();
+        }).catch((error) => {
+            if (error.request) {
+                this.setState({errorOccurred: true}, function () {
+                });
+            }
+        });
     }
 
     render() {

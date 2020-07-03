@@ -23,6 +23,7 @@ import ResourceAPI from '../utils/apis/ResourceAPI';
 import Link from '@material-ui/core/Link';
 
 import MUIDataTable from "mui-datatables";
+import Switch from "react-switch";
 
 export default class SequenceListPage extends Component {
 
@@ -51,14 +52,14 @@ export default class SequenceListPage extends Component {
             this.sequences.forEach((element) => {
                 const rowData = [];
                 rowData.push(element.name);
-                rowData.push(element.tracing);
                 rowData.push(element.stats);
+                rowData.push(element.tracing);
                 data.push(rowData);
 
             });
             this.setState({data: data});
         }).catch((error) => {
-            this.setState({error:error});
+            this.setState({error: error});
         });
     }
 
@@ -78,7 +79,23 @@ export default class SequenceListPage extends Component {
                     );
                 }
             }
-        }, "Tracing", "Statistics"];
+        }, "Statistics",
+            {
+                name: "Tracing",
+                options: {
+                    customBodyRender: (value, tableMeta, updateValue) => {
+                        let traceState = false;
+                        if ("enabled" === tableMeta.rowData[2]) {
+                            traceState = true;
+                        }
+                        return (<Switch height={25} width={50}
+                                        onChange={updatedState => this.handleTraceUpdate(tableMeta.rowData[0], updatedState)}
+                                        checked={traceState}/>);
+                    }
+                }
+            }
+
+        ];
         const options = {
             selectableRows: 'none',
             print: false,
@@ -93,6 +110,22 @@ export default class SequenceListPage extends Component {
                 options={options}
             />
         );
+    }
+
+    handleTraceUpdate(seqName, currentState) {
+
+        let traceState = "disable";
+        if (currentState) {
+            traceState = "enable";
+        }
+        new ResourceAPI().handleSeqTraceLevelUpdate(seqName, traceState).then((response) => {
+            this.retrieveSequences();
+        }).catch((error) => {
+            if (error.request) {
+                this.setState({errorOccurred: true}, function () {
+                });
+            }
+        });
     }
 
     render() {
