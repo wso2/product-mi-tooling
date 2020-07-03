@@ -67,7 +67,8 @@ export default class ListViewParent extends Component {
         super(props, context);
         this.state = {
             connectionErrorDialogOpen: false,
-            responseErrorDialogOpen: false
+            responseErrorDialogOpen: false,
+            serverErrorMsg: {}
         };
         this.handleConnectionErrorDialogClose = this.handleConnectionErrorDialogClose.bind(this);
         this.handlerResponseErrorDialogClose = this.handlerResponseErrorDialogClose.bind(this);
@@ -84,8 +85,12 @@ export default class ListViewParent extends Component {
     handleError(error) {
         if (error.response) {
             // response received with error (non 2XX SC)
-            this.setState({responseErrorDialogOpen: true});
-
+            this.setState({
+                responseErrorDialogOpen: true,
+                serverErrorMsg:
+                    error.response.data.Error === undefined ?
+                        "Unknown error occurred while processing request. Please check server logs" : error.response.data.Error
+            });
         } else if (error.request) {
             // response was not received, hence connection issue
             this.setState({connectionErrorDialogOpen: true});
@@ -98,7 +103,9 @@ export default class ListViewParent extends Component {
     }
 
     handlerResponseErrorDialogClose() {
-        this.setState({responseErrorDialogOpen: false});
+        this.setState({
+            responseErrorDialogOpen: false
+        });
     }
 
     /**
@@ -132,7 +139,7 @@ export default class ListViewParent extends Component {
                                 <DialogTitle id="alert-dialog-title">{"Error in Response"}</DialogTitle>
                                 <DialogContent dividers>
                                     <DialogContentText id="alert-dialog-description">
-                                        Error occurred while processing request. Please check Micro-integrator server logs
+                                        {this.state.serverErrorMsg}
                                     </DialogContentText>
                                 </DialogContent>
                                 <DialogActions>
