@@ -118,6 +118,29 @@ export default class ResourceAPI {
         return this.getHTTPClient().post(`/message-processors`, payload);
     }
 
+    handleApiTraceLevelUpdate(apiName, state) {
+        return this.updateTraceLevel(`/apis?apiName=${apiName}`, state);
+    }
+
+    handleInboundTraceLevelUpdate(inboundName, state) {
+        return this.updateTraceLevel(`/inbound-endpoints?inboundEndpointName=${inboundName}`, state);
+    }
+
+    handleProxyTraceLevelUpdate(proxyName, state) {
+        return this.updateTraceLevel(`/proxy-services?proxyServiceName=${proxyName}`, state);
+    }
+
+    handleSeqTraceLevelUpdate(seqName, state) {
+        return this.updateTraceLevel(`/sequences?sequenceName=${seqName}`, state);
+    }
+
+    updateTraceLevel(url, state) {
+        let payload = {
+            trace: state
+        };
+        return this.getHTTPClient().post(url, payload);
+    }
+
     updateLogLevel(loggerName, logLevel) {
 
         let payload = {

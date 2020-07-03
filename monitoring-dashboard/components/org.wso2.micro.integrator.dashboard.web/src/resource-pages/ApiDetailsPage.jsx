@@ -27,7 +27,8 @@ import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
 import SourceViewComponent from '../common/SourceViewComponent';
 import Box from '@material-ui/core/Box';
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
+import Switch from "react-switch";
 
 export default class ApiDetailsPage extends Component {
 
@@ -61,13 +62,14 @@ export default class ApiDetailsPage extends Component {
             metaData.push(this.createData("Context", response.data.context));
             metaData.push(this.createData("Host Name", response.data.host));
             metaData.push(this.createData("Port", response.data.port));
+            metaData.push(this.createData("Tracing", response.data.tracing === "enabled"));
             this.setState(
                 {
                     metaData: metaData,
                     response: response.data,
                 });
         }).catch((error) => {
-            this.setState({error:error});
+            this.setState({error: error});
         });
     }
 
@@ -80,10 +82,25 @@ export default class ApiDetailsPage extends Component {
                         <TableBody>
                             {
                                 this.state.metaData.map(row => (
-                                    <TableRow>
-                                        <TableCell>{row.name}</TableCell>
-                                        <TableCell>{row.value}</TableCell>
-                                    </TableRow>
+
+                                    row.name == "Tracing" ?
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>
+                                                    <Switch height={18} width={36}
+                                                            onChange={updatedState => this.handleTraceUpdate(this.state.response.name, updatedState)}
+                                                            checked={row.value}/>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                        :
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>{row.value}</TableCell>
+                                            </TableRow>
+                                        )
                                 ))
                             }
                         </TableBody>
@@ -94,9 +111,25 @@ export default class ApiDetailsPage extends Component {
         );
     }
 
+    handleTraceUpdate(apiName, updatedState) {
+
+        let traceState = "disable";
+        if (updatedState) {
+            traceState = "enable";
+        }
+        new ResourceAPI().handleApiTraceLevelUpdate(apiName, traceState).then((response) => {
+            this.retrieveApis();
+        }).catch((error) => {
+            if (error.request) {
+                this.setState({errorOccurred: true}, function () {
+                });
+            }
+        });
+    }
+
     renderBreadCrumbs() {
         return (
-            <div style={{display:"flex"}}>
+            <div style={{display: "flex"}}>
                 <Box color="inherit" component={Link} to="/api">API</Box>
                 <Box color="textPrimary">&nbsp;>&nbsp;</Box>
                 <Box color="textPrimary"> {this.state.response.name}</Box>

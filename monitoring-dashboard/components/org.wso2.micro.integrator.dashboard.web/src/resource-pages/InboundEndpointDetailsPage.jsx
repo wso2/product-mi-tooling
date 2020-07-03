@@ -28,8 +28,9 @@ import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
 import Typography from '@material-ui/core/Typography';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import Box from '@material-ui/core/Box';
+import Switch from "react-switch";
 
 export default class InboundEndpointDetailsPage extends Component {
 
@@ -62,7 +63,7 @@ export default class InboundEndpointDetailsPage extends Component {
 
             metaData.push(this.createData("Inbound Endpoint Name", response.data.name));
             metaData.push(this.createData("Protocol", response.data.protocol));
-            metaData.push(this.createData("Tracing", response.data.tracing));
+            metaData.push(this.createData("Tracing", response.data.tracing === "enabled"));
             metaData.push(this.createData("Statistics", response.data.stats));
             metaData.push(this.createData("Sequence", response.data.sequence));
             metaData.push(this.createData("On Error", response.data.error));
@@ -74,7 +75,7 @@ export default class InboundEndpointDetailsPage extends Component {
                     response: response.data,
                 });
         }).catch((error) => {
-            this.setState({error:error});
+            this.setState({error: error});
         });
     }
 
@@ -87,10 +88,25 @@ export default class InboundEndpointDetailsPage extends Component {
                         <TableBody>
                             {
                                 this.state.metaData.map(row => (
-                                    <TableRow>
-                                        <TableCell>{row.name}</TableCell>
-                                        <TableCell>{row.value}</TableCell>
-                                    </TableRow>
+
+                                    row.name == "Tracing" ?
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>
+                                                    <Switch height={18} width={36}
+                                                            onChange={enabled => this.handleTraceUpdate(this.state.response.name, enabled)}
+                                                            checked={row.value}/>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                        :
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>{row.value}</TableCell>
+                                            </TableRow>
+                                        )
                                 ))
                             }
                         </TableBody>
@@ -116,9 +132,25 @@ export default class InboundEndpointDetailsPage extends Component {
         );
     }
 
+    handleTraceUpdate(inboundName, enabled) {
+
+        let traceState = "disable";
+        if (enabled) {
+            traceState = "enable";
+        }
+        new ResourceAPI().handleInboundTraceLevelUpdate(inboundName, traceState).then((response) => {
+            this.retrieveApis();
+        }).catch((error) => {
+            if (error.request) {
+                this.setState({errorOccurred: true}, function () {
+                });
+            }
+        });
+    }
+
     renderBreadCrumbs() {
         return (
-            <div style={{display:"flex"}}>
+            <div style={{display: "flex"}}>
                 <Box color="inherit" component={Link} to="/inbound-endpoint">Inbound Endpoint</Box>
                 <Box color="textPrimary">&nbsp;>&nbsp;</Box>
                 <Box color="textPrimary"> {this.state.response.name}</Box>

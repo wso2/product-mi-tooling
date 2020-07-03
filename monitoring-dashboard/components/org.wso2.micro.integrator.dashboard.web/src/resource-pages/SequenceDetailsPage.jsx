@@ -28,7 +28,8 @@ import TableHeaderBox from '../common/TableHeaderBox';
 import SourceViewComponent from '../common/SourceViewComponent';
 import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
+import Switch from "react-switch";
 
 export default class SequenceDetailsPage extends Component {
 
@@ -59,7 +60,7 @@ export default class SequenceDetailsPage extends Component {
         new ResourceAPI().getSequenceByName(name).then((response) => {
 
             metaData.push(this.createData("Sequence Name", response.data.name));
-            metaData.push(this.createData("Tracing", response.data.tracing));
+            metaData.push(this.createData("Tracing", response.data.tracing === "enabled"));
             metaData.push(this.createData("Statistics", response.data.stats));
             this.setState(
                 {
@@ -67,7 +68,7 @@ export default class SequenceDetailsPage extends Component {
                     metaData: metaData,
                 });
         }).catch((error) => {
-            this.setState({error:error});
+            this.setState({error: error});
         });
     }
 
@@ -80,10 +81,25 @@ export default class SequenceDetailsPage extends Component {
                         <TableBody>
                             {
                                 this.state.metaData.map(row => (
-                                    <TableRow>
-                                        <TableCell>{row.name}</TableCell>
-                                        <TableCell>{row.value}</TableCell>
-                                    </TableRow>
+
+                                    row.name == "Tracing" ?
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>
+                                                    <Switch height={18} width={36}
+                                                            onChange={updatedState => this.handleTraceUpdate(this.state.response.name, updatedState)}
+                                                            checked={row.value}/>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                        :
+                                        (
+                                            <TableRow>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>{row.value}</TableCell>
+                                            </TableRow>
+                                        )
                                 ))
                             }
                         </TableBody>
@@ -95,9 +111,25 @@ export default class SequenceDetailsPage extends Component {
         );
     }
 
+    handleTraceUpdate(seqName, currentState) {
+
+        let traceState = "disable";
+        if (currentState) {
+            traceState = "enable";
+        }
+        new ResourceAPI().handleSeqTraceLevelUpdate(seqName, traceState).then((response) => {
+            this.retrieveSequences();
+        }).catch((error) => {
+            if (error.request) {
+                this.setState({errorOccurred: true}, function () {
+                });
+            }
+        });
+    }
+
     renderBreadCrumbs() {
         return (
-            <div style={{display:"flex"}}>
+            <div style={{display: "flex"}}>
                 <Box color="inherit" component={Link} to="/sequence">Sequences</Box>
                 <Box color="textPrimary">&nbsp;>&nbsp;</Box>
                 <Box color="textPrimary"> {this.state.response.name}</Box>
