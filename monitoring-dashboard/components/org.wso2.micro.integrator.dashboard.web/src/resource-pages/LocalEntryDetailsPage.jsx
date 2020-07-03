@@ -25,6 +25,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
+import Box from '@material-ui/core/Box';
 import { Link } from "react-router-dom";
 
 export default class LocalEntryDetailsPage extends Component {
