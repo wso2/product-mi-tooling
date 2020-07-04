@@ -118,7 +118,7 @@ export default class ApiDetailsPage extends Component {
             traceState = "enable";
         }
         new ResourceAPI().handleApiTraceLevelUpdate(apiName, traceState).then((response) => {
-            this.retrieveApis();
+            this.retrieveApiInfo(apiName);
         }).catch((error) => {
             if (error.request) {
                 this.setState({errorOccurred: true}, function () {

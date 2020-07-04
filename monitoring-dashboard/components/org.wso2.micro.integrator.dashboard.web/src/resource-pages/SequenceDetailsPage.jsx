@@ -118,7 +118,7 @@ export default class SequenceDetailsPage extends Component {
             traceState = "enable";
         }
         new ResourceAPI().handleSeqTraceLevelUpdate(seqName, traceState).then((response) => {
-            this.retrieveSequences();
+            this.retrieveSequenceInfo(seqName);
         }).catch((error) => {
             if (error.request) {
                 this.setState({errorOccurred: true}, function () {
