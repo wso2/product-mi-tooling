@@ -42,7 +42,9 @@ func GetRemoteConfigFilePath() string {
 	if err != nil {
 		HandleErrorAndExit("Error getting user home directory: ", err)
 	}
-	remoteConfigFilePath := filepath.Join(userHomeDir, RemoteConfigFileName)
+	configDirectory := filepath.Join(userHomeDir, ConfigDirName)
+	makeDirectoryIfNotExists(configDirectory)
+	remoteConfigFilePath := filepath.Join(configDirectory, RemoteConfigFileName)
 	return remoteConfigFilePath
 }
 
@@ -63,4 +65,11 @@ func GetConfigFilePath(configFileName string) string {
 	}
 	configFilePath := filepath.Join(userHomeDir, configFileName)
 	return configFilePath
+}
+
+func makeDirectoryIfNotExists(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return os.Mkdir(path, os.ModeDir|0755)
+	}
+	return nil
 }
