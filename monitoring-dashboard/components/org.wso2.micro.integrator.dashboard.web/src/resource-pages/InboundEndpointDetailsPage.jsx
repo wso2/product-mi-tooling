@@ -139,7 +139,7 @@ export default class InboundEndpointDetailsPage extends Component {
             traceState = "enable";
         }
         new ResourceAPI().handleInboundTraceLevelUpdate(inboundName, traceState).then((response) => {
-            this.retrieveApis();
+            this.retrieveEndpointInfo(inboundName);
         }).catch((error) => {
             if (error.request) {
                 this.setState({errorOccurred: true}, function () {
