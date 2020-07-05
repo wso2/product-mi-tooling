@@ -30,6 +30,7 @@ import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import {Link} from "react-router-dom";
 import Switch from "react-switch";
+import * as Constants from "../utils/Constants";
 
 export default class SequenceDetailsPage extends Component {
 
@@ -87,7 +88,8 @@ export default class SequenceDetailsPage extends Component {
                                             <TableRow>
                                                 <TableCell>{row.name}</TableCell>
                                                 <TableCell>
-                                                    <Switch height={18} width={36}
+                                                    <Switch height={Constants.detailsPageSwitchAttributes.Height}
+                                                            width={Constants.detailsPageSwitchAttributes.Width}
                                                             onChange={updatedState => this.handleTraceUpdate(this.state.response.name, updatedState)}
                                                             checked={row.value}/>
                                                 </TableCell>

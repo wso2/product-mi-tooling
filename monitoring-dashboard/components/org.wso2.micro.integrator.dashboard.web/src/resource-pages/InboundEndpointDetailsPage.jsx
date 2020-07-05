@@ -31,6 +31,7 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import {Link} from "react-router-dom";
 import Box from '@material-ui/core/Box';
 import Switch from "react-switch";
+import * as Constants from "../utils/Constants";
 
 export default class InboundEndpointDetailsPage extends Component {
 
@@ -94,7 +95,8 @@ export default class InboundEndpointDetailsPage extends Component {
                                             <TableRow>
                                                 <TableCell>{row.name}</TableCell>
                                                 <TableCell>
-                                                    <Switch height={18} width={36}
+                                                    <Switch height={Constants.detailsPageSwitchAttributes.Height}
+                                                            width={Constants.detailsPageSwitchAttributes.Width}
                                                             onChange={enabled => this.handleTraceUpdate(this.state.response.name, enabled)}
                                                             checked={row.value}/>
                                                 </TableCell>

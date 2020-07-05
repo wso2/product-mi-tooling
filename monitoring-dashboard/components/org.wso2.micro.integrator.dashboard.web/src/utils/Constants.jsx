@@ -40,3 +40,8 @@ const MediaType = {
 };
 
 export { HttpStatus, MediaType };
+
+export const detailsPageSwitchAttributes = {
+    Height: 18,
+    Width: 36
+};
