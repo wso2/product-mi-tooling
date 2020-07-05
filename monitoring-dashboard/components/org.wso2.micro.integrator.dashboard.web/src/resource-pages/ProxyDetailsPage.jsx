@@ -30,6 +30,7 @@ import {Link} from "react-router-dom";
 import Switch from "react-switch";
 
 import Box from '@material-ui/core/Box';
+import * as Constants from "../utils/Constants";
 
 export default class ProxyDetailsPage extends Component {
 
@@ -102,7 +103,8 @@ export default class ProxyDetailsPage extends Component {
                                             <TableRow>
                                                 <TableCell>{row.name}</TableCell>
                                                 <TableCell>
-                                                    <Switch height={18} width={36}
+                                                    <Switch height={Constants.detailsPageSwitchAttributes.Height}
+                                                            width={Constants.detailsPageSwitchAttributes.Width}
                                                             onChange={e => this.handleProxyStateChange(this.state.response.name, row.value)}
                                                             checked={row.value}/>
                                                 </TableCell>
