@@ -80,8 +80,6 @@ export default class HomePage extends Component {
         options.push(this.createData("Server Name", metadata.productName));
         options.push(this.createData("Version", metadata.productVersion));
         options.push(this.createData("Micro Integrator Home", metadata.carbonHome));
-        options.push(this.createData("Work Directory", metadata.workDirectory));
-        options.push(this.createData("Repository Location", metadata.repositoryLocation));
         options.push(this.createData("Java Home", metadata.javaHome));
         options.push(this.createData("Java Version", metadata.javaVersion));
         options.push(this.createData("Java Vendor", metadata.javaVendor));
