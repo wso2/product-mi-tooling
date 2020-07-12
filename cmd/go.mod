@@ -3,6 +3,7 @@ module github.com/wso2/product-mi-tooling/cmd
 go 1.12
 
 require (
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/lithammer/dedent v1.1.0
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-runewidth v0.0.4 // indirect
