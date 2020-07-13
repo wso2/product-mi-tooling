@@ -19,18 +19,20 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"fmt"
-	"os/exec"
 	"bufio"
-	"os"
-	"strings"
 	"errors"
+	"fmt"
+	"github.com/kardianos/osext"
+	"github.com/spf13/cobra"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
-	"path"
-	"runtime"
-	"log"
 	"golang.org/x/crypto/ssh/terminal"
+	"log"
+	"os"
+	"os/exec"
+	"path"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"syscall"
 )
 
@@ -42,6 +44,7 @@ var file = ""
 var algorithm = ""
 var inputs = make(map[string]string)
 var keystoreInfoFile = utils.GetkeyStoreInfoFileLocation()
+var encryptionClientPath = ""
 
 var secretCreateCmd = &cobra.Command{
 	Use:   secretCreateCmdLiteral,
@@ -66,7 +69,14 @@ func init() {
 }
 
 func handleSecretCmdArguments(args []string) {
-		// checks for the output type
+
+	encryptionClientPath = getEncryptionClientPath()
+	// checks if client jar exists
+	if len(encryptionClientPath) == 0 {
+		log.Fatal("[FATAL ERROR] Encryption client library is missing")
+		return
+	}
+	// checks for the output type
 		if len(args) == 0 {
 			// default output will be console
 			inputs["secret.output.type"] = "console"
@@ -109,19 +119,14 @@ func initSecretInformation() {
 }
 
 func execClient() {
-	var stdoutMessage []byte
-	// checks if client jar exists
-	if len(strings.TrimSpace(getEncryptionClientName())) == 0 {
-		errors.New("encryption client could not be found")
-	}
 
+	var stdoutMessage []byte
+	command := "java -jar " + encryptionClientPath
 	if runtime.GOOS == "windows" {
-		windowsCommand := "java -jar " + getEncryptionClientName()
-		output := exec.Command("cmd", "/c", windowsCommand)
+		output := exec.Command("cmd", "/c", command)
 		stdoutMessage, _ = output.CombinedOutput()
 	} else {
-		unixCommand := "java -jar " + getEncryptionClientName()
-		output := exec.Command("bash", "-c", unixCommand)
+		output := exec.Command("bash", "-c", command)
 		stdoutMessage, _ = output.CombinedOutput()
 	}
 	fmt.Printf("%s", stdoutMessage)
@@ -167,23 +172,22 @@ func validateKeystoreInitialization() bool {
 	return true
 }
 
-func getEncryptionClientName() (string) {
-	pwd, _ := os.Getwd()
-	content, err := os.Open(pwd)
+func getEncryptionClientPath() string {
+
+	programDir, _ := osext.Executable()
+	binDir, _ := filepath.Abs(programDir + string(os.PathSeparator) + "..")
+	content, err := os.Open(binDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 	files, _ := content.Readdir(-1)
 	content.Close()
-
-	var fileName = ""
 	for _, file := range files {
 		if strings.Contains(file.Name(), "encryption-client") {
-			fileName = file.Name()
-			break
+			return binDir + string(os.PathSeparator) + file.Name()
 		}
 	}
-	return fileName
+	return ""
 }
 
 func validateSecrets(secret string, repeatSecret string) bool {

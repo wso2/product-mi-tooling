@@ -19,15 +19,16 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"bufio"
-	"os"
+	"encoding/base64"
 	"fmt"
+	"github.com/spf13/cobra"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
+	"golang.org/x/crypto/ssh/terminal"
+	"log"
+	"os"
 	"strings"
 	"syscall"
-	"golang.org/x/crypto/ssh/terminal"
-	"encoding/base64"
 )
 
 
@@ -51,7 +52,12 @@ func init() {
 
 }
 
-func handleSecretInitCmdArgs(args []string)  {
+func handleSecretInitCmdArgs(args []string) {
+
+	if len(getEncryptionClientPath()) == 0 {
+		log.Fatal("[FATAL ERROR] Encryption client library is missing")
+		return
+	}
 	if len(args) > 0 {
 		fmt.Println("Too many arguments. See the usage guide.")
 	} else {
