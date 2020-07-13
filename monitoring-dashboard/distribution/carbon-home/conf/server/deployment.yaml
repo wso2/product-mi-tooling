@@ -39,12 +39,12 @@ wso2.transport.http:
 
   listenerConfigurations:
     -
-      id: "default"
+      id: "http"
       host: "0.0.0.0"
       port: 9390
       scheme: http
     -
-      id: "msf4j-https"
+      id: "https"
       host: "0.0.0.0"
       port: 9743
       scheme: https
@@ -247,4 +247,4 @@ wso2.datasources:
 wso2.carbon-ui-server:
   apps:
     dashboard:
-      transportId: "default"
+      transportId: "https"
