@@ -46,13 +46,11 @@ export default class LogFileListPage extends Component {
 
         new ResourceAPI().getResourceList(`/logs`).then((response) => {
             this.logFiles = response.data.list || [];
-
-            this.logFiles.forEach((element) => {
+            this.logFiles.filter(file => file.FileName.endsWith(".log")).forEach(element => {
                 const rowData = [];
                 rowData.push(element.FileName);
                 rowData.push(element.Size);
                 data.push(rowData);
-
             });
             this.setState({data: data});
         }).catch((error) => {
