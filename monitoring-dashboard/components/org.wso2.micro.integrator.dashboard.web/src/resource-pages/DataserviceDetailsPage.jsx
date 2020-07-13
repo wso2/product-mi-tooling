@@ -99,6 +99,7 @@ export default class DataserviceDetailsPage extends Component {
         generalDetails.push(DataUtils.createData("Name", dss.serviceName));
         generalDetails.push(DataUtils.createData("WSDL 1.1", dss.wsdl1_1));
         generalDetails.push(DataUtils.createData("WSDL 2.0", dss.wsdl2_0));
+        generalDetails.push(DataUtils.createData("Swagger URL", dss.swagger_url));
         return (
             <Table size="small">
                 <TableBody>
