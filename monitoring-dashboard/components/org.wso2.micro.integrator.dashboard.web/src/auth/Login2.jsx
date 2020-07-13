@@ -124,6 +124,7 @@ export default class Login2 extends Component {
                     errorMessage = 'Incorrect username or password!';
                 } else {
                     errorMessage = 'Error occurred in communication.';
+                    window.open(`https://${host}:${port}/management`,  'sharer', 'toolbar=0,status=0,width=1000,height=400');
                 }
                 this.setState({
                     username: '',
