@@ -26,9 +26,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TableHeaderBox from '../common/TableHeaderBox';
 import SourceViewComponent from '../common/SourceViewComponent';
-import Typography from '@material-ui/core/Typography';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 import Box from '@material-ui/core/Box';
 
@@ -100,17 +98,18 @@ export default class MessageStoreDetailsPage extends Component {
                     </Table>
                 </Box>
 
-                <Box pb={5}>
+                <Box pb={4}>
                     <TableHeaderBox title="Parameters"/>
                     <Table size="small">
                         <TableBody>
                             {
-                                Object.keys(this.state.parameters).map(key => (
-                                    <TableRow>
-                                        <TableCell>{key}</TableCell>
-                                        <TableCell>{this.state.parameters[key]}</TableCell>
-                                    </TableRow>
-                                ))
+                                Object.keys(this.state.parameters).filter(key => !key.includes("password"))
+                                    .map(key => (
+                                        <TableRow>
+                                            <TableCell>{key}</TableCell>
+                                            <TableCell>{this.state.parameters[key]}</TableCell>
+                                        </TableRow>
+                                    ))
                             }
                         </TableBody>
                     </Table>
