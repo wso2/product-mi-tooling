@@ -73,8 +73,7 @@ func handleSecretCmdArguments(args []string) {
 	encryptionClientPath = getEncryptionClientPath()
 	// checks if client jar exists
 	if len(encryptionClientPath) == 0 {
-		log.Fatal("[FATAL ERROR] Encryption client library is missing")
-		return
+		utils.HandleErrorAndExit("[FATAL ERROR] Encryption client library is missing", nil)
 	}
 	// checks for the output type
 		if len(args) == 0 {
