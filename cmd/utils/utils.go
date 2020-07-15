@@ -209,6 +209,12 @@ func UnmarshalLogFileData(url string, headers map[string]string, params map[stri
 
     resp, err := InvokeGETRequest(url, headers, params)
 
+	if resp.StatusCode() == http.StatusUnauthorized {
+		// not logged in to MI
+		HandleErrorAndExit("User not logged in or session timed out. Please login to the current Micro " +
+			"Integrator instance", nil)
+	}
+
     if err != nil {
         HandleErrorAndExit("Unable to connect to "+url, nil)
     }
