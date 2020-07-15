@@ -20,10 +20,11 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/spf13/cobra"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
 	"github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
-	"strconv"
 )
 
 const transactionCountCmdLiteral = "count"
@@ -75,7 +76,7 @@ func executeGetTransactionCountWithArgsCmd(year string, month string) {
 
 // Invoke ../management/transactions/count?year=[year]&month=[month]
 func executeGetTransactionCountCmd(params map[string]string) {
-	finalUrl := utils.GetRESTAPIBase() + utils.PrefixTransactions + "/"+ utils.TransactionCountCmd
+	finalUrl := utils.GetRESTAPIBase() + utils.PrefixTransactions + "/" + utils.TransactionCountCmd
 	resp, err := utils.UnmarshalData(finalUrl, nil, params, &artifactUtils.TransactionCount{})
 	handleResponse(resp, err)
 }
@@ -86,12 +87,7 @@ func handleResponse(resp interface{}, err error) {
 		transactionCount := resp.(*artifactUtils.TransactionCount)
 		printTransactionCountInfo(*transactionCount)
 	} else {
-		errBody := resp.(string)
-		if len(errBody) > 0 {
-			fmt.Println(utils.LogPrefixError+errBody, err)
-		} else {
-			fmt.Println(utils.LogPrefixError+"When getting information of Transaction Counts.", err)
-		}
+		fmt.Println(utils.LogPrefixError+"Retrieving transactions count.", err)
 	}
 }
 
