@@ -88,7 +88,7 @@ func executeGetMessageProcessorCmd(messageProcessorName string) {
 		messageProcessor := resp.(*artifactUtils.MessageProcessorData)
 		printMessageProcessor(*messageProcessor)
 	} else {
-		fmt.Println(utils.LogPrefixError+"Getting Information of Endpoint", err)
+		fmt.Println(utils.LogPrefixError+"Getting Information of Message Processor", err)
 	}
 }
 
