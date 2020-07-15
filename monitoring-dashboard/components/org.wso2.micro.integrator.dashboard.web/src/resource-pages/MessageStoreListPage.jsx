@@ -51,7 +51,6 @@ export default class MessageStoreListPage extends Component {
                 const rowData = [];
                 rowData.push(element.name);
                 rowData.push(element.type);
-                rowData.push(element.size);
                 data.push(rowData);
             });
             this.setState({data: data});
@@ -76,7 +75,7 @@ export default class MessageStoreListPage extends Component {
                     );
                 }
             }
-        }, "Type", "Messages"];
+        }, "Type"];
         const options = {
             selectableRows: 'none',
             print: false,
