@@ -25,7 +25,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
 	"golang.org/x/crypto/ssh/terminal"
-	"log"
 	"os"
 	"strings"
 	"syscall"
@@ -55,8 +54,7 @@ func init() {
 func handleSecretInitCmdArgs(args []string) {
 
 	if len(getEncryptionClientPath()) == 0 {
-		log.Fatal("[FATAL ERROR] Encryption client library is missing")
-		return
+		utils.HandleErrorAndExit("[FATAL ERROR] Encryption client library is missing", nil)
 	}
 	if len(args) > 0 {
 		fmt.Println("Too many arguments. See the usage guide.")
