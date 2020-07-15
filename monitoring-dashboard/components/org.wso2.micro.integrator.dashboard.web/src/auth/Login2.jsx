@@ -166,7 +166,6 @@ export default class Login2 extends Component {
                                 <MuiThemeProvider muiTheme={lightTheme}>
                                 <TextField
                                     id="txt-host"
-                                    autoFocus
                                     fullWidth
                                     autoComplete="off"
                                     margin="normal"
@@ -183,7 +182,6 @@ export default class Login2 extends Component {
                                 <TextField
                                     id="txt-port"
                                     type="email"
-                                    autoFocus
                                     fullWidth
                                     autoComplete="off"
                                     margin="normal"
@@ -200,7 +198,7 @@ export default class Login2 extends Component {
                                 <TextField
                                     id="txt-username"
                                     type="email"
-                                    autoFocus
+                                    autofocus="true"
                                     fullWidth
                                     autoComplete="off"
                                     margin="normal"
@@ -217,7 +215,6 @@ export default class Login2 extends Component {
                                 <TextField
                                     type="password"
                                     id="defaultFormPasswordEx"
-                                    autoFocus
                                     fullWidth
                                     autoComplete="off"
                                     margin="normal"
