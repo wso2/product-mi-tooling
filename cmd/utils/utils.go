@@ -220,6 +220,7 @@ func UnmarshalLogFileData(url string, headers map[string]string, params map[stri
     }
 
     ioutil.WriteFile(filename, resp.Body(), 0644)
+    fmt.Println("Log file downloaded to " + filename)
     Logln(LogPrefixInfo+"Response:", resp.Status())
 }
 
