@@ -93,6 +93,7 @@ export default class Login2 extends Component {
 
         this.authenticate = this.authenticate.bind(this);
         this.handleLoginErrorDialogClose = this.handleLoginErrorDialogClose.bind(this);
+        this.handleOpenCertWindow = this.handleOpenCertWindow.bind(this);
     }
 
 
@@ -111,6 +112,11 @@ export default class Login2 extends Component {
         }
     }
 
+    handleOpenCertWindow(){
+        const {host, port} = this.state;
+        window.open(`https://${host}:${port}/management`,  '_blank', 'toolbar=0,status=0,width=1000,height=400');
+    }
+
     authenticate(e) {
         const { intl } = this.context;
         const {username, password, host, port, rememberMe} = this.state;
@@ -123,8 +129,11 @@ export default class Login2 extends Component {
                 if (error.response && error.response.status === 401)  {
                     errorMessage = 'Incorrect username or password!';
                 } else {
-                    errorMessage = 'Error occurred in communication.';
-                    window.open(`https://${host}:${port}/management`,  'sharer', 'toolbar=0,status=0,width=1000,height=400');
+                    errorMessage =
+                        <div>
+                            Network Error Encountered. Probably due to self-singed certificates. Try trusting the
+                            server certs in following url and try again. <br/><a onClick={this.handleOpenCertWindow} href="#">https://{host}:{port}/management</a>
+                        </div>;
                 }
                 this.setState({
                     username: '',

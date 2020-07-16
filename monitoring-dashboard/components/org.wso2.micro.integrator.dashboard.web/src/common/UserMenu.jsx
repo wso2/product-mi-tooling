@@ -17,28 +17,56 @@
  */
 
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
-
-import {FlatButton} from 'material-ui';
+import { FlatButton, Menu, MenuItem, Popover } from 'material-ui';
 import {ActionAccountCircle} from 'material-ui/svg-icons';
-
+import AuthManager from "../auth/utils/AuthManager";
 
 export default class UserMenu extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            isMenuOpen: false,
+            anchorElement: null,
+        };
+        this.handleUserIconClick = this.handleUserIconClick.bind(this);
+        this.handleMenuCloseRequest = this.handleMenuCloseRequest.bind(this);
+    }
+
+    handleUserIconClick(event) {
+        event.preventDefault();
+        this.setState({
+            isMenuOpen: !this.state.isMenuOpen,
+            anchorElement: event.currentTarget,
+        });
+    }
+
+    handleMenuCloseRequest() {
+        this.setState({
+            isMenuOpen: false,
+        });
     }
 
     render() {
-
+        const user = AuthManager.getUser();
         return (
             <span>
                     <FlatButton
-                        style={{marginTop: '6px'}}
-                        label='Logout'
-                        icon={<ActionAccountCircle/>}
-                        containerElement={<Link to={'/logout'}/>}
-                        linkButton={true}
+                        style={{ marginTop: '6px' }}
+                        label={user.username}
+                        onClick={this.handleUserIconClick}
+                        icon={<ActionAccountCircle />}
                     />
+                    <Popover
+                        open={this.state.isMenuOpen}
+                        anchorEl={this.state.anchorElement}
+                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                        targetOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        onRequestClose={this.handleMenuCloseRequest}
+                    >
+                        <Menu>
+                            <MenuItem href={window.contextPath + "/logout"}>Logout</MenuItem>
+                        </Menu>
+                    </Popover>
                 </span>
         );
     }
