@@ -60,6 +60,7 @@ export default class MessageStoreDetailsPage extends Component {
         new ResourceAPI().getMessageStoreServiceByName(name).then((response) => {
 
             metaData.push(this.createData("Store Name", response.data.name));
+            metaData.push(this.createData("Message Count", response.data.size == -1 ? "Not Supported" : response.data.size));
             const parameters = response.data.properties || {};
             this.setState(
                 {
