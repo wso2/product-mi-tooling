@@ -33,6 +33,8 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Box from '@material-ui/core/Box';
 import { Link } from "react-router-dom";
+import Switch from "react-switch";
+import * as Constants from "../utils/Constants";
 
 export default class EndpointDetailsPage extends Component {
 
@@ -110,6 +112,7 @@ export default class EndpointDetailsPage extends Component {
         options.push(this.createData("Type", endpoint.type));
         options.push(this.createData("Method", endpoint.method));
         options.push(this.createData("URI Template", endpoint.uriTemplate));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Table size="small">
                 <TableBody>
@@ -123,6 +126,7 @@ export default class EndpointDetailsPage extends Component {
         options.push(this.createData("Name", endpoint.name));
         options.push(this.createData("Type", endpoint.type));
         options.push(this.createData("Address", endpoint.address));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Table size="small">
                 <TableBody>
@@ -139,6 +143,7 @@ export default class EndpointDetailsPage extends Component {
         options.push(this.createData("WSDL URI", endpoint.wsdlUri));
         options.push(this.createData("Service", endpoint.serviceName));
         options.push(this.createData("Port", endpoint.portName));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Table size="small">
                 <TableBody>
@@ -154,6 +159,7 @@ export default class EndpointDetailsPage extends Component {
         options.push(this.createData("Type", endpoint.type));
         options.push(this.createData("Template", endpoint.template));
         options.push(this.createData("URI", endpoint.parameters.uri));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Table size="small">
                 <TableBody>
@@ -166,6 +172,7 @@ export default class EndpointDetailsPage extends Component {
         const options = [];
         options.push(this.createData("Name", endpoint.name));
         options.push(this.createData("Type", endpoint.type));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Box>
                 <Table size="small">
@@ -184,6 +191,7 @@ export default class EndpointDetailsPage extends Component {
         const options = [];
         options.push(this.createData("Name", endpoint.name));
         options.push(this.createData("Type", endpoint.type));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Box>
                 <Table size="small">
@@ -202,6 +210,7 @@ export default class EndpointDetailsPage extends Component {
         const options = [];
         options.push(this.createData("Name", endpoint.name));
         options.push(this.createData("Type", endpoint.type));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Box>
                 <Table size="small">
@@ -220,6 +229,7 @@ export default class EndpointDetailsPage extends Component {
         const options = [];
         options.push(this.createData("Name", endpoint.name));
         options.push(this.createData("Type", endpoint.type));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Table size="small">
                 <TableBody>
@@ -233,6 +243,7 @@ export default class EndpointDetailsPage extends Component {
         options.push(this.createData("Name", endpoint.name));
         options.push(this.createData("Type", endpoint.type));
         options.push(this.createData("Key", endpoint.key));
+        options.push(this.createData("Tracing", endpoint.tracing === "enabled"));
         return (
             <Table size="small">
                 <TableBody>
@@ -244,10 +255,24 @@ export default class EndpointDetailsPage extends Component {
     renderRowsFromData(data) {
         return (
             data.map(row => (
-                <TableRow>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.value}</TableCell>
-                </TableRow>
+                row.name == "Tracing" ?
+                    (
+                        <TableRow>
+                            <TableCell>{row.name}</TableCell>
+                            <TableCell>
+                                <Switch height={Constants.detailsPageSwitchAttributes.Height} width={Constants.detailsPageSwitchAttributes.Width}
+                                        onChange={updatedState => this.handleTraceUpdate(this.state.response.name, updatedState)}
+                                        checked={row.value}/>
+                            </TableCell>
+                        </TableRow>
+                    )
+                    :
+                    (
+                        <TableRow>
+                            <TableCell>{row.name}</TableCell>
+                            <TableCell>{row.value}</TableCell>
+                        </TableRow>
+                    )
             ))
         );
     }
@@ -279,6 +304,21 @@ export default class EndpointDetailsPage extends Component {
                 <Box color="textPrimary"> {this.state.response.name}</Box>
             </div>
         );
+    }
+
+    handleTraceUpdate(endpointName, currentState) {
+        let traceState = "disable";
+        if (currentState) {
+            traceState = "enable";
+        }
+        new ResourceAPI().handleEndpointTraceLevelUpdate(endpointName, traceState).then((response) => {
+            this.retrieveEndpointInfo(endpointName);
+        }).catch((error) => {
+            if (error.request) {
+                this.setState({errorOccurred: true}, function () {
+                });
+            }
+        });
     }
 
     render() {
