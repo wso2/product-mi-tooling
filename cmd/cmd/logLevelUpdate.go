@@ -36,14 +36,14 @@ var updateLogLevelCmdUsage = "Usage:\n\n" +
 	" To update the level of an existing logger\n\n" +
 	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]\n\n" +
 	" To add a new logger\n\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]" +
-	" [class-name]\n\n"
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [class-name]" +
+	" [log-level]\n\n"
 
 var updateLogLevelCmdExamples = "Example:\n\n" +
 	" To update the level of an existing logger\n\n" +
 	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " org-apache-coyote DEBUG\n\n" +
 	" To add a new logger\n\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " synapse-api DEBUG org.apache.synapse.rest.API\n\n"
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " synapse-api org.apache.synapse.rest.API DEBUG\n\n"
 
 var updateLogLevelCmdHelpString = updateLogLevelCmdLongDesc + updateLogLevelCmdUsage + updateLogLevelCmdExamples
 
@@ -76,7 +76,8 @@ func handleUpdateLoggerCmdArguments(args []string) {
 					printUpdateLoggerHelp()
 					return
 				} else {
-					logClass = args[2]
+					logClass = args[1]
+					logLevel = args[2]
 				}
 			}
 			executeUpdateLoggerCmd(loggerName, logLevel, logClass)
