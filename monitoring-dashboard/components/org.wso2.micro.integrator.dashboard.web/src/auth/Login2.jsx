@@ -131,8 +131,8 @@ export default class Login2 extends Component {
                 } else {
                     errorMessage =
                         <div>
-                            Network Error Encountered. Probably due to self-singed certificates. Try trusting the
-                            server certs in following url and try again. <br/><a onClick={this.handleOpenCertWindow} href="#">https://{host}:{port}/management</a>
+                            Retry logging in after trusting the server certificate in the following URL. <br/><a onClick={this.handleOpenCertWindow} href="#" target="_blank">https://{host}:{port}/management</a>
+                            <br/><sub>Refer the <a href="https://ei.docs.wso2.com/en/7.1.0/micro-integrator/administer-and-observe/working-with-monitoring-dashboard/" target="_blank">documentation</a> for more information.</sub>
                         </div>;
                 }
                 this.setState({
