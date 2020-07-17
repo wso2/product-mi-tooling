@@ -66,7 +66,7 @@ export default class ResourceExplorerParent extends Component {
     }
 
     render() {
-        return (<ListViewParent data={this.renderSourceViewContent()} error={this.props.error}/>);
+        return (<ListViewParent data={this.renderSourceViewContent()} error={this.props.error} errorMessage={this.props.errorMessage}/>);
     }
 }
 
@@ -78,7 +78,8 @@ ResourceExplorerParent.propTypes = {
     content: PropTypes.element,
     breadcrumb: PropTypes.element,
     connectionError: PropTypes.bool,
-    error: PropTypes.object
+    error: PropTypes.object,
+    errorMessage: PropTypes.string
 };
 
 ResourceExplorerParent.defaultProps = {
@@ -89,5 +90,6 @@ ResourceExplorerParent.defaultProps = {
     content: '<span/>',
     breadcrumb: ' ',
     connectionError: false,
-    error: null
+    error: null,
+    errorMessage: null
 };
