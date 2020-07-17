@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
 	"github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
+	"strconv"
 )
 
 var endpointName string
@@ -93,15 +94,37 @@ func executeGetEndpointCmd(endpointname string) {
 }
 
 // Print the details of an Endpoint
-// Name, Type, Method, Url, Stats
 // @param Endpoint : Endpoint object
 func printEndpoint(endpoint artifactUtils.Endpoint) {
 
-	fmt.Println("Name - " + endpoint.Name)
-	fmt.Println("Type - " + endpoint.Type)
-	fmt.Println("Method - " + endpoint.Method)
-	fmt.Println("Url - " + endpoint.Url)
-	fmt.Println("Stats - " + endpoint.Stats)
+	if len(endpoint.Name) > 0 {
+		fmt.Println("Name - " + endpoint.Name)
+	}
+	if len(endpoint.Type) > 0 {
+		fmt.Println("Type - " + endpoint.Type)
+	}
+	if len(strconv.FormatBool(endpoint.Active)) > 0 {
+		fmt.Println("Active - " + strconv.FormatBool(endpoint.Active))
+	}
+	if len(endpoint.Method) > 0 {
+		fmt.Println("Method - " + endpoint.Method)
+	}
+	if len(endpoint.Address) > 0 {
+		fmt.Println("Address - " + endpoint.Address)
+	}
+	if len(endpoint.URITemplate) > 0 {
+		fmt.Println("URI Template - " + endpoint.URITemplate)
+	}
+	if len(endpoint.ServiceName) > 0 {
+		fmt.Println("Service Name - " + endpoint.ServiceName)
+	}
+	if len(endpoint.PortName) > 0 {
+		fmt.Println("Port Name - " + endpoint.PortName)
+	}
+	if len(endpoint.WsdlURI) > 0 {
+		fmt.Println("WSDL URI - " + endpoint.WsdlURI)
+	}
+
 }
 
 func executeListEndpointsCmd() {
@@ -113,7 +136,7 @@ func executeListEndpointsCmd() {
 	if err == nil {
 		// Printing the list of available Endpoints
 		list := resp.(*artifactUtils.EndpointList)
-		utils.PrintItemList(list, []string{utils.Name, utils.Type, utils.Method, utils.Url}, "No endpoints found")
+		utils.PrintItemList(list, []string{utils.Name, utils.Type, utils.IsActive}, "No endpoints found")
 	} else {
 		utils.Logln(utils.LogPrefixError+"Getting List of Endpoints", err)
 	}

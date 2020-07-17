@@ -1,5 +1,7 @@
 package artifactUtils
 
+import "strconv"
+
 type EndpointList struct {
 	Count     int32             `json:"count"`
 	Endpoints []EndpointSummary `json:"list"`
@@ -8,16 +10,21 @@ type EndpointList struct {
 type EndpointSummary struct {
 	Name   string `json:"name"`
 	Type   string `json:"type"`
-	Method string `json:"method"`
-	Url    string `json:"url"`
+	Active bool `json:"isActive"`
 }
 
 type Endpoint struct {
 	Name   string `json:"name"`
 	Type   string `json:"type"`
+	Active bool `json:"isActive"`
 	Method string `json:"method"`
 	Url    string `json:"url"`
 	Stats  string `json:"stats"`
+	Address    string `json:"address"`
+	URITemplate string `json:"uriTemplate"`
+	ServiceName string `json:"serviceName"`
+	PortName string `json:"portName"`
+	WsdlURI string `json:"wsdlUri"`
 }
 
 func (endpoints *EndpointList) GetDataIterator() <-chan []string {
@@ -25,7 +32,7 @@ func (endpoints *EndpointList) GetDataIterator() <-chan []string {
 
 	go func() {
 		for _, endpoint := range endpoints.Endpoints {
-			ch <- []string{endpoint.Name, endpoint.Type, endpoint.Method, endpoint.Url}
+			ch <- []string{endpoint.Name, endpoint.Type, strconv.FormatBool(endpoint.Active)}
 		}
 		close(ch)
 	}()
