@@ -119,23 +119,28 @@ export default class ResourceAPI {
     }
 
     handleApiTraceLevelUpdate(apiName, state) {
-        return this.updateTraceLevel(`/apis?apiName=${apiName}`, state);
+        return this.updateTraceLevel(`/apis`, apiName, state);
     }
 
     handleInboundTraceLevelUpdate(inboundName, state) {
-        return this.updateTraceLevel(`/inbound-endpoints?inboundEndpointName=${inboundName}`, state);
+        return this.updateTraceLevel(`/inbound-endpoints`, inboundName, state);
     }
 
     handleProxyTraceLevelUpdate(proxyName, state) {
-        return this.updateTraceLevel(`/proxy-services?proxyServiceName=${proxyName}`, state);
+        return this.updateTraceLevel(`/proxy-services`, proxyName, state);
     }
 
     handleSeqTraceLevelUpdate(seqName, state) {
-        return this.updateTraceLevel(`/sequences?sequenceName=${seqName}`, state);
+        return this.updateTraceLevel(`/sequences`, seqName, state);
     }
 
-    updateTraceLevel(url, state) {
+    handleEndpointTraceLevelUpdate(endpointName, state) {
+        return this.updateTraceLevel(`/endpoints`, endpointName, state);
+    }
+
+    updateTraceLevel(url, name, state) {
         let payload = {
+            name: name,
             trace: state
         };
         return this.getHTTPClient().post(url, payload);
