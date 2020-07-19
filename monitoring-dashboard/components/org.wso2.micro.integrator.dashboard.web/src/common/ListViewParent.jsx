@@ -85,11 +85,15 @@ export default class ListViewParent extends Component {
     handleError(error) {
         if (error.response) {
             // response received with error (non 2XX SC)
+            var errorMessage = "Error occurred while processing request. Please check server logs";
+            if (this.props.errorMessage) {
+                errorMessage = this.props.errorMessage;
+            } else if (error.response.data.Error) {
+                errorMessage = error.response.data.Error;
+            }
             this.setState({
                 responseErrorDialogOpen: true,
-                serverErrorMsg:
-                    error.response.data.Error === undefined ?
-                        "Unknown error occurred while processing request. Please check server logs" : error.response.data.Error
+                serverErrorMsg: errorMessage
             });
         } else if (error.request) {
             // response was not received, hence connection issue
@@ -173,7 +177,8 @@ ListViewParent.propTypes = {
     theme: PropTypes.shape({}),
     data: PropTypes.element,
     connectionError: PropTypes.bool,
-    error: PropTypes.object
+    error: PropTypes.object,
+    errorMessage: PropTypes.string
 };
 
 ListViewParent.defaultProps = {
@@ -181,5 +186,6 @@ ListViewParent.defaultProps = {
     data: <span/>,
     theme: defaultTheme,
     connectionError: false,
-    error: null
+    error: null,
+    errorMessage: null
 };

@@ -58,7 +58,8 @@ export default class Users extends Component {
             dialogOpen: false,
             deleteConfirmDialogOpen: false,
             deleteUserId: '',
-            error: null
+            error: null,
+            errorMessage: null,
         };
         this.handleUserInput = this.handleUserInput.bind(this);
         this.handleFormSubmission = this.handleFormSubmission.bind(this);
@@ -72,7 +73,11 @@ export default class Users extends Component {
     }
 
     handleErrorResponses(error) {
-      this.setState({error:error});
+        var errorMessage = null;
+        if (error.response && error.response.status === 404) {
+            errorMessage = "Operation not supported. Please refer server logs.";
+        }
+        this.setState({error: error, errorMessage: errorMessage});
     }
 
     retrieveAllUsers() {
@@ -310,6 +315,7 @@ export default class Users extends Component {
             title='User Management'
             content={this.renderUsersView()}
             error={this.state.error}
+            errorMessage={this.state.errorMessage}
         />);
     }
 }
