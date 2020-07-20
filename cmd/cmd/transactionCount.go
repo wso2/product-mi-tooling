@@ -32,12 +32,18 @@ const transactionCountCmdShortDesc = "Retrieve transaction count"
 const transactionCountCmdLongDesc = "Retrieve transaction count based on the given year and month. \nIf year and " +
 	"month not provided, retrieve the count for the current year and month.\n\n"
 
+var transactionCountCmdExamples = "Example:\n" +
+	"To get the transaction count for the current month\n" +
+	"  " + programName + " " + transactionCmdLiteral + " " + transactionCountCmdLiteral + "\n\n" +
+	"To get the transaction count for a specific month\n" +
+	"  " + programName + " " + transactionCmdLiteral + " " + transactionCountCmdLiteral + " 2020 06" + "\n\n"
+
 var transactionCountCmdArgs = "[year] [month]"
 
 var transactionCountCmd = &cobra.Command{
 	Use:   transactionCountCmdLiteral,
 	Short: transactionCountCmdShortDesc,
-	Long:  transactionCountCmdLongDesc,
+	Long:  transactionCountCmdLongDesc + transactionCountCmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
 		handleTransactionCountCmdArguments(args)
 	},
@@ -46,7 +52,7 @@ var transactionCountCmd = &cobra.Command{
 func init() {
 	transactionCmd.AddCommand(transactionCountCmd)
 	transactionCountCmd.SetHelpTemplate(transactionCountCmdLongDesc + utils.GetCmdUsage(programName,
-		transactionCmdLiteral, transactionCountCmdLiteral, transactionCountCmdArgs) +
+		transactionCmdLiteral, transactionCountCmdLiteral, transactionCountCmdArgs) + transactionCountCmdExamples +
 		utils.GetCmdFlags(transactionCmdLiteral))
 }
 
@@ -62,8 +68,9 @@ func handleTransactionCountCmdArguments(args []string) {
 		month := args[1]
 		executeGetTransactionCountWithArgsCmd(year, month)
 	} else {
-		fmt.Println("Invalid number of arguments. See the usage guide.\n\n" + utils.GetCmdUsage(programName,
-			transactionCmdLiteral, transactionCountCmdLiteral, transactionCountCmdArgs))
+		fmt.Println("Invalid number of arguments. See the usage guide.\n\n" +
+			utils.GetCmdUsage(programName, transactionCmdLiteral, transactionCountCmdLiteral, transactionCountCmdArgs) +
+			transactionCountCmdExamples)
 	}
 }
 
