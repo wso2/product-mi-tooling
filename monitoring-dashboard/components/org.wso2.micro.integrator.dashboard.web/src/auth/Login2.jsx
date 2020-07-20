@@ -160,10 +160,15 @@ export default class Login2 extends Component {
         return (
             <MuiThemeProvider muiTheme={defaultTheme}>
                 {isSecure? null: <WarningBanner/>}
-                <Header
-                    title={'MICRO INTEGRATOR'}
-                    rightElement={<span/>}
-                />
+                {isSecure ?
+                    <Header
+                        title={'MICRO INTEGRATOR'}
+                        rightElement={<span/>}/>
+                    :
+                    <Header
+                        title={'MICRO INTEGRATOR'}
+                        rightElement={<span/>}
+                        position='absolute'/>}
             <MDBContainer>
                 <MDBRow>
                     <MDBCol md="6" style={styles.LoginForm}>

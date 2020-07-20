@@ -46,7 +46,7 @@ export default class InsecureWarnBanner extends Component {
                  zIndex={this.props.theme.zIndex.drawer + 100}>
                 <Typography style={styles.titleSection}>
                     <WarningIcon/><b> Warning - Insecure connection to the server. This is not
-                    recommended when deploying on production environments!</b>
+                    recommended when deploying in production environments!</b>
                 </Typography>
             </Box>
 
