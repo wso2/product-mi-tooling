@@ -36,6 +36,14 @@ const transactionReportCmdLongDesc = "Generate the transaction count summary rep
 	"given period of time.\nIf a location not provided, generate the report in current directory.\nIf an end date " +
 	"not provided, generate the report with values upto current date.\n\n"
 
+var transactionReportCmdExamples = "Example:\n" +
+	"To generate transaction count report consisting data within a specified time period at a specified location\n" +
+	"  " + programName + " " + transactionCmdLiteral + " " + transactionReportCmdLiteral + " 2020-05 2020-06 --path=</dir_path>\n\n" +
+	"To generate transaction count report with data from a given month upto the current month at a specified location\n" +
+	"  " + programName + " " + transactionCmdLiteral + " " + transactionReportCmdLiteral + " 2020-01 --path=</dir_path>\n\n" +
+	"To generate transaction count report at the current location with data between 2020-01 and 2020-05\n" +
+	"  " + programName + " " + transactionCmdLiteral + " " + transactionReportCmdLiteral + " 2020-01 2020-05\n\n"
+
 var transactionReportCmdArgs = []string{
 	"[start] [end] --path=[destination-file-location]",
 	"[start] [end]",
@@ -45,7 +53,7 @@ var transactionReportCmdArgs = []string{
 var transactionReportCmd = &cobra.Command{
 	Use:   transactionReportCmdLiteral,
 	Short: transactionReportCmdShortDesc,
-	Long:  transactionReportCmdLongDesc,
+	Long:  transactionReportCmdLongDesc + transactionReportCmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
 		destinationFileLocation, _ := cmd.Flags().GetString("path")
 		if len(strings.TrimSpace(destinationFileLocation)) == 0 || destinationFileLocation == "." {
@@ -58,9 +66,9 @@ var transactionReportCmd = &cobra.Command{
 func init() {
 	transactionCmd.AddCommand(transactionReportCmd)
 	transactionReportCmd.Flags().StringP("path", "p", "", "destination file location")
-	transactionReportCmd.SetHelpTemplate(transactionReportCmdLongDesc + utils.GetCmdUsageForArgsOnly(programName,
-		transactionCmdLiteral, transactionReportCmdLiteral, transactionReportCmdArgs) +
-		utils.GetCmdFlags(transactionCmdLiteral))
+	transactionReportCmd.SetHelpTemplate(transactionReportCmdLongDesc +
+		utils.GetCmdUsageForArgsOnly(programName, transactionCmdLiteral, transactionReportCmdLiteral, transactionReportCmdArgs) +
+		transactionReportCmdExamples + utils.GetCmdFlags(transactionCmdLiteral))
 }
 
 // Check arguments for "start" and "end" and execute get transaction report generation command.
@@ -78,8 +86,9 @@ func handleTransactionReportCmdArguments(args []string, targetPath string) {
 		end := args[1]
 		executeTransactionReportGenerationCmd(targetPath, start, end)
 	} else {
-		fmt.Println("Invalid number of arguments. See the usage guide.\n\n" + utils.GetCmdUsageForArgsOnly(programName,
-			transactionCmdLiteral, transactionReportCmdLiteral, transactionReportCmdArgs))
+		fmt.Println("Invalid number of arguments. See the usage guide.\n\n" +
+			utils.GetCmdUsageForArgsOnly(programName, transactionCmdLiteral, transactionReportCmdLiteral, transactionReportCmdArgs) +
+			transactionReportCmdExamples)
 	}
 }
 
