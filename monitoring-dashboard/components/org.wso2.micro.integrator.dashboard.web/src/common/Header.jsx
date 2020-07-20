@@ -19,18 +19,15 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
-
 import {AppBar} from 'material-ui';
-
 import defaultTheme from '../utils/Theme';
-
 import UserMenu from './UserMenu';
 
 export default class Header extends Component {
     render() {
         return (
             <AppBar
-                style={{zIndex: this.props.theme.zIndex.drawer + 100, position: 'fixed'}}
+                style={{zIndex: this.props.theme.zIndex.drawer + 100, position: this.props.position}}
                 title={this.props.title}
                 iconElementRight={this.props.rightElement}
                 iconElementLeft={this.props.logo}
@@ -53,6 +50,7 @@ Header.propTypes = {
     ]).isRequired,
     rightElement: PropTypes.element,
     theme: PropTypes.shape({}),
+    position: PropTypes.string
 };
 
 Header.defaultProps = {
@@ -68,4 +66,5 @@ Header.defaultProps = {
     onLogoClick: null,
     rightElement: <UserMenu/>,
     theme: defaultTheme,
+    position:'fixed'
 };
