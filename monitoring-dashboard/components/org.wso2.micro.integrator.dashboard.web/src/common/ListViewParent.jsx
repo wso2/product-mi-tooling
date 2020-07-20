@@ -33,6 +33,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import AuthManager from '../auth/utils/AuthManager';
+import WarningBanner from '../common/InsecureWarnBanner';
 
 /**
  * Style constants.
@@ -65,10 +66,12 @@ export default class ListViewParent extends Component {
 
     constructor(props, context) {
         super(props, context);
+        let isSecureMode = (location.protocol === 'https:');
         this.state = {
             connectionErrorDialogOpen: false,
             responseErrorDialogOpen: false,
-            serverErrorMsg: {}
+            serverErrorMsg: {},
+            isSecure: isSecureMode
         };
         this.handleConnectionErrorDialogClose = this.handleConnectionErrorDialogClose.bind(this);
         this.handlerResponseErrorDialogClose = this.handlerResponseErrorDialogClose.bind(this);
@@ -116,8 +119,10 @@ export default class ListViewParent extends Component {
      * Render the general view of the synapse artifacts listing pages
      */
     renderParentView() {
+        const {isSecure} = this.state;
         return (
             <MuiThemeProvider muiTheme={this.props.theme}>
+                {isSecure? null: <WarningBanner/>}
                 <Header title={this.props.title} theme={this.props.theme}/>
                 <SideDrawer/>
                 <Box flexGrow={1} id={"content-box"}>

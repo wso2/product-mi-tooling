@@ -32,6 +32,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
+import WarningBanner from '../common/InsecureWarnBanner';
 
 import {
     MDBContainer,
@@ -155,9 +156,10 @@ export default class Login2 extends Component {
      * @return {XML} HTML content
      */
     renderDefaultLogin() {
-        const {username, password, host, port} = this.state;
+        const {username, password, host, port, isSecure} = this.state;
         return (
             <MuiThemeProvider muiTheme={defaultTheme}>
+                {isSecure? null: <WarningBanner/>}
                 <Header
                     title={'MICRO INTEGRATOR'}
                     rightElement={<span/>}
