@@ -126,15 +126,22 @@ export default class Login2 extends Component {
         AuthManager.authenticate(host, port, username, password, rememberMe, this.state.isSecure)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                var errorMessage;
-                if (error.response && error.response.status === 401)  {
+                console.log("Authentication failed with error :: " + error); // just for future debugging purposes
+                let errorMessage;
+                if (error.response && error.response.status === 401) {
                     errorMessage = 'Incorrect username or password!';
                 } else {
-                    errorMessage =
-                        <div>
-                            Retry logging in after trusting the server certificate in the following URL. <br/><a onClick={this.handleOpenCertWindow} href="#" target="_blank">https://{host}:{port}/management</a>
-                            <br/><sub>Refer the <a href="https://ei.docs.wso2.com/en/7.1.0/micro-integrator/administer-and-observe/working-with-monitoring-dashboard/" target="_blank">documentation</a> for more information.</sub>
-                        </div>;
+                    error.toString().includes("Network") ?
+                        errorMessage =
+                            <div>
+                                Retry logging in after trusting the server certificate in the following URL. <br/><a
+                                onClick={this.handleOpenCertWindow} href="#"
+                                target="_blank">https://{host}:{port}/management</a>
+                                <br/><sub>Refer the <a
+                                href="https://ei.docs.wso2.com/en/7.1.0/micro-integrator/administer-and-observe/working-with-monitoring-dashboard/"
+                                target="_blank">documentation</a> for more information.</sub>
+                            </div>
+                        : errorMessage = "Error occurred in communication. Please check server logs."
                 }
                 this.setState({
                     username: '',
@@ -143,7 +150,6 @@ export default class Login2 extends Component {
                     loginError: true,
                 });
             });
-
     }
 
     handleLoginErrorDialogClose() {
