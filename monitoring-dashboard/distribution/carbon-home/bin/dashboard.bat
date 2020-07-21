@@ -44,7 +44,6 @@ rem ----- Only set CARBON_HOME if not already set ----------------------------
 :checkServer
 rem %~sdp0 is expanded pathname of the current script under NT with spaces in the path removed
 set CARBON_HOME=%~sdp0..
-echo "%CARBON_HOME%\bin\version.txt"
 SET curDrive=%cd:~0,1%
 SET wsasDrive=%CARBON_HOME:~0,1%
 if not "%curDrive%" == "%wsasDrive%" %wsasDrive%:
