@@ -34,12 +34,16 @@ import (
 // Show secret command related usage info
 const secretInitCmdLiteral = "init"
 const secretInitCmdShortDesc = "initialize keystore"
-const secretInitCmdLongDesc = "Initialize key store information required for secret encryption"
+const secretInitCmdLongDesc = "Initialize key store information required for secret encryption\n\n"
+
+var secretInitCmdExamples = "Example:\n" +
+	"To initialize keystore information\n" +
+	"  " + programName + " " + secretCmdLiteral + " " + secretInitCmdLiteral + "\n\n"
 
 var secretInitCmd = &cobra.Command{
 	Use:   secretInitCmdLiteral,
 	Short: secretInitCmdShortDesc,
-	Long:  secretInitCmdLongDesc,
+	Long:  secretInitCmdLongDesc + secretInitCmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
 		handleSecretInitCmdArgs(args)
 	},
@@ -47,8 +51,8 @@ var secretInitCmd = &cobra.Command{
 
 func init() {
 	secretCmd.AddCommand(secretInitCmd)
-	secretInitCmd.SetHelpTemplate(secretInitCmdLongDesc)
-
+	secretInitCmd.SetHelpTemplate(secretInitCmdLongDesc + utils.GetCmdUsage(programName, secretCmdLiteral,
+		secretInitCmdLiteral, "") + secretInitCmdExamples + utils.GetCmdFlags(secretCmdLiteral))
 }
 
 func handleSecretInitCmdArgs(args []string) {
@@ -57,7 +61,9 @@ func handleSecretInitCmdArgs(args []string) {
 		utils.HandleErrorAndExit("[FATAL ERROR] Encryption client library is missing", nil)
 	}
 	if len(args) > 0 {
-		fmt.Println("Too many arguments. See the usage guide.")
+		fmt.Println("Invalid number of arguments. See the usage guide.\n\n" +
+			utils.GetCmdUsage(programName, secretCmdLiteral, secretInitCmdLiteral, "") +
+			secretInitCmdExamples + utils.GetCmdFlags(secretCmdLiteral))
 	} else {
 		startConsoleForKeyStore(args)
 	}

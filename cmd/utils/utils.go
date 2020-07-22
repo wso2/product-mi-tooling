@@ -289,6 +289,11 @@ func GetCmdUsage(program, cmd, subcmd, arg string) string {
 	var showCmdUsage = "Usage:\n" +
 		"  " + program + " " + cmd + " " + subcmd + "\n" +
 		"  " + program + " " + cmd + " " + subcmd + " " + arg + "\n\n"
+
+	if len(arg) == 0 {
+		showCmdUsage = "Usage:\n" +
+			"  " + program + " " + cmd + " " + subcmd + "\n\n"
+	}
 	return showCmdUsage
 }
 

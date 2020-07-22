@@ -38,7 +38,19 @@ import (
 
 const secretCreateCmdLiteral = "create"
 const secretCreateCmdShortDesc = "Encrypt secrets"
-const secretCreateCmdLongDesc = "Create secrets based on given arguments"
+const secretCreateCmdLongDesc = "Create secrets based on given arguments\n\n"
+
+var secretCreateCmdExamples = "Example:\n" +
+	"To encrypt secret and get output on console\n" +
+	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + "\n\n" +
+	"To encrypt secret and get output to file (stored in the <CLI_HOME>/bin/security folder)\n" +
+	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " file\n\n" +
+	"To encrypt secret and get output as a .yaml file (stored in the <CLI_HOME>/bin/security folder)\n" +
+	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " k8\n\n" +
+	"To bulk encrypt secrets defined in a properties file\n" +
+	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " -f=</file_path>\n\n" +
+	"To bulk encrypt secrets defined in a properties file and get a .yaml file (stored in the <CLI_HOME>/bin/security folder)\n" +
+	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " k8 -f=</file_path>\n\n"
 
 var file = ""
 var algorithm = ""
@@ -46,10 +58,18 @@ var inputs = make(map[string]string)
 var keystoreInfoFile = utils.GetkeyStoreInfoFileLocation()
 var encryptionClientPath = ""
 
+var secretCreateCmdArgs = []string{
+	"",
+	"file",
+	"k8",
+	"-f=</file_path>",
+	"k8 -f=</file_path>",
+}
+
 var secretCreateCmd = &cobra.Command{
 	Use:   secretCreateCmdLiteral,
 	Short: secretCreateCmdShortDesc,
-	Long:  secretCreateCmdLongDesc,
+	Long:  secretCreateCmdLongDesc + secretCreateCmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
 		file, _ = cmd.Flags().GetString("file")
 		algorithm, _ = cmd.Flags().GetString("cipher")
@@ -63,7 +83,8 @@ var secretCreateCmd = &cobra.Command{
 
 func init() {
 	secretCmd.AddCommand(secretCreateCmd)
-	secretCreateCmd.SetHelpTemplate(secretCreateCmdLongDesc)
+	secretCreateCmd.SetHelpTemplate(secretCreateCmdLongDesc + utils.GetCmdUsageForArgsOnly(programName, secretCmdLiteral,
+		secretCreateCmdLiteral, secretCreateCmdArgs) + secretCreateCmdExamples + utils.GetCmdFlags(secretCmdLiteral))
 	secretCreateCmd.Flags().StringP("file", "f", "", "from file")
 	secretCreateCmd.Flags().StringP("cipher", "c", "", "algorithm")
 }
@@ -85,7 +106,9 @@ func handleSecretCmdArguments(args []string) {
 			inputs["secret.output.type"] = outputType
 			initSecretInformation()
 		} else {
-			fmt.Println("Too many arguments. See the usage guide.")
+			fmt.Println("Invalid number of arguments. See the usage guide.\n\n" +
+				utils.GetCmdUsageForArgsOnly(programName, secretCmdLiteral, secretCreateCmdLiteral, secretCreateCmdArgs) +
+				secretCreateCmdExamples + utils.GetCmdFlags(secretCmdLiteral))
 		}
 }
 
