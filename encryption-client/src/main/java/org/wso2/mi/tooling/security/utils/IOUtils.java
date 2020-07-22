@@ -22,6 +22,8 @@ import org.wso2.mi.tooling.security.exception.EncryptionToolException;
 import org.wso2.mi.tooling.security.output.K8SecretYaml;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -92,10 +94,14 @@ public class IOUtils {
     public static void writeYamlFile(String filePath, K8SecretYaml yaml) {
 
         DumperOptions options = new DumperOptions();
+        // Configuration to hide the bean type (org.wso2.mi.tooling.security.output.K8SecretYaml)
+        Representer representer = new Representer();
+        representer.addClassTag(K8SecretYaml.class, Tag.MAP);
+
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(true);
 
-        Yaml output = new Yaml(options);
+        Yaml output = new Yaml(representer, options);
         try (FileWriter writer = new FileWriter(filePath)) {
             output.dump(yaml, writer);
             System.out.println("Kubernetes secret file created in " + filePath + " with default name and namespace");
