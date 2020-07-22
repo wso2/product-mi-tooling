@@ -31,16 +31,16 @@ const showDataServiceCmdShortDesc = "Show infomation about data services"
 const showDataServiceCmdLongDesc = "Get information about the Data service specified by command line argument [dataservice-name] If not specified, list all the data services\n"
 
 var showDataServiceCmdExmaples = "Example:\n" +
+	"To list all the data-services\n" +
+	"  " + programName + " " + dataServicesCmdLiteral + " " + showDataServiceCmdLiteral + "\n\n" +
 	"To get details about a specific data-service\n" +
-	"  " + programName + " " + dataServicesCmdLiteral + " " + showDataServiceCmdLiteral + " SampleDataService\n\n" +
-	"To list all the proxies\n" +
-	"  " + programName + " " + dataServicesCmdLiteral + " " + showDataServiceCmdLiteral + "\n\n"
+	"  " + programName + " " + dataServicesCmdLiteral + " " + showDataServiceCmdLiteral + " SampleDataService\n\n"
 
 // dataServiceInfoCmd represents the dataServiceInfo command
 var dataServiceInfoCmd = &cobra.Command{
 	Use:   showDataServiceCmdLiteral,
 	Short: showDataServiceCmdShortDesc,
-	Long:  showDataServiceCmdLongDesc,
+	Long:  showDataServiceCmdLongDesc + showDataServiceCmdExmaples,
 	Run: func(cmd *cobra.Command, args []string) {
 		utils.Logln(utils.LogPrefixInfo + showDataServiceCmdLiteral + " called")
 		handleDataServiceCmdArguments(args)
@@ -49,6 +49,8 @@ var dataServiceInfoCmd = &cobra.Command{
 
 func init() {
 	dataServiceCmd.AddCommand(dataServiceInfoCmd)
+	dataServiceCmd.SetHelpTemplate(showDataServiceCmdLongDesc + utils.GetCmdUsage(programName, dataServicesCmdLiteral,
+		showDataServiceCmdLiteral, "[dataservice-name]") + showDataServiceCmdExmaples + utils.GetCmdFlags(dataServicesCmdLiteral))
 }
 
 func handleDataServiceCmdArguments(args []string) {
@@ -96,7 +98,7 @@ func executeGetDataServiceCmd(dataServiceName string) {
 }
 
 func printShowDataServiceHelp() {
-	fmt.Println(showProxyServiceCmdLongDesc + utils.GetCmdUsage(programName, dataServicesCmdLiteral, showDataServiceCmdLiteral,
+	fmt.Println(showDataServiceCmdLongDesc + utils.GetCmdUsage(programName, dataServicesCmdLiteral, showDataServiceCmdLiteral,
 		"[data-service-name]") + showDataServiceCmdExmaples + utils.GetCmdFlags(dataServicesCmdLiteral))
 }
 
