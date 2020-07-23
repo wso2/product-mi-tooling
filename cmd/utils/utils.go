@@ -519,8 +519,12 @@ func SetProperties(variables map[string]string, fileName string)  {
 }
 
 func GetSecurityDirectoryPath() string {
-	workingDirectory, _ := os.Getwd()
-	return path.Join(workingDirectory, "security")
+
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		HandleErrorAndExit("Error getting user home directory: ", err)
+	}
+	return filepath.Join(userHomeDir, ConfigDirName , "security")
 }
 
 func GetkeyStoreInfoFileLocation() string {
@@ -576,4 +580,11 @@ func CloseFile(f *os.File) {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+func MakeDirectoryIfNotExists(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return os.Mkdir(path, os.ModeDir|0755)
+	}
+	return nil
 }

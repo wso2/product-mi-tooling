@@ -93,16 +93,11 @@ func startConsoleForKeyStore(args []string) {
 	inputs["secret.keystore.password"] = base64.StdEncoding.EncodeToString([]byte(strings.TrimSpace(keyPassword)))
 
 	if utils.IsValidConsoleInput(inputs) {
-		createSecurityDirectory()
+		utils.MakeDirectoryIfNotExists(utils.GetSecurityDirectoryPath())
 		keystorePropertiesPath := utils.GetkeyStoreInfoFileLocation()
 		utils.SetProperties(inputs, keystorePropertiesPath)
 		fmt.Println("secret initialization completed")
 	} else {
 		fmt.Println("secret initialization failed.")
 	}
-}
-
-func createSecurityDirectory()  {
-	os.RemoveAll(utils.GetSecurityDirectoryPath())
-	os.Mkdir(utils.GetSecurityDirectoryPath(), 0755)
 }
