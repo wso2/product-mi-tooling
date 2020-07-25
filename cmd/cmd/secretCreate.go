@@ -198,6 +198,7 @@ func getEncryptionClientPath() string {
 
 	programDir, _ := osext.Executable()
 	binDir, _ := filepath.Abs(programDir + string(os.PathSeparator) + "..")
+	_ = os.Setenv("wso2.mi.cli.home", binDir)
 	content, err := os.Open(binDir)
 	if err != nil {
 		log.Fatal(err)

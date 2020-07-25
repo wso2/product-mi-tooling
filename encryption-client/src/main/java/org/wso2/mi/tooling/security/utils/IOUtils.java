@@ -35,6 +35,8 @@ import java.util.Properties;
 
 public class IOUtils {
 
+    private static final String CLI_HOME_PROP = "wso2.mi.cli.home";
+
     /**
      * Get properties defined in file.
      *
@@ -79,8 +81,14 @@ public class IOUtils {
      * @return absolute output path
      */
     public static String getOutputFilePath(String fileName) {
-        String workingDirectory = System.getProperty("user.dir");
-        return Paths.get(workingDirectory, "security", fileName).toString();
+
+        String cliHome = System.getenv(CLI_HOME_PROP);
+        File directory = new File(cliHome);
+        File securityDir = new File(directory.getParent() + File.separator + "security");
+        if (!securityDir.exists() && !securityDir.mkdir()) {
+            throw new EncryptionToolException("Failed to create directory in " + securityDir);
+        }
+        return securityDir.getPath() + File.separator + fileName;
     }
 
     /**
