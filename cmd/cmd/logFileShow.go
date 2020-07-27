@@ -24,6 +24,7 @@ import (
     "github.com/wso2/product-mi-tooling/cmd/utils"
     "github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
     "os"
+    "strings"
 )
 
 var logfileName string
@@ -97,8 +98,14 @@ func executeListLogsCmd() {
     if err == nil {
         // Printing the list of available log files
         list := resp.(*artifactUtils.LogFileList)
-        utils.PrintItemList(list, []string{utils.Name, utils.Size},
-            "No log files found")
+        filteredList := new(artifactUtils.LogFileList)
+        for k := range list.LogFiles {
+            if strings.HasSuffix(list.LogFiles[k].FileName, ".log") {
+                filteredList.LogFiles = append(filteredList.LogFiles, list.LogFiles[k])
+            }
+        }
+        filteredList.Count = int32(len(filteredList.LogFiles))
+        utils.PrintItemList(filteredList, []string{utils.Name, utils.Size}, "No log files found")
     } else {
         utils.Logln(utils.LogPrefixError+"Getting List of log files", err)
     }
