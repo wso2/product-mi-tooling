@@ -279,7 +279,7 @@ func PutQueryParamsToMap(paramMap map[string]string, key string, value string) m
 
 func GetCmdFlags(cmd string) string {
 	var showCmdFlags = "Flags:\n" +
-		"  -h, --help\t\thelp for " + cmd + "\n" +
+		"  -h, --help\t\tHelp for " + cmd + "\n" +
 		"Global Flags:\n" +
 		"  -v, --verbose\t\tEnable verbose mode\n"
 	return showCmdFlags

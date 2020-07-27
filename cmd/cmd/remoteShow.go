@@ -69,8 +69,6 @@ func handleRemoteShowCmdArguments(args []string) {
 		if err == nil {
 			remoteInfo := resp.(*utils.RemoteInfo)
 			fmt.Println("Product Version - " + remoteInfo.ProductVersion)
-			fmt.Println("Repository Location - " + remoteInfo.RepositoryLocation)
-			fmt.Println("Work Directory - " + remoteInfo.WorkDirectory)
 			fmt.Println("Carbon Home - " + remoteInfo.CarbonHome)
 			fmt.Println("Product Name - " + remoteInfo.ProductName)
 			fmt.Println("Java Home - " + remoteInfo.JavaHome)

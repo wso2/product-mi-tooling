@@ -21,19 +21,23 @@ package cmd
 import (
 	"fmt"
 	"github.com/lithammer/dedent"
+	"github.com/spf13/cobra"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
 	"net/http"
-
-	"github.com/spf13/cobra"
 )
 
 const logoutCmdLiteral = "logout"
-const logoutCmdShortDesc = "Logout of the current Micro Integrator instance (current remote)"
+const logoutCmdShortDesc = "Logout of the current Micro Integrator instance (current remote)\n\n"
 
-var logoutCmdExamples = dedent.Dedent(`
-Example:
-	` + utils.ProjectName + ` ` + remoteCmdLiteral + ` ` + logoutCmdLiteral + `
+var remoteLogoutUsage = dedent.Dedent(`
+Usage:
+  ` + programName + ` ` + remoteCmdLiteral + ` ` + logoutCmdLiteral + `
 `)
+
+var logoutCmdExamples = "Example:\n" +
+	" " + programName + " " + remoteCmdLiteral + " " + logoutCmdLiteral + "\n\n"
+
+var remoteLogoutCmdHelpString = loginCmdShortDesc + remoteLogoutUsage + logoutCmdExamples
 
 // logoutCmd represents the logout command
 var logoutCmd = &cobra.Command{
@@ -66,5 +70,6 @@ func executeLogoutCmd() {
 
 func init() {
 	remoteCmd.AddCommand(logoutCmd)
-	logoutCmd.SetHelpTemplate(logoutCmdShortDesc + logoutCmdExamples)
+	logoutCmd.SetHelpTemplate(logoutCmdShortDesc + utils.GetCmdUsageForNonArguments(programName,  remoteCmdLiteral, logoutCmdLiteral) +
+		logoutCmdExamples + utils.GetCmdFlags(remoteCmdLiteral))
 }
