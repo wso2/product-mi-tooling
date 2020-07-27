@@ -43,13 +43,13 @@ const secretCreateCmdLongDesc = "Create secrets based on given arguments\n\n"
 var secretCreateCmdExamples = "Example:\n" +
 	"To encrypt secret and get output on console\n" +
 	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + "\n\n" +
-	"To encrypt secret and get output to file (stored in the <CLI_HOME>/bin/security folder)\n" +
+	"To encrypt secret and get output to file (stored in the <CLI_HOME>/security folder)\n" +
 	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " file\n\n" +
-	"To encrypt secret and get output as a .yaml file (stored in the <CLI_HOME>/bin/security folder)\n" +
+	"To encrypt secret and get output as a .yaml file (stored in the <CLI_HOME>/security folder)\n" +
 	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " k8\n\n" +
 	"To bulk encrypt secrets defined in a properties file\n" +
 	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " -f=</file_path>\n\n" +
-	"To bulk encrypt secrets defined in a properties file and get a .yaml file (stored in the <CLI_HOME>/bin/security folder)\n" +
+	"To bulk encrypt secrets defined in a properties file and get a .yaml file (stored in the <CLI_HOME>/security folder)\n" +
 	"  " + programName + " " + secretCmdLiteral + " " + secretCreateCmdLiteral + " k8 -f=</file_path>\n\n"
 
 var file = ""

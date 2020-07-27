@@ -37,7 +37,6 @@ const addUserCmdLongDesc = "Add new user to the micro-integrator user store\n"
 
 var addUserCmdExamples = "Example:\n" +
     "To Add a new user\n" +
-    "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral + " [new user-id]\n" +
     "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral + " user1\n"
 
 // userAddCmd represents the add users command
@@ -53,7 +52,7 @@ var userAddCmd = &cobra.Command{
 func init() {
     userAddCmd.SetHelpTemplate(addUserCmdLongDesc + "Usage:\n" +
         "  " + programName + " " + usersCmdLiteral + " " + addUserCmdLiteral +
-        " [new user-id]\n" +
+        " [user-id]\n" +
         addUserCmdExamples + utils.GetCmdFlags(addUserCmdLiteral))
     usersCmd.AddCommand(userAddCmd)
 }
