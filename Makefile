@@ -31,7 +31,6 @@ endif
 
 .PHONY: install-cli
 install-cli:
-	cd encryption-client && mvn clean install
 	cd cmd && ./build.sh -t mi.go -v ${VERSION} -f
 
 .PHONY: install-cli-skip-test
@@ -41,4 +40,5 @@ install-cli-skip-test:
 .PHONY: install-cli-local
 install-cli-local:
 	$(eval VERSION := $(shell mvn -q -Dexec.executable=echo -Dexec.args='$${project.version}' --non-recursive exec:exec))
+	cd encryption-client && mvn clean install
 	cd cmd && ./build.sh -t mi.go -v ${VERSION} -f
