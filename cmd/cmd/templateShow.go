@@ -20,6 +20,8 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/spf13/cobra"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
 	"github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
@@ -123,14 +125,26 @@ func executeGetTemplateByTypeCmd(templateType string) {
 func executeGetTemplateByNameCmd(templateType string, templateName string) {
 	finalUrl, params := utils.GetUrlAndParams(utils.PrefixTemplates, "type", templateType)
 	params = utils.PutQueryParamsToMap(params, "name", templateName)
-	resp, err := utils.UnmarshalData(finalUrl, nil, params, &artifactUtils.TemplateListByName{})
-
-	if err == nil {
-		// Printing the details of the Template by name
-		list := resp.(*artifactUtils.TemplateListByName)
-		printTemplatesByName(*list)
+	if templateType == "sequence" {
+		resp, err := utils.UnmarshalData(finalUrl, nil, params, &artifactUtils.TemplateSequenceListByName{})
+		if err == nil {
+			// Printing the details of the Sequence Template by name
+			list := resp.(*artifactUtils.TemplateSequenceListByName)
+			printSequenceTemplatesByName(*list)
+		} else {
+			fmt.Println(utils.LogPrefixError+"Getting Information of Sequence Template - "+templateName, err)
+		}
+	} else if templateType == "endpoint" {
+		resp, err := utils.UnmarshalData(finalUrl, nil, params, &artifactUtils.TemplateEndpointListByName{})
+		if err == nil {
+			// Printing the details of the Endpoint Template by name
+			list := resp.(*artifactUtils.TemplateEndpointListByName)
+			printEndpointTemplatesByName(*list)
+		} else {
+			fmt.Println(utils.LogPrefixError+"Getting Information of Endpoint Template - "+templateName, err)
+		}
 	} else {
-		fmt.Println(utils.LogPrefixError+"Getting Information of Template - "+templateName, err)
+		fmt.Println(utils.LogPrefixError + "Template type should either be 'sequence' or 'endpoint'")
 	}
 }
 
@@ -189,11 +203,29 @@ func printTemplatesByType(templateList artifactUtils.TemplateListByType) {
 	}
 }
 
-func printTemplatesByName(templateList artifactUtils.TemplateListByName) {
+func printEndpointTemplatesByName(templateList artifactUtils.TemplateEndpointListByName) {
 	fmt.Println("Name - " + templateList.Name)
 	var parameters string
 	for _, params := range templateList.Parameters {
 		parameters = parameters + params + ", "
 	}
 	fmt.Println("Parameters - " + parameters[:len(parameters)-2])
+}
+
+func printSequenceTemplatesByName(templateList artifactUtils.TemplateSequenceListByName) {
+	fmt.Println("Name : " + templateList.Name)
+	fmt.Println("Parameters : ")
+
+	if len(templateList.Parameters) > 0 {
+		table := utils.GetTableWriter()
+
+		data := []string{utils.Name, utils.DefaultValue, utils.IsMandatory}
+		table.Append(data)
+
+		for _, param := range templateList.Parameters {
+			data := []string{param.Name, param.DefaultValue, strconv.FormatBool(param.IsMandatory)}
+			table.Append(data)
+		}
+		table.Render()
+	}
 }
