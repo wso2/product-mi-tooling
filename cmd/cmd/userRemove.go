@@ -86,6 +86,7 @@ func executeRemoveUserCmd(userId string) {
     } else if res.StatusCode() == http.StatusUnauthorized {
         // not logged in to MI
         fmt.Println("User not logged in or session timed out. Please login to the current Micro Integrator instance")
+        utils.HandleErrorAndExit("Execute 'mi remote login --help' for more information", nil)
     } else {
         if err == nil {
             fmt.Println(utils.LogPrefixError + errString)
