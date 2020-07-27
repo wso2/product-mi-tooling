@@ -28,12 +28,19 @@ import (
 )
 
 const logoutCmdLiteral = "logout"
-const logoutCmdShortDesc = "Logout of the current Micro Integrator instance (current remote)"
+const logoutCmdShortDesc = "Logout of the current Micro Integrator instance (current remote)\n"
+
+var remoteLogoutUsage = dedent.Dedent(`
+Usage:
+  ` + programName + ` ` + remoteCmdLiteral + ` ` + logoutCmdLiteral + `
+`)
 
 var logoutCmdExamples = dedent.Dedent(`
 Example:
 	` + utils.ProjectName + ` ` + remoteCmdLiteral + ` ` + logoutCmdLiteral + `
 `)
+
+var remoteLogoutCmdHelpString = loginCmdShortDesc + remoteLogoutUsage + logoutCmdExamples
 
 // logoutCmd represents the logout command
 var logoutCmd = &cobra.Command{
@@ -66,5 +73,5 @@ func executeLogoutCmd() {
 
 func init() {
 	remoteCmd.AddCommand(logoutCmd)
-	logoutCmd.SetHelpTemplate(logoutCmdShortDesc + logoutCmdExamples)
+	logoutCmd.SetHelpTemplate(remoteLogoutCmdHelpString)
 }

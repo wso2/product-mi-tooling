@@ -30,13 +30,21 @@ var username string
 var password string
 
 const loginCmdLiteral = "login"
-const loginCmdShortDesc = "Login to the current Micro Integrator instance (current remote)"
+const loginCmdShortDesc = "Login to the current Micro Integrator instance (current remote)\n"
+
+var remoteLoginUsage = dedent.Dedent(`
+Usage:
+  ` + programName + ` ` + remoteCmdLiteral + ` ` + loginCmdLiteral + `
+`)
 
 var loginCmdExamples = dedent.Dedent(`
 Example: 
 	` + utils.ProjectName + ` ` + remoteCmdLiteral + ` ` + loginCmdLiteral + `  # will be prompted for username and password
+	` + utils.ProjectName + ` ` + remoteCmdLiteral + ` ` + loginCmdLiteral + ` admin  # will be prompted for password
 	` + utils.ProjectName + ` ` + remoteCmdLiteral + ` ` + loginCmdLiteral + ` admin  admin
 `)
+
+var remoteLoginCmdHelpString = loginCmdShortDesc + remoteLoginUsage + loginCmdExamples
 
 // loginCmd represents the login command
 var loginCmd = &cobra.Command{
@@ -98,5 +106,5 @@ func executeLoginCmd(args []string) {
 
 func init() {
 	remoteCmd.AddCommand(loginCmd)
-	loginCmd.SetHelpTemplate(loginCmdShortDesc + loginCmdExamples)
+	loginCmd.SetHelpTemplate(remoteLoginCmdHelpString)
 }
