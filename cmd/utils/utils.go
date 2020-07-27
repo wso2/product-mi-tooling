@@ -309,7 +309,7 @@ func GetCmdUsageMultipleArgs(program, cmd, subcmd string, args []string) string 
 
 // Create a usage command for a command that always get invoked with its arguments.
 func GetCmdUsageForArgsOnly(program, cmd, subcmd string, args []string) string {
-	baseCommand := "  " + program + " " + cmd + " " + subcmd + " "
+	baseCommand := " " + program + " " + cmd + " " + subcmd + " "
 	var showCmdUsage = "Usage:\n"
 	for _, arg := range args {
 		showCmdUsage += baseCommand + " " + arg + "\n"
