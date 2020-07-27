@@ -32,18 +32,18 @@ const updateLogLevelCmdShortDesc = "Update log level"
 
 const updateLogLevelCmdLongDesc = "Update log level of the Loggers in Micro Integrator\n"
 
-var updateLogLevelCmdUsage = "Usage:\n\n" +
-	" To update the level of an existing logger\n\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]\n\n" +
-	" To add a new logger\n\n" +
+var updateLogLevelCmdUsage = "Usage:\n" +
+	" To update the level of an existing logger\n" +
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [log-level]\n" +
+	" To add a new logger\n" +
 	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " [logger-name] [class-name]" +
 	" [log-level]\n\n"
 
-var updateLogLevelCmdExamples = "Example:\n\n" +
-	" To update the level of an existing logger\n\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " org-apache-coyote DEBUG\n\n" +
-	" To add a new logger\n\n" +
-	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " synapse-api org.apache.synapse.rest.API DEBUG\n\n"
+var updateLogLevelCmdExamples = "Example:\n" +
+	" To update the level of an existing logger\n" +
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " org-apache-coyote DEBUG\n" +
+	" To add a new logger\n" +
+	"  " + programName + " " + logLevelCmdLiteral + " " + updateLogLevelCmdLiteral + " synapse-api org.apache.synapse.rest.API DEBUG\n"
 
 var updateLogLevelCmdHelpString = updateLogLevelCmdLongDesc + updateLogLevelCmdUsage + updateLogLevelCmdExamples
 
@@ -59,7 +59,7 @@ var loggerUpdateCmd = &cobra.Command{
 
 func init() {
 	logLevelCmd.AddCommand(loggerUpdateCmd)
-	loggerUpdateCmd.SetHelpTemplate(updateLogLevelCmdHelpString)
+	loggerUpdateCmd.SetHelpTemplate(updateLogLevelCmdHelpString + utils.GetCmdFlags(logLevelCmdLiteral))
 }
 
 func handleUpdateLoggerCmdArguments(args []string) {
