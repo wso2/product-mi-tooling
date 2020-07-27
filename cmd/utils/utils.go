@@ -186,7 +186,7 @@ func UnmarshalData(url string, headers map[string]string, params map[string]stri
 		if resp.StatusCode() == http.StatusUnauthorized {
 			// not logged in to MI
 			fmt.Println("User not logged in or session timed out. Please login to the current Micro Integrator instance")
-			fmt.Println("Execute '" + ProjectName + " remote login --help' for more information")
+			HandleErrorAndExit("Execute '" + ProjectName + " remote login --help' for more information", nil)
 		}
 		if len(resp.Body()) == 0 {
 			return nil, errors.New(resp.Status())
