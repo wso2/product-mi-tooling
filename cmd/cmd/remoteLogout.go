@@ -35,7 +35,7 @@ Usage:
 `)
 
 var logoutCmdExamples = "Example:\n" +
-	programName + " " + remoteCmdLiteral + " " + logoutCmdLiteral + "\n\n"
+	" " + programName + " " + remoteCmdLiteral + " " + logoutCmdLiteral + "\n\n"
 
 var remoteLogoutCmdHelpString = loginCmdShortDesc + remoteLogoutUsage + logoutCmdExamples
 

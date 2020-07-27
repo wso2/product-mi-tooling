@@ -34,9 +34,9 @@ const loginCmdShortDesc = "Login to the current Micro Integrator instance (curre
 
 
 var loginCmdExamples = "Example:\n" +
-	programName + " " + remoteCmdLiteral + " " + loginCmdLiteral + "\t # will be prompted for username and password \n" +
-	programName + " " + remoteCmdLiteral + " " + loginCmdLiteral + "admin\t # will be prompted for password \n" +
-	programName + " " + remoteCmdLiteral + " " + loginCmdLiteral + "admin admin \n\n"
+	" " + programName + " " + remoteCmdLiteral + " " + loginCmdLiteral + "\t # will be prompted for username and password \n" +
+	" " + programName + " " + remoteCmdLiteral + " " + loginCmdLiteral + " admin\t # will be prompted for password \n" +
+	" " + programName + " " + remoteCmdLiteral + " " + loginCmdLiteral + " admin admin \n\n"
 
 // loginCmd represents the login command
 var loginCmd = &cobra.Command{
