@@ -18,19 +18,10 @@
     ```
     cd to the <DASHBOARD_HOME>/bin
     
-    Execute `dashboard.sh or dashboard.bat as appropriate.
+    Execute dashboard.sh or dashboard.bat as appropriate.
     ```
 
-- Load the login page with the dashboard context. i.e: https://localhost:9743/dashboard .
-- Please note that in order to connect the monitoring dashboard to an instance of WSO2 Micro integrator, the
-  said instance should have the Management Api enabled. 
-  
-### How to Enable the Management API.
-   Please note that Management Api is disabled by default. To use the Management Api you must use the 
-   system property `-DenableManagementApi` when starting the micro integrator. This can be done by
-   navigating to <DASHBOARD_HOME>/bin and executing the script as follows.
-   1. `sh micro-integrator.sh -DenableManagementApi` - Linux and Unix 
-   2. `docker run -p 8290:8290 -p 9164:9164 -e JAVA_OPTS="-DenableManagementApi=true" <Docker_Image_Name>` - Docker
+- Load the login page with the dashboard context. i.e: https://localhost:9743/dashboard.
     
 ### Management API Address and Port
    The Management API address and Port is required when logging into the dashboard.
