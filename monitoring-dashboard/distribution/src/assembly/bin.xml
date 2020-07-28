@@ -41,13 +41,6 @@
                 <exclude>**/*.eclipse</exclude>
             </excludes>
         </fileSet>
-        <fileSet>
-            <directory>../..</directory>
-            <outputDirectory>.</outputDirectory>
-            <includes>
-                <include>README.md</include>
-            </includes>
-        </fileSet>
 
         <fileSet>
             <directory>carbon-home/conf/server</directory>
@@ -87,7 +80,7 @@
             <includes>
                 <include>**/*.txt</include>
             </includes>
-            <fileMode>444</fileMode>
+            <fileMode>644</fileMode>
         </fileSet>
 
         <fileSet>
@@ -111,19 +104,19 @@
             <source>carbon-home/updates/product.txt</source>
             <outputDirectory>updates/</outputDirectory>
             <filtered>true</filtered>
-            <fileMode>444</fileMode>
+            <fileMode>644</fileMode>
         </file>
         <file>
             <source>target/wso2carbon-kernel-${carbon.kernel5.version}/bin/kernel-version.txt</source>
             <outputDirectory>bin/</outputDirectory>
             <filtered>true</filtered>
-            <fileMode>444</fileMode>
+            <fileMode>644</fileMode>
         </file>
         <file>
             <source>target/wso2carbon-kernel-${carbon.kernel5.version}/bin/README.txt</source>
             <outputDirectory>bin/</outputDirectory>
             <filtered>true</filtered>
-            <fileMode>444</fileMode>
+            <fileMode>644</fileMode>
         </file>
         <file>
             <source>carbon-home/bin/version.txt</source>
