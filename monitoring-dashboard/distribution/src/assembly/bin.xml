@@ -154,5 +154,12 @@
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>
+        <file>
+            <source>resources/wrapper.conf</source>
+            <outputDirectory>bin/yajsw/</outputDirectory>
+            <destName>wrapper.conf</destName>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
     </files>
 </assembly>
