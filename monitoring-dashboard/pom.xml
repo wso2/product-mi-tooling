@@ -33,6 +33,7 @@
         <module>components</module>
         <module>features</module>
         <module>distribution</module>
+        <module>integration</module>
     </modules>
 
     <dependencyManagement>
