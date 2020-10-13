@@ -103,6 +103,8 @@ const PrefixUsers = "users"
 const PrefixTransactions = "transactions"
 const TransactionCountCmd = "count"
 const TransactionReportCmd = "report"
+const PrefixExternalVaults = "external-vaults"
+const ExternalVaultHashiCorp = "hashicorp"
 
 const Name = "NAME"
 const Type = "TYPE"
