@@ -1,0 +1,163 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Jetty Server Dump</title><link rel="stylesheet" type="text/css" href="css/docbook.css"><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"><meta name="keywords" content="jetty, servlet, servlet-api, cometd, http, websocket, eclipse, maven, java, server, software"><link rel="home" href="index.html" title="Jetty"><link rel="up" href="configuring-logging.html" title="Chapter&nbsp;11.&nbsp;Jetty Logging"><link rel="prev" href="example-logging-logback-centralized.html" title="Centralized Logging using Logback"><link rel="next" href="jndi.html" title="Chapter&nbsp;12.&nbsp;Configuring JNDI"><link xmlns:d="http://docbook.org/ns/docbook" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" xmlns:xslthl="http://xslthl.sf.net" xmlns:date="http://exslt.org/dates-and-times" rel="shortcut icon" href="images/favicon.ico"><link rel="stylesheet" href="css/highlighter/foundation.css"><script src="js/highlight.pack.js"></script><script>
+      hljs.initHighlightingOnLoad();
+    </script><link type="text/css" rel="stylesheet" href="css/font-awesome/font-awesome.min.css"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><table xmlns:d="http://docbook.org/ns/docbook" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" xmlns:xslthl="http://xslthl.sf.net" xmlns:date="http://exslt.org/dates-and-times"><tr><td style="width: 25%"><a href="https://www.eclipse.org/jetty/"><img src="images/jetty-header-logo.png" alt="Jetty Logo"></a><br><span style="font-size: small">
+            Version: 9.4.34.v20201102</span></td><td style="width: 50%"></td></tr></table><div xmlns:d="http://docbook.org/ns/docbook" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" xmlns:xslthl="http://xslthl.sf.net" xmlns:date="http://exslt.org/dates-and-times" class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Jetty Server Dump</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="example-logging-logback-centralized.html"><i class="fa fa-chevron-left" aria-hidden="true"></i> Previous</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;11.&nbsp;Jetty Logging<br><a accesskey="p" href="index.html"><i class="fa fa-home" aria-hidden="true"></i> Home</a></th><td width="20%" align="right">&nbsp;<a accesskey="n" href="jndi.html">Next <i class="fa fa-chevron-right" aria-hidden="true"></i></a></td></tr></table><hr></div><div xmlns:d="http://docbook.org/ns/docbook" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" xmlns:xslthl="http://xslthl.sf.net" xmlns:date="http://exslt.org/dates-and-times" class="jetty-callout"><h5 class="callout"><a href="http://www.webtide.com/">Contact the core Jetty developers at
+          <span class="website">www.webtide.com</span></a></h5><p>
+ private support for your internal/customer projects ... custom extensions and distributions ... versioned snapshots for indefinite support ...
+ scalability guidance for your apps and Ajax/Comet projects ... development services for sponsored feature development
+      </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jetty-server-dump"></a>Jetty Server Dump</h2></div></div></div><div class="toc"><dl class="toc"><dt><span class="section"><a href="jetty-server-dump.html#configuring-dump-feature">Configuring the Jetty Server Dump</a></span></dt><dt><span class="section"><a href="jetty-server-dump.html#extra-threadpool-info">Extra ThreadPool Information</a></span></dt><dt><span class="section"><a href="jetty-server-dump.html#dump-tool-via-jmx">Using the Dump Feature via JMX</a></span></dt><dt><span class="section"><a href="jetty-server-dump.html#examing-jetty-distro-dump">Explanation of the Dump Key</a></span></dt><dt><span class="section"><a href="jetty-server-dump.html#_jetty_server_dump_example">Jetty Server Dump Example</a></span></dt></dl></div><p>The dump feature in Jetty provides a snapshot of the bean containment tree of the main Jetty components together with a summary of their configuration. This includes threadpool, connectors,  contexts, webapplications, servlets and so forth.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="configuring-dump-feature"></a>Configuring the Jetty Server Dump</h3></div></div></div><p>You can request that Jetty do a dump immediately after starting and just before stopping by calling the appropriate setters on the <code class="literal">Server</code> instance.
+For embedded usage this can be used by calling the setters directly.</p><pre xmlns:d="http://docbook.org/ns/docbook" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" xmlns:xslthl="http://xslthl.sf.net" xmlns:date="http://exslt.org/dates-and-times"><code>server.setDumpAfterStart(true);
+server.setDumpBeforeStop(true);</code></pre><p>Standalone Jetty uses two properties to control this behaviour which are referenced in <code class="literal">jetty.xml</code> to call these setters.
+These properties are <code class="literal">jetty.server.dumpAfterStart</code> and <code class="literal">jetty.server.dumpBeforeStop</code>.</p><p>These can be temporarily enabled by supplying these properties as command line arguments,
+or they can be enabled via the <code class="literal">server.ini</code> file (see <a class="xref" href="quick-start-configure.html" title="Chapter&nbsp;3.&nbsp;An Introduction to Jetty Configuration">Chapter&nbsp;3, <i>An Introduction to Jetty Configuration</i></a>).</p><pre class="screen">java -jar $JETTY_HOME/start.jar jetty.server.dumpAfterStart=true jetty.server.dumpBeforeStop=true</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="extra-threadpool-info"></a>Extra ThreadPool Information</h3></div></div></div><p>To get maximum detail from the <code class="literal">QueuedThreadPool</code> in the dump, you need to <code class="literal">setDetailDump(true)</code> on any instances of <code class="literal">QueuedThreadPool</code> you are using.
+This extra detail in the detailed dump consists of full stack traces for every running thread, and a list of queued jobs waiting to be run.</p><p>For embedded usage this can be used by calling the setters directly.</p><pre xmlns:d="http://docbook.org/ns/docbook" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" xmlns:xslthl="http://xslthl.sf.net" xmlns:date="http://exslt.org/dates-and-times"><code>threadPool.setDetailedDump(true);</code></pre><p>For standalone jetty you can enable the <code class="literal">threadpool</code> module and configure the <code class="literal">jetty.threadPool.detailedDump</code> property.
+See <a class="xref" href="startup-modules.html" title="Managing Startup Modules">Managing Startup Modules</a> for information on how to enable a module.
+This same property can also be set via the command line the same as the server dump property.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="dump-tool-via-jmx"></a>Using the Dump Feature via JMX</h3></div></div></div><p>The <code class="literal">dump</code> method is on the Server instance and many of its nested components (Handlers, Connectors, and so forth).
+Dumps may be obtained by calling these methods either in code or via JMX (see <a class="xref" href="jmx-chapter.html#using-jmx" title="Using JMX with Jetty">Using JMX with Jetty</a>).</p><p>The Server MBean has a <code class="literal">dump()</code> method, which dumps everything, plus a <code class="literal">dumpStdErr()</code> operation that dumps to StdErr rather than replying to JConsole.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="examing-jetty-distro-dump"></a>Explanation of the Dump Key</h3></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><code class="literal">+- bean</code> is a java POJO that is contained by the parent object as a bean added with the addBean method.</li><li class="listitem"><code class="literal">+= managed</code> is a bean that is also a LifeCycle that is started and stopped with the parent object.</li><li class="listitem"><code class="literal">+~ unmanaged</code> is a bean that is also a LifeCycle that is started and stopped with the parent object. It is typically shared with other objects (hence its children are not dumped).</li><li class="listitem"><code class="literal">+? auto</code> is a bean that has been added to an unstarted parent. If it is a LifeCycle that is not started when the parent is started, then it is started and becomes a managed bean, otherwise it becomes either unmanaged or just a bean.</li><li class="listitem"><code class="literal">+: iterable</code> is an object that is contained within an iterable field of the parent (eg a list, set etc).</li><li class="listitem"><code class="literal">+] array</code> is an object that is contained within an array field of the parent.</li><li class="listitem"><code class="literal">+@ map</code> is an object that is contained within an map field of the parent.</li><li class="listitem"><code class="literal">+&gt; undefined</code> is an object that is contained within the parent by an undefined relationship.</li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="_jetty_server_dump_example"></a>Jetty Server Dump Example</h3></div></div></div><p>This is a dump of the OneServletContext embedded example with extra threadpool information:</p><pre class="literallayout">Server@59906517{STARTED}[9.4.32-SNAPSHOT] - STARTED
++= QueuedThreadPool[qtp488044861]@1d16f93d{STARTED,8&lt;=8&lt;=200,i=2,r=4,q=0}[ReservedThreadExecutor@16267862{s=2/4,p=0}] - STARTED
+|  += ReservedThreadExecutor@16267862{s=2/4,p=0} - STARTED
+|  +&gt; threads size=8
+|  |  +&gt; qtp488044861-13 RUNNABLE tid=13 prio=5 SELECTING
+|  |  +&gt; qtp488044861-15-acceptor-0@296e0338-ServerConnector@1e6d1014{HTTP/1.1, (http/1.1)}{0.0.0.0:8080} RUNNABLE tid=15 prio=3 ACCEPTING
+|  |  +&gt; qtp488044861-17 TIMED_WAITING tid=17 prio=5 RESERVED
+|  |  +&gt; qtp488044861-19 RUNNABLE tid=19 prio=5
+|  |  |  +&gt; app//org.eclipse.jetty.http.pathmap.PathMappings.getMatch(PathMappings.java:130)
+|  |  |  +&gt; app//org.eclipse.jetty.servlet.ServletHandler.getMappedServlet(ServletHandler.java:591)
+|  |  |  +&gt; app//org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:474)
+|  |  |  +&gt; app//org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1582)
+|  |  |  +&gt; app//org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:186)
+|  |  |  +&gt; app//org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1349)
+|  |  |  +&gt; app//org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+|  |  |  +&gt; app//org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:127)
+|  |  |  +&gt; app//org.eclipse.jetty.server.Server.handle(Server.java:516)
+|  |  |  +&gt; app//org.eclipse.jetty.server.HttpChannel.lambda$handle$1(HttpChannel.java:383)
+|  |  |  +&gt; app//org.eclipse.jetty.server.HttpChannel$$Lambda$102/0x000000010016d440.dispatch(Unknown Source)
+|  |  |  +&gt; app//org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:556)
+|  |  |  +&gt; app//org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:375)
+|  |  |  +&gt; app//org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:273)
+|  |  |  +&gt; app//org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:311)
+|  |  |  +&gt; app//org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:105)
+|  |  |  +&gt; app//org.eclipse.jetty.io.ChannelEndPoint$1.run(ChannelEndPoint.java:104)
+|  |  |  +&gt; app//org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:336)
+|  |  |  +&gt; app//org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:313)
+|  |  |  +&gt; app//org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:171)
+|  |  |  +&gt; app//org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:129)
+|  |  |  +&gt; app//org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:375)
+|  |  |  +&gt; app//org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:773)
+|  |  |  +&gt; app//org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:905)
+|  |  |  +&gt; java.base@11.0.5/java.lang.Thread.run(Thread.java:834)
+|  |  +&gt; qtp488044861-16 TIMED_WAITING tid=16 prio=5 RESERVED
+|  |  +&gt; qtp488044861-21 RUNNABLE tid=21 prio=5 SELECTING
+|  |  +&gt; qtp488044861-18 TIMED_WAITING tid=18 prio=5 IDLE
+|  |  +&gt; qtp488044861-14 TIMED_WAITING tid=14 prio=5 IDLE
+|  +&gt; jobs size=0
++= ServerConnector@1e6d1014{HTTP/1.1, (http/1.1)}{0.0.0.0:8080} - STARTED
+|  +~ Server@59906517{STARTED}[9.4.32-SNAPSHOT] - STARTED
+|  +~ QueuedThreadPool[qtp488044861]@1d16f93d{STARTED,8&lt;=8&lt;=200,i=2,r=4,q=0}[ReservedThreadExecutor@16267862{s=2/4,p=0}] - STARTED
+|  += ScheduledExecutorScheduler@453da22c{STARTED} - STARTED
+|  |  +&gt; java.base@11.0.5/jdk.internal.misc.Unsafe.park(Native Method)
+|  |  +&gt; java.base@11.0.5/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:234)
+|  |  +&gt; java.base@11.0.5/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2123)
+|  |  +&gt; java.base@11.0.5/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1182)
+|  |  +&gt; java.base@11.0.5/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+|  |  +&gt; java.base@11.0.5/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1054)
+|  |  +&gt; java.base@11.0.5/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1114)
+|  |  +&gt; java.base@11.0.5/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+|  |  +&gt; java.base@11.0.5/java.lang.Thread.run(Thread.java:834)
+|  +- org.eclipse.jetty.io.ArrayByteBufferPool@71248c21
+|  += HttpConnectionFactory@3fd7a715[HTTP/1.1] - STARTED
+|  |  +- HttpConfiguration@442675e1{32768/8192,8192/8192,https://:0,[]}
+|  |     +&gt; customizers size=0
+|  |     +&gt; formEncodedMethods size=2
+|  |     |  +&gt; POST
+|  |     |  +&gt; PUT
+|  |     +&gt; outputBufferSize=32768
+|  |     +&gt; outputAggregationSize=8192
+|  |     +&gt; requestHeaderSize=8192
+|  |     +&gt; responseHeaderSize=8192
+|  |     +&gt; headerCacheSize=1024
+|  |     +&gt; secureScheme=https
+|  |     +&gt; securePort=0
+|  |     +&gt; idleTimeout=-1
+|  |     +&gt; blockingTimeout=-1
+|  |     +&gt; sendDateHeader=true
+|  |     +&gt; sendServerVersion=true
+|  |     +&gt; sendXPoweredBy=false
+|  |     +&gt; delayDispatchUntilContent=true
+|  |     +&gt; persistentConnectionsEnabled=true
+|  |     +&gt; maxErrorDispatches=10
+|  |     +&gt; minRequestDataRate=0
+|  |     +&gt; minResponseDataRate=0
+|  |     +&gt; cookieCompliance=RFC6265
+|  |     +&gt; setRequestCookieCompliance=RFC6265
+|  |     +&gt; notifyRemoteAsyncErrors=true
+|  |     +&gt; relativeRedirectAllowed=false
+|  += SelectorManager@ServerConnector@1e6d1014{HTTP/1.1, (http/1.1)}{0.0.0.0:8080} - STARTED
+|  |  += ManagedSelector@38364841{STARTED} id=0 keys=0 selected=0 updates=0 - STARTED
+|  |  |  += EatWhatYouKill@28c4711c/SelectorProducer@59717824/PRODUCING/p=false/QueuedThreadPool[qtp488044861]@1d16f93d{STARTED,8&lt;=8&lt;=200,i=2,r=4,q=0}[ReservedThreadExecutor@16267862{s=2/4,p=0}][pc=0,pic=0,pec=0,epc=0]@2020-09-04T10:57:20.077669+10:00 - STARTED
+|  |  |  |  +- SelectorProducer@59717824
+|  |  |  |  +~ QueuedThreadPool[qtp488044861]@1d16f93d{STARTED,8&lt;=8&lt;=200,i=2,r=4,q=0}[ReservedThreadExecutor@16267862{s=2/4,p=0}] - STARTED
+|  |  |  +&gt; updates @ 2020-09-04T10:57:20.058489+10:00 size=0
+|  |  |  +&gt; keys @ 2020-09-04T10:57:20.061714+10:00 size=0
+|  |  += ManagedSelector@146044d7{STARTED} id=1 keys=1 selected=0 updates=0 - STARTED
+|  |     += EatWhatYouKill@1e9e725a/SelectorProducer@15d9bc04/PRODUCING/p=false/QueuedThreadPool[qtp488044861]@1d16f93d{STARTED,8&lt;=8&lt;=200,i=2,r=4,q=0}[ReservedThreadExecutor@16267862{s=2/4,p=0}][pc=0,pic=0,pec=1,epc=14]@2020-09-04T10:57:20.082696+10:00 - STARTED
+|  |     |  +- SelectorProducer@15d9bc04
+|  |     |  +~ QueuedThreadPool[qtp488044861]@1d16f93d{STARTED,8&lt;=8&lt;=200,i=2,r=4,q=0}[ReservedThreadExecutor@16267862{s=2/4,p=0}] - STARTED
+|  |     +&gt; updates @ 2020-09-04T10:57:20.078661+10:00 size=0
+|  |     +&gt; keys @ 2020-09-04T10:57:20.082035+10:00 size=1
+|  |        +&gt; SelectionKey@74bb45ed{i=0}-&gt;SocketChannelEndPoint@569ef11f{l=/127.0.0.1:8080,r=/127.0.0.1:58702,OPEN,fill=-,flush=-,to=3/30000}{io=0/0,kio=0,kro=1}-&gt;HttpConnection@25b03990[p=HttpParser{s=CONTENT,0 of -1},g=HttpGenerator@218fb9fe{s=START}]=&gt;HttpChannelOverHttp@648d33ab{s=HttpChannelState@717b7e16{s=HANDLING rs=BLOCKING os=OPEN is=IDLE awp=false se=false i=true al=0},r=54,c=false/false,a=HANDLING,uri=//localhost:8080/,age=4}
+|  +- sun.nio.ch.ServerSocketChannelImpl[/0:0:0:0:0:0:0:0:8080]
+|  +- qtp488044861-15-acceptor-0@296e0338-ServerConnector@1e6d1014{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
++= AttributeContainerMap@473b46c3{size=0} - STARTED
++= o.e.j.s.ServletContextHandler@3ffcd140{/,file:///tmp/,AVAILABLE} - STARTED
+|  += org.eclipse.jetty.server.session.SessionHandler1089504328==dftMaxIdleSec=-1 - STARTED
+|  |  += ServletHandler@516be40f{STARTED} - STARTED
+|  |  |  +&gt; listeners ServletHandler@516be40f{STARTED} size=2
+|  |  |  |  +&gt; ListenerHolder@3c0a50da{STARTED}: org.eclipse.jetty.embedded.OneServletContext$InitListener - STARTED
+|  |  |  |  +&gt; ListenerHolder@646be2c3{STARTED}: org.eclipse.jetty.embedded.OneServletContext$RequestListener - STARTED
+|  |  |  +&gt; filters ServletHandler@516be40f{STARTED} size=2
+|  |  |  |  +&gt; org.eclipse.jetty.embedded.OneServletContext$TestFilter-e874448@e874448==org.eclipse.jetty.embedded.OneServletContext$TestFilter,inst=true,async=true - STARTED
+|  |  |  |  |  +&gt; org.eclipse.jetty.embedded.OneServletContext$TestFilter@797badd3
+|  |  |  |  +&gt; org.eclipse.jetty.embedded.OneServletContext$TestFilter-60285225@60285225==org.eclipse.jetty.embedded.OneServletContext$TestFilter,inst=true,async=true - STARTED
+|  |  |  |     +&gt; org.eclipse.jetty.embedded.OneServletContext$TestFilter@77be656f
+|  |  |  +&gt; filterMappings ServletHandler@516be40f{STARTED} size=2
+|  |  |  |  +&gt; [/test/*]/[]/[REQUEST]=&gt;org.eclipse.jetty.embedded.OneServletContext$TestFilter-e874448
+|  |  |  |  +&gt; [*.test]/[]/[ASYNC, REQUEST]=&gt;org.eclipse.jetty.embedded.OneServletContext$TestFilter-60285225
+|  |  |  +&gt; servlets ServletHandler@516be40f{STARTED} size=3
+|  |  |  |  +&gt; org.eclipse.jetty.embedded.HelloServlet-58c1670b@d20bf05b==org.eclipse.jetty.embedded.HelloServlet,jsp=null,order=-1,inst=false,async=true - STARTED
+|  |  |  |  |  +&gt; class org.eclipse.jetty.embedded.HelloServlet
+|  |  |  |  +&gt; debug@5b09653==org.eclipse.jetty.embedded.DumpServlet,jsp=null,order=-1,inst=false,async=true - STARTED
+|  |  |  |  |  +&gt; class org.eclipse.jetty.embedded.DumpServlet
+|  |  |  |  +&gt; org.eclipse.jetty.servlet.DefaultServlet-6b9651f3@8eb381d1==org.eclipse.jetty.servlet.DefaultServlet,jsp=null,order=-1,inst=true,async=true - STARTED
+|  |  |  |     +&gt; org.eclipse.jetty.servlet.DefaultServlet@78a2da20
+|  |  |  +&gt; servletMappings ServletHandler@516be40f{STARTED} size=4
+|  |  |     +&gt; [/hello/*]=&gt;org.eclipse.jetty.embedded.HelloServlet-58c1670b
+|  |  |     +&gt; [/dump/*]=&gt;debug
+|  |  |     +&gt; [*.dump]=&gt;debug
+|  |  |     +&gt; [/]=&gt;org.eclipse.jetty.servlet.DefaultServlet-6b9651f3
+|  |  += org.eclipse.jetty.server.session.DefaultSessionCache@dd3b207[evict=-1,removeUnloadable=false,saveOnCreate=false,saveOnInactiveEvict=false] - STARTED
+|  |  |  += org.eclipse.jetty.server.session.NullSessionDataStore@551bdc27[passivating=false,graceSec=3600] - STARTED
+|  |  +~ DefaultSessionIdManager@58fdd99{STARTED}[worker=node0] - STARTED
+|  +&gt; No ClassLoader
+|  +&gt; eventListeners o.e.j.s.ServletContextHandler@3ffcd140{/,file:///tmp/,AVAILABLE} size=2
+|  |  +&gt; org.eclipse.jetty.embedded.OneServletContext$InitListener@6b1274d2
+|  |  +&gt; org.eclipse.jetty.embedded.OneServletContext$RequestListener@7bc1a03d
+|  +&gt; handler attributes o.e.j.s.ServletContextHandler@3ffcd140{/,file:///tmp/,AVAILABLE} size=1
+|  |  +&gt; org.eclipse.jetty.server.Executor=QueuedThreadPool[qtp488044861]@1d16f93d{STARTED,8&lt;=8&lt;=200,i=2,r=4,q=0}[ReservedThreadExecutor@16267862{s=2/4,p=0}]
+|  +&gt; context attributes o.e.j.s.ServletContextHandler@3ffcd140{/,file:///tmp/,AVAILABLE} size=2
+|  |  +&gt; org.eclipse.jetty.util.DecoratedObjectFactory=org.eclipse.jetty.util.DecoratedObjectFactory[decorators=1]
+|  |  +&gt; X-Init=true
+|  +&gt; initparams o.e.j.s.ServletContextHandler@3ffcd140{/,file:///tmp/,AVAILABLE} size=0
++= ErrorHandler@ba8d91c{STARTED} - STARTED
++= DefaultSessionIdManager@58fdd99{STARTED}[worker=node0] - STARTED
+|  += HouseKeeper@60438a68{STARTED}[interval=660000, ownscheduler=true] - STARTED
++&gt; jdk.internal.loader.ClassLoaders$AppClassLoader@2c13da15
+   +&gt; jdk.internal.loader.ClassLoaders$PlatformClassLoader@7364985f
+key: +- bean, += managed, +~ unmanaged, +? auto, +: iterable, +] array, +@ map, +&gt; undefined</pre></div></div><script type="text/javascript">
+      SyntaxHighlighter.all()
+    </script><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="example-logging-logback-centralized.html"><i class="fa fa-chevron-left" aria-hidden="true"></i> Previous</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="configuring-logging.html"><i class="fa fa-chevron-up" aria-hidden="true"></i> Top</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="jndi.html">Next <i class="fa fa-chevron-right" aria-hidden="true"></i></a></td></tr><tr><td width="40%" align="left" valign="top">Centralized Logging using Logback&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html"><i class="fa fa-home" aria-hidden="true"></i> Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;12.&nbsp;Configuring JNDI</td></tr></table></div><p xmlns:d="http://docbook.org/ns/docbook" xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0" xmlns:xslthl="http://xslthl.sf.net" xmlns:date="http://exslt.org/dates-and-times"><div class="jetty-callout">
+            See an error or something missing?
+            <span class="callout"><a href="http://github.com/eclipse/jetty.project">Contribute to this documentation at
+                <span class="website"><i class="fa fa-github" aria-hidden="true"></i> Github!</span></a></span><span style="float: right"><i>(Generated: 2020-11-02)</i></span></div></p></body></html>
