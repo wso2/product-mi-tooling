@@ -44,10 +44,10 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../components/rest-api/target</directory>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.server/target</directory>
             <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>dashboard.war</include>
+                <include>org.wso2.micro.integrator.dashboard.server.war</include>
             </includes>
         </fileSet>
         <fileSet>

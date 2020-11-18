@@ -32,6 +32,6 @@
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>rest-api</module>
+        <module>org.wso2.micro.integrator.dashboard.server</module>
     </modules>
 </project>

@@ -46,7 +46,7 @@ parse_config_file() {
         context="${val//\"}"
         context="${context//\/}"
         rm $DASHBOARD_HOME/jetty/webapps/*.war
-        cp $DASHBOARD_HOME/lib/dashboard.war $DASHBOARD_HOME/jetty/webapps/$context.war;;
+        cp $DASHBOARD_HOME/lib/org.wso2.micro.integrator.dashboard.server.war $DASHBOARD_HOME/jetty/webapps/$context.war;;
       port) port="$val" ;;
     esac
   done
@@ -62,4 +62,4 @@ printf 'context configured to "%s"\n' "$context"
 
 JETTY_HOME=$DASHBOARD_HOME/jetty
 cd $JETTY_HOME;
-java -jar start.jar -Djetty.port=$port
+java -jar start.jar -Djetty.http.port=$port
