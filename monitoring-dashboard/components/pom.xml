@@ -33,6 +33,5 @@
     <packaging>pom</packaging>
     <modules>
         <module>org.wso2.micro.integrator.dashboard.server</module>
-        <module>org.wso2.micro.integrator.dashboard.web</module>
     </modules>
 </project>
