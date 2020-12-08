@@ -45,25 +45,43 @@
             <fileMode>755</fileMode>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.server/target</directory>
-            <outputDirectory>lib</outputDirectory>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/www</directory>
+            <outputDirectory>server/www</outputDirectory>
             <includes>
-                <include>org.wso2.micro.integrator.dashboard.server.war</include>
+                <include>**</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/resources/jetty</directory>
-            <outputDirectory>jetty</outputDirectory>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.backend/target</directory>
+            <outputDirectory>server/webapps</outputDirectory>
+            <includes>
+                <include>org.wso2.micro.integrator.dashboard.backend.war</include>
+            </includes>
         </fileSet>
     </fileSets>
 
     <!-- package dependencies -->
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
             <useProjectArtifact>false</useProjectArtifact>
-            <scope>runtime</scope>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>org.wso2.ei:org.wso2.micro.integrator.dashboard.bootstrap:jar</include>
+                <include>org.eclipse.jetty:jetty-server:jar</include>
+                <include>org.eclipse.jetty:jetty-servlet:jar</include>
+                <include>org.eclipse.jetty:jetty-webapp:jar</include>
+                <include>org.eclipse.jetty:jetty-server:jar</include>
+                <include>org.eclipse.jetty:jetty-servlet:jar</include>
+                <include>org.eclipse.jetty:jetty-util:jar</include>
+                <include>org.eclipse.jetty:jetty-http:jar</include>
+                <include>org.eclipse.jetty:jetty-io:jar</include>
+                <include>org.eclipse.jetty:jetty-security:jar</include>
+                <include>org.eclipse.jetty:jetty-xml:jar</include>
+                <include>javax.servlet:javax.servlet-api:jar</include>
+                <include>net.consensys.cava:cava-toml:jar</include>
+                <include>org.antlr:antlr4-runtime:jar</include>
+                <include>log4j:log4j:jar</include>
+            </includes>
         </dependencySet>
     </dependencySets>
 </assembly>
