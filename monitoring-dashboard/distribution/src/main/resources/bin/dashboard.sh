@@ -17,49 +17,11 @@
 PRG="$0"
 PRGDIR=`dirname "$PRG"`
 
-# Only set CARBON_HOME if not already set
+# Only set DASHBOARD_HOME if not already set
 [ -z "$DASHBOARD_HOME" ] && DASHBOARD_HOME=`cd "$PRGDIR/.." ; pwd`
-
-declare -r config_file="$DASHBOARD_HOME/conf/deployment.toml"
-
-# define default values
-declare port=9743
-declare context="/dashboard"
-
-parse_config_file() {
-  local line key val nr=0
-  local config_err=()
-  while IFS= read -r line; do
-    # keep a running count of which line we're on
-    (( ++nr ))
-    # ignore empty lines and lines starting with a #
-    [[ -z "$line" || "$line" = '#'* ]] && continue
-    read -r key <<< "${line%% *}"   # grabs the first word and strips trailing whitespace
-    read -r val <<< "${line#* = }"    # grabs everything after the first word and strips trailing whitespace
-    if [[ -z "$val" ]]; then
-      # store errors in an array
-      config_err+=( "missing value for \"$key\" in config file on line $nr" )
-      continue
-    fi
-    case "$key" in
-      context)
-        context="${val//\"}"
-        context="${context//\/}"
-        rm $DASHBOARD_HOME/jetty/webapps/*.war
-        cp $DASHBOARD_HOME/lib/org.wso2.micro.integrator.dashboard.server.war $DASHBOARD_HOME/jetty/webapps/$context.war;;
-      port) port="$val" ;;
-    esac
-  done
-  if (( ${#config_err[@]} > 0 )); then
-    printf '%s\n' 'there were errors parsing the config file:' "${config_err[@]}"
-  fi
-}
-
-[[ -s "$config_file" ]] && parse_config_file < "$config_file"
-
-printf 'port is configured to "%s"\n' "$port"
-printf 'context configured to "%s"\n' "$context"
-
-JETTY_HOME=$DASHBOARD_HOME/jetty
-cd $JETTY_HOME;
-java -jar start.jar -Djetty.http.port=$port
+export DASHBOARD_HOME=$DASHBOARD_HOME
+for t in "$DASHBOARD_HOME"/lib/*.jar
+do
+    CARBON_CLASSPATH="$CARBON_CLASSPATH":$t
+done
+java -cp $CARBON_CLASSPATH org.wso2.micro.integrator.dashboard.bootstrap.Bootstrap
