@@ -37,7 +37,21 @@
                     <id>exec-npm-install</id>
                     <phase>generate-sources</phase>
                     <configuration>
-                        <workingDirectory>${project.basedir}/src/main/ui/dashboard</workingDirectory>
+                        <workingDirectory>${project.basedir}/web-app</workingDirectory>
+                        <executable>npm</executable>
+                        <arguments>
+                            <argument>install</argument>
+                        </arguments>
+                    </configuration>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>exec-npm-build</id>
+                    <phase>generate-sources</phase>
+                    <configuration>
+                        <workingDirectory>${project.basedir}/web-app</workingDirectory>
                         <executable>npm</executable>
                         <arguments>
                             <argument>run</argument>
