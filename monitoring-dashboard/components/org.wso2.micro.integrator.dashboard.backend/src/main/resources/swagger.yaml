@@ -1,0 +1,1656 @@
+################################################################################
+#   Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
+#
+#   Licensed under the Apache License, Version 2.0 (the \"License\");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an \"AS IS\" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+################################################################################
+
+openapi: 3.0.0
+info:
+  description: This is to retrieve details from the rest api to the UI.
+  version: "1.0.0"
+  title: Cluster Aware MI Dashboard
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: "heartbeat"
+    description: "Heartbeat Management"
+  - name: "groups"
+    description: "Access group list"
+  - name: "nodes"
+    description: "Access nodes details"
+  - name: "proxyServices"
+    description: "Access proxy services details"
+  - name: "endpoints"
+    description: "Access endpoints details"
+  - name: "inboundEndpoints"
+    description: "Access inbound endpoints details"
+  - name: "messageProcessors"
+    description: "Access message processors details"
+  - name: "messageStores"
+    description: "Access message stores details"
+  - name: "apis"
+    description: "Access APIs details"
+  - name: "templates"
+    description: "Access templates details"
+  - name: "sequences"
+    description: "Access sequences details"
+  - name: "tasks"
+    description: "Access tasks details"
+  - name: "localEntries"
+    description: "Access local entries details"
+  - name: "dataservices"
+    description: "Access data services details"
+  - name: "datasources"
+    description: "Access datasources details"
+  - name: "connectors"
+    description: "Access connectors details"
+  - name: "carbonApplications"
+    description: "Access carbon applications details"
+  - name: "logFiles"
+    description: "Access log files details"
+  - name: "logConfigs"
+    description: "Access log configs details"
+  - name: "Users"
+    description: "Access users details"
+
+paths:
+  /heartbeat:
+    post:
+      tags:
+        - "heartbeat"
+      summary: "Receive heartbeats from nodes"
+      operationId: "ReceiveNodeHeartbeat"
+      requestBody:
+        $ref: '#/components/requestBodies/Heartbeat'
+      responses:
+        200:
+          description: "Receive node heartbeats"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups:
+    get:
+      tags:
+        - "groups"
+      summary: "Get set of groups"
+      operationId: "RetrieveGroups"
+      responses:
+        200:
+          description: "The list of groups registered to dashboard"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupList'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/nodes:
+    get:
+      tags:
+        - "nodes"
+      summary: "Get set of nodes in the group"
+      operationId: "RetrieveNodesByGroupId"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "The list of nodes in group"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeList'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/proxy-services:
+    get:
+      tags:
+        - "proxyServices"
+      summary: "Get proxy services by node ids"
+      operationId: "getProxyServicesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of proxy services deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - "proxyServices"
+      summary: "Update proxy service"
+      operationId: "updateProxyService"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Proxy'
+      responses:
+        200:
+          description: "Proxy update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/endpoints:
+    get:
+      tags:
+        - "endpoints"
+      summary: "Get endpoints by node ids"
+      operationId: "getEndpointsByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of endpoints deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndpointList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - "endpoints"
+      summary: "Update endpoint"
+      operationId: "updateEndpoint"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Endpoint'
+      responses:
+        200:
+          description: "Endpoint update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/inbound-endpoints:
+    get:
+      tags:
+        - "inboundEndpoints"
+      summary: "Get inbound endpoints by node ids"
+      operationId: "getInboundEpsByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of inbound endpoints deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundEpList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - "inboundEndpoints"
+      summary: "Update inbound endpoint"
+      operationId: "updateInboundEp"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/InboundEp'
+      responses:
+        200:
+          description: "Inbound endpoint update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/message-processors:
+    get:
+      tags:
+        - "messageProcessors"
+      summary: "Get message processors by node ids"
+      operationId: "getMessageProcessorsByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of message processorss deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageProcessorList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - "messageProcessors"
+      summary: "Update message processor"
+      operationId: "updateMessageProcessor"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/MessageProcessor'
+      responses:
+        200:
+          description: "Message processor update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/message-stores:
+    get:
+      tags:
+        - "messageStores"
+      summary: "Get message stores by node ids"
+      operationId: "getMessageStoresByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of message stores deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageStoreList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/apis:
+    get:
+      tags:
+        - "apis"
+      summary: "Get APIs by node ids"
+      operationId: "getApisByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of APIs deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - "apis"
+      summary: "Update API"
+      operationId: "updateApi"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Api'
+      responses:
+        200:
+          description: "API update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/templates:
+    get:
+      tags:
+        - "templates"
+      summary: "Get templates by node ids"
+      operationId: "getTemplatesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of templates deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/sequences:
+    get:
+      tags:
+        - "sequences"
+      summary: "Get sequences by node ids"
+      operationId: "getSequencesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of sequences deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SequenceList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - "sequences"
+      summary: "Update sequence"
+      operationId: "updateSequence"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Sequence'
+      responses:
+        200:
+          description: "Sequence update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/tasks:
+    get:
+      tags:
+        - "tasks"
+      summary: "Get tasks by node ids"
+      operationId: "getTasksByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of tasks deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/local-entries:
+    get:
+      tags:
+        - "localEntries"
+      summary: "Get local entries by node ids"
+      operationId: "getLocalEntriesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of local entries deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalEntryList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/dataservices:
+    get:
+      tags:
+        - "dataservices"
+      summary: "Get dataservices by node ids"
+      operationId: "getDataservicesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of dataservices deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataserviceList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/datasources:
+    get:
+      tags:
+        - "datasources"
+      summary: "Get datasources by node ids"
+      operationId: "getDatasourcesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of datsources deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasourceList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/connectors:
+    get:
+      tags:
+        - "connectors"
+      summary: "Get connectors by node ids"
+      operationId: "getConnectorsByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of connectors deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectorList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/capps:
+    get:
+      tags:
+        - "carbonApplications"
+      summary: "Get carbon applications by node ids"
+      operationId: "getCarbonApplicationsByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of carbon applications deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CAppList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/logs:
+    get:
+      tags:
+        - "logFiles"
+      summary: "Get log files by node ids"
+      operationId: "getLogFilesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of log files of provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/logs/{file-name}/nodes/{node-id}:
+    get:
+      tags:
+        - "logFiles"
+      summary: "Download log file"
+      operationId: "downloadLogFile"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "file-name"
+          in: path
+          description: "Log file name"
+          required: true
+          schema:
+            type: string
+        - name: "node-id"
+          in: path
+          description: "Node id of the file"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Get log file in .log format"
+          content:
+            binary/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/log-configs:
+    get:
+      tags:
+        - "logConfigs"
+      summary: "Get log configs"
+      operationId: "getLogConfigs"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "List of log configs"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogConfig'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - "logConfigs"
+      summary: "Add logger"
+      operationId: "addLogger"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Logger'
+      responses:
+        200:
+          description: "Logger insert status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/users:
+    get:
+      tags:
+        - "Users"
+      summary: "Get users"
+      operationId: "getUsers"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "List of users"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - "Users"
+      summary: "Add user"
+      operationId: "addUser"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/User'
+      responses:
+        200:
+          description: "User insert status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    HeatbeatSignalRequestBody:
+      type: object
+      properties:
+        groupId:
+          type: string
+        nodeId:
+          type: string
+        interval:
+          type: integer
+      example: {groupId: mi_dev, nodeId: node_01, interval: 30}
+
+    Ack:
+      type: object
+      properties:
+        status:
+          type: string
+      example: {status: ok}
+
+    GroupList:
+      type: array
+      items:
+        type: object
+        properties:
+          groupId:
+            type: string
+          groupName:
+            type: string
+      example: [{groupId: group_01, groupName: dev_env}]
+    NodeList:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: "node id."
+          isActive:
+            type: boolean
+            description: "Is node active."
+          details:
+            type: array
+            description: Array contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
+            items:
+              $ref: '#/components/schemas/KeyValue'
+      example: [{ id: node_01,
+                  isActive: true,
+                  details: [{ key:  serverName,
+                              value:  WSO2 micro integrator },
+                            { key: version,
+                              value: 1.2.0  },
+                            { key: javaVersion,
+                              value: 1.8.0_191 },
+                            { key: javaVendor, value: Oracle}]
+                }]
+    ProxyList:
+      type: array
+      items:
+        type: object
+        properties:
+          ServiceName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                isActive:
+                  type: boolean
+                endpoints:
+                  type: array
+                  items:
+                    type: string
+                details:
+                  type: array
+                  description: Array contains wsdl1.1, statistics, tracing, configuration etc.
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+        example: [
+        { ServiceName: HospitalProxy,
+          nodes: [
+          { nodeId: node_01,
+            isActive: true,
+            endpoints: ["http://localhost:8290/services/HospitalProxy","https://localhost:8253/services/HospitalProxy"],
+            details: [
+            { key: statistics,
+              value: disabled },
+            { key: tracing,
+              value: false  }
+            ]
+          },
+          ]
+        }
+        ]
+    ProxyUpdateRequestBody:
+      type: object
+      properties:
+        serviceName:
+          type: string
+        nodeId:
+          type: string
+        isActive:
+          type: boolean
+        tracing:
+          type: boolean
+    EndpointList:
+      type: array
+      items:
+        type: object
+        properties:
+          endpointName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                isActive:
+                  type: boolean
+                details:
+                  type: array
+                  description: Array contains type, tracing, configuration etc.
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                properties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    EndpointUpdateRequestBody:
+      type: object
+      properties:
+        epName:
+          type: string
+        nodeId:
+          type: string
+        isActive:
+          type: boolean
+        tracing:
+          type: boolean
+    InboundEpList:
+      type: array
+      items:
+        type: object
+        properties:
+          inboundEpName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains protocol, tracing, statistics, sequence, onError etc.
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                parameters:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    InboundEpUpdateRequestBody:
+      type: object
+      properties:
+        inboundEpName:
+          type: string
+        nodeId:
+          type: string
+        tracing:
+          type: boolean
+    MessageProcessorList:
+      type: array
+      items:
+        type: object
+        properties:
+          processorName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains type, isActive, messageStore, configuration etc.
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                paramaters:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    MessageProcessorUpdateRequestBody:
+      type: object
+      properties:
+        processorName:
+          type: string
+        nodeId:
+          type: string
+        isActive:
+          type: boolean
+    MessageStoreList:
+      type: array
+      items:
+        type: object
+        properties:
+          storeName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains type, messageCount, configuration
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                paramaters:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    ApiList:
+      type: array
+      items:
+        type: object
+        properties:
+          apiName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains contex, hostName, port, url, tracing, configuration etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    ApiUpdateRequestBody:
+      type: object
+      properties:
+        apiName:
+          type: string
+        nodeId:
+          type: string
+        tracing:
+          type: boolean
+    TemplateList:
+      type: array
+      items:
+        type: object
+        properties:
+          templateName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - Endpoint Template
+                    - Sequence Template
+    SequenceList:
+      type: array
+      items:
+        type: object
+        properties:
+          sequenceName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains statistics, tracing, configuration etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    SequenceUpdateRequestBody:
+      type: object
+      properties:
+        sequenceName:
+          type: string
+        nodeId:
+          type: string
+        tracing:
+          type: boolean
+    TaskList:
+      type: array
+      items:
+        type: object
+        properties:
+          taskName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains group, implementation, configuration etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                triggerDetails:
+                  type: array
+                  description: Array contains trigger, count, interval etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    LocalEntryList:
+      type: array
+      items:
+        type: object
+        properties:
+          entryName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains type, value etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    DataserviceList:
+      type: array
+      items:
+        type: object
+        properties:
+          dataserviceName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains wsdl1.1, swaggerUrl, configuration etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                datasources:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
+                queries:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
+                resources:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
+                operations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
+      example: [
+      { dataserviceName: "StudentDataService",
+        nodes: [
+        { nodeId: "node_01",
+          details: [
+          { key: "WSDL 1.1", value: "http://localhost:8290/services/StudentDataService?wsdl" },
+          { key: "Swagger URL", value: "http://localhost:8290/services/StudentDataService?swagger.json" }
+          ],
+          datasources: [
+          { key: "StudentsDatasource",
+            value: [
+            { key: "dataSourceId",
+              value: "StudentsDatasource"},
+            { key: "dataSourceType",
+              value: "RDBMS" }
+            ]
+          }],
+          queries: [
+          { key: "CreateStudents",
+            value: [
+            { key: "id",
+              value: "CreateStudents" },
+            { key: "dataSourceId",
+              value: "StudentsDatasource" },
+            { key: "namespace",
+              value: "http://ws.wso2.org/dataservice"}
+            ]
+          }],
+          resources: [
+          { key: "createStudents",
+            value: [
+            { key: "path",
+              value: "student/{id}" },
+            { key: "method",
+              value: "et" }
+            ]
+          }],
+          operations: [
+          { key: "CreateStudents",
+            value: [
+            { key: "operationName",
+              value: "CreateStudents" },
+            { key: "queryId",
+              value: "createStudents" }
+            ]
+          }]
+        }]
+
+
+      },{}]
+    DatasourceList:
+      type: array
+      items:
+        type: object
+        properties:
+          datasourceName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains type, status, description, datsource provider, database engine, driver, url, username etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                configParameters:
+                  type: array
+                  description: Array contains default auto commit, default read only, test on borrow, test on return, test while idle etc.
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+    ConnectorList:
+      type: array
+      items:
+        type: object
+        properties:
+          connectorName:
+            type: string
+          package:
+            type: string
+          description:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                isFaulty:
+                  type: boolean
+    CAppList:
+      type: array
+      items:
+        type: object
+        properties:
+          cAppName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                details:
+                  type: array
+                  description: Array contains isFaulty, version etc
+                  items:
+                    $ref: '#/components/schemas/KeyValue'
+                artifacts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KeyValueAsArray'
+      example: [
+      { cAppName: "helloworldCompositeExporter",
+        nodes: [
+        { nodeId: "node_01",
+          details: [
+          { key: "version", value: "1.0.0"}
+          ],
+          artifacts: [
+          { key: "API", value: ["InitialWelcome","ABC_api"]},
+          { key: "Connectors", value: ["FileConnector", "CSV"]}]
+        }
+        ]
+      }
+      ]
+    LogList:
+      type: array
+      items:
+        type: object
+        properties:
+          logFileName:
+            type: string
+          nodes:
+            type: array
+            items:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+                size:
+                  type: boolean
+    LogConfig:
+      type: array
+      items:
+        type: object
+        properties:
+          loggerName:
+            type: string
+          className:
+            type: string
+          level:
+            type: string
+            enum:
+              - OFF
+              - Trace
+              - DEBUG
+              - INFO
+              - WARN
+              - ERROR
+              - FATAL
+    LogConfigAddRequestBody:
+      type: object
+      properties:
+        loggerName:
+          type: string
+        className:
+          type: string
+        level:
+          type: string
+          enum:
+            - OFF
+            - Trace
+            - DEBUG
+            - INFO
+            - WARN
+            - ERROR
+            - FATAL
+    User:
+      type: array
+      items:
+        type: object
+        properties:
+          userId:
+            type: string
+          isAdmin:
+            type: boolean
+          roles:
+            type: array
+            items:
+              type: string
+    UserAddRequestBody:
+      type: object
+      properties:
+        user:
+          type: string
+        password:
+          type: string
+        isAdmin:
+          type: boolean
+    KeyValue:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    KeyValueAsArray:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+    KeyValueAsArrayOfObject:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyValue'
+    SuccessStatus:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "Success status"
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      example:
+        {code: 500, message: Internal server error}
+
+
+  requestBodies:
+    Heartbeat:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HeatbeatSignalRequestBody'
+      description: "The request body to update proxy."
+    Proxy:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProxyUpdateRequestBody'
+      description: "The request body to update proxy."
+    Endpoint:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EndpointUpdateRequestBody'
+      description: "The request body to update endpoint."
+    InboundEp:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InboundEpUpdateRequestBody'
+      description: "The request body to update inbound endpoint."
+    MessageProcessor:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageProcessorUpdateRequestBody'
+      description: "The request body to update message processor."
+    Api:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiUpdateRequestBody'
+      description: "The request body to update API."
+    Sequence:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SequenceUpdateRequestBody'
+      description: "The request body to update sequence."
+    Logger:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LogConfigAddRequestBody'
+      description: "The request body to add logger."
+    User:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserAddRequestBody'
+      description: "The request body to add user."
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/a2294/MI_Dashboard/1.0.0
