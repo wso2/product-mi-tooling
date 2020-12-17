@@ -26,7 +26,7 @@ export default class ProxyService extends React.Component {
         super(props)
         this.state = { pageInfo: {
                 pageId: "proxyPage",
-                title: "PROXY SERVICES",
+                title: "Proxy Services",
                 headCells: [
                     {id: 'service', label: 'Service'},
                     {id: 'nodes', label: 'Nodes'},
