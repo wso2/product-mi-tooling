@@ -42,7 +42,6 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import { mainListItems, globalSettings } from './NavMenuItems';
 import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
-// pages
 import NodeFilter from './NodeFilter';
 import ProxyService from '../pages/ProxyService';
 import Endpoints from '../pages/Endpoints';
@@ -51,7 +50,6 @@ import InboundEndpoints from '../pages/InboundEndpoints';
 import MessageProcessors from '../pages/MessageProcessors'
 import MessageStores from '../pages/MessageStores'
 import APIs from '../pages/APIs'
-
 import Sequences from '../pages/Sequences';
 import DataServices from '../pages/DataServices';
 import Datasources from '../pages/Datasources';
@@ -172,7 +170,6 @@ export default function Dashboard() {
                                         <Route exact path='/message_processors' component={MessageProcessors}/>
                                         <Route exact path='/message_stores' component={MessageStores}/>
                                         <Route exact path='/apis' component={APIs}/>
-
                                         <Route exact path='/sequences' component={Sequences}/>
                                         <Route exact path='/data_services' component={DataServices}/>
                                         <Route exact path='/datasources' component={Datasources}/>
