@@ -28,6 +28,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * This class starting up the jetty server on the port as defined in deployment.toml file.
@@ -37,6 +38,12 @@ public class Bootstrap {
     private static final String CONF_DIR = "conf";
     private static final String DEPLOYMENT_TOML = "deployment.toml";
     private static final String TOML_CONF_PORT = "server_config.port";
+    private static final String TOML_DB_CONF_URL = "database_config.url";
+    private static final String TOML_DB_CONF_USERNAME = "database_config.username";
+    private static final String TOML_CONF_PASSWORD = "database_config.password";
+    private static final String DATABASE_URL = "db_url";
+    private static final String DATABASE_USERNAME = "db_username";
+    private static final String DATABASE_PASSWORD = "db_password";
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
@@ -46,10 +53,11 @@ public class Bootstrap {
     public static void main(String[] args) {
         String dashboardHome = System.getenv("DASHBOARD_HOME");
         int serverPort = 9743;
-        String tomlFile = dashboardHome + File.separator + CONF_DIR + DEPLOYMENT_TOML;
+        String tomlFile = dashboardHome + File.separator + CONF_DIR + File.separator + DEPLOYMENT_TOML;
         try {
             TomlParseResult parseResult = Toml.parse(Paths.get(tomlFile));
-            serverPort = Integer.parseInt(parseResult.getString(TOML_CONF_PORT));
+            serverPort = parseResult.getLong(TOML_CONF_PORT).intValue();
+            loadDatabaseConfigurations(parseResult);
         } catch (IOException e) {
             logger.warn("Error while reading TOML file in " + tomlFile + ". Using default port " + serverPort, e);
         }
@@ -75,10 +83,23 @@ public class Bootstrap {
         try {
             server.start();
             server.join();
+            logger.info("Server started in port " + serverPort);
         } catch (Exception ex) {
             logger.error("Error while starting up the server", ex);
         }
 
         logger.info("Stopping the server");
     }
+
+    private static void loadDatabaseConfigurations(TomlParseResult parseResult) {
+        String url = parseResult.getString(TOML_DB_CONF_URL);
+        String username = parseResult.getString(TOML_DB_CONF_USERNAME);
+        String password = parseResult.getString(TOML_CONF_PASSWORD);
+        Properties properties = System.getProperties();
+        properties.put(DATABASE_URL, url);
+        properties.put(DATABASE_USERNAME, username);
+        properties.put(DATABASE_PASSWORD, password);
+        System.setProperties(properties);
+    }
+
 }
