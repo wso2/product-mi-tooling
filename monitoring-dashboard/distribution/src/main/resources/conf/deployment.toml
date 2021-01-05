@@ -1,3 +1,6 @@
 [server_config]
 port = 9743
 context = "/dashboard"
+
+[heartbeat_config]
+pool_size = 10
