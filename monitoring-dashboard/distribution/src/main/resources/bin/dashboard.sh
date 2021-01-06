@@ -80,4 +80,4 @@ if [ -z "$JAVACMD" ] ; then
  java \
  $JAVA_OPTS \
  -cp $CARBON_CLASSPATH \
- org.wso2.micro.integrator.dashboard.bootstrap.Bootstrap
+ org.wso2.ei.dashboard.bootstrap.Bootstrap

@@ -32,7 +32,8 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.ei</groupId>
-            <artifactId>org.wso2.micro.integrator.dashboard.bootstrap</artifactId>
+            <artifactId>org.wso2.ei.dashboard.bootstrap</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
