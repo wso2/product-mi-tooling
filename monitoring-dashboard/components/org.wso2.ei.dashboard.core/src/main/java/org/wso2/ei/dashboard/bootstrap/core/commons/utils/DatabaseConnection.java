@@ -29,8 +29,8 @@ public class DatabaseConnection {
 
     public static DatabaseManager getDbManager() {
           if (databaseManager == null) {
-              String databaseUrl = System.getProperty(Constants.DATABASE_URL);
-              String dbType = DbUtils.getDbType(databaseUrl);
+              String connectionUrl = DbUtils.getDBConnectionUrl();
+              String dbType = DbUtils.getDbType(connectionUrl);
               DatabaseManagerFactory databaseManagerFactory = new DatabaseManagerFactory();
               databaseManager = databaseManagerFactory.getDatabaseManager(dbType);
           }

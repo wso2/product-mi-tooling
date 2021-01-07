@@ -20,6 +20,8 @@
 
 package org.wso2.ei.dashboard.bootstrap.core.commons.utils;
 
+import org.wso2.ei.dashboard.bootstrap.core.commons.Constants;
+
 import java.net.URI;
 
 public class DbUtils {
@@ -27,6 +29,11 @@ public class DbUtils {
     public static String getDbType(String connectionUrl) {
         URI uri = URI.create(connectionUrl.substring(5));
         return uri.getScheme();
+    }
+
+    public static String getDBConnectionUrl() {
+        String dashboardHome = System.getenv(Constants.DASHBOARD_HOME);
+        return "jdbc:h2:" + dashboardHome + "/repository/database/WSO2_EI_DASHBOARD_DB";
     }
 
 }

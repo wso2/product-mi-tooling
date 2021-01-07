@@ -30,6 +30,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.bootstrap.core.commons.Constants;
+import org.wso2.ei.dashboard.bootstrap.core.commons.utils.DbUtils;
 import org.wso2.ei.dashboard.bootstrap.core.rest.model.HeatbeatSignalRequestBody;
 import org.wso2.ei.dashboard.bootstrap.core.exception.DashboardServerException;
 
@@ -42,13 +43,15 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     JDBCDatabaseManager() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty(Constants.DATABASE_URL));
-        config.setUsername(System.getProperty(Constants.DATABASE_USERNAME));
-        config.setPassword(System.getProperty(Constants.DATABASE_PASSWORD));
+
+        config.setJdbcUrl(DbUtils.getDBConnectionUrl());
+        config.setUsername(Constants.DATABASE_USERNAME);
+        config.setPassword(Constants.DATABASE_PASSWORD);
 
         config.addDataSourceProperty( "cachePrepStmts" , "true" );
         config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
         config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
+        
         ds = new HikariDataSource(config);
     }
 

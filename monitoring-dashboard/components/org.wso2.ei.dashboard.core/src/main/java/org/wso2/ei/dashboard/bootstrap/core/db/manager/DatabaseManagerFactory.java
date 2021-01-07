@@ -24,10 +24,8 @@ public class DatabaseManagerFactory {
 
     public DatabaseManager getDatabaseManager(String dbType) {
         switch (dbType) {
-            case "h2" :
-                return new JDBCDatabaseManager();
             default:
-                throw new RuntimeException("db type not fround");
+                return new JDBCDatabaseManager();
         }
     }
 }
