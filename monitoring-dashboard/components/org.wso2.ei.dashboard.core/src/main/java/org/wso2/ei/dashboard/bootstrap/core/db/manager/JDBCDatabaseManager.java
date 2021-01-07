@@ -41,17 +41,16 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     private static final Log log = LogFactory.getLog(JDBCDatabaseManager.class);
     private final DataSource ds;
 
-    JDBCDatabaseManager() {
+    public JDBCDatabaseManager() {
         HikariConfig config = new HikariConfig();
 
-        config.setJdbcUrl(DbUtils.getDBConnectionUrl());
+        config.setJdbcUrl(Constants.DATABASE_URL);
         config.setUsername(Constants.DATABASE_USERNAME);
         config.setPassword(Constants.DATABASE_PASSWORD);
 
         config.addDataSourceProperty( "cachePrepStmts" , "true" );
         config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
         config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
-        
         ds = new HikariDataSource(config);
     }
 

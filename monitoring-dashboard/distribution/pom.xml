@@ -91,10 +91,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -105,32 +101,6 @@
                     <source>7</source>
                     <target>7</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>create-in-memory-database</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <path id="h2.classpath">
-                                    <path refid="maven.compile.classpath" />
-                                </path>
-                                <sql driver="org.h2.Driver" url="jdbc:h2:${basedir}/target/database/WSO2_EI_DASHBOARD_DB" userid="wso2carbon" password="wso2carbon" autocommit="true" onerror="abort">
-                                    <classpath>
-                                        <path refid="h2.classpath" />
-                                    </classpath>
-                                    <fileset file="${basedir}/src/main/resources/dbscripts/h2.sql" />
-                                </sql>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

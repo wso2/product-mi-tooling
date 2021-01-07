@@ -20,20 +20,51 @@
 
 package org.wso2.ei.dashboard.bootstrap.core.commons.utils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.bootstrap.core.commons.Constants;
 import org.wso2.ei.dashboard.bootstrap.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.bootstrap.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.bootstrap.core.exception.DashboardServerException;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DatabaseConnection {
+    private static final Log log = LogFactory.getLog(DatabaseConnection.class);
+
     private static DatabaseManager databaseManager;
 
     public static DatabaseManager getDbManager() {
           if (databaseManager == null) {
-              String connectionUrl = DbUtils.getDBConnectionUrl();
+              String connectionUrl = Constants.DATABASE_URL;
               String dbType = DbUtils.getDbType(connectionUrl);
+              if (dbType.equals("h2")) {
+                  createInMemoryDB();
+              }
               DatabaseManagerFactory databaseManagerFactory = new DatabaseManagerFactory();
               databaseManager = databaseManagerFactory.getDatabaseManager(dbType);
           }
           return databaseManager;
+    }
+
+    private static void createInMemoryDB() {
+        String scriptLocation = Constants.DASHBOARD_HOME + "/dbscripts/h2.sql";
+        String dbUrl = Constants.DATABASE_URL + ";INIT=RUNSCRIPT FROM '" + scriptLocation + "'";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(dbUrl, Constants.DATABASE_USERNAME, Constants.DATABASE_PASSWORD);
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while creating in memory database");
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    log.error("Failed to close database connection.", e);
+                }
+            }
+        }
     }
 }

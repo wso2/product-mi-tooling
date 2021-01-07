@@ -38,7 +38,7 @@ public class HeartBeatDelegate {
     private static final String SUCCESS_STATUS = "success";
     private static final String FAIL_STATUS = "fail";
     private final DatabaseManager databaseManager = DatabaseConnection.getDbManager();
-    private final int heartbeatPoolSize = Integer.parseInt(System.getProperty(Constants.HEARTBEAT_POOL_SIZE));
+    private final int heartbeatPoolSize = Integer.parseInt(Constants.HEARTBEAT_POOL_SIZE);
     private ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newScheduledThreadPool(heartbeatPoolSize);
 
     public Ack processHeartbeat(HeatbeatSignalRequestBody heartbeat) {
@@ -74,7 +74,7 @@ public class HeartBeatDelegate {
     }
 
     private void runHeartbeatExecutorService(HeatbeatSignalRequestBody heartbeat) {
-        int heartbeatInterval = heartbeat.getInterval();
+        long heartbeatInterval = heartbeat.getInterval();
         String timestampOfRegisteredNode = databaseManager.retrieveTimestampOfHeartBeat(heartbeat);
         Runnable runnableTask = () -> {
             boolean isNodeDeregistered = isNodeShutDown(heartbeat, timestampOfRegisteredNode);

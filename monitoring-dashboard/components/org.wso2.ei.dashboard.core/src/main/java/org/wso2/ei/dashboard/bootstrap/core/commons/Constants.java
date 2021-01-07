@@ -21,9 +21,13 @@
 package org.wso2.ei.dashboard.bootstrap.core.commons;
 
 public class Constants {
-    public static final String DASHBOARD_HOME = "DASHBOARD_HOME";
-    public static final String DATABASE_USERNAME = "wso2carbon";
-    public static final String DATABASE_PASSWORD = "wso2carbon";
 
-    public static final String HEARTBEAT_POOL_SIZE = "heartbeat_pool_size";
+    public static final String DATABASE_URL = System.getProperty("db_url");
+    public static final String DATABASE_USERNAME = System.getProperty("db_username");
+    public static final String DATABASE_PASSWORD = System.getProperty("db_password");
+
+    public static final String DASHBOARD_HOME = System.getenv("DASHBOARD_HOME");
+
+    public static final String HEARTBEAT_POOL_SIZE = System.getProperty("heartbeat_pool_size");
+
 }
