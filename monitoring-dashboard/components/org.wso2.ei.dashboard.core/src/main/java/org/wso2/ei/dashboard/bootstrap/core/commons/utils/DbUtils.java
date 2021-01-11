@@ -20,13 +20,14 @@
 
 package org.wso2.ei.dashboard.bootstrap.core.commons.utils;
 
-import java.net.URI;
-
 public class DbUtils {
 
     public static String getDbType(String connectionUrl) {
-        URI uri = URI.create(connectionUrl.substring(5));
-        return uri.getScheme();
+        String dbType = "";
+        if (connectionUrl.startsWith("jdbc")) {
+            dbType = "jdbc";
+        }
+        return dbType;
     }
 
 }

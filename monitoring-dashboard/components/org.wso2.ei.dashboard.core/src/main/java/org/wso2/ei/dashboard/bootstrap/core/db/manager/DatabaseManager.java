@@ -24,11 +24,9 @@ import org.wso2.ei.dashboard.bootstrap.core.rest.model.HeatbeatSignalRequestBody
 
 public interface DatabaseManager {
 
-    int updateDatabase(String query);
+    boolean insertHeartbeat(HeatbeatSignalRequestBody heartbeat);
 
-    int insertHeartbeat(HeatbeatSignalRequestBody heartbeat);
-
-    int updateHeartbeat(HeatbeatSignalRequestBody heartbeat);
+    boolean updateHeartbeat(HeatbeatSignalRequestBody heartbeat);
 
     int deleteHeartbeat(HeatbeatSignalRequestBody heartbeat);
 

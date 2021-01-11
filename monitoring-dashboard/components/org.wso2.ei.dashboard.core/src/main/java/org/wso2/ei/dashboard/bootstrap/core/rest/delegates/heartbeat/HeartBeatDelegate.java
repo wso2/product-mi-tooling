@@ -21,7 +21,7 @@
 package org.wso2.ei.dashboard.bootstrap.core.rest.delegates.heartbeat;
 
 import org.wso2.ei.dashboard.bootstrap.core.commons.Constants;
-import org.wso2.ei.dashboard.bootstrap.core.commons.utils.DatabaseConnection;
+import org.wso2.ei.dashboard.bootstrap.core.commons.utils.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.bootstrap.core.rest.model.HeatbeatSignalRequestBody;
 import org.wso2.ei.dashboard.bootstrap.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.bootstrap.core.exception.DashboardServerException;
@@ -37,31 +37,39 @@ public class HeartBeatDelegate {
     private static final Log log = LogFactory.getLog(HeartBeatDelegate.class);
     private static final String SUCCESS_STATUS = "success";
     private static final String FAIL_STATUS = "fail";
-    private final DatabaseManager databaseManager = DatabaseConnection.getDbManager();
+    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private final int heartbeatPoolSize = Integer.parseInt(Constants.HEARTBEAT_POOL_SIZE);
     private ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newScheduledThreadPool(heartbeatPoolSize);
 
     public Ack processHeartbeat(HeatbeatSignalRequestBody heartbeat) {
         Ack ack = new Ack(FAIL_STATUS);
-        boolean isNodeRegistered = isNodeRegistered(heartbeat);
-        int rowCount;
-        if (!isNodeRegistered) {
-            log.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
-                     " Inserting heartbeat information");
-            rowCount = databaseManager.insertHeartbeat(heartbeat);
-            fetchData();
+        boolean isSuccess;
+        if (isNodeRegistered(heartbeat)) {
+            isSuccess = updateHeartbeat(heartbeat);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Updating heartbeat information of node " + heartbeat.getNodeId() + " in group : " +
-                          heartbeat.getGroupId());
-            }
-            rowCount = databaseManager.updateHeartbeat(heartbeat);
+            isSuccess = registerAndFetchData(heartbeat);
         }
-        if (rowCount > 0) {
+        if (isSuccess) {
             ack.setStatus(SUCCESS_STATUS);
         }
         runHeartbeatExecutorService(heartbeat);
         return ack;
+    }
+
+    private boolean updateHeartbeat(HeatbeatSignalRequestBody heartbeat) {
+        if (log.isDebugEnabled()) {
+            log.debug("Updating heartbeat information of node " + heartbeat.getNodeId() + " in group : " +
+                      heartbeat.getGroupId());
+        }
+        return databaseManager.updateHeartbeat(heartbeat);
+    }
+
+    private boolean registerAndFetchData(HeatbeatSignalRequestBody heartbeat) {
+        log.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
+                 " Inserting heartbeat information");
+        boolean isSuccess = databaseManager.insertHeartbeat(heartbeat);
+        fetchData();
+        return  isSuccess;
     }
 
     private boolean isNodeRegistered(HeatbeatSignalRequestBody heartbeat) {
@@ -85,7 +93,6 @@ public class HeartBeatDelegate {
             }
         };
         heartbeatScheduledExecutorService.schedule(runnableTask, 3*heartbeatInterval, TimeUnit.SECONDS);
-        // todo this should be triggered during shutdown
         heartbeatScheduledExecutorService.shutdown();
     }
 
