@@ -1,3 +1,11 @@
 [server_config]
 port = 9743
 context = "/dashboard"
+
+[heartbeat_config]
+pool_size = 10
+
+[database_config]
+url = "jdbc:h2:mem:ei-dashboard-db;DB_CLOSE_DELAY=-1"
+username = "wso2carbon"
+password = "wso2carbon"

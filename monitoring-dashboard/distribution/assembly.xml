@@ -45,6 +45,20 @@
             <fileMode>755</fileMode>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/src/main/resources/dbscripts</directory>
+            <outputDirectory>dbscripts</outputDirectory>
+            <includes>
+                <include>h2.sql</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/target/database</directory>
+            <outputDirectory>repository/database</outputDirectory>
+            <includes>
+                <include>WSO2_EI_DASHBOARD_DB.mv.db</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/www</directory>
             <outputDirectory>server/www</outputDirectory>
             <includes>
@@ -52,10 +66,10 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.backend/target</directory>
+            <directory>${project.basedir}/../components/org.wso2.ei.dashboard.core/target</directory>
             <outputDirectory>server/webapps</outputDirectory>
             <includes>
-                <include>org.wso2.micro.integrator.dashboard.backend.war</include>
+                <include>org.wso2.ei.dashboard.core.war</include>
             </includes>
         </fileSet>
     </fileSets>
@@ -66,7 +80,7 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>org.wso2.ei:org.wso2.micro.integrator.dashboard.bootstrap:jar</include>
+                <include>org.wso2.ei:org.wso2.ei.dashboard.bootstrap:jar</include>
                 <include>org.eclipse.jetty:jetty-server:jar</include>
                 <include>org.eclipse.jetty:jetty-servlet:jar</include>
                 <include>org.eclipse.jetty:jetty-webapp:jar</include>
