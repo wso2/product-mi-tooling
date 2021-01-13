@@ -28,16 +28,19 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
 import java.io.IOException;
 import javax.net.ssl.SSLContext;
 
+/**
+ * Utilities to execute http requests.
+ */
 public class HttpUtils {
 
     private HttpUtils() {
@@ -61,7 +64,7 @@ public class HttpUtils {
                                                                                       NoopHostnameVerifier.INSTANCE);
 
             Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                    RegistryBuilder.<ConnectionSocketFactory> create()
+                    RegistryBuilder.<ConnectionSocketFactory>create()
                             .register("https", socketFactory)
                             .register("http", new PlainConnectionSocketFactory())
                             .build();

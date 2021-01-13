@@ -20,6 +20,9 @@
 
 package org.wso2.ei.dashboard.core.exception;
 
+/**
+ * RuntimeException to throw when exception/error is caught inside dashboard server.
+ */
 public class DashboardServerException extends RuntimeException {
     public DashboardServerException() {
         super();

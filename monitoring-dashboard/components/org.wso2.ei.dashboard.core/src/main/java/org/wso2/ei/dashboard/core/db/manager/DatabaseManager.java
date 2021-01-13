@@ -22,6 +22,9 @@ package org.wso2.ei.dashboard.core.db.manager;
 
 import org.wso2.ei.dashboard.core.rest.model.HeatbeatSignalRequestBody;
 
+/**
+ * This interface represents database operations.
+ */
 public interface DatabaseManager {
 
     boolean insertHeartbeat(HeatbeatSignalRequestBody heartbeat);

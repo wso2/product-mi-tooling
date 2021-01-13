@@ -23,6 +23,9 @@ package org.wso2.ei.dashboard.core.rest;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+/**
+ * Temporary rest application.
+ */
 @ApplicationPath("/")
 public class RestApplication extends Application {
 

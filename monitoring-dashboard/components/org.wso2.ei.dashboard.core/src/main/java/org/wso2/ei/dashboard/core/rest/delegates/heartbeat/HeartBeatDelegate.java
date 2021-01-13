@@ -20,22 +20,22 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 
-import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.commons.utils.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
-import org.wso2.ei.dashboard.core.rest.model.HeatbeatSignalRequestBody;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.exception.DashboardServerException;
-import org.wso2.ei.dashboard.core.rest.model.Ack;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.util.EntityUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
+import org.wso2.ei.dashboard.core.commons.Constants;
+import org.wso2.ei.dashboard.core.commons.utils.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
+import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
+import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.rest.model.Ack;
+import org.wso2.ei.dashboard.core.rest.model.HeatbeatSignalRequestBody;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -45,6 +45,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Manages heartbeats received to the dashboard.
+ */
 public class HeartBeatDelegate {
     private static final Log log = LogFactory.getLog(HeartBeatDelegate.class);
     private static final String SUCCESS_STATUS = "success";
@@ -54,7 +57,8 @@ public class HeartBeatDelegate {
     private static final String APIS = "apis";
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private final int heartbeatPoolSize = Integer.parseInt(Constants.HEARTBEAT_POOL_SIZE);
-    private ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newScheduledThreadPool(heartbeatPoolSize);
+    private ScheduledExecutorService heartbeatScheduledExecutorService =
+            Executors.newScheduledThreadPool(heartbeatPoolSize);
 
     public Ack processHeartbeat(HeatbeatSignalRequestBody heartbeat) {
         Ack ack = new Ack(FAIL_STATUS);
@@ -109,7 +113,7 @@ public class HeartBeatDelegate {
                 deleteNode(heartbeat);
             }
         };
-        heartbeatScheduledExecutorService.schedule(runnableTask, 3*heartbeatInterval, TimeUnit.SECONDS);
+        heartbeatScheduledExecutorService.schedule(runnableTask, 3 * heartbeatInterval, TimeUnit.SECONDS);
         heartbeatScheduledExecutorService.shutdown();
     }
 
@@ -172,7 +176,7 @@ public class HeartBeatDelegate {
         int serviceCount = proxyServices.get("count").getAsInt();
         if (serviceCount > 0) {
             JsonArray serviceList = proxyServices.get("list").getAsJsonArray();
-            for (int i = 0; i <serviceCount; i++) {
+            for (int i = 0; i < serviceCount; i++) {
                 String serviceName = serviceList.get(i).getAsJsonObject().get("name").getAsString();
                 String proxyInfoUrl = url + "?proxyServiceName=" + serviceName;
                 CloseableHttpResponse proxyDetails = doGet(accessToken, proxyInfoUrl);
@@ -196,7 +200,7 @@ public class HeartBeatDelegate {
         int apiCount = apis.get("count").getAsInt();
         if (apiCount > 0) {
             JsonArray apiList = apis.get("list").getAsJsonArray();
-            for (int i = 0; i <apiCount; i++) {
+            for (int i = 0; i < apiCount; i++) {
                 String apiName = apiList.get(i).getAsJsonObject().get("name").getAsString();
                 String apiInfoUrl = url + "?apiName=" + apiName;
                 CloseableHttpResponse apiDetails = doGet(accessToken, apiInfoUrl);
