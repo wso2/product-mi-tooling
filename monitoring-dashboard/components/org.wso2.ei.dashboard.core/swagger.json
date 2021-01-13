@@ -1469,12 +1469,16 @@
           },
           "interval" : {
             "type" : "integer"
+          },
+          "mgtApiUrl" : {
+            "type" : "string"
           }
         },
         "example" : {
           "groupId" : "mi_dev",
           "nodeId" : "node_01",
-          "interval" : 30
+          "interval" : 30,
+          "mgtApiUrl" : "https://192.168.1.4:9164/management/"
         }
       },
       "Ack" : {

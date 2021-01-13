@@ -32,6 +32,7 @@ public class HeatbeatSignalRequestBody   {
   private @Valid String groupId = null;
   private @Valid String nodeId = null;
   private @Valid Integer interval = null;
+  private @Valid String mgtApiUrl = null;
 
   /**
    **/
@@ -40,7 +41,6 @@ public class HeatbeatSignalRequestBody   {
     return this;
   }
 
-  
   @ApiModelProperty(value = "")
   @JsonProperty("groupId")
 
@@ -87,6 +87,24 @@ public class HeatbeatSignalRequestBody   {
     this.interval = interval;
   }
 
+  /**
+   **/
+  public HeatbeatSignalRequestBody mgtApiUrl(String mgtApiUrl) {
+    this.mgtApiUrl = mgtApiUrl;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("mgtApiUrl")
+
+  public String getMgtApiUrl() {
+    return mgtApiUrl;
+  }
+  public void setMgtApiUrl(String mgtApiUrl) {
+    this.mgtApiUrl = mgtApiUrl;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -99,12 +117,13 @@ public class HeatbeatSignalRequestBody   {
     HeatbeatSignalRequestBody heatbeatSignalRequestBody = (HeatbeatSignalRequestBody) o;
     return Objects.equals(groupId, heatbeatSignalRequestBody.groupId) &&
         Objects.equals(nodeId, heatbeatSignalRequestBody.nodeId) &&
-        Objects.equals(interval, heatbeatSignalRequestBody.interval);
+        Objects.equals(interval, heatbeatSignalRequestBody.interval) &&
+        Objects.equals(mgtApiUrl, heatbeatSignalRequestBody.mgtApiUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, nodeId, interval);
+    return Objects.hash(groupId, nodeId, interval, mgtApiUrl);
   }
 
   @Override
@@ -115,6 +134,7 @@ public class HeatbeatSignalRequestBody   {
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    nodeId: ").append(toIndentedString(nodeId)).append("\n");
     sb.append("    interval: ").append(toIndentedString(interval)).append("\n");
+    sb.append("    mgtApiUrl: ").append(toIndentedString(mgtApiUrl)).append("\n");
     sb.append("}");
     return sb.toString();
   }

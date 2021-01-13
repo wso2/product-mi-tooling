@@ -34,4 +34,9 @@ public interface DatabaseManager {
 
     String retrieveTimestampOfHeartBeat(HeatbeatSignalRequestBody heartbeat);
 
+    boolean insertServerInformation(HeatbeatSignalRequestBody heartbeat, String serverInfo);
+
+    boolean insertProxyServices(HeatbeatSignalRequestBody heartbeat, String serviceName, String details);
+
+    boolean insertApis(HeatbeatSignalRequestBody heartbeat, String apiName, String details);
 }

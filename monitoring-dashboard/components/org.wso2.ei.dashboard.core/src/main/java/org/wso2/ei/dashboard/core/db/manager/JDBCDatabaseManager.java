@@ -73,6 +73,70 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public boolean insertServerInformation(HeatbeatSignalRequestBody heartbeat, String serverInfo) {
+        String query = "INSERT INTO SERVERS VALUES (?,?,?);";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, heartbeat.getGroupId());
+            statement.setString(2, heartbeat.getNodeId());
+            statement.setString(3, serverInfo);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while inserting server information of node : "
+                                               + heartbeat.getNodeId() + " in group: " + heartbeat.getGroupId(), e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean insertProxyServices(HeatbeatSignalRequestBody heartbeat, String serviceName, String details) {
+        String query = "INSERT INTO PROXY_SERVICES VALUES (?,?,?,?);";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, heartbeat.getGroupId());
+            statement.setString(2, heartbeat.getNodeId());
+            statement.setString(3, serviceName);
+            statement.setString(4, details);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while inserting " + serviceName
+                                               + " proxy information.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean insertApis(HeatbeatSignalRequestBody heartbeat, String apiName, String details) {
+        String query = "INSERT INTO APIS VALUES (?,?,?,?);";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, heartbeat.getGroupId());
+            statement.setString(2, heartbeat.getNodeId());
+            statement.setString(3, apiName);
+            statement.setString(4, details);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while inserting " + apiName + " api information.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
     public boolean updateHeartbeat(HeatbeatSignalRequestBody heartbeat) {
         String query = "UPDATE HEARTBEAT SET TIMESTAMP=CURRENT_TIMESTAMP() WHERE GROUP_ID=? AND NODE_ID=?;";
         Connection con = null;
