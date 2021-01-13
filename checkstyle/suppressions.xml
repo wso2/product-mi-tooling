@@ -34,5 +34,6 @@
 
     <suppress files="[\\/]src[\\/]gen[\\/]" checks="."/>
     <suppress files="[\\/]target[\\/].*[\\/]generated[\\/]" checks="."/>
-
+    <suppress files="monitoring-dashboard/components/org.wso2.ei.dashboard.core/src/main/java/org/wso2/ei/dashboard/core/rest/api" checks="[a-zA-Z0-9]*"/>
+    <suppress files="monitoring-dashboard/components/org.wso2.ei.dashboard.core/src/main/java/org/wso2/ei/dashboard/core/rest/model" checks="[a-zA-Z0-9]*"/>
 </suppressions>
