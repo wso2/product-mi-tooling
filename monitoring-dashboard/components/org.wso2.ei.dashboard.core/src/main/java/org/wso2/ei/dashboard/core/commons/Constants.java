@@ -20,6 +20,9 @@
 
 package org.wso2.ei.dashboard.core.commons;
 
+/**
+ * Constants for the dashboard core.
+ */
 public final class Constants {
 
     private Constants() {

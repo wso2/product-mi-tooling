@@ -20,6 +20,9 @@
 
 package org.wso2.ei.dashboard.core.commons.utils;
 
+/**
+ * Database utility methods.
+ */
 public class DbUtils {
 
     public static String getDbType(String connectionUrl) {

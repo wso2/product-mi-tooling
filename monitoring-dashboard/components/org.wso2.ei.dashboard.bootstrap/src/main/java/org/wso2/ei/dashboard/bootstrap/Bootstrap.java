@@ -104,7 +104,7 @@ public class Bootstrap {
         String username = parseResult.getString(TOML_DB_CONF_USERNAME);
         String password = parseResult.getString(TOML_DB_CONF_PASSWORD);
         String heartbeatPoolSize = String.valueOf(5);
-        if (parseResult.contains(TOML_CONF_HEARTBEAT_POOL_SIZE)){
+        if (parseResult.contains(TOML_CONF_HEARTBEAT_POOL_SIZE)) {
             heartbeatPoolSize = parseResult.getLong(TOML_CONF_HEARTBEAT_POOL_SIZE).toString();
         }
         String miUsername = parseResult.getString(TOML_MI_USERNAME);

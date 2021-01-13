@@ -25,15 +25,18 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.rest.model.HeatbeatSignalRequestBody;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.rest.model.HeatbeatSignalRequestBody;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 
+/**
+ * Performs jdbc operations.
+ */
 public final class JDBCDatabaseManager implements DatabaseManager {
 
     private static final Log log = LogFactory.getLog(JDBCDatabaseManager.class);

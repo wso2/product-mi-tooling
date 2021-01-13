@@ -27,6 +27,9 @@ import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.JDBCDatabaseManager;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
+/**
+ * Manage databases.
+ */
 public class DatabaseManagerFactory {
     private static final Log log = LogFactory.getLog(DatabaseManagerFactory.class);
 
