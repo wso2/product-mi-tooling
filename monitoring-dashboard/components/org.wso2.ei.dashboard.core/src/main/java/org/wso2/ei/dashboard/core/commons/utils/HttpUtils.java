@@ -20,6 +20,9 @@
 
 package org.wso2.ei.dashboard.core.commons.utils;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.Registry;
@@ -33,6 +36,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
 import java.io.IOException;
@@ -52,6 +56,20 @@ public class HttpUtils {
             return httpClient.execute(httpGet);
         } catch (IOException e) {
             throw new DashboardServerException("Error occurred while sending http request.", e);
+        }
+    }
+
+    public static JsonObject getJsonResponse(CloseableHttpResponse response) {
+        String stringResponse = getStringResponse(response);
+        return JsonParser.parseString(stringResponse).getAsJsonObject();
+    }
+
+    public static String getStringResponse(CloseableHttpResponse response) {
+        HttpEntity entity = response.getEntity();
+        try {
+            return EntityUtils.toString(entity, "UTF-8");
+        } catch (IOException e) {
+            throw new DashboardServerException("Error occurred while converting Http response to string", e);
         }
     }
 

@@ -966,9 +966,11 @@ paths:
 
 components:
   schemas:
-    HeatbeatSignalRequestBody:
+    HeartbeatRequest:
       type: object
       properties:
+        product :
+          type: string
         groupId:
           type: string
         nodeId:
@@ -977,7 +979,7 @@ components:
           type: integer
         mgtApiUrl:
           type: string
-      example: {groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
+      example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
 
     Ack:
       type: object
@@ -1602,7 +1604,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HeatbeatSignalRequestBody'
+            $ref: '#/components/schemas/HeartbeatRequest'
       description: "The request body to update proxy."
     Proxy:
       content:

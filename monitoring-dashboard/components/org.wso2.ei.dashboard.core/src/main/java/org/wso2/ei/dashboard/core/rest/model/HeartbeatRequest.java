@@ -20,6 +20,7 @@
 
 package org.wso2.ei.dashboard.core.rest.model;
 
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -28,7 +29,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class HeatbeatSignalRequestBody   {
+public class HeartbeatRequest   {
+  private @Valid String product = null;
   private @Valid String groupId = null;
   private @Valid String nodeId = null;
   private @Valid Integer interval = null;
@@ -36,10 +38,29 @@ public class HeatbeatSignalRequestBody   {
 
   /**
    **/
-  public HeatbeatSignalRequestBody groupId(String groupId) {
+  public HeartbeatRequest product(String product) {
+    this.product = product;
+    return this;
+  }
+
+
+  @ApiModelProperty(value = "")
+  @JsonProperty("product")
+
+  public String getProduct() {
+    return product;
+  }
+  public void setProduct(String product) {
+    this.product = product;
+  }
+
+  /**
+   **/
+  public HeartbeatRequest groupId(String groupId) {
     this.groupId = groupId;
     return this;
   }
+
 
   @ApiModelProperty(value = "")
   @JsonProperty("groupId")
@@ -53,12 +74,12 @@ public class HeatbeatSignalRequestBody   {
 
   /**
    **/
-  public HeatbeatSignalRequestBody nodeId(String nodeId) {
+  public HeartbeatRequest nodeId(String nodeId) {
     this.nodeId = nodeId;
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("nodeId")
 
@@ -71,12 +92,12 @@ public class HeatbeatSignalRequestBody   {
 
   /**
    **/
-  public HeatbeatSignalRequestBody interval(Integer interval) {
+  public HeartbeatRequest interval(Integer interval) {
     this.interval = interval;
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("interval")
 
@@ -89,12 +110,12 @@ public class HeatbeatSignalRequestBody   {
 
   /**
    **/
-  public HeatbeatSignalRequestBody mgtApiUrl(String mgtApiUrl) {
+  public HeartbeatRequest mgtApiUrl(String mgtApiUrl) {
     this.mgtApiUrl = mgtApiUrl;
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("mgtApiUrl")
 
@@ -114,23 +135,25 @@ public class HeatbeatSignalRequestBody   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    HeatbeatSignalRequestBody heatbeatSignalRequestBody = (HeatbeatSignalRequestBody) o;
-    return Objects.equals(groupId, heatbeatSignalRequestBody.groupId) &&
-        Objects.equals(nodeId, heatbeatSignalRequestBody.nodeId) &&
-        Objects.equals(interval, heatbeatSignalRequestBody.interval) &&
-        Objects.equals(mgtApiUrl, heatbeatSignalRequestBody.mgtApiUrl);
+    HeartbeatRequest heartbeatRequest = (HeartbeatRequest) o;
+    return Objects.equals(product, heartbeatRequest.product) &&
+           Objects.equals(groupId, heartbeatRequest.groupId) &&
+           Objects.equals(nodeId, heartbeatRequest.nodeId) &&
+           Objects.equals(interval, heartbeatRequest.interval) &&
+           Objects.equals(mgtApiUrl, heartbeatRequest.mgtApiUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(groupId, nodeId, interval, mgtApiUrl);
+    return Objects.hash(product, groupId, nodeId, interval, mgtApiUrl);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class HeatbeatSignalRequestBody {\n");
-    
+    sb.append("class HeartbeatRequest {\n");
+
+    sb.append("    product: ").append(toIndentedString(product)).append("\n");
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    nodeId: ").append(toIndentedString(nodeId)).append("\n");
     sb.append("    interval: ").append(toIndentedString(interval)).append("\n");

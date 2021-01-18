@@ -1458,9 +1458,12 @@
   },
   "components" : {
     "schemas" : {
-      "HeatbeatSignalRequestBody" : {
+      "HeartbeatRequest" : {
         "type" : "object",
         "properties" : {
+          "product" : {
+            "type" : "string"
+          },
           "groupId" : {
             "type" : "string"
           },
@@ -1475,10 +1478,11 @@
           }
         },
         "example" : {
+          "type" : "mi",
           "groupId" : "mi_dev",
           "nodeId" : "node_01",
           "interval" : 30,
-          "mgtApiUrl" : "https://192.168.1.4:9164/management/"
+          "mgtApiUrl" : "https://10.100.0.64:9164/management/"
         }
       },
       "Ack" : {
@@ -2432,7 +2436,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/HeatbeatSignalRequestBody"
+              "$ref" : "#/components/schemas/HeartbeatRequest"
             }
           }
         }
