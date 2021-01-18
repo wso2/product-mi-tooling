@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
-import org.wso2.ei.dashboard.core.rest.model.HeatbeatSignalRequestBody;
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -56,7 +56,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean insertHeartbeat(HeatbeatSignalRequestBody heartbeat) {
+    public boolean insertHeartbeat(HeartbeatObject heartbeat) {
         String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,CURRENT_TIMESTAMP());";
         Connection con = null;
         PreparedStatement statement = null;
@@ -76,7 +76,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean insertServerInformation(HeatbeatSignalRequestBody heartbeat, String serverInfo) {
+    public boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo) {
         String query = "INSERT INTO SERVERS VALUES (?,?,?);";
         Connection con = null;
         PreparedStatement statement = null;
@@ -97,7 +97,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean insertProxyServices(HeatbeatSignalRequestBody heartbeat, String serviceName, String details) {
+    public boolean insertProxyServices(HeartbeatObject heartbeat, String serviceName, String details) {
         String query = "INSERT INTO PROXY_SERVICES VALUES (?,?,?,?);";
         Connection con = null;
         PreparedStatement statement = null;
@@ -119,7 +119,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean insertApis(HeatbeatSignalRequestBody heartbeat, String apiName, String details) {
+    public boolean insertApis(HeartbeatObject heartbeat, String apiName, String details) {
         String query = "INSERT INTO APIS VALUES (?,?,?,?);";
         Connection con = null;
         PreparedStatement statement = null;
@@ -140,7 +140,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean updateHeartbeat(HeatbeatSignalRequestBody heartbeat) {
+    public boolean updateHeartbeat(HeartbeatObject heartbeat) {
         String query = "UPDATE HEARTBEAT SET TIMESTAMP=CURRENT_TIMESTAMP() WHERE GROUP_ID=? AND NODE_ID=?;";
         Connection con = null;
         PreparedStatement statement = null;
@@ -159,7 +159,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public int deleteHeartbeat(HeatbeatSignalRequestBody heartbeat) {
+    public int deleteHeartbeat(HeartbeatObject heartbeat) {
         String query = "DELETE FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
         Connection con = null;
         PreparedStatement statement = null;
@@ -177,7 +177,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         }
     }
 
-    public String retrieveTimestampOfHeartBeat(HeatbeatSignalRequestBody heartbeat) {
+    public String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat) {
         String query = "SELECT TIMESTAMP FROM HEARTBEAT WHERE GROUP_ID = ? AND NODE_ID = ? ;";
         Connection con = null;
         PreparedStatement statement = null;
@@ -201,7 +201,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean checkIfTimestampExceedsInitial(HeatbeatSignalRequestBody heartbeat, String initialTimestamp) {
+    public boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp) {
         String query = "SELECT COUNT(*) FROM HEARTBEAT WHERE TIMESTAMP>? AND GROUP_ID=? AND NODE_ID=?;";
         boolean isExists = false;
         Connection con = null;

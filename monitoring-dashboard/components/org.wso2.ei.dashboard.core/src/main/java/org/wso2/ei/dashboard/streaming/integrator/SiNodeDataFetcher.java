@@ -18,28 +18,30 @@
  *
  */
 
-package org.wso2.ei.dashboard.core.db.manager;
+package org.wso2.ei.dashboard.streaming.integrator;
 
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.NodeDataFetcher;
+
+import java.util.Set;
 
 /**
- * This interface represents database operations.
+ * Fetch artifact information from registered streaming integrator nodes and store.
  */
-public interface DatabaseManager {
+public class SiNodeDataFetcher implements NodeDataFetcher {
+    private final HeartbeatObject heartbeat;
 
-    boolean insertHeartbeat(HeartbeatObject heartbeat);
+    public SiNodeDataFetcher(HeartbeatObject heartbeat) {
+        this.heartbeat = heartbeat;
+    }
 
-    boolean updateHeartbeat(HeartbeatObject heartbeat);
+    @Override
+    public void runFetchExecutorService() {
 
-    int deleteHeartbeat(HeartbeatObject heartbeat);
+    }
 
-    boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp);
+    @Override
+    public void fetchData(Set<String> artifactList) {
 
-    String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat);
-
-    boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo);
-
-    boolean insertProxyServices(HeartbeatObject heartbeat, String serviceName, String details);
-
-    boolean insertApis(HeartbeatObject heartbeat, String apiName, String details);
+    }
 }
