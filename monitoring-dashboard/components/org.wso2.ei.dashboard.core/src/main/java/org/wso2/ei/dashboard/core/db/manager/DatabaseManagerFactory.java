@@ -18,20 +18,15 @@
  *
  */
 
-package org.wso2.ei.dashboard.core.commons.utils;
+package org.wso2.ei.dashboard.core.db.manager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.JDBCDatabaseManager;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
 /**
  * Manage databases.
  */
 public class DatabaseManagerFactory {
-    private static final Log log = LogFactory.getLog(DatabaseManagerFactory.class);
 
     private DatabaseManagerFactory() {
 
@@ -42,18 +37,24 @@ public class DatabaseManagerFactory {
     public static DatabaseManager getDbManager() {
           if (databaseManager == null) {
               String connectionUrl = Constants.DATABASE_URL;
-              String dbType = DbUtils.getDbType(connectionUrl);
+              String dbType = getDbType(connectionUrl);
               databaseManager = getDatabaseManager(dbType);
           }
           return databaseManager;
     }
 
     public static DatabaseManager getDatabaseManager(String dbType) {
-        switch (dbType) {
-            case "jdbc" :
-                return new JDBCDatabaseManager();
-            default:
-                throw new DashboardServerException("The database type " + dbType + " is not supported.");
+        if ("jdbc".equals(dbType)) {
+            return new JDBCDatabaseManager();
         }
+        throw new DashboardServerException("The database type " + dbType + " is not supported.");
+    }
+
+   private static String getDbType(String connectionUrl) {
+        String dbType = "";
+        if (connectionUrl.startsWith("jdbc")) {
+            dbType = "jdbc";
+        }
+        return dbType;
     }
 }
