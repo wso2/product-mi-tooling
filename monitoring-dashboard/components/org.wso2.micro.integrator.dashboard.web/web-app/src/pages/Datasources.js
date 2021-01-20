@@ -31,7 +31,7 @@ export default class Datasources extends React.Component {
                     {id: 'name', label: 'Inbound Endpoint Name'},
                     {id: 'nodes', label: 'Nodes'},
                     {id: 'type', label: 'Type'},
-                    {id: 'status', label: 'Status'}],
+                    {id: 'data_source_status', label: 'Status'}],
                 tableOrderBy: 'service'
             },
             datasourceList: [{
@@ -39,12 +39,12 @@ export default class Datasources extends React.Component {
                 nodes: [
                     { nodeId: "node_01",
                         type: "Type",
-                        status: "Inactive"
+                        data_source_status: "Inactive"
 
                     },
                     { nodeId: "node_02",
                         protocol: "http",
-                        status: "Active"
+                        data_source_status: "Active"
 
                     }
                 ]

@@ -30,214 +30,6 @@ import NodeInfoSideDrawer from '../commons/NodeInfoSideDrawer';
 
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers } = props;
-
-    switch(pageInfo.pageId) {
-        case 'nodeInfo':
-            return <NodeRowCreator headers={headers} data={data} />
-        case 'nodes':
-            return <NodeRowCreator headers={headers} data={data} />
-        case 'proxyPage':
-            return <ProxyRowCreator headers={headers} data={data} />
-        case 'endpoints':
-            return <EndpointRowCreator headers={headers} data={data} />
-        case 'inbound_endpoints':
-            return <InboundEndpointRowCreator headers={headers} data={data} />
-        case 'message_processors':
-            return <EndpointRowCreator headers={headers} data={data} />
-        case 'message_stores':
-            return <MessageStoreRowCreator headers={headers} data={data} />
-        case 'apis':
-            return <APIRowCreator headers={headers} data={data} />
-        case 'sequences':
-            return <SequenceRowCreator headers={headers} data={data} />
-        case 'dataservices':
-            return <DataserviceRowCreator headers={headers} data={data} />
-        case 'datasources':
-            return <DatasourceRowCreator headers={headers} data={data} />
-        case 'connectors':
-            return <ConnectorRowCreator headers={headers} data={data} />
-        case 'carbon_applications':
-            return <CarbonApplicationRowCreator headers={headers} data={data} />
-        case 'logfiles':
-            return <LogFileRowCreator headers={headers} data={data} />
-
-    }
-}
-
-function NodeRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'nodeId':
-                return <TableCell>{data.nodeId}</TableCell>
-            case 'status':
-                return <TableCell><StatusCell data={data.status} /></TableCell>
-            case 'role':
-                return <TableCell>{data.role}</TableCell>
-            case 'upTime':
-                return <TableCell>{data.upTime}</TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-function ProxyRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'service':
-                return <TableCell>{data.service}</TableCell>
-            case 'nodes':
-                return <TableCell>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</TableCell>
-            case 'wsdlUrl':
-                return <TableCell>{data.nodes.map(node=><StringCell data={node.wsdlUrl}/>)}</TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-
-function EndpointRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'type':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.type} proxyName={data['service']}/>)}</table></TableCell>
-            case 'state':
-                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node.state}/>)}</TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-
-function InboundEndpointRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'protocol':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.protocol} proxyName={data['service']}/>)}</table></TableCell>
-            case 'port':
-                return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-
-function MessageStoreRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'type':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.type} proxyName={data['service']}/>)}</table></TableCell>
-            case 'message_count':
-                return <TableCell>{data.nodes.map(node=><StringCell data={node.message_count}/>)}</TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-function APIRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'urls':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.urls} />)}</table></TableCell>
-            case 'tracing':
-                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node}/>)}</TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-function SequenceRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'statistic':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.statistic} />)}</table></TableCell>
-            case 'tracing':
-                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node}/>)}</TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-function DataserviceRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'wsdlUrl':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.wsdlURL} />)}</table></TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-
-function DatasourceRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'type':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.type} />)}</table></TableCell>
-            case 'status':
-                return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.status} />)}</table></TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-
-function ConnectorRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
-            case 'package':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.package} />)}</table></TableCell>
-            case 'description':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.description} />)}</table></TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-
-function CarbonApplicationRowCreator(props) {
-    const { headers, data } = props;
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             case 'name':
@@ -246,22 +38,42 @@ function CarbonApplicationRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
             case 'version':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>
-            default:
-                <TableCell>Table data not available</TableCell>
-        }})}
-    </TableRow>
-}
-
-function LogFileRowCreator(props) {
-    const { headers, data } = props;
-    return <TableRow>
-        {headers.map(header => {switch(header.id) {
-            case 'name':
-                return <TableCell>{data.name}</TableCell>
-            case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
             case 'size':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.size} />)}</table></TableCell>
+            case 'package':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.package} />)}</table></TableCell>
+            case 'description':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.description} />)}</table></TableCell>
+            case 'type':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.type} />)}</table></TableCell>
+            case 'status':
+                return <TableCell>{data.status}</TableCell>
+            case 'data_source_status':
+                return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
+            case 'wsdlUrl':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.wsdlURL} />)}</table></TableCell>
+            case 'statistic':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.statistic} />)}</table></TableCell>
+            case 'tracing':
+                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node}/>)}</TableCell>
+            case 'urls':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.urls} />)}</table></TableCell>
+            case 'message_count':
+                return <TableCell>{data.nodes.map(node=><StringCell data={node.message_count}/>)}</TableCell>
+            case 'protocol':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.protocol} proxyName={data['service']}/>)}</table></TableCell>
+            case 'port':
+                return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
+            case 'state':
+                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node.state}/>)}</TableCell>
+            case 'service':
+                return <TableCell>{data.service}</TableCell>
+            case 'nodeId':
+                return <TableCell>{data.nodeId}</TableCell>
+            case 'role':
+                return <TableCell>{data.role}</TableCell>
+            case 'upTime':
+                return <TableCell>{data.upTime}</TableCell>
             default:
                 <TableCell>Table data not available</TableCell>
         }})}

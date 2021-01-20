@@ -28,7 +28,7 @@ export default class Nodes extends React.Component {
                 title: "Nodes",
                 headCells: [
                     {id: 'nodeId', label: 'Node ID'},
-                    {id: 'status', label: 'Status'},
+                    {id: 'node_status', label: 'Status'},
                     {id: 'role', label: 'Role'},
                     {id: 'upTime', label: 'Up Time'}],
                 tableOrderBy: 'service'
@@ -36,13 +36,13 @@ export default class Nodes extends React.Component {
             nodeList: [{
                 name: "Calculator EP",
                 nodeId: "Node_1",
-                status: "Active",
+                node_status: "Active",
                 role: "Member",
                 upTime: "22 min"
             },{
                 name: "Calculator EP2",
                 nodeId: "Node_1",
-                status: "Inactive",
+                node_status: "Inactive",
                 role: "Member",
                 upTime: "4 min"
             }

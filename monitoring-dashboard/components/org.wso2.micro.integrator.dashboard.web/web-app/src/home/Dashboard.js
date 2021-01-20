@@ -39,7 +39,7 @@ import Link from '@material-ui/core/Link';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import { mainListItems, globalSettings } from './NavMenuItems';
+import { NavMenuItems, globalSettings } from './NavMenuItems';
 import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
 import NodeFilter from './NodeFilter';
@@ -152,7 +152,7 @@ export default function Dashboard() {
                     </IconButton>
                 </div>
                 <Divider />
-                <List>{mainListItems}</List>
+                <List><NavMenuItems></NavMenuItems></List>
                 <Divider />
                 <List>{globalSettings}</List>
             </Drawer>
