@@ -118,7 +118,8 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
             final String serviceName = serviceList.get(i).getAsJsonObject().get("name").getAsString();
             final String proxyInfoUrl = url + "?proxyServiceName=" + serviceName;
             CloseableHttpResponse proxyDetails = doGet(accessToken, proxyInfoUrl);
-            boolean isSuccess = storeProxyServices(serviceName, HttpUtils.getStringResponse(proxyDetails));
+            JsonObject jsonProxyDetails = removeConfigurationFromResponse(proxyDetails);
+            boolean isSuccess = storeProxyServices(serviceName, jsonProxyDetails.toString());
             if (!isSuccess) {
                 log.error("Error occurred while adding " + serviceName + " proxy details");
                 addToDelayedQueue();
@@ -141,7 +142,8 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
                 String apiName = apiList.get(i).getAsJsonObject().get("name").getAsString();
                 String apiInfoUrl = url + "?apiName=" + apiName;
                 CloseableHttpResponse apiDetails = doGet(accessToken, apiInfoUrl);
-                boolean isSuccess = storeApis(apiName, HttpUtils.getStringResponse(apiDetails));
+                JsonObject jsonProxyDetails = removeConfigurationFromResponse(apiDetails);
+                boolean isSuccess = storeApis(apiName, jsonProxyDetails.toString());
                 if (!isSuccess) {
                     log.error("Error occurred while adding " + apiName + " api details");
                     addToDelayedQueue();
@@ -154,6 +156,12 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
         return databaseManager.insertApis(heartbeat, apiName, details);
     }
 
+    private JsonObject removeConfigurationFromResponse(CloseableHttpResponse proxyDetails) {
+        JsonObject jsonResponse = HttpUtils.getJsonResponse(proxyDetails);
+        jsonResponse.remove("configuration");
+        return jsonResponse;
+    }
+    
     private String getAccessToken(HeartbeatObject heartbeat) {
         String username = System.getProperty("mi_username");
         String password = System.getProperty("mi_password");
