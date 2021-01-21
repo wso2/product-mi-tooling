@@ -17,11 +17,9 @@
  *
  *
  */
-
 package org.wso2.ei.dashboard.core.rest.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -32,8 +30,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class NodeListInner   {
   private @Valid String id = null;
-  private @Valid Boolean isActive = null;
-  private @Valid List<KeyValue> details = new ArrayList<KeyValue>();
+  private @Valid String details = null;
 
   /**
    * node id.
@@ -55,40 +52,21 @@ public class NodeListInner   {
   }
 
   /**
-   * Is node active.
+   * String contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
    **/
-  public NodeListInner isActive(Boolean isActive) {
-    this.isActive = isActive;
-    return this;
-  }
-
-  
-  @ApiModelProperty(value = "Is node active.")
-  @JsonProperty("isActive")
-
-  public Boolean isIsActive() {
-    return isActive;
-  }
-  public void setIsActive(Boolean isActive) {
-    this.isActive = isActive;
-  }
-
-  /**
-   * Array contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
-   **/
-  public NodeListInner details(List<KeyValue> details) {
+  public NodeListInner details(String details) {
     this.details = details;
     return this;
   }
 
   
-  @ApiModelProperty(value = "Array contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName")
+  @ApiModelProperty(value = "String contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName")
   @JsonProperty("details")
 
-  public List<KeyValue> getDetails() {
+  public String getDetails() {
     return details;
   }
-  public void setDetails(List<KeyValue> details) {
+  public void setDetails(String details) {
     this.details = details;
   }
 
@@ -103,13 +81,12 @@ public class NodeListInner   {
     }
     NodeListInner nodeListInner = (NodeListInner) o;
     return Objects.equals(id, nodeListInner.id) &&
-        Objects.equals(isActive, nodeListInner.isActive) &&
         Objects.equals(details, nodeListInner.details);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, isActive, details);
+    return Objects.hash(id, details);
   }
 
   @Override
@@ -118,7 +95,6 @@ public class NodeListInner   {
     sb.append("class NodeListInner {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    isActive: ").append(toIndentedString(isActive)).append("\n");
     sb.append("    details: ").append(toIndentedString(details)).append("\n");
     sb.append("}");
     return sb.toString();

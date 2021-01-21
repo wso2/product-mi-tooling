@@ -22,6 +22,8 @@ package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactDetails;
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -32,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ProxyListInner   {
   private @Valid String serviceName = null;
-  private @Valid List<Object> nodes = new ArrayList<Object>();
+  private @Valid List<ArtifactDetails> nodes = new ArrayList<ArtifactDetails>();
 
   /**
    **/
@@ -54,7 +56,7 @@ public class ProxyListInner   {
 
   /**
    **/
-  public ProxyListInner nodes(List<Object> nodes) {
+  public ProxyListInner nodes(List<ArtifactDetails> nodes) {
     this.nodes = nodes;
     return this;
   }
@@ -63,10 +65,10 @@ public class ProxyListInner   {
   @ApiModelProperty(value = "")
   @JsonProperty("nodes")
 
-  public List<Object> getNodes() {
+  public List<ArtifactDetails> getNodes() {
     return nodes;
   }
-  public void setNodes(List<Object> nodes) {
+  public void setNodes(List<ArtifactDetails> nodes) {
     this.nodes = nodes;
   }
 

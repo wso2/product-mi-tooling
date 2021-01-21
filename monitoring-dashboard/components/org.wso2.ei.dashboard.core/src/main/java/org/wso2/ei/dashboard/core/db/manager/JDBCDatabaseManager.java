@@ -27,11 +27,18 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactDetails;
+import org.wso2.ei.dashboard.core.rest.model.NodeList;
+import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
+import org.wso2.ei.dashboard.core.rest.model.ProxyList;
+import org.wso2.ei.dashboard.core.rest.model.ProxyListInner;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.sql.DataSource;
 
 /**
@@ -225,6 +232,108 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         }
         return isExists;
     }
+
+    @Override
+    public NodeList fetchNodes(String groupId) {
+        String query = "SELECT * FROM SERVERS WHERE GROUP_ID=?";
+        Connection con = null;
+        PreparedStatement statement = null;
+
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, groupId);
+            NodeList nodeList = new NodeList();
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String nodeId = resultSet.getString("NODE_ID");
+                String details = resultSet.getString("DETAILS");
+                NodeListInner nodeListInner = new NodeListInner();
+                nodeListInner.setId(nodeId);
+                nodeListInner.setDetails(details);
+                nodeList.add(nodeListInner);
+            }
+            return nodeList;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred fetching servers.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public ProxyList fetchProxyServices(String groupId, List<String> nodeList) {
+
+        ProxyList proxyList = new ProxyList();
+        String nodeSearch = "";
+        for (int i = 0; i < nodeList.size(); i++) {
+            nodeSearch = nodeSearch.concat("NODE_ID=? OR ");
+        }
+        if (!nodeSearch.equals("")) {
+            nodeSearch = nodeSearch.substring(0, nodeSearch.length() - 4);
+        }
+        String getDistinctNamesQuery = "SELECT DISTINCT NAME FROM PROXY_SERVICES WHERE GROUP_ID=? " +
+                                       "AND (" + nodeSearch + ");";
+        String getServicesQuery = "SELECT NODE_ID, DETAILS FROM PROXY_SERVICES WHERE GROUP_ID='mi_dev' AND " +
+                                  "(NODE_ID='node_1' OR NODE_ID='node_2') AND NAME=?;";
+
+        Connection con = null;
+        PreparedStatement statement = null;
+
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(getDistinctNamesQuery);
+            statement.setString(1, groupId);
+            for (int i = 0, j = 2; i < nodeList.size(); i++, j++) {
+                statement.setString(j, nodeList.get(i));
+            }
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                ProxyListInner proxyListInner = new ProxyListInner();
+                String serviceName = resultSet.getString("NAME");
+                proxyListInner.setServiceName(serviceName);
+                List<ArtifactDetails> artifactDetails = getArtifactDetails(getServicesQuery, serviceName);
+                proxyListInner.setNodes(artifactDetails);
+                proxyList.add(proxyListInner);
+            }
+            return proxyList;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred fetching proxy services.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    private List<ArtifactDetails> getArtifactDetails(String getServicesQuery, String artifactName) {
+        Connection con = null;
+        PreparedStatement statement = null;
+
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(getServicesQuery);
+            statement.setString(1, artifactName);
+            ResultSet resultSet = statement.executeQuery();
+            List<ArtifactDetails> artifactDetailsList = new ArrayList<>();
+            while (resultSet.next()) {
+                ArtifactDetails artifactDetails = new ArtifactDetails();
+                String nodeId = resultSet.getString("NODE_ID");
+                String details = resultSet.getString("DETAILS");
+
+                artifactDetails.setNodeId(nodeId);
+                artifactDetails.setDetails(details);
+                artifactDetailsList.add(artifactDetails);
+            }
+            return artifactDetailsList;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while retrieving next row.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
 
     private Connection getConnection() throws SQLException {
         return dataSource.getConnection();

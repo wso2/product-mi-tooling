@@ -998,6 +998,7 @@ components:
           groupName:
             type: string
       example: [{groupId: group_01, groupName: dev_env}]
+
     NodeList:
       type: array
       items:
@@ -1006,24 +1007,21 @@ components:
           id:
             type: string
             description: "node id."
-          isActive:
-            type: boolean
-            description: "Is node active."
           details:
-            type: array
-            description: Array contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
-            items:
-              $ref: '#/components/schemas/KeyValue'
+            type: string
+            description: String contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
       example: [{ id: node_01,
-                  isActive: true,
-                  details: [{ key:  serverName,
-                              value:  WSO2 micro integrator },
-                            { key: version,
-                              value: 1.2.0  },
-                            { key: javaVersion,
-                              value: 1.8.0_191 },
-                            { key: javaVendor, value: Oracle}]
+                  details: {\"productVersion\":\"1.2.0\",\"osVersion\":\"10.15.7\",\"javaVersion\":\"1.8.0_191\"}
                 }]
+
+    ArtifactDetails:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        details:
+          type: string
+
     ProxyList:
       type: array
       items:
@@ -1034,21 +1032,8 @@ components:
           nodes:
             type: array
             items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                isActive:
-                  type: boolean
-                endpoints:
-                  type: array
-                  items:
-                    type: string
-                details:
-                  type: array
-                  description: Array contains wsdl1.1, statistics, tracing, configuration etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
+              $ref: '#/components/schemas/ArtifactDetails'
+#                  todo update the example
         example: [
         { ServiceName: HospitalProxy,
           nodes: [

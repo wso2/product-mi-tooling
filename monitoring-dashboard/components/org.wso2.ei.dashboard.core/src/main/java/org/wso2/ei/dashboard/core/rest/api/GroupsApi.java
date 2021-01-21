@@ -20,6 +20,8 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.NodesDelegate;
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.ProxyServicesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.EndpointUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.Error;
@@ -323,6 +325,7 @@ public class GroupsApi {
 ) {
         return Response.ok().entity("magic!").build();
     }
+
     @GET
     @Path("/{group-id}/proxy-services")
     @Produces({ "application/json" })
@@ -331,15 +334,14 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "List of proxy services deployed in provided nodes", content = @Content(schema = @Schema(implementation = ProxyList.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getProxyServicesByNodeIds( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+    public Response getProxyServicesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes) {
+        ProxyServicesDelegate proxyServicesDelegate = new ProxyServicesDelegate();
+        ProxyList proxyList = proxyServicesDelegate.getProxyServices(groupId, nodes);
+        return Response.ok().entity(proxyList).build();
     }
+
     @GET
     @Path("/{group-id}/sequences")
     @Produces({ "application/json" })
@@ -415,20 +417,25 @@ public class GroupsApi {
     public Response retrieveGroups() {
         return Response.ok().entity("magic!").build();
     }
+
     @GET
     @Path("/{group-id}/nodes")
     @Produces({ "application/json" })
     @Operation(summary = "Get set of nodes in the group", description = "", tags={ "nodes" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "The list of nodes in group", content = @Content(schema = @Schema(implementation = NodeList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "The list of nodes in group",
+                     content = @Content(schema = @Schema(implementation = NodeList.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response retrieveNodesByGroupId( @PathParam("group-id")
+    public Response retrieveNodesByGroupId(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) {
 
- @Parameter(description = "Group ID of the node") String groupId
-) {
-        return Response.ok().entity("magic!").build();
+        NodesDelegate nodesDeligate = new NodesDelegate();
+        NodeList nodeList = nodesDeligate.getNodes(groupId);
+        return Response.ok().entity(nodeList).build();
     }
+
     @PUT
     @Path("/{group-id}/apis")
     @Consumes({ "application/json" })

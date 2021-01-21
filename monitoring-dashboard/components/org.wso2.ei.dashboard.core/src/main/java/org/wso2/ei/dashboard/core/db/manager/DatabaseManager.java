@@ -21,6 +21,10 @@
 package org.wso2.ei.dashboard.core.db.manager;
 
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
+import org.wso2.ei.dashboard.core.rest.model.NodeList;
+import org.wso2.ei.dashboard.core.rest.model.ProxyList;
+
+import java.util.List;
 
 /**
  * This interface represents database operations.
@@ -42,4 +46,8 @@ public interface DatabaseManager {
     boolean insertProxyServices(HeartbeatObject heartbeat, String serviceName, String details);
 
     boolean insertApis(HeartbeatObject heartbeat, String apiName, String details);
+
+    NodeList fetchNodes(String groupId);
+
+    ProxyList fetchProxyServices(String groupId, List<String> nodeList);
 }

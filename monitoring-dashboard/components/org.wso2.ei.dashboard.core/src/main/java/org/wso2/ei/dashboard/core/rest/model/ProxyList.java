@@ -21,8 +21,16 @@
 package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
+import java.util.List;
+import org.wso2.ei.dashboard.core.rest.model.ProxyListInner;
+import javax.validation.constraints.*;
+import javax.validation.Valid;
 
+
+import io.swagger.annotations.*;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class ProxyList extends ArrayList<ProxyListInner>  {
 
