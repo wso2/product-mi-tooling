@@ -19,6 +19,7 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -39,101 +40,142 @@ import CappIcon from '@material-ui/icons/Dashboard';
 import UserIcon from '@material-ui/icons/People';
 import LogFileIcon from '@material-ui/icons/Description';
 import LayersIcon from '@material-ui/icons/Layers';
+import {makeStyles} from "@material-ui/core/styles/index";
 
-export const mainListItems = (
-    <div>
-        <ListItem button>
-            <ListItemIcon>
-                <ProxyIcon />
-            </ListItemIcon>
-            <ListItemText primary="Proxy Services" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <EndpointIcon/>
-            </ListItemIcon>
-            <ListItemText primary="Endpoints" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <InbountEpIcon />
-            </ListItemIcon>
-            <ListItemText primary="Inbound Endpoints" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <MessageProcessorIcon />
-            </ListItemIcon>
-            <ListItemText primary="Message Processors" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <MessageStoreIcon />
-            </ListItemIcon>
-            <ListItemText primary="Message Stores" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <ApiIcon />
-            </ListItemIcon>
-            <ListItemText primary="API" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <TemplateIcon />
-            </ListItemIcon>
-            <ListItemText primary="Templates" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <SequenceIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sequences" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <Event />
-            </ListItemIcon>
-            <ListItemText primary="Tasks" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <LocalEntriesIcon />
-            </ListItemIcon>
-            <ListItemText primary="Local Entries" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <DssIcon />
-            </ListItemIcon>
-            <ListItemText primary="Data Services" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <LayersIcon />
-            </ListItemIcon>
-            <ListItemText primary="Datasources" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <ConnectorIcon />
-            </ListItemIcon>
-            <ListItemText primary="Connectors" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <CappIcon />
-            </ListItemIcon>
-            <ListItemText primary="Carbon Applications" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <LogFileIcon />
-            </ListItemIcon>
-            <ListItemText primary="Log Files" />
-        </ListItem>
-    </div>
-);
+export function NavMenuItems() {
+    const classes = useStyles();
+    return (
+        <div>
+            <Link to={'/proxy_services'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <ProxyIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Proxy Services"/>
+                </ListItem>
+            </Link>
+            <Link to={'/endpoints'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <EndpointIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Endpoints"/>
+                </ListItem>
+            </Link>
+            <Link to={'/inbound_endpoints'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <InbountEpIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Inbound Endpoints"/>
+                </ListItem>
+            </Link>
+            <Link to={'/message_processors'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <MessageProcessorIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Message Processors"/>
+                </ListItem>
+            </Link>
+            <Link to={'/message_stores'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <MessageStoreIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Message Stores"/>
+                </ListItem>
+            </Link>
+            <Link to={'/apis'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <ApiIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="API"/>
+                </ListItem>
+            </Link>
+            <Link to={'/templates'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <TemplateIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Templates"/>
+                </ListItem>
+            </Link>
+            <Link to={'/sequences'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <SequenceIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Sequences"/>
+                </ListItem>
+            </Link>
+            <Link to={'/tasks'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Event/>
+                    </ListItemIcon>
+                    <ListItemText primary="Tasks"/>
+                </ListItem>
+            </Link>
+            <Link to={'/local_entries'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <LocalEntriesIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Local Entries"/>
+                </ListItem>
+            </Link>
+            <Link to={'/data_services'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <DssIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Data Services"/>
+                </ListItem>
+            </Link>
+            <Link to={'/datasources'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <LayersIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Datasources"/>
+                </ListItem>
+            </Link>
+            <Link to={'/connectors'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <ConnectorIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Connectors"/>
+                </ListItem>
+            </Link>
+            <Link to={'/carbon_applications'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <CappIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Carbon Applications"/>
+                </ListItem>
+            </Link>
+            <Link to={'/log_files'} className={classes.navLink}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <LogFileIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Log Files"/>
+                </ListItem>
+            </Link>
+        </div>
+    )
+
+}
+const useStyles = makeStyles((theme) => ({
+    navLink: {
+        textDecoration: 'none',
+        color: 'rgba(0, 0, 0, 0.87)'
+    }
+}));
 
 export const globalSettings = (
     <div>
