@@ -37,8 +37,6 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import { NavMenuItems, globalSettings } from './NavMenuItems';
 import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
@@ -56,10 +54,6 @@ import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
-
-import NodeInfo from './NodeInfo';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
 import logo from '../images/logo.svg';
 
 export default function Dashboard() {
@@ -81,8 +75,6 @@ export default function Dashboard() {
             <Router>
             <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
                 <Toolbar className={classes.toolbar}>
-
-
                     <div style={{ width: '100%' }}>
                         <Box display="flex" p={1}>
                             <Box flexGrow={0} p={1}>
@@ -111,7 +103,6 @@ export default function Dashboard() {
                                 Group ID
                             </Box>
                             <Box p={1}>
-
                                     <Select
                                         native
                                         value={groupId}

@@ -19,35 +19,31 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 export default class Nodes extends React.Component {
+    componentDidMount() {
+        const url = "http://0.0.0.0:9743/api/rest/groups/mi_dev/nodes";
+        axios.get(url).then(response => {
+            response.data.map(data => data.details = JSON.parse(data.details))
+            const nodeList = response.data
+            this.setState({nodeList})
+        })
+        
+    }
     constructor(props) {
         super(props)
         this.state = { pageInfo: {
-                pageId: "nodes",
+                pageId: "nodesPage",
                 title: "Nodes",
                 headCells: [
                     {id: 'nodeId', label: 'Node ID'},
                     {id: 'node_status', label: 'Status'},
-                    {id: 'role', label: 'Role'},
-                    {id: 'upTime', label: 'Up Time'}],
+                    {id: 'role', label: 'Role'}],
                 tableOrderBy: 'service'
             },
-            nodeList: [{
-                name: "Calculator EP",
-                nodeId: "Node_1",
-                node_status: "Active",
-                role: "Member",
-                upTime: "22 min"
-            },{
-                name: "Calculator EP2",
-                nodeId: "Node_1",
-                node_status: "Inactive",
-                role: "Member",
-                upTime: "4 min"
-            }
-
-            ]};
+            nodeList: []
+        };
     }
     render() {
         return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.nodeList}/>;

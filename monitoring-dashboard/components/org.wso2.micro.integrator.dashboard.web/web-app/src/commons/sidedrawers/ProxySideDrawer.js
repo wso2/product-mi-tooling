@@ -34,8 +34,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import XMLViewer from 'react-xml-viewer';
 import Box from '@material-ui/core/Box';
 
-export default function SideDrawer(props) {
-    var artifactName = props.proxyName;
+export default function ProxySideDrawer(props) {
     var nodeData = props.nodeData;
 
     const [open, setOpen] = React.useState(false);
@@ -74,10 +73,10 @@ export default function SideDrawer(props) {
                 <Grid item xs={12}>
                     <Paper className={classes.sideDrawerHeading} square>
                         <Typography variant="h6" color="inherit" noWrap>
-                            {artifactName}
+                            {nodeData.details.name}
                         </Typography>
                         <Typography variant="h8" color="inherit" noWrap>
-                            {nodeData['nodeId']}
+                            {nodeData.nodeId}
                         </Typography>
                     </Paper>
                     <Paper className={classes.paper}>
@@ -88,17 +87,17 @@ export default function SideDrawer(props) {
                             </TableRow>
                             <TableRow>
                                 <TableCell>Service Name</TableCell>
-                                <TableCell>{artifactName}</TableCell>
+                                <TableCell>{nodeData.details.name}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Statistics</TableCell>
-                                <TableCell>{nodeData.details['statistics']}</TableCell>
+                                <TableCell>{nodeData.details.stats}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Tracing</TableCell>
                                 <TableCell>
                                     <label>
-                                        <Switch checked={nodeData.details['tracing']} onChange={changeTracingStatus}/>
+                                        <Switch checked={nodeData.details.tracing} onChange={changeTracingStatus}/>
                                     </label>
                                 </TableCell>
                             </TableRow>
@@ -114,7 +113,7 @@ export default function SideDrawer(props) {
                     </Paper>
                     <Paper className={classes.paper} square>
                         <Table>
-                            {nodeData.endpoints.map(ep =>
+                            {nodeData.details.eprs.map(ep =>
                                 <TableRow>{ep}
                                     <CopyToClipboard text={ep} className={classes.clipboard}>
                                         <Button><FileCopyIcon/></Button>
@@ -131,13 +130,13 @@ export default function SideDrawer(props) {
                             aria-describedby="scroll-dialog-description"
                             classes={classes.sourceView}
                         >
-                            <DialogTitle id="scroll-dialog-title">{artifactName}</DialogTitle>
+                            <DialogTitle id="scroll-dialog-title">{nodeData.details.name}</DialogTitle>
                             <DialogContent>
                                 <DialogContentText
                                     id="scroll-dialog-description"
                                     ref={descriptionElementRef}
                                     tabIndex={-1}>
-                                    <XMLViewer xml={nodeData.source} />
+                                    <XMLViewer xml={nodeData.details.source} />
                                 </DialogContentText>
                             </DialogContent>
                         </Dialog>

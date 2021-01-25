@@ -75,7 +75,7 @@ export default function EnhancedTable(props) {
                         />
                         <TableBody>
 
-                            {stableSort(dataSet, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => <TableRowCreator pageInfo={pageInfo} data={row} headers={headCells}/>
+                            {stableSort(dataSet, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => <TableRowCreator pageId={pageInfo.pageId} data={row} headers={headCells}/>
                             )}
                         </TableBody>
                     </Table>

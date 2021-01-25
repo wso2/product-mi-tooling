@@ -23,12 +23,12 @@ import TableCell from "@material-ui/core/TableCell";
 import Drawer from '@material-ui/core/Drawer';
 import TableRow from '@material-ui/core/TableRow'
 import { makeStyles } from '@material-ui/core/styles';
-import SideDrawer from './SideDrawer';
+import ProxySideDrawer from './sidedrawers/ProxySideDrawer';
+import HomePageSideDrawer from './sidedrawers/HomePageSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
-    var nodeData = props.data;
-    var proxyName = props.proxyName;
+    const { pageId, nodeData } = props;
 
     const [state, setState] = React.useState({
         openSideDrawer: false,
@@ -45,9 +45,18 @@ export default function NodesCell(props) {
     return <TableRow hover role="presentation">
         <TableCell onClick={toggleDrawer(true)} className={classes.tableCell}>{nodeData.nodeId}</TableCell>
         <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
-            <SideDrawer proxyName={proxyName} nodeData={nodeData} />
+            <SideDrawer pageId={pageId} nodeData={nodeData}/>
         </Drawer>
     </TableRow>;
+}
+
+function SideDrawer(props) {
+    switch(props.pageId) {
+        case 'proxyPage':
+            return <ProxySideDrawer nodeData={props.nodeData} />
+        default :
+            return <HomePageSideDrawer nodeData={props.nodeData} />
+    }
 }
 
 const useStyles = makeStyles((theme) => ({

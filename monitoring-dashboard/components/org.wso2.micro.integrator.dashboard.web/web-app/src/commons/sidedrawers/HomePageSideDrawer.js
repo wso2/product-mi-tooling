@@ -24,16 +24,41 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
-export default function NodeInfoSideDrawer(props) {
-    const { data } = props;
-    console.log("data");
-    console.log(data);
-    var details = data.details;
+export default function HomePageSideDrawer(props) {
+    var nodeData = props.nodeData;
+
+    const [open, setOpen] = React.useState(false);
+
+    const openSourceViewPopup = () => {
+        setOpen(true);
+    }
+
+    const closeSourceViewPopup = () => {
+        setOpen(false);
+    };
+
+    const descriptionElementRef = React.useRef(null);
+    React.useEffect(() => {
+        if (open) {
+            const { current: descriptionElement } = descriptionElementRef;
+            if (descriptionElement !== null) {
+                descriptionElement.focus();
+            }
+        }
+    }, [open]);
 
     const classes = useStyles();
+
+    const changeServiceStatus = () => {
+        nodeData['isActive'] = !nodeData['isActive'];
+    };
+
+    const changeTracingStatus = () => {
+        nodeData.details['tracing'] = !nodeData.details['tracing'];
+    };
 
     return (
         <div className={classes.root}>
@@ -41,55 +66,59 @@ export default function NodeInfoSideDrawer(props) {
                 <Grid item xs={12}>
                     <Paper className={classes.sideDrawerHeading} square>
                         <Typography variant="h6" color="inherit" noWrap>
-                            {data.id} Information
+                            {nodeData.nodeId} Information
                         </Typography>
                     </Paper>
                     <Paper className={classes.paper}>
                         <Table>
                             <TableRow>
                                 <TableCell>Server Name</TableCell>
-                                <TableCell>{details.serverName}</TableCell>
+                                <TableCell>{nodeData.details.productName}</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell>Version</TableCell>
-                                <TableCell>{details.version}</TableCell>
+                                <TableCell>Product Version</TableCell>
+                                <TableCell>{nodeData.details.productVersion}</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell>Micro Integrator Home</TableCell>
-                                <TableCell>{details.miHome}
-                                    <CopyToClipboard text={details.miHome} className={classes.clipboard}>
+                                <TableCell>Product Home</TableCell>
+                                <TableCell>{nodeData.details.carbonHome}
+                                    <CopyToClipboard text={nodeData.details.carbonHome} className={classes.clipboard}>
                                         <Button><FileCopyIcon/></Button>
                                     </CopyToClipboard>
                                 </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Java Home</TableCell>
-                                <TableCell>{details.javaHome}
-                                    <CopyToClipboard text={details.javaHome} className={classes.clipboard}>
+                                <TableCell>{nodeData.details.javaHome}
+                                    <CopyToClipboard text={nodeData.details.javaHome} className={classes.clipboard}>
                                         <Button><FileCopyIcon/></Button>
                                     </CopyToClipboard>
                                 </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Java Version</TableCell>
-                                <TableCell>{details.javaVersion}</TableCell>
+                                <TableCell>{nodeData.details.javaVersion}</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell>Java Vender</TableCell>
-                                <TableCell>{details.javaVendor}</TableCell>
+                                <TableCell>Java Vendor</TableCell>
+                                <TableCell>{nodeData.details.javaVendor}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>OS Name</TableCell>
-                                <TableCell>{details.os}</TableCell>
+                                <TableCell>{nodeData.details.osName}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>OS Version</TableCell>
+                                <TableCell>{nodeData.details.osVersion}</TableCell>
                             </TableRow>
                         </Table>
                     </Paper>
                 </Grid>
-
             </Grid>
         </div>
     );
 }
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -115,5 +144,9 @@ const useStyles = makeStyles((theme) => ({
     },
     clipboard: {
         color: '#3f51b5'
+    },
+    sourceView: {
+        backgroundColor: 'red',
+        width: '2000px',
     }
 }));
