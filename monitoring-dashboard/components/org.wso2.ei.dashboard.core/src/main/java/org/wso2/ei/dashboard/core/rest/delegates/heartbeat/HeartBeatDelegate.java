@@ -48,10 +48,10 @@ public class HeartBeatDelegate {
             Executors.newScheduledThreadPool(heartbeatPoolSize);
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) {
+        Ack ack = new Ack(FAIL_STATUS);
         HeartbeatObject heartbeat = new HeartbeatObject(heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(),
                                                         heartbeatRequest.getNodeId(), heartbeatRequest.getInterval(),
                                                         heartbeatRequest.getMgtApiUrl());
-        Ack ack = new Ack(FAIL_STATUS);
         NodeDataFetcher nodeDataFetcher;
 
         boolean isSuccess;

@@ -31,6 +31,7 @@ public class NodesDelegate {
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     public NodeList getNodes(String groupId) {
+
         return databaseManager.fetchNodes(groupId);
     }
 

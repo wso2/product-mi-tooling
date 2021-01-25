@@ -249,7 +249,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 String nodeId = resultSet.getString("NODE_ID");
                 String details = resultSet.getString("DETAILS");
                 NodeListInner nodeListInner = new NodeListInner();
-                nodeListInner.setId(nodeId);
+                nodeListInner.setNodeId(nodeId);
                 nodeListInner.setDetails(details);
                 nodeList.add(nodeListInner);
             }

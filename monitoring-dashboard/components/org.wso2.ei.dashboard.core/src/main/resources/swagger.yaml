@@ -1004,13 +1004,13 @@ components:
       items:
         type: object
         properties:
-          id:
+          nodeId:
             type: string
             description: "node id."
           details:
             type: string
             description: String contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
-      example: [{ id: node_01,
+      example: [{ nodeId: node_01,
                   details: {\"productVersion\":\"1.2.0\",\"osVersion\":\"10.15.7\",\"javaVersion\":\"1.8.0_191\"}
                 }]
 

@@ -1509,7 +1509,7 @@
       "NodeList" : {
         "type" : "array",
         "example" : [ {
-          "id" : "node_01",
+          "nodeId" : "node_01",
           "details" : {
             "\\\"productVersion\\\":\\\"1.2.0\\\"" : null,
             "\\\"osVersion\\\":\\\"10.15.7\\\"" : null,
@@ -1902,7 +1902,7 @@
       "NodeList_inner" : {
         "type" : "object",
         "properties" : {
-          "id" : {
+          "nodeId" : {
             "type" : "string",
             "description" : "node id."
           },
