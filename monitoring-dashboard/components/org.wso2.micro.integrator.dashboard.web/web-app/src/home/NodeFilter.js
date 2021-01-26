@@ -19,6 +19,7 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -28,28 +29,23 @@ import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 
-const useStyles = makeStyles((theme) => ({
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120,
-        maxWidth: 300,
-    },
-    chips: {
-        display: 'flex',
-        flexWrap: 'wrap',
-    },
-    chip: {
-        margin: 2,
-    },
-    noLabel: {
-        marginTop: theme.spacing(3),
-    },
-}));
-
 export default class NodeFilter extends React.Component {
+    componentDidMount() {
+        const url = "http://0.0.0.0:9743/api/rest/groups/mi_dev/nodes";
+        axios.get(url).then(response => {
+            var list = [];
+            response.data.map(data => 
+                list.push(data.nodeId)
+            )
+            const nodeList = list
+            this.setState({nodeList})
+        })
+        
+    }
+
     constructor(props){
         super(props)
-        this.state = {nodeList : ['node_01', 'node_02', 'node_03', 'node_04']};
+        this.state = {nodeList : []};
     }
 
     render() {
@@ -93,3 +89,21 @@ function MultipleSelect(props) {
         </div>
     );
 }
+
+const useStyles = makeStyles((theme) => ({
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+        maxWidth: 300,
+    },
+    chips: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    chip: {
+        margin: 2,
+    },
+    noLabel: {
+        marginTop: theme.spacing(3),
+    },
+}));
