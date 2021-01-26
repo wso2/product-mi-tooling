@@ -28,6 +28,7 @@ import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactDetails;
+import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
 import org.wso2.ei.dashboard.core.rest.model.ProxyList;
@@ -231,6 +232,29 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             closeConnection(con);
         }
         return isExists;
+    }
+
+    @Override
+    public GroupList fetchGroups() {
+        String query = "SELECT DISTINCT GROUP_ID FROM HEARTBEAT;";
+        Connection con = null;
+        PreparedStatement statement = null;
+
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            GroupList groupList = new GroupList();
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                groupList.add(resultSet.getString("GROUP_ID"));
+            }
+            return groupList;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred fetching groups.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
     }
 
     @Override

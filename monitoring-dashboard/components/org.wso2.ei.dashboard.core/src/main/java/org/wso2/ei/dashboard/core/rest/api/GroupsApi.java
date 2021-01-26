@@ -20,6 +20,7 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.NodesDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.ProxyServicesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
@@ -415,7 +416,9 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
     public Response retrieveGroups() {
-        return Response.ok().entity("magic!").build();
+        GroupDelegate groupDelegate = new GroupDelegate();
+        GroupList groupList = groupDelegate.getGroupList();
+        return Response.ok().entity(groupList).build();
     }
 
     @GET

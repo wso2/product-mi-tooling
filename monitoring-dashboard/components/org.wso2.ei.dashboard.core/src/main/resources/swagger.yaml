@@ -991,13 +991,8 @@ components:
     GroupList:
       type: array
       items:
-        type: object
-        properties:
-          groupId:
-            type: string
-          groupName:
-            type: string
-      example: [{groupId: group_01, groupName: dev_env}]
+        type: string
+      example: [group_01, group_02]
 
     NodeList:
       type: array

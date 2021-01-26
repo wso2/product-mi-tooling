@@ -1498,12 +1498,9 @@
       },
       "GroupList" : {
         "type" : "array",
-        "example" : [ {
-          "groupId" : "group_01",
-          "groupName" : "dev_env"
-        } ],
+        "example" : [ "group_01", "group_02" ],
         "items" : {
-          "$ref" : "#/components/schemas/GroupList_inner"
+          "type" : "string"
         }
       },
       "NodeList" : {
@@ -1886,17 +1883,6 @@
         "example" : {
           "code" : 500,
           "message" : "Internal server error"
-        }
-      },
-      "GroupList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "groupId" : {
-            "type" : "string"
-          },
-          "groupName" : {
-            "type" : "string"
-          }
         }
       },
       "NodeList_inner" : {

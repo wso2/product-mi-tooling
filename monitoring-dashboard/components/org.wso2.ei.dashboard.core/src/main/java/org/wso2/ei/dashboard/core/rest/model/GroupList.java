@@ -21,10 +21,17 @@
 package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
+import javax.validation.Valid;
 
+
+import io.swagger.annotations.*;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GroupList extends ArrayList<GroupListInner>  {
+
+public class GroupList extends ArrayList<String>  {
 
 
   @Override

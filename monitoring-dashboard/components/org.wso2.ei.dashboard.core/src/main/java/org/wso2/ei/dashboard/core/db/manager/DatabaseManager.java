@@ -21,6 +21,7 @@
 package org.wso2.ei.dashboard.core.db.manager;
 
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
+import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.ProxyList;
 
@@ -47,7 +48,10 @@ public interface DatabaseManager {
 
     boolean insertApis(HeartbeatObject heartbeat, String apiName, String details);
 
+    GroupList fetchGroups();
+
     NodeList fetchNodes(String groupId);
 
     ProxyList fetchProxyServices(String groupId, List<String> nodeList);
+
 }

@@ -40,6 +40,7 @@ import Select from '@material-ui/core/Select';
 import { NavMenuItems, globalSettings } from './NavMenuItems';
 import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
+import GroupSelector from './GroupSelector';
 import NodeFilter from './NodeFilter';
 import ProxyService from '../pages/ProxyService';
 import Endpoints from '../pages/Endpoints';
@@ -99,24 +100,7 @@ export default function Dashboard() {
                                     Micro Integrator Dashboard
                                 </Typography>
                             </Box>
-                            <Box p={1} style={{padding: '13px'}}>
-                                Group ID
-                            </Box>
-                            <Box p={1}>
-                                    <Select
-                                        native
-                                        value={groupId}
-                                        onChange={handleGroupId}
-                                        label="Group Id"
-                                        style={{ textDecoration: 'none' , color: '#fff'}}
-                                    >
-                                        <option aria-label="None" value="" />
-                                        <option value="group_01">Group 01</option>
-                                        <option value="group_02">Group 02</option>
-                                        <option value="group_03">Group 03</option>
-                                    </Select>
-
-                            </Box>
+                            <GroupSelector/>
                             <Box p={1}>
                                 <Avatar alt="Remy Sharp" src="/broken-image.jpg" className={classes.orange}>
                                     B
