@@ -299,8 +299,9 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         }
         String getDistinctNamesQuery = "SELECT DISTINCT NAME FROM PROXY_SERVICES WHERE GROUP_ID=? " +
                                        "AND (" + nodeSearch + ");";
-        String getServicesQuery = "SELECT NODE_ID, DETAILS FROM PROXY_SERVICES WHERE GROUP_ID='mi_dev' AND " +
-                                  "(NODE_ID='node_1' OR NODE_ID='node_2') AND NAME=?;";
+
+        String getServicesQuery = "SELECT NODE_ID, DETAILS FROM PROXY_SERVICES WHERE NAME=? AND GROUP_ID=? AND " +
+                                  "(" + nodeSearch + ");";
 
         Connection con = null;
         PreparedStatement statement = null;
@@ -317,7 +318,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 ProxyListInner proxyListInner = new ProxyListInner();
                 String serviceName = resultSet.getString("NAME");
                 proxyListInner.setServiceName(serviceName);
-                List<ArtifactDetails> artifactDetails = getArtifactDetails(getServicesQuery, serviceName);
+                List<ArtifactDetails> artifactDetails = getArtifactDetails(getServicesQuery, serviceName, groupId,
+                                                                           nodeList);
                 proxyListInner.setNodes(artifactDetails);
                 proxyList.add(proxyListInner);
             }
@@ -330,7 +332,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         }
     }
 
-    private List<ArtifactDetails> getArtifactDetails(String getServicesQuery, String artifactName) {
+    private List<ArtifactDetails> getArtifactDetails(String getServicesQuery, String artifactName, String groupId,
+                                                     List<String> nodeList) {
         Connection con = null;
         PreparedStatement statement = null;
 
@@ -338,6 +341,10 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             con = getConnection();
             statement = con.prepareStatement(getServicesQuery);
             statement.setString(1, artifactName);
+            statement.setString(2, groupId);
+            for (int i = 0, j = 3; i < nodeList.size(); i++, j++) {
+                statement.setString(j, nodeList.get(i));
+            }
             ResultSet resultSet = statement.executeQuery();
             List<ArtifactDetails> artifactDetailsList = new ArrayList<>();
             while (resultSet.next()) {
