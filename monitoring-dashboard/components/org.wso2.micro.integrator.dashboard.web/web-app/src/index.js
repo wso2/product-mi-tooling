@@ -21,10 +21,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Dashboard from './home/Dashboard'
+import { createStore } from 'redux';
+import { Provider } from 'react-redux'
+import Reducers from './redux/Reducers';
+
+const store = createStore (Reducers)
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Provider store = {store}>
     <Dashboard />
-  </React.StrictMode>,
+  </Provider>,
   document.getElementById('root')
 );

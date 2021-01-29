@@ -21,31 +21,32 @@
 import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
-export default class Nodes extends React.Component {
-    componentDidMount() {
-        const url = "http://0.0.0.0:9743/api/rest/groups/mi_dev/nodes";
+import { useSelector } from 'react-redux';
+
+export default function Nodes () {
+
+    const [pageInfo, setpageInfo] = React.useState({
+        pageId: "nodesPage",
+        title: "Nodes",
+        headCells: [
+            {id: 'nodeId', label: 'Node ID'},
+            {id: 'node_status', label: 'Status'},
+            {id: 'role', label: 'Role'}],
+        tableOrderBy: 'service'
+    });
+    const [nodeList, setNodeList] = React.useState([]);
+
+    const globalGroupId = useSelector(state => state.groupId);
+
+    React.useEffect(()=>{
+        // todo are we taking it from node filter, do we need to apply filter here as well?
+        
+        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/nodes");
         axios.get(url).then(response => {
             response.data.map(data => data.details = JSON.parse(data.details))
-            const nodeList = response.data
-            this.setState({nodeList})
+            setNodeList(response.data)
         })
-        
-    }
-    constructor(props) {
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "nodesPage",
-                title: "Nodes",
-                headCells: [
-                    {id: 'nodeId', label: 'Node ID'},
-                    {id: 'node_status', label: 'Status'},
-                    {id: 'role', label: 'Role'}],
-                tableOrderBy: 'service'
-            },
-            nodeList: []
-        };
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.nodeList}/>;
-    }
+    },[globalGroupId])
+
+    return (<EnhancedTable pageInfo={pageInfo} dataSet={nodeList}/>);
 }

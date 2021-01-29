@@ -88,12 +88,11 @@ export default function Dashboard() {
                                 >
                                     <MenuIcon />
                                 </IconButton>
-                                <Link style={{height: '17px'}} to={'/home'}><img
+                                <Link style={{height: '17px'}} to={'/'}><img
                                     height='17'
                                     src={logo}
                                     alt='logo'
                                 /></Link>
-
                             </Box>
                             <Box flexGrow={10}>
                                 <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.typography}>

@@ -28,38 +28,38 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
+import { filterNodes } from '../redux/Actions';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-export default class NodeFilter extends React.Component {
-    componentDidMount() {
-        const url = "http://0.0.0.0:9743/api/rest/groups/mi_dev/nodes";
-        axios.get(url).then(response => {
-            var list = [];
-            response.data.map(data => 
-                list.push(data.nodeId)
-            )
-            const nodeList = list
-            this.setState({nodeList})
-        })
-        
-    }
+export default function NodeFilter () {
 
-    constructor(props){
-        super(props)
-        this.state = {nodeList : []};
-    }
+    const [nodeList, setNodeList] = React.useState([]);
+    const globalGroupId = useSelector(state => state.groupId);
 
-    render() {
-        return <MultipleSelect nodeList={this.state.nodeList}/>
-    }
+    React.useEffect(()=>{
+        if (globalGroupId !== 0) {
+            const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/nodes");
+            axios.get(url).then(response => {
+                var list = [];
+                response.data.map(data => list.push(data.nodeId))
+                setNodeList(list)
+            })
+        }
+    },[globalGroupId])
+
+    return <MultipleSelect nodeList={nodeList}/>
 }
 
 function MultipleSelect(props) {
+
     var NodeList = props.nodeList;
     const classes = useStyles();
-    const [nodeId, setNodeId] = React.useState([]);
+    const [nodeList, setNodeList] = React.useState([]);
+    const dispatch = useDispatch();
 
     const handleChange = (event) => {
-        setNodeId(event.target.value);
+        setNodeList(event.target.value);
     };
 
     return (
@@ -68,8 +68,9 @@ function MultipleSelect(props) {
                 <InputLabel>Select Nodes</InputLabel>
                 <Select
                     multiple
-                    value={nodeId}
+                    value={nodeList}
                     onChange={handleChange}
+                    onClick={() => dispatch(filterNodes(nodeList))}
                     renderValue={(selected) => (
                         <div className={classes.chips}>
                             {selected.map((value) => (
@@ -80,7 +81,7 @@ function MultipleSelect(props) {
                 >
                     {NodeList.map((name) => (
                         <MenuItem key={name} value={name}>
-                            <Checkbox checked={nodeId.indexOf(name) > -1} />
+                            <Checkbox checked={nodeList.indexOf(name) > -1} />
                             <ListItemText primary={name} />
                         </MenuItem>
                     ))}

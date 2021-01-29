@@ -21,34 +21,37 @@
 import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class ProxyService extends React.Component {
-    componentDidMount() {
-        const url = "http://0.0.0.0:9743/api/rest/groups/mi_dev/proxy-services?nodes=node_1&nodes=node_2";
+export default function ProxyService() {
+    const [pageInfo, setPageInfo] = React.useState({
+        pageId: "proxyPage",
+        title: "Proxy Services",
+        headCells: [
+            {id: 'service', label: 'Service'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'wsdlUrl', label: 'WSDL 1.1'}],
+        tableOrderBy: 'service'
+    });
+    const [proxyList, setProxyList] = React.useState([]);
+
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    
+    React.useEffect(() => {
+        var nodeList="";
+        selectedNodeList.filter(node => {
+            nodeList = nodeList.concat(node, '&nodes=')
+        })
+        // todo if nodelist [] dont perform this
+        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeList.slice(0,-7));
         axios.get(url).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))
             )
-            const proxyList = response.data
-            this.setState({proxyList})
+            setProxyList(response.data)
         })
-    }
+    },[globalGroupId, selectedNodeList])
 
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "proxyPage",
-                title: "Proxy Services",
-                headCells: [
-                    {id: 'service', label: 'Service'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'wsdlUrl', label: 'WSDL 1.1'}],
-                tableOrderBy: 'service'
-            },
-            proxyList:[]
-        };
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.proxyList}/>;
-    }
+    return <EnhancedTable pageInfo={pageInfo} dataSet={proxyList}/>
 }
