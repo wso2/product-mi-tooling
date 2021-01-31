@@ -979,8 +979,28 @@ components:
           type: integer
         mgtApiUrl:
           type: string
+        changeNotification:
+          type: object
+          properties:
+            deployedArtifacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdatedArtifact'
+            undeployedArtifacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdatedArtifact'
       example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
 
+    UpdatedArtifact:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
     Ack:
       type: object
       properties:

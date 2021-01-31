@@ -20,7 +20,6 @@
 
 package org.wso2.ei.dashboard.core.rest.model;
 
-import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -35,6 +34,7 @@ public class HeartbeatRequest   {
   private @Valid String nodeId = null;
   private @Valid Integer interval = null;
   private @Valid String mgtApiUrl = null;
+  private @Valid HeartbeatRequestChangeNotification changeNotification = null;
 
   /**
    **/
@@ -43,7 +43,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-
+  
   @ApiModelProperty(value = "")
   @JsonProperty("product")
 
@@ -61,7 +61,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-
+  
   @ApiModelProperty(value = "")
   @JsonProperty("groupId")
 
@@ -79,7 +79,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-
+  
   @ApiModelProperty(value = "")
   @JsonProperty("nodeId")
 
@@ -97,7 +97,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-
+  
   @ApiModelProperty(value = "")
   @JsonProperty("interval")
 
@@ -115,7 +115,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-
+  
   @ApiModelProperty(value = "")
   @JsonProperty("mgtApiUrl")
 
@@ -124,6 +124,24 @@ public class HeartbeatRequest   {
   }
   public void setMgtApiUrl(String mgtApiUrl) {
     this.mgtApiUrl = mgtApiUrl;
+  }
+
+  /**
+   **/
+  public HeartbeatRequest changeNotification(HeartbeatRequestChangeNotification changeNotification) {
+    this.changeNotification = changeNotification;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("changeNotification")
+
+  public HeartbeatRequestChangeNotification getChangeNotification() {
+    return changeNotification;
+  }
+  public void setChangeNotification(HeartbeatRequestChangeNotification changeNotification) {
+    this.changeNotification = changeNotification;
   }
 
 
@@ -137,27 +155,29 @@ public class HeartbeatRequest   {
     }
     HeartbeatRequest heartbeatRequest = (HeartbeatRequest) o;
     return Objects.equals(product, heartbeatRequest.product) &&
-           Objects.equals(groupId, heartbeatRequest.groupId) &&
-           Objects.equals(nodeId, heartbeatRequest.nodeId) &&
-           Objects.equals(interval, heartbeatRequest.interval) &&
-           Objects.equals(mgtApiUrl, heartbeatRequest.mgtApiUrl);
+        Objects.equals(groupId, heartbeatRequest.groupId) &&
+        Objects.equals(nodeId, heartbeatRequest.nodeId) &&
+        Objects.equals(interval, heartbeatRequest.interval) &&
+        Objects.equals(mgtApiUrl, heartbeatRequest.mgtApiUrl) &&
+        Objects.equals(changeNotification, heartbeatRequest.changeNotification);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(product, groupId, nodeId, interval, mgtApiUrl);
+    return Objects.hash(product, groupId, nodeId, interval, mgtApiUrl, changeNotification);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class HeartbeatRequest {\n");
-
+    
     sb.append("    product: ").append(toIndentedString(product)).append("\n");
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    nodeId: ").append(toIndentedString(nodeId)).append("\n");
     sb.append("    interval: ").append(toIndentedString(interval)).append("\n");
     sb.append("    mgtApiUrl: ").append(toIndentedString(mgtApiUrl)).append("\n");
+    sb.append("    changeNotification: ").append(toIndentedString(changeNotification)).append("\n");
     sb.append("}");
     return sb.toString();
   }

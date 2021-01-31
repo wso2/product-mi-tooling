@@ -20,28 +20,31 @@
 
 package org.wso2.ei.dashboard.streaming.integrator;
 
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.NodeDataFetcher;
-
-import java.util.Set;
 
 /**
- * Fetch artifact information from registered streaming integrator nodes and store.
+ * Fetch, store, update and delete artifact information of registered streaming integrator nodes.
  */
-public class SiNodeDataFetcher implements NodeDataFetcher {
+public class SiArtifactsFetcher implements ArtifactsManager {
     private final HeartbeatObject heartbeat;
 
-    public SiNodeDataFetcher(HeartbeatObject heartbeat) {
+    public SiArtifactsFetcher(HeartbeatObject heartbeat) {
         this.heartbeat = heartbeat;
     }
 
     @Override
-    public void runFetchExecutorService() {
+    public void runUpdateExecutorService() {
 
     }
 
     @Override
-    public void fetchData(Set<String> artifactList) {
+    public void runFetchAllExecutorService() {
+
+    }
+
+    @Override
+    public void runDeleteAllExecutorService() {
 
     }
 }

@@ -34,24 +34,29 @@ public interface DatabaseManager {
 
     boolean insertHeartbeat(HeartbeatObject heartbeat);
 
-    boolean updateHeartbeat(HeartbeatObject heartbeat);
-
-    int deleteHeartbeat(HeartbeatObject heartbeat);
-
-    boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp);
-
-    String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat);
-
     boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo);
 
-    boolean insertProxyServices(HeartbeatObject heartbeat, String serviceName, String details);
-
-    boolean insertApis(HeartbeatObject heartbeat, String apiName, String details);
+    boolean insertArtifact(String groupId, String nodeId, String artifactType, String artifactName,
+                           String artifactDetails);
 
     GroupList fetchGroups();
 
     NodeList fetchNodes(String groupId);
 
     ProxyList fetchProxyServices(String groupId, List<String> nodeList);
+
+    boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp);
+
+    String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat);
+
+    boolean updateHeartbeat(HeartbeatObject heartbeat);
+
+    int deleteHeartbeat(HeartbeatObject heartbeat);
+
+    boolean deleteServerInformation(String groupId, String nodeId);
+
+    boolean deleteAllArtifacts(String artifactType, String groupId, String nodeId);
+
+    boolean deleteArtifact(String artifactType, String name, String groupId, String nodeId);
 
 }

@@ -30,59 +30,82 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.NodeDataFetcher;
+import org.wso2.ei.dashboard.core.rest.model.UpdatedArtifact;
 
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Fetch artifact information from registered micro integrator nodes and store.
+ * Fetch, store, update and delete artifact information of registered micro integrator nodes.
  */
-public class MiNodeDataFetcher implements NodeDataFetcher {
-    private static final Log log = LogFactory.getLog(MiNodeDataFetcher.class);
+public class MiArtifactsManager implements ArtifactsManager {
+    private static final Log log = LogFactory.getLog(MiArtifactsManager.class);
     private static final String SERVER = "server";
     private static final String PROXY_SERVICES = "proxy-services";
     private static final String APIS = "apis";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(SERVER, PROXY_SERVICES, APIS)));
+            new HashSet<>(Arrays.asList(PROXY_SERVICES, APIS)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private final HeartbeatObject heartbeat;
 
-    public MiNodeDataFetcher(HeartbeatObject heartbeat) {
+    public MiArtifactsManager(HeartbeatObject heartbeat) {
         this.heartbeat = heartbeat;
     }
 
     @Override
-    public void runFetchExecutorService() {
+    public void runFetchAllExecutorService() {
         ExecutorService fetchExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        Runnable runnable = () -> fetchData(ALL_ARTIFACTS);
+        Runnable runnable = this::fetchAllArtifactsAndStore;
         fetchExecutor.execute(runnable);
     }
 
     @Override
-    public void fetchData(Set<String> artifactList) {
+    public void runUpdateExecutorService() {
+        ExecutorService updateExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        Runnable runnable = () -> {
+           List<UpdatedArtifact> undeployedArtifacts = heartbeat.getUndeployedArtifacts();
+           for (UpdatedArtifact artifact : undeployedArtifacts) {
+               deleteArtifact(artifact.getType(), artifact.getName());
+           }
+
+           List<UpdatedArtifact> deployedArtifacts = heartbeat.getDeployedArtifacts();
+           for (UpdatedArtifact info : deployedArtifacts) {
+               fetchAndStoreArtifact(info);
+           }
+        };
+        updateExecutor.execute(runnable);
+    }
+
+    @Override
+    public void runDeleteAllExecutorService() {
+        ExecutorService deleteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        Runnable runnable = this::deleteAllArtifacts;
+        deleteExecutor.execute(runnable);
+    }
+
+    private void fetchAllArtifactsAndStore() {
         String accessToken = getAccessToken(heartbeat);
-        for (String artifact : artifactList) {
+        for (String artifact : ALL_ARTIFACTS) {
             fetchAndStore(artifact, accessToken);
         }
+        fetchAndStoreServers(accessToken);
     }
 
     private void fetchAndStore(String artifact, String accessToken) {
         switch (artifact) {
-            case SERVER:
-                fetchAndStoreServers(accessToken);
-                break;
             case PROXY_SERVICES:
-                fetchAndStoreProxyServices(accessToken);
+                fetchAndStoreAllProxyServices(accessToken);
                 break;
             case APIS:
-                fetchAndStoreApis(accessToken);
+                fetchAndStoreAllApis(accessToken);
                 break;
             default:
                 throw new DashboardServerException("Artifact type " + artifact + " is invalid.");
@@ -105,21 +128,16 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
         }
     }
 
-    private void addToDelayedQueue() {
-        // todo
-    }
-
-    private void fetchAndStoreProxyServices(String accessToken) {
+    private void fetchAndStoreAllProxyServices(String accessToken) {
         final String url = heartbeat.getMgtApiUrl() + PROXY_SERVICES;
         CloseableHttpResponse response = doGet(accessToken, url);
         JsonObject proxyServices = HttpUtils.getJsonResponse(response);
         JsonArray serviceList = proxyServices.get("list").getAsJsonArray();
         for (int i = 0; i < serviceList.size(); i++) {
             final String serviceName = serviceList.get(i).getAsJsonObject().get("name").getAsString();
-            final String proxyInfoUrl = url + "?proxyServiceName=" + serviceName;
-            CloseableHttpResponse proxyDetails = doGet(accessToken, proxyInfoUrl);
-            JsonObject jsonProxyDetails = removeConfigurationFromResponse(proxyDetails);
-            boolean isSuccess = storeProxyServices(serviceName, jsonProxyDetails.toString());
+            JsonObject proxyDetails = getArtifactDetails(PROXY_SERVICES, serviceName, accessToken);
+            boolean isSuccess = databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(),
+                                                               PROXY_SERVICES, serviceName, proxyDetails.toString());
             if (!isSuccess) {
                 log.error("Error occurred while adding " + serviceName + " proxy details");
                 addToDelayedQueue();
@@ -127,11 +145,7 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
         }
     }
 
-    private boolean storeProxyServices(String serviceName, String details) {
-        return databaseManager.insertProxyServices(heartbeat, serviceName, details);
-    }
-
-    private void fetchAndStoreApis(String accessToken) {
+    private void fetchAndStoreAllApis(String accessToken) {
         String url = heartbeat.getMgtApiUrl() + APIS;
         CloseableHttpResponse response = doGet(accessToken, url);
         JsonObject apis = HttpUtils.getJsonResponse(response);
@@ -140,10 +154,9 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
             JsonArray apiList = apis.get("list").getAsJsonArray();
             for (int i = 0; i < apiCount; i++) {
                 String apiName = apiList.get(i).getAsJsonObject().get("name").getAsString();
-                String apiInfoUrl = url + "?apiName=" + apiName;
-                CloseableHttpResponse apiDetails = doGet(accessToken, apiInfoUrl);
-                JsonObject jsonProxyDetails = removeConfigurationFromResponse(apiDetails);
-                boolean isSuccess = storeApis(apiName, jsonProxyDetails.toString());
+                JsonObject apiDetails = getArtifactDetails(APIS, apiName, accessToken);
+                boolean isSuccess = databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(), APIS,
+                                                                   apiName, apiDetails.toString());
                 if (!isSuccess) {
                     log.error("Error occurred while adding " + apiName + " api details");
                     addToDelayedQueue();
@@ -152,14 +165,50 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
         }
     }
 
-    private boolean storeApis(String apiName, String details) {
-        return databaseManager.insertApis(heartbeat, apiName, details);
+    private void fetchAndStoreArtifact(UpdatedArtifact info) {
+        String accessToken = getAccessToken(heartbeat);
+        String artifactType = info.getType();
+        String artifactName = info.getName();
+        JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+        databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(), artifactType, artifactName,
+                                       artifactDetails.toString());
+    }
+
+    private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken) {
+        final String mgtApiUrl = heartbeat.getMgtApiUrl();
+        String getArtifactDetailsUrl;
+        switch (artifactType) {
+            case PROXY_SERVICES:
+                getArtifactDetailsUrl = mgtApiUrl.concat(PROXY_SERVICES).concat("?proxyServiceName=")
+                                                 .concat(artifactName);
+                break;
+            case APIS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(APIS).concat("?apiName=").concat(artifactName);
+                break;
+            default:
+                throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
+        }
+        CloseableHttpResponse artifactDetails = doGet(accessToken, getArtifactDetailsUrl);
+        return removeConfigurationFromResponse(artifactDetails);
     }
 
     private JsonObject removeConfigurationFromResponse(CloseableHttpResponse proxyDetails) {
         JsonObject jsonResponse = HttpUtils.getJsonResponse(proxyDetails);
         jsonResponse.remove("configuration");
         return jsonResponse;
+    }
+
+    private void deleteArtifact(String artifactType, String name) {
+        databaseManager.deleteArtifact(artifactType, name, heartbeat.getGroupId(), heartbeat.getNodeId());
+    }
+
+    private void deleteAllArtifacts() {
+        String groupId = heartbeat.getGroupId();
+        String nodeId = heartbeat.getNodeId();
+        databaseManager.deleteServerInformation(groupId, nodeId);
+        for (String artifact : ALL_ARTIFACTS) {
+            databaseManager.deleteAllArtifacts(artifact, groupId, nodeId);
+        }
     }
     
     private String getAccessToken(HeartbeatObject heartbeat) {
@@ -190,5 +239,9 @@ public class MiNodeDataFetcher implements NodeDataFetcher {
         httpGet.setHeader("Authorization", authHeader);
 
         return HttpUtils.doGet(httpGet);
+    }
+
+    private void addToDelayedQueue() {
+        // todo
     }
 }

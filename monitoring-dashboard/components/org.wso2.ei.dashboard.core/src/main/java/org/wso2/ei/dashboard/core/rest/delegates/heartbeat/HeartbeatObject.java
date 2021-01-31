@@ -20,6 +20,10 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 
+import org.wso2.ei.dashboard.core.rest.model.UpdatedArtifact;
+
+import java.util.List;
+
 /**
  * Heartbeat object class.
  */
@@ -29,13 +33,19 @@ public class HeartbeatObject {
     private String nodeId;
     private Integer interval;
     private String mgtApiUrl;
+    private List<UpdatedArtifact> deployedArtifacts;
+    private List<UpdatedArtifact> undeployedArtifacts;
 
-    public HeartbeatObject(String product, String groupId, String nodeId, Integer interval, String mgtApiUrl) {
+    public HeartbeatObject(String product, String groupId, String nodeId, Integer interval, String mgtApiUrl,
+                           List<UpdatedArtifact> deployedArtifacts, List<UpdatedArtifact> undeployedArtifacts) {
+
         this.product = product;
         this.groupId = groupId;
         this.nodeId = nodeId;
         this.interval = interval;
         this.mgtApiUrl = mgtApiUrl;
+        this.deployedArtifacts = deployedArtifacts;
+        this.undeployedArtifacts = undeployedArtifacts;
     }
 
     public String getProduct() {
@@ -86,5 +96,25 @@ public class HeartbeatObject {
     public void setMgtApiUrl(String mgtApiUrl) {
 
         this.mgtApiUrl = mgtApiUrl;
+    }
+
+    public List<UpdatedArtifact> getDeployedArtifacts() {
+
+        return deployedArtifacts;
+    }
+
+    public void setDeployedArtifacts(List<UpdatedArtifact> deployedArtifacts) {
+
+        this.deployedArtifacts = deployedArtifacts;
+    }
+
+    public List<UpdatedArtifact> getUndeployedArtifacts() {
+
+        return undeployedArtifacts;
+    }
+
+    public void setUndeployedArtifacts(List<UpdatedArtifact> undeployedArtifacts) {
+
+        this.undeployedArtifacts = undeployedArtifacts;
     }
 }

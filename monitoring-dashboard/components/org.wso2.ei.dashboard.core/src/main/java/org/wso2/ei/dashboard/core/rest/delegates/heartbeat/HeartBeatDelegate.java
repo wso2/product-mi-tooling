@@ -28,8 +28,8 @@ import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.HeartbeatRequest;
-import org.wso2.ei.dashboard.micro.integrator.MiNodeDataFetcher;
-import org.wso2.ei.dashboard.streaming.integrator.SiNodeDataFetcher;
+import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
+import org.wso2.ei.dashboard.streaming.integrator.SiArtifactsFetcher;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,6 +42,8 @@ public class HeartBeatDelegate {
     private static final Log log = LogFactory.getLog(HeartBeatDelegate.class);
     private static final String SUCCESS_STATUS = "success";
     private static final String FAIL_STATUS = "fail";
+    private static final String PRODUCT_MI = "mi";
+    private static final String PRODUCT_SI = "si";
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private final int heartbeatPoolSize = Integer.parseInt(Constants.HEARTBEAT_POOL_SIZE);
     private ScheduledExecutorService heartbeatScheduledExecutorService =
@@ -49,27 +51,26 @@ public class HeartBeatDelegate {
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) {
         Ack ack = new Ack(FAIL_STATUS);
-        HeartbeatObject heartbeat = new HeartbeatObject(heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(),
-                                                        heartbeatRequest.getNodeId(), heartbeatRequest.getInterval(),
-                                                        heartbeatRequest.getMgtApiUrl());
-        NodeDataFetcher nodeDataFetcher;
-
+        HeartbeatObject heartbeat = new HeartbeatObject(
+                heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
+                heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(),
+                heartbeatRequest.getChangeNotification().getDeployedArtifacts(),
+                heartbeatRequest.getChangeNotification().getUndeployedArtifacts());
         boolean isSuccess;
+        String productName = heartbeat.getProduct();
+        ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
+
         if (isNodeRegistered(heartbeat)) {
             isSuccess = updateHeartbeat(heartbeat);
+            artifactsManager.runUpdateExecutorService();
         } else {
             isSuccess = registerNode(heartbeat);
-            String productName = heartbeat.getProduct();
-            if (productName.equals("mi")) {
-                nodeDataFetcher = new MiNodeDataFetcher(heartbeat);
-            } else if (productName.equals("si")) {
-                nodeDataFetcher = new SiNodeDataFetcher(heartbeat);
-            } else {
-                throw new DashboardServerException("Unsupported product : " + productName);
+            if (isSuccess) {
+                artifactsManager.runFetchAllExecutorService();
             }
-            nodeDataFetcher.runFetchExecutorService();
         }
-        runHeartbeatExecutorService(heartbeat);
+        runHeartbeatExecutorService(productName, heartbeat);
+
         if (isSuccess) {
             ack.setStatus(SUCCESS_STATUS);
         }
@@ -95,7 +96,7 @@ public class HeartBeatDelegate {
         return databaseManager.insertHeartbeat(heartbeat);
     }
 
-    private void runHeartbeatExecutorService(HeartbeatObject heartbeat) {
+    private void runHeartbeatExecutorService(String productName, HeartbeatObject heartbeat) {
         long heartbeatInterval = heartbeat.getInterval();
         String timestampOfRegisteredNode = databaseManager.retrieveTimestampOfHeartBeat(heartbeat);
         Runnable runnableTask = () -> {
@@ -103,7 +104,7 @@ public class HeartBeatDelegate {
             if (isNodeDeregistered) {
                 log.info("Node : " + heartbeat.getNodeId() + " of group : " + heartbeat.getGroupId() + " has " +
                          "de-registered. Hence deleting node information");
-                deleteNode(heartbeat);
+                deleteNode(productName, heartbeat);
             }
         };
         heartbeatScheduledExecutorService.schedule(runnableTask, 3 * heartbeatInterval, TimeUnit.SECONDS);
@@ -114,12 +115,12 @@ public class HeartBeatDelegate {
         return !databaseManager.checkIfTimestampExceedsInitial(heartbeat, initialTimestamp);
     }
 
-    private void deleteNode(HeartbeatObject heartbeat) {
+    private void deleteNode(String productName, HeartbeatObject heartbeat) {
         int rowCount = databaseManager.deleteHeartbeat(heartbeat);
         if (rowCount > 0) {
             log.info("Successfully deleted node where group_id : " + heartbeat.getGroupId() + " and node_id : "
                      + heartbeat.getNodeId() + ".");
-            deleteAllData();
+            deleteAllNodeData(productName, heartbeat);
         } else {
             throw new DashboardServerException("Error occurred while deleting node where group_id : "
                                                + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId()
@@ -127,9 +128,21 @@ public class HeartBeatDelegate {
         }
     }
 
-    private void deleteAllData() {
-        // todo to be implemented once fetching mechanism completed
-        log.info("Deleting all node info....");
+    private void deleteAllNodeData(String productName, HeartbeatObject heartbeat) {
+        log.info("Deleting all artifacts and server information in node : " + heartbeat.getNodeId() + " in group: "
+                 + heartbeat.getGroupId());
+        ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
+        artifactsManager.runDeleteAllExecutorService();
+    }
+
+    private ArtifactsManager getArtifactManager(String productName, HeartbeatObject heartbeat) {
+        if (productName.equals(PRODUCT_MI)) {
+            return new MiArtifactsManager(heartbeat);
+        } else if (productName.equals(PRODUCT_SI)) {
+            return new SiArtifactsFetcher(heartbeat);
+        } else {
+            throw new DashboardServerException("Unsupported product : " + productName);
+        }
     }
 
 }

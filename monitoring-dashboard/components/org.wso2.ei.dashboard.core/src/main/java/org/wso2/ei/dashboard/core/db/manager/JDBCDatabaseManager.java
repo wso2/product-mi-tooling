@@ -105,133 +105,26 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean insertProxyServices(HeartbeatObject heartbeat, String serviceName, String details) {
-        String query = "INSERT INTO PROXY_SERVICES VALUES (?,?,?,?);";
+    public boolean insertArtifact(String groupId, String nodeId, String artifactType, String artifactName,
+                                  String artifactDetails) {
+        String query = "INSERT INTO " + getTableName(artifactType) + " VALUES (?,?,?,?);";
         Connection con = null;
         PreparedStatement statement = null;
         try {
             con = getConnection();
             statement = con.prepareStatement(query);
-            statement.setString(1, heartbeat.getGroupId());
-            statement.setString(2, heartbeat.getNodeId());
-            statement.setString(3, serviceName);
-            statement.setString(4, details);
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
+            statement.setString(3, artifactName);
+            statement.setString(4, artifactDetails);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while inserting " + serviceName
-                                               + " proxy information.", e);
+            throw new DashboardServerException("Error occurred while inserting " + artifactName + " information.",
+                                               e);
         } finally {
             closeStatement(statement);
             closeConnection(con);
         }
-    }
-
-    @Override
-    public boolean insertApis(HeartbeatObject heartbeat, String apiName, String details) {
-        String query = "INSERT INTO APIS VALUES (?,?,?,?);";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
-            statement.setString(1, heartbeat.getGroupId());
-            statement.setString(2, heartbeat.getNodeId());
-            statement.setString(3, apiName);
-            statement.setString(4, details);
-            return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while inserting " + apiName + " api information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
-        }
-    }
-
-    @Override
-    public boolean updateHeartbeat(HeartbeatObject heartbeat) {
-        String query = "UPDATE HEARTBEAT SET TIMESTAMP=CURRENT_TIMESTAMP() WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
-            statement.setString(1, heartbeat.getGroupId());
-            statement.setString(2, heartbeat.getNodeId());
-            return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
-        }
-    }
-
-    @Override
-    public int deleteHeartbeat(HeartbeatObject heartbeat) {
-        String query = "DELETE FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
-            statement.setString(1, heartbeat.getGroupId());
-            statement.setString(2, heartbeat.getNodeId());
-            return statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
-        }
-    }
-
-    public String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat) {
-        String query = "SELECT TIMESTAMP FROM HEARTBEAT WHERE GROUP_ID = ? AND NODE_ID = ? ;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
-            statement.setString(1, heartbeat.getGroupId());
-            statement.setString(2, heartbeat.getNodeId());
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getString(1);
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while retrieveTimestampOfRegisteredNode results.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
-        }
-    }
-
-    @Override
-    public boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp) {
-        String query = "SELECT COUNT(*) FROM HEARTBEAT WHERE TIMESTAMP>? AND GROUP_ID=? AND NODE_ID=?;";
-        boolean isExists = false;
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
-            statement.setString(1, initialTimestamp);
-            statement.setString(2, heartbeat.getGroupId());
-            statement.setString(3, heartbeat.getNodeId());
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            if (resultSet.getInt(1) == 1) {
-                isExists = true;
-            }
-        } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while retrieving next row.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
-        }
-        return isExists;
     }
 
     @Override
@@ -332,6 +225,160 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         }
     }
 
+    @Override
+    public boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp) {
+        String query = "SELECT COUNT(*) FROM HEARTBEAT WHERE TIMESTAMP>? AND GROUP_ID=? AND NODE_ID=?;";
+        boolean isExists = false;
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, initialTimestamp);
+            statement.setString(2, heartbeat.getGroupId());
+            statement.setString(3, heartbeat.getNodeId());
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            if (resultSet.getInt(1) == 1) {
+                isExists = true;
+            }
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while retrieving next row.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+        return isExists;
+    }
+
+    public String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat) {
+        String query = "SELECT TIMESTAMP FROM HEARTBEAT WHERE GROUP_ID = ? AND NODE_ID = ? ;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, heartbeat.getGroupId());
+            statement.setString(2, heartbeat.getNodeId());
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString(1);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while retrieveTimestampOfRegisteredNode results.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean updateHeartbeat(HeartbeatObject heartbeat) {
+        String query = "UPDATE HEARTBEAT SET TIMESTAMP=CURRENT_TIMESTAMP() WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, heartbeat.getGroupId());
+            statement.setString(2, heartbeat.getNodeId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public int deleteHeartbeat(HeartbeatObject heartbeat) {
+        String query = "DELETE FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, heartbeat.getGroupId());
+            statement.setString(2, heartbeat.getNodeId());
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while deleting heartbeat information.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean deleteServerInformation(String groupId, String nodeId) {
+        log.debug("Deleting server information of node: " + nodeId + " in group : " + groupId);
+        String query = "DELETE FROM SERVERS WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
+            return (statement.executeUpdate() > 0);
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while deleting server information.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean deleteAllArtifacts(String artifactType, String groupId, String nodeId) {
+        log.debug("Deleting all " + artifactType + " in node: " + nodeId + " in group : " + groupId);
+        String tableName = getTableName(artifactType);
+        String query = "DELETE FROM " + tableName + " WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
+            return (statement.executeUpdate() > 0);
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while deleting all " + artifactType +  " in node: "
+                                               + nodeId + " in group : " + groupId, e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean deleteArtifact(String artifactType, String artifactName, String groupId, String nodeId) {
+
+        log.debug("Deleting " + artifactType + " : " + artifactName + " in node: " + nodeId + " in group : " + groupId);
+
+        String tableName = getTableName(artifactType);
+
+        String query = "DELETE FROM " + tableName + " WHERE GROUP_ID=? AND NODE_ID=? AND NAME=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
+            statement.setString(3, artifactName);
+            return (statement.executeUpdate() > 0);
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while deleting " + artifactName, e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
     private List<ArtifactDetails> getArtifactDetails(String getServicesQuery, String artifactName, String groupId,
                                                      List<String> nodeList) {
         Connection con = null;
@@ -365,6 +412,16 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         }
     }
 
+    private String getTableName(String artifactType) {
+        switch (artifactType) {
+            case "proxy-services":
+                return "PROXY_SERVICES";
+            case "api":
+                return "APIS";
+            default:
+                throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
+        }
+    }
 
     private Connection getConnection() throws SQLException {
         return dataSource.getConnection();

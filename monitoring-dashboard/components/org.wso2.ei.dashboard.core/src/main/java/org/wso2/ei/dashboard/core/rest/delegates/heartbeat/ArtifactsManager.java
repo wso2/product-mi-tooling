@@ -20,15 +20,15 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 
-import java.util.Set;
-
 /**
- * This interface should be implemented by all products using the dashboard for data fetching from nodes.
+ * This interface should be implemented by all products to store, update and delete node data.
  */
-public interface NodeDataFetcher {
+public interface ArtifactsManager {
 
-    void runFetchExecutorService();
+    void runFetchAllExecutorService();
 
-    void fetchData(Set<String> artifactList);
+    void runUpdateExecutorService();
+
+    void runDeleteAllExecutorService();
 
 }
