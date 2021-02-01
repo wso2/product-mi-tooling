@@ -45,11 +45,15 @@ public interface DatabaseManager {
 
     ProxyList fetchProxyServices(String groupId, List<String> nodeList);
 
+    String getMgtApiUrl(String groupId, String nodeId);
+
     boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp);
 
     String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat);
 
     boolean updateHeartbeat(HeartbeatObject heartbeat);
+
+    boolean updateDetails(String artifactType, String artifactName, String groupId, String nodeId, String details);
 
     int deleteHeartbeat(HeartbeatObject heartbeat);
 

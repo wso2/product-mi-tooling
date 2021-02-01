@@ -65,7 +65,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean insertHeartbeat(HeartbeatObject heartbeat) {
-        String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,CURRENT_TIMESTAMP());";
+        String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,?,CURRENT_TIMESTAMP());";
         Connection con = null;
         PreparedStatement statement = null;
         try {
@@ -74,6 +74,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             statement.setString(1, heartbeat.getGroupId());
             statement.setString(2, heartbeat.getNodeId());
             statement.setInt(3, heartbeat.getInterval());
+            statement.setString(4, heartbeat.getMgtApiUrl());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
@@ -226,6 +227,30 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public String getMgtApiUrl(String groupId, String nodeId) {
+        String query = "SELECT MGT_API_URL FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        String mgtApiUrl = "";
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                mgtApiUrl = resultSet.getString(1);
+            }
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while retrieveTimestampOfRegisteredNode results.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+        return mgtApiUrl;
+    }
+
+    @Override
     public boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp) {
         String query = "SELECT COUNT(*) FROM HEARTBEAT WHERE TIMESTAMP>? AND GROUP_ID=? AND NODE_ID=?;";
         boolean isExists = false;
@@ -284,6 +309,29 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             statement = con.prepareStatement(query);
             statement.setString(1, heartbeat.getGroupId());
             statement.setString(2, heartbeat.getNodeId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean updateDetails(String artifactType, String artifactName, String groupId, String nodeId,
+                                 String details) {
+        String tableName = getTableName(artifactType);
+        String query = "UPDATE " + tableName + " SET DETAILS=? WHERE GROUP_ID=? AND NODE_ID=? AND NAME=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, details);
+            statement.setString(2, groupId);
+            statement.setString(3, nodeId);
+            statement.setString(4, artifactName);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
@@ -416,7 +464,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         switch (artifactType) {
             case "proxy-services":
                 return "PROXY_SERVICES";
-            case "api":
+            case "apis":
                 return "APIS";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");

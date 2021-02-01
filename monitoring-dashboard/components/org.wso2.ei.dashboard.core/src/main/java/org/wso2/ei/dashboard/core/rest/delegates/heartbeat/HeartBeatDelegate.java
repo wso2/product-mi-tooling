@@ -26,6 +26,7 @@ import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.HeartbeatRequest;
 import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
@@ -40,8 +41,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class HeartBeatDelegate {
     private static final Log log = LogFactory.getLog(HeartBeatDelegate.class);
-    private static final String SUCCESS_STATUS = "success";
-    private static final String FAIL_STATUS = "fail";
     private static final String PRODUCT_MI = "mi";
     private static final String PRODUCT_SI = "si";
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
@@ -50,7 +49,7 @@ public class HeartBeatDelegate {
             Executors.newScheduledThreadPool(heartbeatPoolSize);
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) {
-        Ack ack = new Ack(FAIL_STATUS);
+        Ack ack = new Ack(Constants.FAIL_STATUS);
         HeartbeatObject heartbeat = new HeartbeatObject(
                 heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
                 heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(),
@@ -72,7 +71,7 @@ public class HeartBeatDelegate {
         runHeartbeatExecutorService(productName, heartbeat);
 
         if (isSuccess) {
-            ack.setStatus(SUCCESS_STATUS);
+            ack.setStatus(Constants.SUCCESS_STATUS);
         }
         return ack;
     }

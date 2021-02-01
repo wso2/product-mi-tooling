@@ -18,21 +18,17 @@
  *
  */
 
-package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
-
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.rest.model.NodeList;
+package org.wso2.ei.dashboard.core.rest.delegates;
 
 /**
- * Delegate class to handle requests from Nodes page (Home page).
+ * This interface should be implemented by all products to store, update and delete node data.
  */
-public class NodesDelegate {
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+public interface ArtifactsManager {
 
-    public NodeList getNodes(String groupId) {
+    void runFetchAllExecutorService();
 
-        return databaseManager.fetchNodes(groupId);
-    }
+    void runUpdateExecutorService();
+
+    void runDeleteAllExecutorService();
 
 }

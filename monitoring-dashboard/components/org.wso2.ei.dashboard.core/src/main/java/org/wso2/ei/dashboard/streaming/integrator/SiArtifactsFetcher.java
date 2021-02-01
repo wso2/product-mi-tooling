@@ -20,7 +20,7 @@
 
 package org.wso2.ei.dashboard.streaming.integrator;
 
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.ArtifactsManager;
+import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 
 /**

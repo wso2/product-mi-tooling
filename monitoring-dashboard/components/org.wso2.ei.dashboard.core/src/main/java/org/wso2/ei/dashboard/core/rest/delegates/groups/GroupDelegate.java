@@ -18,25 +18,23 @@
  *
  */
 
-package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
+package org.wso2.ei.dashboard.core.rest.delegates.groups;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.rest.model.ProxyList;
-
-import java.util.List;
+import org.wso2.ei.dashboard.core.rest.model.GroupList;
 
 /**
- * Delegate class to handle requests from proxy-services page.
+ * Delegate class to fetch set of groups registered to the dashboard.
  */
-public class ProxyServicesDelegate {
-    private static final Log log = LogFactory.getLog(ProxyServicesDelegate.class);
+public class GroupDelegate {
+    private static final Log log = LogFactory.getLog(GroupDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
-    public ProxyList getProxyServices(String groupId, List<String> nodeList) {
-        log.debug("Fetching proxy services from database.");
-        return databaseManager.fetchProxyServices(groupId, nodeList);
+    public GroupList getGroupList() {
+        log.debug("Fetching group list registered with the dashboard.");
+        return databaseManager.fetchGroups();
     }
 }

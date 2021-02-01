@@ -18,23 +18,21 @@
  *
  */
 
-package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
+package org.wso2.ei.dashboard.core.rest.delegates.nodes;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.rest.model.GroupList;
+import org.wso2.ei.dashboard.core.rest.model.NodeList;
 
 /**
- * Delegate class to fetch set of groups registered to the dashboard.
+ * Delegate class to handle requests from Nodes page (Home page).
  */
-public class GroupDelegate {
-    private static final Log log = LogFactory.getLog(GroupDelegate.class);
+public class NodesDelegate {
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
-    public GroupList getGroupList() {
-        log.debug("Fetching group list registered with the dashboard.");
-        return databaseManager.fetchGroups();
+    public NodeList getNodes(String groupId) {
+
+        return databaseManager.fetchNodes(groupId);
     }
+
 }

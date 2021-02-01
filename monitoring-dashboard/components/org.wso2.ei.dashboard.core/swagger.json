@@ -1560,10 +1560,10 @@
           "nodeId" : {
             "type" : "string"
           },
-          "isActive" : {
-            "type" : "boolean"
+          "type" : {
+            "type" : "string"
           },
-          "tracing" : {
+          "value" : {
             "type" : "boolean"
           }
         }

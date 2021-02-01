@@ -20,9 +20,10 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.GroupDelegate;
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.NodesDelegate;
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.ProxyServicesDelegate;
+import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
+import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
+import org.wso2.ei.dashboard.core.rest.delegates.ProxyServicesDelegate;
+import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.EndpointUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.Error;
@@ -508,11 +509,11 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "Proxy update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response updateProxyService( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid ProxyUpdateRequestBody body) {
-        return Response.ok().entity("magic!").build();
+    public Ack updateProxyService(@PathParam("group-id")
+                                            @Parameter(description = "Group ID of the node") String groupId,
+                                  @Valid ProxyUpdateRequestBody body) {
+        ProxyServicesDelegate proxyServicesDelegate = new ProxyServicesDelegate();
+        return proxyServicesDelegate.updateProxyService(groupId, body);
     }
     @PUT
     @Path("/{group-id}/sequences")

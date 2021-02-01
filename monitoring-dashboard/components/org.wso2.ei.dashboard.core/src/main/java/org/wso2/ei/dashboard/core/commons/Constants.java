@@ -29,6 +29,11 @@ public final class Constants {
 
     }
 
+    public static final String PROXY_SERVICES = "proxy-services";
+
+    public static final String SUCCESS_STATUS = "success";
+    public static final String FAIL_STATUS = "fail";
+
     // todo change this structure
 
     public static final String DASHBOARD_HOME = System.getenv("DASHBOARD_HOME");

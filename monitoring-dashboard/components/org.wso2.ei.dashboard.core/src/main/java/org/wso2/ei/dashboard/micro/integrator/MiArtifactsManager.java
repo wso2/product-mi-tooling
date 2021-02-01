@@ -27,15 +27,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApi;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.ArtifactsManager;
+import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
+import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.core.rest.model.UpdatedArtifact;
 
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +55,12 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(PROXY_SERVICES, APIS)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
-    private final HeartbeatObject heartbeat;
+    private HeartbeatObject heartbeat = null;
+    private UpdateArtifactObject updateArtifactObject = null;
+
+    public MiArtifactsManager(UpdateArtifactObject updateArtifactObject) {
+        this.updateArtifactObject = updateArtifactObject;
+    }
 
     public MiArtifactsManager(HeartbeatObject heartbeat) {
         this.heartbeat = heartbeat;
@@ -92,7 +98,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private void fetchAllArtifactsAndStore() {
-        String accessToken = getAccessToken(heartbeat);
+        String accessToken = ManagementApi.getAccessToken(heartbeat.getMgtApiUrl());
         for (String artifact : ALL_ARTIFACTS) {
             fetchAndStore(artifact, accessToken);
         }
@@ -165,8 +171,23 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
+    public boolean updateArtifactDetails() {
+        if (updateArtifactObject != null) {
+            String mgtApiUrl = updateArtifactObject.getMgtApiUrl();
+            String accessToken = ManagementApi.getAccessToken(mgtApiUrl);
+            String artifactType = updateArtifactObject.getType();
+            String artifactName = updateArtifactObject.getName();
+            JsonObject details = getArtifactDetails(mgtApiUrl, artifactType, artifactName,
+                                                    accessToken);
+            return databaseManager.updateDetails(artifactType, artifactName, updateArtifactObject.getGroupId(),
+                                          updateArtifactObject.getNodeId(), details.toString());
+        } else {
+            throw new DashboardServerException("Artifact details are invalid");
+        }
+    }
+
     private void fetchAndStoreArtifact(UpdatedArtifact info) {
-        String accessToken = getAccessToken(heartbeat);
+        String accessToken = ManagementApi.getAccessToken(heartbeat.getMgtApiUrl());
         String artifactType = info.getType();
         String artifactName = info.getName();
         JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
@@ -176,6 +197,11 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken) {
         final String mgtApiUrl = heartbeat.getMgtApiUrl();
+        return getArtifactDetails(mgtApiUrl, artifactType, artifactName, accessToken);
+    }
+
+    private JsonObject getArtifactDetails(String mgtApiUrl, String artifactType, String artifactName,
+                                          String accessToken) {
         String getArtifactDetailsUrl;
         switch (artifactType) {
             case PROXY_SERVICES:
@@ -208,26 +234,6 @@ public class MiArtifactsManager implements ArtifactsManager {
         databaseManager.deleteServerInformation(groupId, nodeId);
         for (String artifact : ALL_ARTIFACTS) {
             databaseManager.deleteAllArtifacts(artifact, groupId, nodeId);
-        }
-    }
-    
-    private String getAccessToken(HeartbeatObject heartbeat) {
-        String username = System.getProperty("mi_username");
-        String password = System.getProperty("mi_password");
-        String usernamePassword = username + ":" + password;
-        String encodedUsernamePassword = Base64.getEncoder().encodeToString(usernamePassword.getBytes());
-        String loginUrl = heartbeat.getMgtApiUrl() + "login";
-
-        final HttpGet httpGet = new HttpGet(loginUrl);
-        httpGet.setHeader("Accept", "application/json");
-        httpGet.setHeader("Authorization", "Basic " + encodedUsernamePassword);
-        CloseableHttpResponse response = HttpUtils.doGet(httpGet);
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(response);
-
-        if (jsonResponse.has("AccessToken")) {
-            return jsonResponse.get("AccessToken").getAsString();
-        } else {
-            throw new DashboardServerException("Error occurred while retrieving access token from management api.");
         }
     }
 

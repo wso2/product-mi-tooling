@@ -1,25 +1,6 @@
-/*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- *
- *
- */
-
 package org.wso2.ei.dashboard.core.rest.model;
 
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -31,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ProxyUpdateRequestBody   {
   private @Valid String serviceName = null;
   private @Valid String nodeId = null;
-  private @Valid Boolean isActive = null;
-  private @Valid Boolean tracing = null;
+  private @Valid String type = null;
+  private @Valid Boolean value = null;
 
   /**
    **/
@@ -72,38 +53,38 @@ public class ProxyUpdateRequestBody   {
 
   /**
    **/
-  public ProxyUpdateRequestBody isActive(Boolean isActive) {
-    this.isActive = isActive;
+  public ProxyUpdateRequestBody type(String type) {
+    this.type = type;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("isActive")
+  @JsonProperty("type")
 
-  public Boolean isIsActive() {
-    return isActive;
+  public String getType() {
+    return type;
   }
-  public void setIsActive(Boolean isActive) {
-    this.isActive = isActive;
+  public void setType(String type) {
+    this.type = type;
   }
 
   /**
    **/
-  public ProxyUpdateRequestBody tracing(Boolean tracing) {
-    this.tracing = tracing;
+  public ProxyUpdateRequestBody value(Boolean value) {
+    this.value = value;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("tracing")
+  @JsonProperty("value")
 
-  public Boolean isTracing() {
-    return tracing;
+  public Boolean isValue() {
+    return value;
   }
-  public void setTracing(Boolean tracing) {
-    this.tracing = tracing;
+  public void setValue(Boolean value) {
+    this.value = value;
   }
 
 
@@ -118,13 +99,13 @@ public class ProxyUpdateRequestBody   {
     ProxyUpdateRequestBody proxyUpdateRequestBody = (ProxyUpdateRequestBody) o;
     return Objects.equals(serviceName, proxyUpdateRequestBody.serviceName) &&
         Objects.equals(nodeId, proxyUpdateRequestBody.nodeId) &&
-        Objects.equals(isActive, proxyUpdateRequestBody.isActive) &&
-        Objects.equals(tracing, proxyUpdateRequestBody.tracing);
+        Objects.equals(type, proxyUpdateRequestBody.type) &&
+        Objects.equals(value, proxyUpdateRequestBody.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(serviceName, nodeId, isActive, tracing);
+    return Objects.hash(serviceName, nodeId, type, value);
   }
 
   @Override
@@ -134,8 +115,8 @@ public class ProxyUpdateRequestBody   {
     
     sb.append("    serviceName: ").append(toIndentedString(serviceName)).append("\n");
     sb.append("    nodeId: ").append(toIndentedString(nodeId)).append("\n");
-    sb.append("    isActive: ").append(toIndentedString(isActive)).append("\n");
-    sb.append("    tracing: ").append(toIndentedString(tracing)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
     return sb.toString();
   }

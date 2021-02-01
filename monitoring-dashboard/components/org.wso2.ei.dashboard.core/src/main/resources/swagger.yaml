@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -1072,9 +1072,9 @@ components:
           type: string
         nodeId:
           type: string
-        isActive:
-          type: boolean
-        tracing:
+        type:
+          type: string
+        value:
           type: boolean
     EndpointList:
       type: array

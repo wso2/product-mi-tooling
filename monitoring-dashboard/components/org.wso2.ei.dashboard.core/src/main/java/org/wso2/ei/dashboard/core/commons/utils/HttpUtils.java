@@ -25,6 +25,7 @@ import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -55,7 +56,16 @@ public class HttpUtils {
         try {
             return httpClient.execute(httpGet);
         } catch (IOException e) {
-            throw new DashboardServerException("Error occurred while sending http request.", e);
+            throw new DashboardServerException("Error occurred while sending get http request.", e);
+        }
+    }
+
+    public static CloseableHttpResponse doPost(HttpPost httpPost) {
+        CloseableHttpClient httpClient = getHttpClient();
+        try {
+            return httpClient.execute(httpPost);
+        } catch (IOException e) {
+            throw new DashboardServerException("Error occurred while sending http post request.", e);
         }
     }
 
