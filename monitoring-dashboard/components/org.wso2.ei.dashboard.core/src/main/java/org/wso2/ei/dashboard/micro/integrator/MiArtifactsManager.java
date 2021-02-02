@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
-import org.wso2.ei.dashboard.core.commons.utils.ManagementApi;
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
@@ -98,7 +98,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private void fetchAllArtifactsAndStore() {
-        String accessToken = ManagementApi.getAccessToken(heartbeat.getMgtApiUrl());
+        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
         for (String artifact : ALL_ARTIFACTS) {
             fetchAndStore(artifact, accessToken);
         }
@@ -174,7 +174,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     public boolean updateArtifactDetails() {
         if (updateArtifactObject != null) {
             String mgtApiUrl = updateArtifactObject.getMgtApiUrl();
-            String accessToken = ManagementApi.getAccessToken(mgtApiUrl);
+            String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
             String artifactType = updateArtifactObject.getType();
             String artifactName = updateArtifactObject.getName();
             JsonObject details = getArtifactDetails(mgtApiUrl, artifactType, artifactName,
@@ -187,7 +187,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private void fetchAndStoreArtifact(UpdatedArtifact info) {
-        String accessToken = ManagementApi.getAccessToken(heartbeat.getMgtApiUrl());
+        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
         String artifactType = info.getType();
         String artifactName = info.getName();
         JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);

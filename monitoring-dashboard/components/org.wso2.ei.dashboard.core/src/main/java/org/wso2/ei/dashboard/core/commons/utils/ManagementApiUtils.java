@@ -23,6 +23,8 @@ package org.wso2.ei.dashboard.core.commons.utils;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
+import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
 import java.util.Base64;
@@ -30,10 +32,16 @@ import java.util.Base64;
 /**
  * Util class for micro integrator management api.
  */
-public class ManagementApi {
+public class ManagementApiUtils {
 
-    private ManagementApi() {
+    private ManagementApiUtils() {
 
+    }
+
+    private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+
+    public static String getMgtApiUrl(String groupId, String nodeId) {
+        return databaseManager.getMgtApiUrl(groupId, nodeId);
     }
 
     public static String getAccessToken(String mgtApiUrl) {

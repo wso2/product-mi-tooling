@@ -29,6 +29,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Paths;
 import java.util.Properties;
 
@@ -69,7 +70,8 @@ public class Bootstrap {
         } catch (IOException e) {
             logger.warn("Error while reading TOML file in " + tomlFile + ". Using default port " + serverPort, e);
         }
-        Server server = new Server(serverPort);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(serverPort);
+        Server server = new Server(inetSocketAddress);
         HandlerCollection handlers = new HandlerCollection();
         String webAppsPath = dashboardHome + File.separator + SERVER_DIR + File.separator + WEBAPPS_DIR;
         File f = new File(webAppsPath);
@@ -118,5 +120,4 @@ public class Bootstrap {
         properties.put(MI_PASSWORD, miPassword);
         System.setProperties(properties);
     }
-
 }

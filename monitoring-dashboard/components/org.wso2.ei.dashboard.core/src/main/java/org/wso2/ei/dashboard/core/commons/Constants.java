@@ -30,6 +30,7 @@ public final class Constants {
     }
 
     public static final String PROXY_SERVICES = "proxy-services";
+    public static final String APIS = "apis";
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";

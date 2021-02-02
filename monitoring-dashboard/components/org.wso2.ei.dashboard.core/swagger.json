@@ -73,6 +73,9 @@
   }, {
     "name" : "Users",
     "description" : "Access users details"
+  }, {
+    "name" : "configuration",
+    "description" : "Access configurations"
   } ],
   "paths" : {
     "/heartbeat" : {
@@ -253,7 +256,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -1454,6 +1457,76 @@
           }
         }
       }
+    },
+    "/configuration" : {
+      "get" : {
+        "tags" : [ "configuration" ],
+        "summary" : "Get configurations using management api",
+        "operationId" : "RetrieveConfiguration",
+        "parameters" : [ {
+          "name" : "groupId",
+          "in" : "query",
+          "description" : "Group id of the node",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "nodeId",
+          "in" : "query",
+          "description" : "Node id of the node",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "artifactType",
+          "in" : "query",
+          "description" : "Type of the artifact",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "artifactName",
+          "in" : "query",
+          "description" : "name of the artifact",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The configuration of the relevant artifact",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Configuration"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -1878,6 +1951,14 @@
           }
         }
       },
+      "Configuration" : {
+        "type" : "object",
+        "properties" : {
+          "configuration" : {
+            "type" : "string"
+          }
+        }
+      },
       "SuccessStatus" : {
         "type" : "object",
         "properties" : {
@@ -1980,7 +2061,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains type, tracing, configuration etc.",
+                  "description" : "Array contains type, tracing etc.",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2044,7 +2125,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains type, isActive, messageStore, configuration etc.",
+                  "description" : "Array contains type, isActive, messageStore etc.",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2076,7 +2157,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains type, messageCount, configuration",
+                  "description" : "Array contains type, messageCount",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2108,7 +2189,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains contex, hostName, port, url, tracing, configuration etc",
+                  "description" : "Array contains contex, hostName, port, url, tracing etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2157,7 +2238,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains statistics, tracing, configuration etc",
+                  "description" : "Array contains statistics, tracing etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2183,7 +2264,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains group, implementation, configuration etc",
+                  "description" : "Array contains group, implementation etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2242,7 +2323,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains wsdl1.1, swaggerUrl, configuration etc",
+                  "description" : "Array contains wsdl1.1, swaggerUrl etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }

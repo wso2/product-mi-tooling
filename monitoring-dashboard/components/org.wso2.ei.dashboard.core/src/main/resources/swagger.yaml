@@ -63,6 +63,8 @@ tags:
     description: "Access log configs details"
   - name: "Users"
     description: "Access users details"
+  - name: "configuration"
+    description: "Access configurations"
 
 paths:
   /heartbeat:
@@ -963,6 +965,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configuration:
+    get:
+      tags:
+        - "configuration"
+      summary: "Get configurations using management api"
+      operationId: "RetrieveConfiguration"
+      parameters:
+        - name: "groupId"
+          in: query
+          description: "Group id of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodeId"
+          in: query
+          description: "Node id of the node"
+          required: true
+          schema:
+            type: string
+        - name: "artifactType"
+          in: query
+          description: "Type of the artifact"
+          required: true
+          schema:
+            type: string
+        - name: "artifactName"
+          in: query
+          description: "Name of the artifact"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "The configuration of the relevant artifact"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Configuration'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 
 components:
   schemas:
@@ -1094,7 +1141,7 @@ components:
                   type: boolean
                 details:
                   type: array
-                  description: Array contains type, tracing, configuration etc.
+                  description: Array contains type, tracing etc.
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 properties:
@@ -1160,7 +1207,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains type, isActive, messageStore, configuration etc.
+                  description: Array contains type, isActive, messageStore etc.
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 paramaters:
@@ -1192,7 +1239,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains type, messageCount, configuration
+                  description: Array contains type, messageCount
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 paramaters:
@@ -1215,7 +1262,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains contex, hostName, port, url, tracing, configuration etc
+                  description: Array contains contex, hostName, port, url, tracing etc
                   items:
                     $ref: '#/components/schemas/KeyValue'
     ApiUpdateRequestBody:
@@ -1262,7 +1309,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains statistics, tracing, configuration etc
+                  description: Array contains statistics, tracing etc
                   items:
                     $ref: '#/components/schemas/KeyValue'
     SequenceUpdateRequestBody:
@@ -1290,7 +1337,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains group, implementation, configuration etc
+                  description: Array contains group, implementation etc
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 triggerDetails:
@@ -1333,7 +1380,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains wsdl1.1, swaggerUrl, configuration etc
+                  description: Array contains wsdl1.1, swaggerUrl etc
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 datasources:
@@ -1582,6 +1629,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/KeyValue'
+    Configuration:
+      type: object
+      properties:
+        configuration:
+          type: string
     SuccessStatus:
       type: object
       properties:

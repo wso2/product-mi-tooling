@@ -28,7 +28,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
-import org.wso2.ei.dashboard.core.commons.utils.ManagementApi;
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
@@ -56,10 +56,10 @@ public class ProxyServicesDelegate {
         log.debug("Updating proxy " + payload.getServiceName() + " in node " + payload.getNodeId() + " in group "
                   + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
-        String mgtApiUrl = databaseManager.getMgtApiUrl(groupId, payload.getNodeId());
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, payload.getNodeId());
         if (null != mgtApiUrl && !mgtApiUrl.isEmpty()) {
             String url = mgtApiUrl.concat(Constants.PROXY_SERVICES);
-            String accessToken = ManagementApi.getAccessToken(mgtApiUrl);
+            String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
             boolean isSuccess = updateProxyService(mgtApiUrl, url, accessToken, groupId, payload);
             if (isSuccess) {
                 ack.setStatus(Constants.SUCCESS_STATUS);
