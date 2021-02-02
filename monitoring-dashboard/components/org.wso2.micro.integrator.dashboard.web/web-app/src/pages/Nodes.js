@@ -40,12 +40,13 @@ export default function Nodes () {
 
     React.useEffect(()=>{
         // todo are we taking it from node filter, do we need to apply filter here as well?
-        
-        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/nodes");
-        axios.get(url).then(response => {
-            response.data.map(data => data.details = JSON.parse(data.details))
-            setNodeList(response.data)
-        })
+        if (globalGroupId !== 0) {
+            const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/nodes");
+            axios.get(url).then(response => {
+                response.data.map(data => data.details = JSON.parse(data.details))
+                setNodeList(response.data)
+            })
+        }
     },[globalGroupId])
 
     return (<EnhancedTable pageInfo={pageInfo} dataSet={nodeList}/>);

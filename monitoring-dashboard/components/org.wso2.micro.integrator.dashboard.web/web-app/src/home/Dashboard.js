@@ -70,6 +70,7 @@ export default function Dashboard() {
     const handleGroupId = (event) => {
         setGroupId(event.target.value);
     };
+
     return (
         <div className={classes.root}>
             <CssBaseline />

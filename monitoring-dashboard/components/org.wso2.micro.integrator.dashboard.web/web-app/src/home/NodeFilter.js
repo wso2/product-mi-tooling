@@ -29,8 +29,7 @@ import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 import { filterNodes } from '../redux/Actions';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function NodeFilter () {
 
@@ -38,7 +37,7 @@ export default function NodeFilter () {
     const globalGroupId = useSelector(state => state.groupId);
 
     React.useEffect(()=>{
-        if (globalGroupId !== 0) {
+        if (globalGroupId !== '') {
             const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/nodes");
             axios.get(url).then(response => {
                 var list = [];

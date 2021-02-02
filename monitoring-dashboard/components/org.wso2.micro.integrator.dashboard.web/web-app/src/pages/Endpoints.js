@@ -52,6 +52,7 @@ export default class Endpoints extends React.Component {
             ]};
     }
     render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.endpointList}/>;
+        return <div>This page is under developement</div>
+        // return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.endpointList}/>;
     }
 }

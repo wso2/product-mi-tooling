@@ -19,6 +19,7 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -33,9 +34,30 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import XMLViewer from 'react-xml-viewer';
 import Box from '@material-ui/core/Box';
+import { useSelector } from 'react-redux';
 
 export default function ProxySideDrawer(props) {
+    const globalGroupId = useSelector(state => state.groupId);
     var nodeData = props.nodeData;
+    if(Object.keys(nodeData) !==0 ) {
+        if(nodeData.details['tracing'] == 'enabled') {
+            nodeData.details['tracing'] = true
+        } else {
+            nodeData.details['tracing'] = false
+        }
+    }
+
+    const params = {
+        groupId: globalGroupId,
+        nodeId: nodeData.nodeId,
+        artifactType : "proxy-services",
+        artifactName : nodeData.details.name
+    };
+      
+    const url = "http://0.0.0.0:9743/api/rest/configuration";
+    axios.get(url, {params}).then(response => {
+        nodeData.details.source = response.data.configuration;
+    })
 
     const [open, setOpen] = React.useState(false);
 
@@ -60,12 +82,24 @@ export default function ProxySideDrawer(props) {
     const classes = useStyles();
 
     const changeServiceStatus = () => {
-        nodeData['isActive'] = !nodeData['isActive'];
+        nodeData.details['isRunning'] = !nodeData.details['isRunning'];
+        updateProxy("isRunning", nodeData.details['isRunning']);
     };
 
     const changeTracingStatus = () => {
         nodeData.details['tracing'] = !nodeData.details['tracing'];
+        updateProxy("tracing", nodeData.details['tracing']);
     };
+
+    const updateProxy = (type, value) => {
+        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/proxy-services");
+        axios.put(url, {
+            "serviceName": nodeData.details.name,
+            "nodeId": nodeData.nodeId,
+            "type": type,
+            "value": value
+        });
+    }
 
     return (
         <div className={classes.root}>
@@ -83,7 +117,7 @@ export default function ProxySideDrawer(props) {
                         <Table>
                             <TableRow>
                                 <TableCell>Service Status</TableCell>
-                                <TableCell><Switch checked={nodeData['isActive']} onChange={changeServiceStatus} /></TableCell>
+                                <TableCell><Switch checked={nodeData.details.isRunning} onChange={changeServiceStatus} /></TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Service Name</TableCell>
