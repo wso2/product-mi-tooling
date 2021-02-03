@@ -35,49 +35,85 @@ if [ -z "$JAVACMD" ] ; then
    else
      JAVACMD=java
    fi
- fi
- # ----- Process the input command ----------------------------------------------
- args=""
- for c in $*
- do
-     if [ "$c" = "--debug" ] || [ "$c" = "-debug" ] || [ "$c" = "debug" ]; then
-           CMD="--debug"
-           continue
-     elif [ "$CMD" = "--debug" ]; then
-           if [ -z "$PORT" ]; then
-                 PORT=$c
-           fi
-     elif [ "$c" = "--stop" ] || [ "$c" = "-stop" ] || [ "$c" = "stop" ]; then
-           CMD="stop"
-     elif [ "$c" = "--start" ] || [ "$c" = "-start" ] || [ "$c" = "start" ]; then
-           CMD="start"
-     elif [ "$c" = "--version" ] || [ "$c" = "-version" ] || [ "$c" = "version" ]; then
-           CMD="version"
-     elif [ "$c" = "--restart" ] || [ "$c" = "-restart" ] || [ "$c" = "restart" ]; then
-           CMD="restart"
-     else
-         args="$args $c"
-     fi
- done
+fi
 
- if [ "$CMD" = "--debug" ]; then
-   if [ "$PORT" = "" ]; then
-     echo " Please specify the debug port after the --debug option"
-     exit 1
+if [ -e "$DASHBOARD_HOME/runtime.pid" ]; then
+  PID=`cat "$DASHBOARD_HOME"/runtime.pid`
+fi
+
+# ----- Process the input command ----------------------------------------------
+args=""
+for c in $*
+do
+   if [ "$c" = "--debug" ] || [ "$c" = "-debug" ] || [ "$c" = "debug" ]; then
+         CMD="--debug"
+         continue
+   elif [ "$CMD" = "--debug" ]; then
+         if [ -z "$PORT" ]; then
+               PORT=$c
+         fi
+   elif [ "$c" = "--stop" ] || [ "$c" = "-stop" ] || [ "$c" = "stop" ]; then
+         CMD="stop"
+   elif [ "$c" = "--start" ] || [ "$c" = "-start" ] || [ "$c" = "start" ]; then
+         CMD="start"
+   elif [ "$c" = "--version" ] || [ "$c" = "-version" ] || [ "$c" = "version" ]; then
+         CMD="version"
+   elif [ "$c" = "--restart" ] || [ "$c" = "-restart" ] || [ "$c" = "restart" ]; then
+         CMD="restart"
+   else
+       args="$args $c"
    fi
-   if [ -n "$JAVA_OPTS" ]; then
-     echo "Warning !!!. User specified JAVA_OPTS will be ignored, once you give the --debug option."
-   fi
-   CMD="RUN"
-   JAVA_OPTS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=$PORT"
-   echo "Please start the remote debugging client to continue..."
- fi
- if [ ! -x "$JAVACMD" ] ; then
-   echo "Error: JAVA_HOME is not defined correctly."
-   echo " CARBON cannot execute $JAVACMD"
+done
+
+if [ "$CMD" = "--debug" ]; then
+ if [ "$PORT" = "" ]; then
+   echo " Please specify the debug port after the --debug option"
    exit 1
  fi
- java \
- $JAVA_OPTS \
- -cp $CARBON_CLASSPATH \
- org.wso2.ei.dashboard.bootstrap.Bootstrap
+ if [ -n "$JAVA_OPTS" ]; then
+   echo "Warning !!!. User specified JAVA_OPTS will be ignored, once you give the --debug option."
+ fi
+ CMD="RUN"
+ JAVA_OPTS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=$PORT"
+ echo "Please start the remote debugging client to continue..."
+elif [ "$CMD" = "start" ]; then
+  if [ -e "$DASHBOARD_HOME/runtime.pid" ]; then
+    if  ps -p $PID > /dev/null ; then
+      echo "Process is already running"
+      exit 0
+    fi
+  fi
+# using nohup bash to avoid errors in solaris OS
+  nohup bash $DASHBOARD_HOME/bin/dashboard.sh $args > /dev/null 2>&1 &
+  exit 0
+elif [ "$CMD" = "stop" ]; then
+  kill -term `cat $DASHBOARD_HOME/runtime.pid`
+  exit 0
+elif [ "$CMD" = "restart" ]; then
+  kill -term `cat $DASHBOARD_HOME/runtime.pid`
+  process_status=0
+  pid=`cat $DASHBOARD_HOME/runtime.pid`
+  while [ "$process_status" -eq "0" ]
+  do
+        sleep 1;
+        ps -p$pid 2>&1 > /dev/null
+        process_status=$?
+  done
+# using nohup bash to avoid errors in solaris OS
+  nohup bash $DASHBOARD_HOME/bin/dashboard.sh $args > /dev/null 2>&1 &
+  exit 0
+elif [ "$CMD" = "version" ]; then
+  cat $DASHBOARD_HOME/bin/version.txt
+  exit 0
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+ echo "Error: JAVA_HOME is not defined correctly."
+ echo " CARBON cannot execute $JAVACMD"
+ exit 1
+fi
+
+java \
+$JAVA_OPTS \
+-cp $CARBON_CLASSPATH \
+org.wso2.ei.dashboard.bootstrap.Bootstrap

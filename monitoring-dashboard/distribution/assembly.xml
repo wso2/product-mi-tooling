@@ -41,8 +41,17 @@
             <outputDirectory>bin</outputDirectory>
             <includes>
                 <include>dashboard.sh</include>
+                <include>dashboard.bat</include>
             </includes>
             <fileMode>755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/target/classes</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>version.txt</include>
+            </includes>
+            <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources/dbscripts</directory>

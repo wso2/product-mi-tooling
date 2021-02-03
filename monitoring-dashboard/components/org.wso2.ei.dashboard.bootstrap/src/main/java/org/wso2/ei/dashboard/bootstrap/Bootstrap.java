@@ -29,7 +29,11 @@ import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
@@ -92,6 +96,7 @@ public class Bootstrap {
         server.setHandler(handlers);
         try {
             server.start();
+            writePID(dashboardHome);
             server.join();
             logger.info("Server started in port " + serverPort);
         } catch (Exception ex) {
@@ -119,5 +124,28 @@ public class Bootstrap {
         properties.put(MI_USERNAME , miUsername);
         properties.put(MI_PASSWORD, miPassword);
         System.setProperties(properties);
+    }
+
+    /**
+     * Write the process ID of this process to the file.
+     *
+     * @param runtimePath DASHBOARD_HOME sys property value.
+     */
+    private static void writePID(String runtimePath) {
+        // Adopted from: https://stackoverflow.com/a/7690178
+        String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        int indexOfAt = jvmName.indexOf('@');
+        if (indexOfAt < 1) {
+            logger.warn("Cannot extract current process ID from JVM name '" + jvmName + "'.");
+            return;
+        }
+        String pid = jvmName.substring(0, indexOfAt);
+
+        Path runtimePidFile = Paths.get(runtimePath, "runtime.pid");
+        try {
+            Files.write(runtimePidFile, pid.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.warn("Cannot write process ID '" + pid + "' to '" + runtimePidFile.toString() + "' file.", e);
+        }
     }
 }
