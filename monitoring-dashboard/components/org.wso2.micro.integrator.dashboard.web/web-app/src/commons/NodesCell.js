@@ -23,8 +23,9 @@ import TableCell from "@material-ui/core/TableCell";
 import Drawer from '@material-ui/core/Drawer';
 import TableRow from '@material-ui/core/TableRow'
 import { makeStyles } from '@material-ui/core/styles';
-import ProxySideDrawer from './sidedrawers/ProxySideDrawer';
-import HomePageSideDrawer from './sidedrawers/HomePageSideDrawer';
+import ProxySideDrawer from './sideDrawers/ProxySideDrawer';
+import EndpointSideDrawer from './sideDrawers/EndpointSideDrawer';
+import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -45,7 +46,7 @@ export default function NodesCell(props) {
     return <TableRow hover role="presentation">
         <TableCell onClick={toggleDrawer(true)} className={classes.tableCell}>{nodeData.nodeId}</TableCell>
         <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
-            <SideDrawer pageId={pageId} nodeData={nodeData}/>
+            <SideDrawer pageId={pageId} nodeData={nodeData} />
         </Drawer>
     </TableRow>;
 }
@@ -54,6 +55,8 @@ function SideDrawer(props) {
     switch(props.pageId) {
         case 'proxyPage':
             return <ProxySideDrawer nodeData={props.nodeData} />
+        case 'endpoints':
+            return <EndpointSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }

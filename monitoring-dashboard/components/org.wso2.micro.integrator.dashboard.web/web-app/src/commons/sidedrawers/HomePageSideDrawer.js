@@ -32,14 +32,6 @@ export default function HomePageSideDrawer(props) {
 
     const [open, setOpen] = React.useState(false);
 
-    const openSourceViewPopup = () => {
-        setOpen(true);
-    }
-
-    const closeSourceViewPopup = () => {
-        setOpen(false);
-    };
-
     const descriptionElementRef = React.useRef(null);
     React.useEffect(() => {
         if (open) {
@@ -51,14 +43,6 @@ export default function HomePageSideDrawer(props) {
     }, [open]);
 
     const classes = useStyles();
-
-    const changeServiceStatus = () => {
-        nodeData['isActive'] = !nodeData['isActive'];
-    };
-
-    const changeTracingStatus = () => {
-        nodeData.details['tracing'] = !nodeData.details['tracing'];
-    };
 
     return (
         <div className={classes.root}>
@@ -118,7 +102,6 @@ export default function HomePageSideDrawer(props) {
         </div>
     );
 }
-
 
 const useStyles = makeStyles((theme) => ({
     root: {

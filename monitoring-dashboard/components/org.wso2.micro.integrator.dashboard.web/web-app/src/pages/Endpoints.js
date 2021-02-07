@@ -19,40 +19,40 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class Endpoints extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "endpoints",
-                title: "Endpoints",
-                headCells: [
-                    {id: 'name', label: 'Endpoint Name'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'type', label: 'Type'},
-                    {id: 'state', label: 'State'}],
-                tableOrderBy: 'service'
-            },
-            endpointList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        type: "http",
-                        state: true
+export default function Endpoints() {
+    const [pageInfo, setPageInfo] = React.useState({
+        pageId: "endpoints",
+        title: "Endpoints",
+        headCells: [
+            {id: 'name', label: 'Endpoint Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'type', label: 'Type'},
+            {id: 'state', label: 'State'}],
+        tableOrderBy: 'service'
+    });
 
-                    },
-                    { nodeId: "node_02",
-                        type: "http",
-                        state: false
+    const [endpointList, setEndpointList] = React.useState([]);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <div>This page is under developement</div>
-        // return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.endpointList}/>;
-    }
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/endpoints?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setEndpointList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={endpointList}/>
 }

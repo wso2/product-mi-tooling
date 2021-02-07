@@ -39,8 +39,7 @@ export default function Nodes () {
     const globalGroupId = useSelector(state => state.groupId);
 
     React.useEffect(()=>{
-        // todo are we taking it from node filter, do we need to apply filter here as well?
-        if (globalGroupId !== 0) {
+        if (globalGroupId !== "") {
             const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/nodes");
             axios.get(url).then(response => {
                 response.data.map(data => data.details = JSON.parse(data.details))

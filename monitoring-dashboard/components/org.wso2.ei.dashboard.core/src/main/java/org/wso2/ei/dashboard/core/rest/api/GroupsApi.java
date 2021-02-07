@@ -457,7 +457,7 @@ public class GroupsApi {
 ,@Valid ApiUpdateRequestBody body) {
         return Response.ok().entity("magic!").build();
     }
-    @PUT
+    @PATCH
     @Path("/{group-id}/endpoints")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
