@@ -67,6 +67,8 @@ public class ConfigurationDelegate {
         switch (artifactType) {
             case Constants.PROXY_SERVICES:
                 return "proxyServiceName";
+            case Constants.ENDPOINTS:
+                return "endpointName";
             case Constants.APIS:
                 return "apiName";
             default:

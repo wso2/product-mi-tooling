@@ -223,14 +223,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EndpointList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "endpoints"
       summary: "Update endpoint"
@@ -243,7 +243,7 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Endpoint'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Endpoint update status"
@@ -1084,6 +1084,18 @@ components:
         details:
           type: string
 
+    Artifacts:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          nodes:
+            type: array
+            items:
+              $ref: '#/components/schemas/ArtifactDetails'
+
     ProxyList:
       type: array
       items:
@@ -1095,23 +1107,29 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ArtifactDetails'
-#                  todo update the example
         example: [
-        { ServiceName: HospitalProxy,
-          nodes: [
-          { nodeId: node_01,
-            isActive: true,
-            endpoints: ["http://localhost:8290/services/HospitalProxy","https://localhost:8253/services/HospitalProxy"],
-            details: [
-            { key: statistics,
-              value: disabled },
-            { key: tracing,
-              value: false  }
-            ]
-          },
-          ]
-        }
-        ]
+                  {"serviceName": "Airport",
+                   "nodes": [
+                      {
+                        "nodeId": "node_dev_1",
+                        "details": "{\"tracing\":\"disabled\",\"eprs\":[\"http://localhost:8290/services/Airport\",\"https://localhost:8253/services/Airport\"],\"stats\":\"disabled\",\"isRunning\":true,\"name\":\"Airport\",\"wsdl1_1\":\"http://localhost:8290/services/Airport?wsdl\",\"wsdl2_0\":\"http://localhost:8290/services/Airport?wsdl2\"}"
+                      },
+                    ]
+                  }
+                ]
+
+    ArtifactUpdateRequest:
+      type: object
+      properties:
+        artifactName:
+          type: string
+        nodeId:
+          type: string
+        type:
+          type: string
+        value:
+          type: boolean
+
     ProxyUpdateRequestBody:
       type: object
       properties:
@@ -1123,42 +1141,7 @@ components:
           type: string
         value:
           type: boolean
-    EndpointList:
-      type: array
-      items:
-        type: object
-        properties:
-          endpointName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                isActive:
-                  type: boolean
-                details:
-                  type: array
-                  description: Array contains type, tracing etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                properties:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    EndpointUpdateRequestBody:
-      type: object
-      properties:
-        epName:
-          type: string
-        nodeId:
-          type: string
-        isActive:
-          type: boolean
-        tracing:
-          type: boolean
+
     InboundEpList:
       type: array
       items:
@@ -1658,18 +1641,21 @@ components:
           schema:
             $ref: '#/components/schemas/HeartbeatRequest'
       description: "The request body to update proxy."
+
+    ArtifactUpdate:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ArtifactUpdateRequest'
+      description: "The request body to update artifact."
+
     Proxy:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ProxyUpdateRequestBody'
       description: "The request body to update proxy."
-    Endpoint:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/EndpointUpdateRequestBody'
-      description: "The request body to update endpoint."
+
     InboundEp:
       content:
         application/json:

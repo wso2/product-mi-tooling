@@ -24,8 +24,9 @@ import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.ProxyServicesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
+import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
-import org.wso2.ei.dashboard.core.rest.model.EndpointUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.InboundEpList;
@@ -47,7 +48,6 @@ import org.wso2.ei.dashboard.core.rest.model.ApiUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.CAppList;
 import org.wso2.ei.dashboard.core.rest.model.ConnectorList;
 import org.wso2.ei.dashboard.core.rest.model.DataserviceList;
-import org.wso2.ei.dashboard.core.rest.model.EndpointList;
 
 import java.io.File;
 
@@ -66,6 +66,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 
 import java.util.List;
 import javax.validation.constraints.*;
@@ -216,17 +217,18 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get endpoints by node ids", description = "", tags={ "endpoints" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of endpoints deployed in provided nodes", content = @Content(schema = @Schema(implementation = EndpointList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of endpoints deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getEndpointsByNodeIds( @PathParam("group-id")
+    public Response getEndpointsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
+        Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(endpointList).build();
     }
     @GET
     @Path("/{group-id}/inbound-endpoints")
@@ -461,14 +463,16 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Update endpoint", description = "", tags={ "endpoints" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Endpoint update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "Endpoint update status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response updateEndpoint( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid EndpointUpdateRequestBody body) {
-        return Response.ok().entity("magic!").build();
+    public Ack updateEndpoint(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) {
+        EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
+        return endpointsDelegate.updateArtifact(groupId, request);
     }
     @PUT
     @Path("/{group-id}/inbound-endpoints")

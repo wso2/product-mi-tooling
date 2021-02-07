@@ -310,7 +310,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EndpointList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -327,7 +327,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "endpoints" ],
         "summary" : "Update endpoint",
         "operationId" : "updateEndpoint",
@@ -343,7 +343,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Endpoint"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -1496,7 +1496,7 @@
         }, {
           "name" : "artifactName",
           "in" : "query",
-          "description" : "name of the artifact",
+          "description" : "Name of the artifact",
           "required" : true,
           "style" : "form",
           "explode" : true,
@@ -1618,10 +1618,33 @@
           }
         }
       },
+      "Artifacts" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Artifacts_inner"
+        }
+      },
       "ProxyList" : {
         "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/ProxyList_inner"
+        }
+      },
+      "ArtifactUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "artifactName" : {
+            "type" : "string"
+          },
+          "nodeId" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "boolean"
+          }
         }
       },
       "ProxyUpdateRequestBody" : {
@@ -1637,29 +1660,6 @@
             "type" : "string"
           },
           "value" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "EndpointList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/EndpointList_inner"
-        }
-      },
-      "EndpointUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "epName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "isActive" : {
-            "type" : "boolean"
-          },
-          "tracing" : {
             "type" : "boolean"
           }
         }
@@ -2013,6 +2013,20 @@
           }
         }
       },
+      "Artifacts_inner" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "nodes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ArtifactDetails"
+            }
+          }
+        }
+      },
       "ProxyList_inner" : {
         "type" : "object",
         "properties" : {
@@ -2027,55 +2041,12 @@
           }
         },
         "example" : [ {
-          "ServiceName" : "HospitalProxy",
+          "serviceName" : "Airport",
           "nodes" : [ {
-            "nodeId" : "node_01",
-            "isActive" : true,
-            "endpoints" : [ "http://localhost:8290/services/HospitalProxy", "https://localhost:8253/services/HospitalProxy" ],
-            "details" : [ {
-              "key" : "statistics",
-              "value" : "disabled"
-            }, {
-              "key" : "tracing",
-              "value" : false
-            } ]
+            "nodeId" : "node_dev_1",
+            "details" : "{\"tracing\":\"disabled\",\"eprs\":[\"http://localhost:8290/services/Airport\",\"https://localhost:8253/services/Airport\"],\"stats\":\"disabled\",\"isRunning\":true,\"name\":\"Airport\",\"wsdl1_1\":\"http://localhost:8290/services/Airport?wsdl\",\"wsdl2_0\":\"http://localhost:8290/services/Airport?wsdl2\"}"
           } ]
         } ]
-      },
-      "EndpointList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "endpointName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "isActive" : {
-                  "type" : "boolean"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, tracing etc.",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "properties" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
       },
       "InboundEpList_inner" : {
         "type" : "object",
@@ -2516,22 +2487,22 @@
           }
         }
       },
+      "ArtifactUpdate" : {
+        "description" : "The request body to update artifact.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/ArtifactUpdateRequest"
+            }
+          }
+        }
+      },
       "Proxy" : {
         "description" : "The request body to update proxy.",
         "content" : {
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/ProxyUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "Endpoint" : {
-        "description" : "The request body to update endpoint.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/EndpointUpdateRequestBody"
             }
           }
         }

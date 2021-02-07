@@ -44,16 +44,18 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
+import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
+import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
+
 /**
  * Fetch, store, update and delete artifact information of registered micro integrator nodes.
  */
 public class MiArtifactsManager implements ArtifactsManager {
     private static final Log log = LogFactory.getLog(MiArtifactsManager.class);
     private static final String SERVER = "server";
-    private static final String PROXY_SERVICES = "proxy-services";
-    private static final String APIS = "apis";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(PROXY_SERVICES, APIS)));
+            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -99,23 +101,24 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     private void fetchAllArtifactsAndStore() {
         String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
-        for (String artifact : ALL_ARTIFACTS) {
-            fetchAndStore(artifact, accessToken);
+        for (String artifactType : ALL_ARTIFACTS) {
+            final String url = heartbeat.getMgtApiUrl().concat(artifactType);
+            CloseableHttpResponse response = doGet(accessToken, url);
+            JsonObject artifacts = HttpUtils.getJsonResponse(response);
+            JsonArray list = artifacts.get("list").getAsJsonArray();
+            for (int i = 0; i < list.size(); i++) {
+                final String artifactName = list.get(i).getAsJsonObject().get("name").getAsString();
+                JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+                boolean isSuccess = databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(),
+                                                                   artifactType, artifactName,
+                                                                   artifactDetails.toString());
+                if (!isSuccess) {
+                    log.error("Error occurred while adding " + artifactName);
+                    addToDelayedQueue();
+                }
+            }
         }
         fetchAndStoreServers(accessToken);
-    }
-
-    private void fetchAndStore(String artifact, String accessToken) {
-        switch (artifact) {
-            case PROXY_SERVICES:
-                fetchAndStoreAllProxyServices(accessToken);
-                break;
-            case APIS:
-                fetchAndStoreAllApis(accessToken);
-                break;
-            default:
-                throw new DashboardServerException("Artifact type " + artifact + " is invalid.");
-        }
     }
 
     private void fetchAndStoreServers(String accessToken) {
@@ -131,43 +134,6 @@ public class MiArtifactsManager implements ArtifactsManager {
             log.error("Error occurred while adding server details of node: " + heartbeat.getNodeId() + " in group "
                       + heartbeat.getGroupId());
             addToDelayedQueue();
-        }
-    }
-
-    private void fetchAndStoreAllProxyServices(String accessToken) {
-        final String url = heartbeat.getMgtApiUrl() + PROXY_SERVICES;
-        CloseableHttpResponse response = doGet(accessToken, url);
-        JsonObject proxyServices = HttpUtils.getJsonResponse(response);
-        JsonArray serviceList = proxyServices.get("list").getAsJsonArray();
-        for (int i = 0; i < serviceList.size(); i++) {
-            final String serviceName = serviceList.get(i).getAsJsonObject().get("name").getAsString();
-            JsonObject proxyDetails = getArtifactDetails(PROXY_SERVICES, serviceName, accessToken);
-            boolean isSuccess = databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(),
-                                                               PROXY_SERVICES, serviceName, proxyDetails.toString());
-            if (!isSuccess) {
-                log.error("Error occurred while adding " + serviceName + " proxy details");
-                addToDelayedQueue();
-            }
-        }
-    }
-
-    private void fetchAndStoreAllApis(String accessToken) {
-        String url = heartbeat.getMgtApiUrl() + APIS;
-        CloseableHttpResponse response = doGet(accessToken, url);
-        JsonObject apis = HttpUtils.getJsonResponse(response);
-        int apiCount = apis.get("count").getAsInt();
-        if (apiCount > 0) {
-            JsonArray apiList = apis.get("list").getAsJsonArray();
-            for (int i = 0; i < apiCount; i++) {
-                String apiName = apiList.get(i).getAsJsonObject().get("name").getAsString();
-                JsonObject apiDetails = getArtifactDetails(APIS, apiName, accessToken);
-                boolean isSuccess = databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(), APIS,
-                                                                   apiName, apiDetails.toString());
-                if (!isSuccess) {
-                    log.error("Error occurred while adding " + apiName + " api details");
-                    addToDelayedQueue();
-                }
-            }
         }
     }
 
@@ -207,6 +173,9 @@ public class MiArtifactsManager implements ArtifactsManager {
             case PROXY_SERVICES:
                 getArtifactDetailsUrl = mgtApiUrl.concat(PROXY_SERVICES).concat("?proxyServiceName=")
                                                  .concat(artifactName);
+                break;
+            case ENDPOINTS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(ENDPOINTS).concat("?endpointName=").concat(artifactName);
                 break;
             case APIS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(APIS).concat("?apiName=").concat(artifactName);
