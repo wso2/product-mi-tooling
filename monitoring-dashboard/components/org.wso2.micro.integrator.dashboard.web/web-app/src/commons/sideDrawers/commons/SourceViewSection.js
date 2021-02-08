@@ -43,13 +43,15 @@ export default function SourceViewSection(props) {
         artifactName : artifactName
     };
 
-    const url = "http://0.0.0.0:9743/api/rest/configuration";
-    axios.get(url, {params}).then(response => {
-        setSource(response.data.configuration);
-    })
-
-    
     const [open, setOpen] = React.useState(false);
+
+    React.useEffect(() => {
+        const url = "http://0.0.0.0:9743/api/rest/configuration";
+        
+        axios.get(url, {params}).then(response => {
+            setSource(response.data.configuration);
+        })
+    },[])
 
     const openSourceViewPopup = () => {
         setOpen(true);
