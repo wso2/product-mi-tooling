@@ -116,7 +116,7 @@ function SwitchStatusCell(props) {
         }
         if(context !== "") {
             const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat(context);
-            axios.put(url, {
+            axios.patch(url, {
                 "artifactName": nodeData.details.name,
                 "nodeId": nodeData.nodeId,
                 "type": "status",
