@@ -26,6 +26,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ProxySideDrawer from './sideDrawers/ProxySideDrawer';
 import EndpointSideDrawer from './sideDrawers/EndpointSideDrawer';
 import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
+import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -57,6 +58,8 @@ function SideDrawer(props) {
             return <ProxySideDrawer nodeData={props.nodeData} />
         case 'endpoints':
             return <EndpointSideDrawer nodeData={props.nodeData} />
+        case 'apis':
+                return <ApiSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }

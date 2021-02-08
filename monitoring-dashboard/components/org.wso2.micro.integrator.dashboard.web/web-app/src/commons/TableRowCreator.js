@@ -51,6 +51,10 @@ export default function TableRowCreator(props) {
             case 'state':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} nodeData={node}/>)}</TableCell>
 
+            // Apis
+            case 'url':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.url} />)}</table></TableCell>
+
             case 'version':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>
             case 'size':
@@ -59,15 +63,10 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.package} />)}</table></TableCell>
             case 'description':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.description} />)}</table></TableCell>
-            
             case 'data_source_status':
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
             case 'statistic':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.statistic} />)}</table></TableCell>
-            case 'tracing':
-                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node}/>)}</TableCell>
-            case 'urls':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.urls} />)}</table></TableCell>
             case 'message_count':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.message_count}/>)}</TableCell>
             case 'protocol':
@@ -104,7 +103,7 @@ function SwitchStatusCell(props) {
     var isActive = nodeData.details.isActive;
     const globalGroupId = useSelector(state => state.groupId);
 
-    const changeEpState = () => {
+    const changeState = () => {
         isActive = !isActive
         updateArtifact()
     };
@@ -128,7 +127,7 @@ function SwitchStatusCell(props) {
 
     switch(pageId) {
         case 'endpoints':
-            return <tr><td><Switch checked={isActive} onChange={changeEpState}/></td></tr>
+            return <tr><td><Switch checked={isActive} onChange={changeState}/></td></tr>
     }
 }
 
