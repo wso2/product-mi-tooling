@@ -250,7 +250,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -444,14 +444,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "apis"
       summary: "Update API"
@@ -464,14 +464,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Api'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "API update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -1229,34 +1229,6 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/KeyValue'
-    ApiList:
-      type: array
-      items:
-        type: object
-        properties:
-          apiName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains contex, hostName, port, url, tracing etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    ApiUpdateRequestBody:
-      type: object
-      properties:
-        apiName:
-          type: string
-        nodeId:
-          type: string
-        tracing:
-          type: boolean
     TemplateList:
       type: array
       items:
@@ -1668,12 +1640,6 @@ components:
           schema:
             $ref: '#/components/schemas/MessageProcessorUpdateRequestBody'
       description: "The request body to update message processor."
-    Api:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiUpdateRequestBody'
-      description: "The request body to update API."
     Sequence:
       content:
         application/json:

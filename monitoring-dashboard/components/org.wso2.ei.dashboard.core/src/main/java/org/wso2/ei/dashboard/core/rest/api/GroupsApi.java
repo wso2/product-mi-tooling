@@ -43,8 +43,6 @@ import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 import org.wso2.ei.dashboard.core.rest.model.TaskList;
 import org.wso2.ei.dashboard.core.rest.model.TemplateList;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.ApiList;
-import org.wso2.ei.dashboard.core.rest.model.ApiUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.CAppList;
 import org.wso2.ei.dashboard.core.rest.model.ConnectorList;
 import org.wso2.ei.dashboard.core.rest.model.DataserviceList;
@@ -66,6 +64,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 
 import java.util.List;
@@ -132,17 +131,16 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get APIs by node ids", description = "", tags={ "apis" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of APIs deployed in provided nodes", content = @Content(schema = @Schema(implementation = ApiList.class))),
+        @ApiResponse(responseCode = "200", description = "List of APIs deployed in provided nodes", content = @Content(schema = @Schema(implementation = Artifacts.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getApisByNodeIds( @PathParam("group-id")
+    public Response getApisByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        ApisDelegate apisDelegate = new ApisDelegate();
+        Artifacts apiList = apisDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(apiList).build();
     }
     @GET
     @Path("/{group-id}/capps")
@@ -442,20 +440,21 @@ public class GroupsApi {
         return Response.ok().entity(nodeList).build();
     }
 
-    @PUT
+    @PATCH
     @Path("/{group-id}/apis")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @Operation(summary = "Update API", description = "", tags={ "apis" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "API update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response updateApi( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid ApiUpdateRequestBody body) {
-        return Response.ok().entity("magic!").build();
+        @ApiResponse(responseCode = "200", description = "API update status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Ack updateApi(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) {
+        ApisDelegate apisDelegate = new ApisDelegate();
+        return apisDelegate.updateArtifact(groupId, request);
     }
     @PATCH
     @Path("/{group-id}/endpoints")
