@@ -35,10 +35,11 @@ export default function NodeFilter () {
 
     const [nodeList, setNodeList] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
+    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(()=>{
         if (globalGroupId !== '') {
-            const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/nodes");
+            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/nodes");
             axios.get(url).then(response => {
                 var list = [];
                 response.data.map(data => list.push(data.nodeId))

@@ -36,7 +36,6 @@ import Paper from '@material-ui/core/Paper';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
-import Select from '@material-ui/core/Select';
 import { NavMenuItems, globalSettings } from './NavMenuItems';
 import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
@@ -56,20 +55,22 @@ import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
 import logo from '../images/logo.svg';
+import { useDispatch } from 'react-redux';
+import { setBasePath } from '../redux/Actions';
 
 export default function Dashboard() {
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
-    const [groupId, setGroupId]= React.useState('group_01');
     const handleDrawerOpen = () => {
         setOpen(true);
     };
     const handleDrawerClose = () => {
         setOpen(false);
     };
-    const handleGroupId = (event) => {
-        setGroupId(event.target.value);
-    };
+
+    const windowLocation = window.location.href;
+    const dispatch = useDispatch();
+    dispatch(setBasePath(windowLocation))
 
     return (
         <div className={classes.root}>

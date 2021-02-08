@@ -102,6 +102,7 @@ function SwitchStatusCell(props) {
     const { pageId, nodeData } = props;
     var isActive = nodeData.details.isActive;
     const globalGroupId = useSelector(state => state.groupId);
+    const basePath = useSelector(state => state.basePath);
 
     const changeState = () => {
         isActive = !isActive
@@ -115,7 +116,7 @@ function SwitchStatusCell(props) {
                 context = "/endpoints"
         }
         if(context !== "") {
-            const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat(context);
+            const url = basePath.concat('/groups/').concat(globalGroupId).concat(context);
             axios.patch(url, {
                 "artifactName": nodeData.details.name,
                 "nodeId": nodeData.nodeId,

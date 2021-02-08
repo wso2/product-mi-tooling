@@ -34,6 +34,7 @@ import { useSelector } from 'react-redux';
 export default function SourceViewSection(props) {
     const { artifactType, artifactName, nodeId } = props;
     const globalGroupId = useSelector(state => state.groupId);
+    const basePath = useSelector(state => state.basePath);
     const [source, setSource] = React.useState("");
     
     const params = {
@@ -46,7 +47,7 @@ export default function SourceViewSection(props) {
     const [open, setOpen] = React.useState(false);
 
     React.useEffect(() => {
-        const url = "http://0.0.0.0:9743/api/rest/configuration";
+        const url = basePath.concat('/configuration');
         
         axios.get(url, {params}).then(response => {
             setSource(response.data.configuration);

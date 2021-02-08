@@ -3,15 +3,16 @@ import axios from 'axios';
 import Box from '@material-ui/core/Box';
 import Select from '@material-ui/core/Select';
 import { changeGroup } from '../redux/Actions';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function GroupSelector() {
 
     const [groupList, setGroupList] = React.useState([]);
     const dispatch = useDispatch();
+    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(()=>{
-        const url = "http://0.0.0.0:9743/api/rest/groups/";
+        const url = basePath.concat('/groups/');
         let groups = [];
         
         axios.get(url).then(response => {

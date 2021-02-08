@@ -39,13 +39,14 @@ export default function Endpoints() {
 
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(() => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
-        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/endpoints?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/endpoints?nodes=").concat(nodeListQueryParams.slice(0,-7));
         axios.get(url).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))

@@ -78,7 +78,7 @@ public class Bootstrap {
         String[] pathnames = f.list();
         for (String pathname : pathnames) {
             WebAppContext webApp = new WebAppContext();
-            webApp.setContextPath("/api/");
+            webApp.setContextPath("/dashboard/");
             File warFile = new File(webAppsPath + File.separator + pathname);
             webApp.setExtractWAR(true);
             webApp.setWar(warFile.getAbsolutePath());
