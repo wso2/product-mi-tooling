@@ -30,7 +30,6 @@ import { useSelector } from 'react-redux';
 
 export default function TableRowCreator(props) {
     const { pageId, data, headers } = props;
-
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             // common
@@ -40,16 +39,17 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} />)}</table></TableCell>
 
             // Proxy Services
-            case 'service':
-                return <TableCell>{data.serviceName}</TableCell>
             case 'wsdlUrl':
                 return <TableCell><table>{data.nodes.map(node=><LinkCell data={node.details.wsdl1_1} />)}</table></TableCell>
-            
+            case 'isRunning':
+                return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
+                        nodeId={node.nodeId} status={node.details.isRunning}/>)}</TableCell>
             // Endpoints
             case 'type':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
             case 'state':
-                return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} nodeData={node}/>)}</TableCell>
+                return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
+                        nodeId={node.nodeId} status={node.details.state}/>)}</TableCell>
 
             // Apis
             case 'url':
@@ -99,8 +99,8 @@ function LinkCell(props) {
 }
 
 function SwitchStatusCell(props) {
-    const { pageId, nodeData } = props;
-    var isActive = nodeData.details.isActive;
+    const { pageId, artifactName, nodeId, status } = props;
+    var isActive = status;
     const globalGroupId = useSelector(state => state.groupId);
     const basePath = useSelector(state => state.basePath);
 
@@ -110,26 +110,16 @@ function SwitchStatusCell(props) {
     };
 
     const updateArtifact = () => {
-        var context = "";
-        switch(pageId) {
-            case 'endpoints':
-                context = "/endpoints"
-        }
-        if(context !== "") {
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat(context);
-            axios.patch(url, {
-                "artifactName": nodeData.details.name,
-                "nodeId": nodeData.nodeId,
-                "type": "status",
-                "value": isActive
-            });
-        }
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/").concat(pageId);
+        axios.patch(url, {
+            "artifactName": artifactName,
+            "nodeId": nodeId,
+            "type": "status",
+            "value": isActive
+        });
     }
 
-    switch(pageId) {
-        case 'endpoints':
-            return <tr><td><Switch checked={isActive} onChange={changeState}/></td></tr>
-    }
+    return <tr><td><Switch checked={isActive} onChange={changeState}/></td></tr>
 }
 
 const useStyles = makeStyles((theme) => ({

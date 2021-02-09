@@ -24,26 +24,29 @@ import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
 
 export default function ProxyService() {
-    const [pageInfo, setPageInfo] = React.useState({
-        pageId: "proxyPage",
+    const [pageInfo] = React.useState({
+        pageId: "proxy-services",
         title: "Proxy Services",
         headCells: [
-            {id: 'service', label: 'Service'},
+            {id: 'name', label: 'Service Name'},
             {id: 'nodes', label: 'Nodes'},
-            {id: 'wsdlUrl', label: 'WSDL 1.1'}],
-        tableOrderBy: 'service'
+            {id: 'wsdlUrl', label: 'WSDL 1.1'},
+            {id: 'isRunning', label: 'State'}
+        ],
+        tableOrderBy: 'name'
     });
     const [proxyList, setProxyList] = React.useState([]);
 
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
     
     React.useEffect(() => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
-        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
         axios.get(url).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))

@@ -31,7 +31,6 @@ import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
 export default function NodesCell(props) {
     const classes = useStyles();
     const { pageId, nodeData } = props;
-
     const [state, setState] = React.useState({
         openSideDrawer: false,
     });
@@ -54,12 +53,12 @@ export default function NodesCell(props) {
 
 function SideDrawer(props) {
     switch(props.pageId) {
-        case 'proxyPage':
+        case 'proxy-services':
             return <ProxySideDrawer nodeData={props.nodeData} />
         case 'endpoints':
             return <EndpointSideDrawer nodeData={props.nodeData} />
         case 'apis':
-                return <ApiSideDrawer nodeData={props.nodeData} />
+            return <ApiSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }

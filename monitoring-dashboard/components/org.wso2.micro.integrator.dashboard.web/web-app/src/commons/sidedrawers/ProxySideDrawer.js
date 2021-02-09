@@ -19,7 +19,6 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -27,160 +26,71 @@ import Typography from '@material-ui/core/Typography';
 import { Button, Table, TableCell, TableRow } from '@material-ui/core';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
-import Switch from "react-switch";
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import XMLViewer from 'react-xml-viewer';
-import Box from '@material-ui/core/Box';
-import { useSelector } from 'react-redux';
+import HeadingSection from './commons/HeadingSection'
+import TracingRow from './commons/TracingRow'
+import SourceViewSection from './commons/SourceViewSection'
 
 export default function ProxySideDrawer(props) {
-    const globalGroupId = useSelector(state => state.groupId);
     var nodeData = props.nodeData;
-    if(Object.keys(nodeData) !==0 ) {
-        if(nodeData.details['tracing'] == 'enabled') {
-            nodeData.details['tracing'] = true
-        } else {
-            nodeData.details['tracing'] = false
-        }
-    }
-
-    const params = {
-        groupId: globalGroupId,
-        nodeId: nodeData.nodeId,
-        artifactType : "proxy-services",
-        artifactName : nodeData.details.name
-    };
-      
-    const url = "http://0.0.0.0:9743/api/rest/configuration";
-    axios.get(url, {params}).then(response => {
-        nodeData.details.source = response.data.configuration;
-    })
-
-    const [open, setOpen] = React.useState(false);
-
-    const openSourceViewPopup = () => {
-        setOpen(true);
-    }
-
-    const closeSourceViewPopup = () => {
-        setOpen(false);
-    };
-
-    const descriptionElementRef = React.useRef(null);
-    React.useEffect(() => {
-        if (open) {
-            const { current: descriptionElement } = descriptionElementRef;
-            if (descriptionElement !== null) {
-                descriptionElement.focus();
-            }
-        }
-    }, [open]);
-
+    const nodeId = nodeData.nodeId;
+    const artifactName = nodeData.details.name; 
     const classes = useStyles();
-
-    const changeServiceStatus = () => {
-        nodeData.details['isRunning'] = !nodeData.details['isRunning'];
-        updateProxy("isRunning", nodeData.details['isRunning']);
-    };
-
-    const changeTracingStatus = () => {
-        nodeData.details['tracing'] = !nodeData.details['tracing'];
-        updateProxy("tracing", nodeData.details['tracing']);
-    };
-
-    const updateProxy = (type, value) => {
-        const url = "http://0.0.0.0:9743/api/rest/groups/".concat(globalGroupId).concat("/proxy-services");
-        axios.put(url, {
-            "serviceName": nodeData.details.name,
-            "nodeId": nodeData.nodeId,
-            "type": type,
-            "value": value
-        });
-    }
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <Paper className={classes.sideDrawerHeading} square>
-                        <Typography variant="h6" color="inherit" noWrap>
-                            {nodeData.details.name}
-                        </Typography>
-                        <Typography variant="h8" color="inherit" noWrap>
-                            {nodeData.nodeId}
-                        </Typography>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId}/>
                     <Paper className={classes.paper}>
-                        <Table>
-                            <TableRow>
-                                <TableCell>Service Status</TableCell>
-                                <TableCell><Switch checked={nodeData.details.isRunning} onChange={changeServiceStatus} /></TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Service Name</TableCell>
-                                <TableCell>{nodeData.details.name}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Statistics</TableCell>
-                                <TableCell>{nodeData.details.stats}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Tracing</TableCell>
-                                <TableCell>
-                                    <label>
-                                        <Switch checked={nodeData.details.tracing} onChange={changeTracingStatus}/>
-                                    </label>
-                                </TableCell>
-                            </TableRow>
-                        </Table>
+                            <ProxyServiceDetailPage nodeData={nodeData}/>
                     </Paper>
                 </Grid>
-                <Grid item xs={12}>
-                    <Paper className={classes.paper} square>
-                        <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                            Endpoints
-                        </Typography>
-                        <hr className={classes.horizontalLine}></hr>
-                    </Paper>
-                    <Paper className={classes.paper} square>
-                        <Table>
-                            {nodeData.details.eprs.map(ep =>
-                                <TableRow>{ep}
-                                    <CopyToClipboard text={ep} className={classes.clipboard}>
-                                        <Button><FileCopyIcon/></Button>
-                                    </CopyToClipboard>
-                                </TableRow>)}
-                        </Table>
-                    </Paper><br/>
-                    <Box textAlign='center'>
-                        <Button onClick={() => openSourceViewPopup()} variant="contained" color="primary">Source View</Button>
-                        <Dialog
-                            open={open}
-                            onClose={closeSourceViewPopup}
-                            aria-labelledby="scroll-dialog-title"
-                            aria-describedby="scroll-dialog-description"
-                            classes={classes.sourceView}
-                        >
-                            <DialogTitle id="scroll-dialog-title">{nodeData.details.name}</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText
-                                    id="scroll-dialog-description"
-                                    ref={descriptionElementRef}
-                                    tabIndex={-1}>
-                                    <XMLViewer xml={nodeData.details.source} />
-                                </DialogContentText>
-                            </DialogContent>
-                        </Dialog>
-                    </Box>
-                </Grid>
+                <EndpointsSection endpoints={nodeData.details.eprs}/>
+                <SourceViewSection artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
 }
 
+function ProxyServiceDetailPage(props) {
+    const nodeData = props.nodeData;
+    const artifactName = nodeData.details.name
+    const pageId = "proxy-services";
+    return <Table>
+                <TableRow>
+                    <TableCell>Service Name</TableCell>
+                    <TableCell>{artifactName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Statistics</TableCell>
+                    <TableCell>{nodeData.details.stats}</TableCell>
+                </TableRow>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
+            </Table>
+}
+
+function EndpointsSection(props) {
+    const endpoints = props.endpoints;
+    const classes = useStyles();
+    return <Grid item xs={12}>
+                <Paper className={classes.paper} square>
+                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                        Endpoints
+                    </Typography>
+                    <hr className={classes.horizontalLine}></hr>
+                </Paper>
+                <Paper className={classes.paper} square>
+                    <Table>
+                        {endpoints.map(ep =>
+                            <TableRow>{ep}
+                                <CopyToClipboard text={ep} className={classes.clipboard}>
+                                    <Button><FileCopyIcon/></Button>
+                                </CopyToClipboard>
+                            </TableRow>)}
+                    </Table>
+                </Paper>
+            </Grid>
+}
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -189,12 +99,6 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(2),
         color: theme.palette.text.secondary,
-    },
-    sideDrawerHeading: {
-        padding: theme.spacing(1),
-        height: '64px',
-        backgroundColor: '#3f51b5',
-        color: '#ffffff'
     },
     subTopic: {
         color: '#3f51b5'
@@ -206,9 +110,5 @@ const useStyles = makeStyles((theme) => ({
     },
     clipboard: {
         color: '#3f51b5'
-    },
-    sourceView: {
-        backgroundColor: 'red',
-        width: '2000px',
     }
 }));
