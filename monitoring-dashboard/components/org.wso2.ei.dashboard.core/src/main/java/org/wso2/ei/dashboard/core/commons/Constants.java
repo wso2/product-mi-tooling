@@ -36,6 +36,7 @@ public final class Constants {
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";
+    public static final String SEQUENCES = "sequences";
 
     // todo change this structure
 

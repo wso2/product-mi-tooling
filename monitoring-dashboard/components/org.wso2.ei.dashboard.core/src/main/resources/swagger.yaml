@@ -541,14 +541,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SequenceList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "sequences"
       summary: "Update sequence"
@@ -561,14 +561,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Sequence'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Sequence update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -1195,34 +1195,6 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/KeyValue'
-    SequenceList:
-      type: array
-      items:
-        type: object
-        properties:
-          sequenceName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains statistics, tracing etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    SequenceUpdateRequestBody:
-      type: object
-      properties:
-        sequenceName:
-          type: string
-        nodeId:
-          type: string
-        tracing:
-          type: boolean
     TaskList:
       type: array
       items:
@@ -1580,12 +1552,6 @@ components:
           schema:
             $ref: '#/components/schemas/MessageProcessorUpdateRequestBody'
       description: "The request body to update message processor."
-    Sequence:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SequenceUpdateRequestBody'
-      description: "The request body to update sequence."
     Logger:
       content:
         application/json:

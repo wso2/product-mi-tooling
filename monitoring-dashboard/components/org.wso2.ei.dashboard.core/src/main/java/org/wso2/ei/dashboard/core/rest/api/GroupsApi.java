@@ -35,8 +35,6 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.MessageProcessorList;
 import org.wso2.ei.dashboard.core.rest.model.MessageProcessorUpdateRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.SequenceList;
-import org.wso2.ei.dashboard.core.rest.model.SequenceUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 import org.wso2.ei.dashboard.core.rest.model.TaskList;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
@@ -63,6 +61,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
 
 import java.util.List;
@@ -349,17 +348,16 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get sequences by node ids", description = "", tags={ "sequences" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of sequences deployed in provided nodes", content = @Content(schema = @Schema(implementation = SequenceList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getSequencesByNodeIds( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        @ApiResponse(responseCode = "200", description = "List of sequences deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response getSequencesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+        SequencesDelegate sequencesDelegate = new SequencesDelegate();
+        Artifacts sequenceList = sequencesDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(sequenceList).build();
     }
     @GET
     @Path("/{group-id}/tasks")
@@ -520,18 +518,20 @@ public class GroupsApi {
         ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
         return proxyServiceDelegate.updateArtifact(groupId, request);
     }
-    @PUT
+    @PATCH
     @Path("/{group-id}/sequences")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @Operation(summary = "Update sequence", description = "", tags={ "sequences" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Sequence update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response updateSequence( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "Sequence update status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Ack updateSequence(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) {
 
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid SequenceUpdateRequestBody body) {
-        return Response.ok().entity("magic!").build();
+        SequencesDelegate sequencesDelegate = new SequencesDelegate();
+        return sequencesDelegate.updateArtifact(groupId, request);
     }}
