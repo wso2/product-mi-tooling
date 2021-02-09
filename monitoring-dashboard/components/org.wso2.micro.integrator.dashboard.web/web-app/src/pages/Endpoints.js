@@ -32,7 +32,7 @@ export default function Endpoints() {
             {id: 'nodes', label: 'Nodes'},
             {id: 'type', label: 'Type'},
             {id: 'state', label: 'State'}],
-        tableOrderBy: 'service'
+        tableOrderBy: 'name'
     });
 
     const [endpointList, setEndpointList] = React.useState([]);

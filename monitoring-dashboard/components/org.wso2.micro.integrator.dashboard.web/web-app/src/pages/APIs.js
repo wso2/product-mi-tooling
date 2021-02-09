@@ -31,7 +31,7 @@ export default function APIs() {
             {id: 'name', label: 'API Name'},
             {id: 'nodes', label: 'Nodes'},
             {id: 'url', label: 'URL'}],
-        tableOrderBy: 'service'
+        tableOrderBy: 'name'
     });
 
     const [apiList, setApiList] = React.useState([]);
