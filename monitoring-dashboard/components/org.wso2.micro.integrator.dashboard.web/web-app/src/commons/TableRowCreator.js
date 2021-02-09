@@ -55,6 +55,10 @@ export default function TableRowCreator(props) {
             case 'url':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.url} />)}</table></TableCell>
 
+            // Templates
+            case 'template_nodes':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.nodeId} />)}</table></TableCell>
+
             case 'version':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>
             case 'size':

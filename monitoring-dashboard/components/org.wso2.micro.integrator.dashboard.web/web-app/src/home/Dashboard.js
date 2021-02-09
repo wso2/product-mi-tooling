@@ -48,6 +48,7 @@ import InboundEndpoints from '../pages/InboundEndpoints';
 import MessageProcessors from '../pages/MessageProcessors'
 import MessageStores from '../pages/MessageStores'
 import APIs from '../pages/APIs'
+import Templates from '../pages/Templates'
 import Sequences from '../pages/Sequences';
 import DataServices from '../pages/DataServices';
 import Datasources from '../pages/Datasources';
@@ -146,6 +147,7 @@ export default function Dashboard() {
                                         <Route exact path='/message_processors' component={MessageProcessors}/>
                                         <Route exact path='/message_stores' component={MessageStores}/>
                                         <Route exact path='/apis' component={APIs}/>
+                                        <Route exact path='/templates' component={Templates}/>
                                         <Route exact path='/sequences' component={Sequences}/>
                                         <Route exact path='/data_services' component={DataServices}/>
                                         <Route exact path='/datasources' component={Datasources}/>
