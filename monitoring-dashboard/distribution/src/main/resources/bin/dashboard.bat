@@ -131,7 +131,7 @@ rem ----------------- Execute The Requested Command ----------------------------
 PATH %PATH%;%JAVA_HOME%\bin\
 
 :runJava
-"%JAVA_HOME%\bin\java" %JAVA_OPTS% -classpath %CARBON_CLASSPATH% org.wso2.ei.dashboard.bootstrap.Bootstrap %CMD%
+"%JAVA_HOME%\bin\java" %JAVA_OPTS% -Dlog4j.configurationFile=%DASHBOARD_HOME%/conf/log4j2.properties -Dwso2.runtime.path=%DASHBOARD_HOME% -classpath %CARBON_CLASSPATH% org.wso2.ei.dashboard.bootstrap.Bootstrap %CMD%
 
 :end
 goto endLocal

@@ -21,8 +21,8 @@ package org.wso2.ei.dashboard.bootstrap;
 
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -97,8 +97,8 @@ public class Bootstrap {
         try {
             server.start();
             writePID(dashboardHome);
-            server.join();
             logger.info("Server started in port " + serverPort);
+            server.join();
         } catch (Exception ex) {
             logger.error("Error while starting up the server", ex);
         }

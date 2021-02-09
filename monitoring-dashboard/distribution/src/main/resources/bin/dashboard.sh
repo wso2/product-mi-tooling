@@ -115,5 +115,7 @@ fi
 
 java \
 $JAVA_OPTS \
+-Dlog4j.configurationFile=$DASHBOARD_HOME/conf/log4j2.properties \
+-Dwso2.runtime.path="$DASHBOARD_HOME" \
 -cp $CARBON_CLASSPATH \
 org.wso2.ei.dashboard.bootstrap.Bootstrap
