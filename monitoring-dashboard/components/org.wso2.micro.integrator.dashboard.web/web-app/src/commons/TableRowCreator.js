@@ -59,6 +59,10 @@ export default function TableRowCreator(props) {
             case 'template_nodes':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.nodeId} />)}</table></TableCell>
 
+            // Sequences
+            case 'statistic':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.stats} />)}</table></TableCell>
+
             case 'version':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>
             case 'size':
@@ -69,8 +73,6 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.description} />)}</table></TableCell>
             case 'data_source_status':
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
-            case 'statistic':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.statistic} />)}</table></TableCell>
             case 'message_count':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.message_count}/>)}</TableCell>
             case 'protocol':

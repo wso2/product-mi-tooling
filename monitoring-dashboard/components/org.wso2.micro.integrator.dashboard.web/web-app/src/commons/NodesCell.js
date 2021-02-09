@@ -27,6 +27,7 @@ import ProxySideDrawer from './sideDrawers/ProxySideDrawer';
 import EndpointSideDrawer from './sideDrawers/EndpointSideDrawer';
 import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
 import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
+import SequenceSideDrawer from './sideDrawers/SequenceSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -59,6 +60,8 @@ function SideDrawer(props) {
             return <EndpointSideDrawer nodeData={props.nodeData} />
         case 'apis':
             return <ApiSideDrawer nodeData={props.nodeData} />
+        case 'sequences':
+            return <SequenceSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }

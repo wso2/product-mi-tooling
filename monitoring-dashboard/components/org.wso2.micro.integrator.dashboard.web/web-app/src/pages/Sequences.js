@@ -19,39 +19,40 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class Sequences extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "sequences",
-                title: "Sequences",
-                headCells: [
-                    {id: 'name', label: 'Sequence'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'statistic', label: 'Statistic'},
-                    {id: 'tracing', label: 'Tracing'}],
-                tableOrderBy: 'service'
-            },
-            sequenceList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        statistic: "disable",
-                        tracing: true
+export default function Sequences() {
+    const [pageInfo] = React.useState({
+        pageId: "sequences",
+        title: "Sequences",
+        headCells: [
+            {id: 'name', label: 'Sequence Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'statistic', label: 'Statistics'}],
+        tableOrderBy: 'name'
+    });
 
-                    },
-                    { nodeId: "node_02",
-                        statistic: "enable",
-                        tracing: false
+    const [sequenceList, setSequenceList] = React.useState([]);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.sequenceList}/>;
-    }
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
+
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/sequences?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setSequenceList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={sequenceList}/>
 }
