@@ -49,7 +49,7 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
             case 'state':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
-                        nodeId={node.nodeId} status={node.details.state}/>)}</TableCell>
+                        nodeId={node.nodeId} status={node.details.isActive}/>)}</TableCell>
 
             // Apis
             case 'url':
