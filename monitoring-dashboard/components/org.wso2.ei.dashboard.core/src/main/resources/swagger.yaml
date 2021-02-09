@@ -161,14 +161,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProxyList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "proxyServices"
       summary: "Update proxy service"
@@ -181,7 +181,7 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Proxy'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Proxy update status"
@@ -1096,44 +1096,10 @@ components:
             items:
               $ref: '#/components/schemas/ArtifactDetails'
 
-    ProxyList:
-      type: array
-      items:
-        type: object
-        properties:
-          ServiceName:
-            type: string
-          nodes:
-            type: array
-            items:
-              $ref: '#/components/schemas/ArtifactDetails'
-        example: [
-                  {"serviceName": "Airport",
-                   "nodes": [
-                      {
-                        "nodeId": "node_dev_1",
-                        "details": "{\"tracing\":\"disabled\",\"eprs\":[\"http://localhost:8290/services/Airport\",\"https://localhost:8253/services/Airport\"],\"stats\":\"disabled\",\"isRunning\":true,\"name\":\"Airport\",\"wsdl1_1\":\"http://localhost:8290/services/Airport?wsdl\",\"wsdl2_0\":\"http://localhost:8290/services/Airport?wsdl2\"}"
-                      },
-                    ]
-                  }
-                ]
-
     ArtifactUpdateRequest:
       type: object
       properties:
         artifactName:
-          type: string
-        nodeId:
-          type: string
-        type:
-          type: string
-        value:
-          type: boolean
-
-    ProxyUpdateRequestBody:
-      type: object
-      properties:
-        serviceName:
           type: string
         nodeId:
           type: string
@@ -1620,13 +1586,6 @@ components:
           schema:
             $ref: '#/components/schemas/ArtifactUpdateRequest'
       description: "The request body to update artifact."
-
-    Proxy:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProxyUpdateRequestBody'
-      description: "The request body to update proxy."
 
     InboundEp:
       content:

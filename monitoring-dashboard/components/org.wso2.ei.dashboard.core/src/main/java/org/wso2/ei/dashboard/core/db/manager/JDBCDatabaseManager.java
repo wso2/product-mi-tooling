@@ -33,8 +33,6 @@ import org.wso2.ei.dashboard.core.rest.model.ArtifactsInner;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
-import org.wso2.ei.dashboard.core.rest.model.ProxyList;
-import org.wso2.ei.dashboard.core.rest.model.ProxyListInner;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -220,52 +218,6 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return artifacts;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred fetching " + artifactType, e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
-        }
-    }
-
-    @Override
-    public ProxyList fetchProxyServices(String groupId, List<String> nodeList) {
-
-        ProxyList proxyList = new ProxyList();
-        String nodeSearch = "";
-        for (int i = 0; i < nodeList.size(); i++) {
-            nodeSearch = nodeSearch.concat("NODE_ID=? OR ");
-        }
-        if (!nodeSearch.equals("")) {
-            nodeSearch = nodeSearch.substring(0, nodeSearch.length() - 4);
-        }
-        String getDistinctNamesQuery = "SELECT DISTINCT NAME FROM PROXY_SERVICES WHERE GROUP_ID=? " +
-                                       "AND (" + nodeSearch + ");";
-
-        String getServicesQuery = "SELECT NODE_ID, DETAILS FROM PROXY_SERVICES WHERE NAME=? AND GROUP_ID=? AND " +
-                                  "(" + nodeSearch + ");";
-
-        Connection con = null;
-        PreparedStatement statement = null;
-
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(getDistinctNamesQuery);
-            statement.setString(1, groupId);
-            for (int i = 0, j = 2; i < nodeList.size(); i++, j++) {
-                statement.setString(j, nodeList.get(i));
-            }
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                ProxyListInner proxyListInner = new ProxyListInner();
-                String serviceName = resultSet.getString("NAME");
-                proxyListInner.setServiceName(serviceName);
-                List<ArtifactDetails> artifactDetails = getArtifactDetails(getServicesQuery, serviceName, groupId,
-                                                                           nodeList);
-                proxyListInner.setNodes(artifactDetails);
-                proxyList.add(proxyListInner);
-            }
-            return proxyList;
-        } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred fetching proxy services.", e);
         } finally {
             closeStatement(statement);
             closeConnection(con);

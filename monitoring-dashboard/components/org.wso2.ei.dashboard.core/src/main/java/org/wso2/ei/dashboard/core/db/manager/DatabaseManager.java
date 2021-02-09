@@ -24,7 +24,6 @@ import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
-import org.wso2.ei.dashboard.core.rest.model.ProxyList;
 
 import java.util.List;
 
@@ -45,8 +44,6 @@ public interface DatabaseManager {
     NodeList fetchNodes(String groupId);
 
     Artifacts fetchArtifacts(String artifactType, String groupId, List<String> nodeList);
-
-    ProxyList fetchProxyServices(String groupId, List<String> nodeList);
 
     String getMgtApiUrl(String groupId, String nodeId);
 

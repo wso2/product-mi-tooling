@@ -215,7 +215,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ProxyList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -232,7 +232,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "proxyServices" ],
         "summary" : "Update proxy service",
         "operationId" : "updateProxyService",
@@ -248,7 +248,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Proxy"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -351,7 +351,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -649,7 +649,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ApiList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -666,7 +666,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "apis" ],
         "summary" : "Update API",
         "operationId" : "updateApi",
@@ -682,7 +682,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Api"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -690,7 +690,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -1624,33 +1624,10 @@
           "$ref" : "#/components/schemas/Artifacts_inner"
         }
       },
-      "ProxyList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/ProxyList_inner"
-        }
-      },
       "ArtifactUpdateRequest" : {
         "type" : "object",
         "properties" : {
           "artifactName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "type" : {
-            "type" : "string"
-          },
-          "value" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "ProxyUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "serviceName" : {
             "type" : "string"
           },
           "nodeId" : {
@@ -1708,26 +1685,6 @@
         "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/MessageStoreList_inner"
-        }
-      },
-      "ApiList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/ApiList_inner"
-        }
-      },
-      "ApiUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "apiName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "tracing" : {
-            "type" : "boolean"
-          }
         }
       },
       "TemplateList" : {
@@ -2027,27 +1984,6 @@
           }
         }
       },
-      "ProxyList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "ServiceName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/ArtifactDetails"
-            }
-          }
-        },
-        "example" : [ {
-          "serviceName" : "Airport",
-          "nodes" : [ {
-            "nodeId" : "node_dev_1",
-            "details" : "{\"tracing\":\"disabled\",\"eprs\":[\"http://localhost:8290/services/Airport\",\"https://localhost:8253/services/Airport\"],\"stats\":\"disabled\",\"isRunning\":true,\"name\":\"Airport\",\"wsdl1_1\":\"http://localhost:8290/services/Airport?wsdl\",\"wsdl2_0\":\"http://localhost:8290/services/Airport?wsdl2\"}"
-          } ]
-        } ]
-      },
       "InboundEpList_inner" : {
         "type" : "object",
         "properties" : {
@@ -2135,32 +2071,6 @@
                 },
                 "paramaters" : {
                   "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "ApiList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "apiName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains contex, hostName, port, url, tracing etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2497,16 +2407,6 @@
           }
         }
       },
-      "Proxy" : {
-        "description" : "The request body to update proxy.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/ProxyUpdateRequestBody"
-            }
-          }
-        }
-      },
       "InboundEp" : {
         "description" : "The request body to update inbound endpoint.",
         "content" : {
@@ -2523,16 +2423,6 @@
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/MessageProcessorUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "Api" : {
-        "description" : "The request body to update API.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/ApiUpdateRequestBody"
             }
           }
         }

@@ -22,7 +22,6 @@ package org.wso2.ei.dashboard.core.rest.api;
 
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
-import org.wso2.ei.dashboard.core.rest.delegates.ProxyServicesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
@@ -36,7 +35,6 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.MessageProcessorList;
 import org.wso2.ei.dashboard.core.rest.model.MessageProcessorUpdateRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.ProxyList;
 import org.wso2.ei.dashboard.core.rest.model.SequenceList;
 import org.wso2.ei.dashboard.core.rest.model.SequenceUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
@@ -52,7 +50,6 @@ import java.io.File;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.MessageStoreList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
-import org.wso2.ei.dashboard.core.rest.model.ProxyUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.User;
 
 import javax.ws.rs.*;
@@ -66,6 +63,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
 
 import java.util.List;
 import javax.validation.constraints.*;
@@ -333,14 +331,16 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get proxy services by node ids", description = "", tags={ "proxyServices" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of proxy services deployed in provided nodes", content = @Content(schema = @Schema(implementation = ProxyList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of proxy services deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
     public Response getProxyServicesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes) {
-        ProxyServicesDelegate proxyServicesDelegate = new ProxyServicesDelegate();
-        ProxyList proxyList = proxyServicesDelegate.getProxyServices(groupId, nodes);
+        ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
+        Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
         return Response.ok().entity(proxyList).build();
     }
 
@@ -503,20 +503,22 @@ public class GroupsApi {
 ,@Valid MessageProcessorUpdateRequestBody body) {
         return Response.ok().entity("magic!").build();
     }
-    @PUT
+    @PATCH
     @Path("/{group-id}/proxy-services")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @Operation(summary = "Update proxy service", description = "", tags={ "proxyServices" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Proxy update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "Proxy update status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Ack updateProxyService(@PathParam("group-id")
-                                            @Parameter(description = "Group ID of the node") String groupId,
-                                  @Valid ProxyUpdateRequestBody body) {
-        ProxyServicesDelegate proxyServicesDelegate = new ProxyServicesDelegate();
-        return proxyServicesDelegate.updateProxyService(groupId, body);
+    public Ack updateProxyService(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) {
+        ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
+        return proxyServiceDelegate.updateArtifact(groupId, request);
     }
     @PUT
     @Path("/{group-id}/sequences")
