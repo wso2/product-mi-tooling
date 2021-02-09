@@ -86,20 +86,8 @@ function ApiDetailTable(props) {
                     <TableCell>{nodeData.details.context}</TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell>Host Name</TableCell>
-                    <TableCell>{nodeData.details.host}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Port</TableCell>
-                    <TableCell>{nodeData.details.port}</TableCell>
-                </TableRow>
-                <TableRow>
                     <TableCell>URL</TableCell>
                     <CopyToClipboardCell text={nodeData.details.url}/>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Version</TableCell>
-                    <TableCell>{nodeData.details.version}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell>Statistics</TableCell>
