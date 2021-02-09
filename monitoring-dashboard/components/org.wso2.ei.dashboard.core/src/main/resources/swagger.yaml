@@ -506,7 +506,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TemplateList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -1195,25 +1195,6 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/KeyValue'
-    TemplateList:
-      type: array
-      items:
-        type: object
-        properties:
-          templateName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                type:
-                  type: string
-                  enum:
-                    - Endpoint Template
-                    - Sequence Template
     SequenceList:
       type: array
       items:

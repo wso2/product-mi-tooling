@@ -466,6 +466,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 return "ENDPOINTS";
             case Constants.APIS:
                 return "APIS";
+            case Constants.TEMPLATES:
+                return "TEMPLATES";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }

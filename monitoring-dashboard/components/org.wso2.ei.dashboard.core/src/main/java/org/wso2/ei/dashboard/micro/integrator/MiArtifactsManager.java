@@ -47,6 +47,7 @@ import java.util.concurrent.Executors;
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
+import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
 
 /**
  * Fetch, store, update and delete artifact information of registered micro integrator nodes.
@@ -55,7 +56,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final Log log = LogFactory.getLog(MiArtifactsManager.class);
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS)));
+            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS, TEMPLATES)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -105,20 +106,46 @@ public class MiArtifactsManager implements ArtifactsManager {
             final String url = heartbeat.getMgtApiUrl().concat(artifactType);
             CloseableHttpResponse response = doGet(accessToken, url);
             JsonObject artifacts = HttpUtils.getJsonResponse(response);
-            JsonArray list = artifacts.get("list").getAsJsonArray();
-            for (int i = 0; i < list.size(); i++) {
-                final String artifactName = list.get(i).getAsJsonObject().get("name").getAsString();
-                JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
-                boolean isSuccess = databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(),
-                                                                   artifactType, artifactName,
-                                                                   artifactDetails.toString());
-                if (!isSuccess) {
-                    log.error("Error occurred while adding " + artifactName);
-                    addToDelayedQueue();
+            if (artifactType.equals(TEMPLATES)) {
+                JsonArray sequences = artifacts.get("sequenceTemplateList").getAsJsonArray();
+                JsonArray endpoints = artifacts.get("endpointTemplateList").getAsJsonArray();
+
+                for (int i = 0; i < sequences.size(); i++) {
+                    final String artifactName = sequences.get(i).getAsJsonObject().get("name").getAsString();
+                    JsonObject artifactDetails = new JsonObject();
+                    artifactDetails.addProperty("name", artifactName);
+                    artifactDetails.addProperty("type", "Sequence Template");
+                    insertArtifact(artifactType, artifactName, artifactDetails);
+                }
+
+                for (int i = 0; i < endpoints.size(); i++) {
+                    final String artifactName = endpoints.get(i).getAsJsonObject().get("name").getAsString();
+                    JsonObject artifactDetails = new JsonObject();
+                    artifactDetails.addProperty("name", artifactName);
+                    artifactDetails.addProperty("type", "Endpoint Template");
+                    insertArtifact(artifactType, artifactName, artifactDetails);
+                }
+
+            } else {
+                JsonArray list = artifacts.get("list").getAsJsonArray();
+                for (int i = 0; i < list.size(); i++) {
+                    final String artifactName = list.get(i).getAsJsonObject().get("name").getAsString();
+                    JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+                    insertArtifact(artifactType, artifactName, artifactDetails);
                 }
             }
         }
         fetchAndStoreServers(accessToken);
+    }
+
+    private void insertArtifact(String artifactType, String artifactName, JsonObject artifactDetails) {
+        boolean isSuccess = databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(),
+                                                           artifactType, artifactName,
+                                                           artifactDetails.toString());
+        if (!isSuccess) {
+            log.error("Error occurred while adding " + artifactName);
+            addToDelayedQueue();
+        }
     }
 
     private void fetchAndStoreServers(String accessToken) {
@@ -179,6 +206,9 @@ public class MiArtifactsManager implements ArtifactsManager {
                 break;
             case APIS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(APIS).concat("?apiName=").concat(artifactName);
+                break;
+            case TEMPLATES:
+                getArtifactDetailsUrl = mgtApiUrl.concat(TEMPLATES).concat("?templateName=").concat(artifactName);
                 break;
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
