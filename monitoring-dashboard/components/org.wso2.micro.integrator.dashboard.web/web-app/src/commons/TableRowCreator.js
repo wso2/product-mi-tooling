@@ -51,6 +51,10 @@ export default function TableRowCreator(props) {
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
                         nodeId={node.nodeId} status={node.details.isActive}/>)}</TableCell>
 
+            // Inbound Endpoints
+            case 'protocol':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.protocol} />)}</table></TableCell>
+
             // Apis
             case 'url':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.url} />)}</table></TableCell>
@@ -75,8 +79,6 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
             case 'message_count':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.message_count}/>)}</TableCell>
-            case 'protocol':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.protocol} proxyName={data['service']}/>)}</table></TableCell>
             case 'port':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
             

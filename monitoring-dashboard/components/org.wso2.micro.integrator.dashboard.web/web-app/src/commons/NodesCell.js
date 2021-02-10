@@ -28,6 +28,7 @@ import EndpointSideDrawer from './sideDrawers/EndpointSideDrawer';
 import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
 import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
 import SequenceSideDrawer from './sideDrawers/SequenceSideDrawer';
+import InboundEpSideDrawer from './sideDrawers/InboundEpSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -62,6 +63,8 @@ function SideDrawer(props) {
             return <ApiSideDrawer nodeData={props.nodeData} />
         case 'sequences':
             return <SequenceSideDrawer nodeData={props.nodeData} />
+        case 'inbound-endpoints':
+            return <InboundEpSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }
