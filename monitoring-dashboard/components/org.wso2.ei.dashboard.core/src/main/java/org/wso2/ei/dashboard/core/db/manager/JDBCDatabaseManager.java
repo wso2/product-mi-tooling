@@ -481,6 +481,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 return "TEMPLATES";
             case Constants.SEQUENCES:
                 return "SEQUENCES";
+            case Constants.TASKS:
+                return "TASKS";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }

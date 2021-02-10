@@ -32,7 +32,6 @@ import org.wso2.ei.dashboard.core.rest.model.LocalEntryList;
 import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
-import org.wso2.ei.dashboard.core.rest.model.TaskList;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.CAppList;
 import org.wso2.ei.dashboard.core.rest.model.ConnectorList;
@@ -60,6 +59,7 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegat
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
 
 import java.util.List;
@@ -364,17 +364,17 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get tasks by node ids", description = "", tags={ "tasks" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of tasks deployed in provided nodes", content = @Content(schema = @Schema(implementation = TaskList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getTasksByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of tasks deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getTasksByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        TasksDelegate tasksDelegate = new TasksDelegate();
+        Artifacts tasksList = tasksDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(tasksList).build();
     }
     @GET
     @Path("/{group-id}/templates")

@@ -52,6 +52,7 @@ import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
 import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
+import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
 import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
 
 /**
@@ -61,8 +62,8 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final Log log = LogFactory.getLog(MiArtifactsManager.class);
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS, TEMPLATES, SEQUENCES, INBOUND_ENDPOINTS,
-                                        MESSAGE_STORES, MESSAGE_PROCESSORS)));
+            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, INBOUND_ENDPOINTS, MESSAGE_PROCESSORS,
+                                        MESSAGE_STORES, APIS, TEMPLATES, SEQUENCES, TASKS)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -239,6 +240,9 @@ public class MiArtifactsManager implements ArtifactsManager {
                 break;
             case SEQUENCES:
                 getArtifactDetailsUrl = mgtApiUrl.concat(SEQUENCES).concat("?sequenceName=").concat(artifactName);
+                break;
+            case TASKS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(TASKS).concat("?taskName=").concat(artifactName);
                 break;
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");

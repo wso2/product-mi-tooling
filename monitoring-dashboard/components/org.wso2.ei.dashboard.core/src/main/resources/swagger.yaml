@@ -603,7 +603,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TaskList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -1107,30 +1107,6 @@ components:
           type: string
         value:
           type: boolean
-    TaskList:
-      type: array
-      items:
-        type: object
-        properties:
-          taskName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains group, implementation etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                triggerDetails:
-                  type: array
-                  description: Array contains trigger, count, interval etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
     LocalEntryList:
       type: array
       items:
