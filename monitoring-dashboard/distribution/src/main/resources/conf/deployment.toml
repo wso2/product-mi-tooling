@@ -9,3 +9,7 @@ pool_size = 10
 url = "jdbc:h2:mem:ei-dashboard-db;DB_CLOSE_DELAY=-1"
 username = "wso2carbon"
 password = "wso2carbon"
+
+[mi_user_store]
+username = "admin"
+password = "admin"

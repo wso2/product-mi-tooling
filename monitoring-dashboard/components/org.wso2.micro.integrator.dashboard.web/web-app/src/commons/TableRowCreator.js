@@ -19,23 +19,54 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import NodesCell from '../commons/NodesCell';
+import NodesCell from './NodesCell';
 import StatusCell from '../commons/StatusCell';
-import SwitchStatusCell from '../commons/SwitchStatusCell';
-import Drawer from '@material-ui/core/Drawer';
+import Switch from "react-switch";
 import { makeStyles } from '@material-ui/core/styles';
-import NodeInfoSideDrawer from '../commons/NodeInfoSideDrawer';
+import { useSelector } from 'react-redux';
 
 export default function TableRowCreator(props) {
-    const { pageInfo, data, headers } = props;
+    const { pageId, data, headers } = props;
     return <TableRow>
         {headers.map(header => {switch(header.id) {
+            // common
             case 'name':
                 return <TableCell>{data.name}</TableCell>
             case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell data={node} proxyName={data['service']}/>)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} />)}</table></TableCell>
+
+            // Proxy Services
+            case 'wsdlUrl':
+                return <TableCell><table>{data.nodes.map(node=><LinkCell data={node.details.wsdl1_1} />)}</table></TableCell>
+            case 'isRunning':
+                return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
+                        nodeId={node.nodeId} status={node.details.isRunning}/>)}</TableCell>
+            // Endpoints
+            case 'type':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
+            case 'state':
+                return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
+                        nodeId={node.nodeId} status={node.details.isActive}/>)}</TableCell>
+
+            // Inbound Endpoints
+            case 'protocol':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.protocol} />)}</table></TableCell>
+
+            // Apis
+            case 'url':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.url} />)}</table></TableCell>
+
+            // Templates
+            case 'template_nodes':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.nodeId} />)}</table></TableCell>
+
+            // Sequences
+            case 'statistic':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.stats} />)}</table></TableCell>
+
             case 'version':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>
             case 'size':
@@ -44,67 +75,61 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.package} />)}</table></TableCell>
             case 'description':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.description} />)}</table></TableCell>
-            case 'type':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.type} />)}</table></TableCell>
-            case 'status':
-                return <TableCell>{data.status}</TableCell>
             case 'data_source_status':
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
-            case 'wsdlUrl':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.wsdlURL} />)}</table></TableCell>
-            case 'statistic':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.statistic} />)}</table></TableCell>
-            case 'tracing':
-                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node}/>)}</TableCell>
-            case 'urls':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.urls} />)}</table></TableCell>
             case 'message_count':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.message_count}/>)}</TableCell>
-            case 'protocol':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.protocol} proxyName={data['service']}/>)}</table></TableCell>
             case 'port':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
-            case 'state':
-                return <TableCell>{data.nodes.map(node=><SwitchStatusCell data={node.state}/>)}</TableCell>
-            case 'service':
-                return <TableCell>{data.service}</TableCell>
+            
+            // Node page
             case 'nodeId':
-                return <TableCell>{data.nodeId}</TableCell>
+                return <TableCell><table><NodesCell pageId={pageId} nodeData={data}/></table></TableCell>
+            case 'node_status':
+                return <TableCell>Active</TableCell>
             case 'role':
-                return <TableCell>{data.role}</TableCell>
-            case 'upTime':
-                return <TableCell>{data.upTime}</TableCell>
+                return <TableCell>Member</TableCell>
             default:
                 <TableCell>Table data not available</TableCell>
         }})}
     </TableRow>
 }
 
-function NodeIDCell(props) {
-    const {data} = props;
+function StringCell(props) {
+    var data = props.data
+    return <tr><td>{data}</td></tr>
+}
+
+function LinkCell(props) {
     const classes = useStyles();
+    var data = props.data
+    return <tr><td><a className={classes.tableCell} href={data}>{data}</a></td></tr>
+}
 
-    const [state, setState] = React.useState({
-        openSideDrawer: false,
-    });
+function SwitchStatusCell(props) {
+    const { pageId, artifactName, nodeId, status } = props;
+    var isActive = status;
+    const globalGroupId = useSelector(state => state.groupId);
+    const basePath = useSelector(state => state.basePath);
 
-    const toggleDrawer = (open) => (event) => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
-
-        setState({ ...state, openSideDrawer: open });
+    const changeState = () => {
+        isActive = !isActive
+        updateArtifact()
     };
 
-    return <TableCell onClick={toggleDrawer(true)} className={classes.tableCell}>{data.id}
-        <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
-            <NodeInfoSideDrawer data={data} />
-        </Drawer> </TableCell>
+    const updateArtifact = () => {
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/").concat(pageId);
+        axios.patch(url, {
+            "artifactName": artifactName,
+            "nodeId": nodeId,
+            "type": "status",
+            "value": isActive
+        });
+    }
+
+    return <tr><td><Switch checked={isActive} onChange={changeState}/></td></tr>
 }
-function StringCell(props) {
-    var nodeData = props.data
-    return <tr><td>{nodeData}</td></tr>
-}
+
 const useStyles = makeStyles((theme) => ({
     tableCell : {
         paddingLeft: '15px',

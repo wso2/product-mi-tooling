@@ -36,12 +36,10 @@ import Paper from '@material-ui/core/Paper';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import { NavMenuItems, globalSettings } from './NavMenuItems';
 import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
+import GroupSelector from './GroupSelector';
 import NodeFilter from './NodeFilter';
 import ProxyService from '../pages/ProxyService';
 import Endpoints from '../pages/Endpoints';
@@ -50,39 +48,37 @@ import InboundEndpoints from '../pages/InboundEndpoints';
 import MessageProcessors from '../pages/MessageProcessors'
 import MessageStores from '../pages/MessageStores'
 import APIs from '../pages/APIs'
+import Templates from '../pages/Templates'
 import Sequences from '../pages/Sequences';
 import DataServices from '../pages/DataServices';
 import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
-
-import NodeInfo from './NodeInfo';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
 import logo from '../images/logo.svg';
+import { useDispatch } from 'react-redux';
+import { setBasePath } from '../redux/Actions';
 
 export default function Dashboard() {
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
-    const [groupId, setGroupId]= React.useState('group_01');
     const handleDrawerOpen = () => {
         setOpen(true);
     };
     const handleDrawerClose = () => {
         setOpen(false);
     };
-    const handleGroupId = (event) => {
-        setGroupId(event.target.value);
-    };
+
+    const windowLocation = window.location.href;
+    const dispatch = useDispatch();
+    dispatch(setBasePath(windowLocation))
+
     return (
         <div className={classes.root}>
             <CssBaseline />
             <Router>
             <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
                 <Toolbar className={classes.toolbar}>
-
-
                     <div style={{ width: '100%' }}>
                         <Box display="flex" p={1}>
                             <Box flexGrow={0} p={1}>
@@ -95,37 +91,18 @@ export default function Dashboard() {
                                 >
                                     <MenuIcon />
                                 </IconButton>
-                                <Link style={{height: '17px'}} to={'/home'}><img
+                                <Link style={{height: '17px'}} to={'/'}><img
                                     height='17'
                                     src={logo}
                                     alt='logo'
                                 /></Link>
-
                             </Box>
                             <Box flexGrow={10}>
                                 <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.typography}>
                                     Micro Integrator Dashboard
                                 </Typography>
                             </Box>
-                            <Box p={1} style={{padding: '13px'}}>
-                                Group ID
-                            </Box>
-                            <Box p={1}>
-
-                                    <Select
-                                        native
-                                        value={groupId}
-                                        onChange={handleGroupId}
-                                        label="Group Id"
-                                        style={{ textDecoration: 'none' , color: '#fff'}}
-                                    >
-                                        <option aria-label="None" value="" />
-                                        <option value="group_01">Group 01</option>
-                                        <option value="group_02">Group 02</option>
-                                        <option value="group_03">Group 03</option>
-                                    </Select>
-
-                            </Box>
+                            <GroupSelector/>
                             <Box p={1}>
                                 <Avatar alt="Remy Sharp" src="/broken-image.jpg" className={classes.orange}>
                                     B
@@ -170,6 +147,7 @@ export default function Dashboard() {
                                         <Route exact path='/message_processors' component={MessageProcessors}/>
                                         <Route exact path='/message_stores' component={MessageStores}/>
                                         <Route exact path='/apis' component={APIs}/>
+                                        <Route exact path='/templates' component={Templates}/>
                                         <Route exact path='/sequences' component={Sequences}/>
                                         <Route exact path='/data_services' component={DataServices}/>
                                         <Route exact path='/datasources' component={Datasources}/>

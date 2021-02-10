@@ -63,6 +63,8 @@ tags:
     description: "Access log configs details"
   - name: "Users"
     description: "Access users details"
+  - name: "configuration"
+    description: "Access configurations"
 
 paths:
   /heartbeat:
@@ -159,14 +161,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProxyList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "proxyServices"
       summary: "Update proxy service"
@@ -179,14 +181,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Proxy'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Proxy update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -221,14 +223,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EndpointList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "endpoints"
       summary: "Update endpoint"
@@ -241,14 +243,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Endpoint'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Endpoint update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -283,14 +285,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InboundEpList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "inboundEndpoints"
       summary: "Update inbound endpoint"
@@ -303,14 +305,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/InboundEp'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Inbound endpoint update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -442,14 +444,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "apis"
       summary: "Update API"
@@ -462,14 +464,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Api'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "API update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -504,7 +506,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TemplateList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -539,14 +541,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SequenceList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "sequences"
       summary: "Update sequence"
@@ -559,14 +561,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Sequence'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Sequence update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -963,20 +965,89 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configuration:
+    get:
+      tags:
+        - "configuration"
+      summary: "Get configurations using management api"
+      operationId: "RetrieveConfiguration"
+      parameters:
+        - name: "groupId"
+          in: query
+          description: "Group id of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodeId"
+          in: query
+          description: "Node id of the node"
+          required: true
+          schema:
+            type: string
+        - name: "artifactType"
+          in: query
+          description: "Type of the artifact"
+          required: true
+          schema:
+            type: string
+        - name: "artifactName"
+          in: query
+          description: "Name of the artifact"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "The configuration of the relevant artifact"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Configuration'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 
 components:
   schemas:
-    HeatbeatSignalRequestBody:
+    HeartbeatRequest:
       type: object
       properties:
+        product :
+          type: string
         groupId:
           type: string
         nodeId:
           type: string
         interval:
           type: integer
-      example: {groupId: mi_dev, nodeId: node_01, interval: 30}
+        mgtApiUrl:
+          type: string
+        changeNotification:
+          type: object
+          properties:
+            deployedArtifacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdatedArtifact'
+            undeployedArtifacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdatedArtifact'
+      example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
 
+    UpdatedArtifact:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
     Ack:
       type: object
       properties:
@@ -987,158 +1058,54 @@ components:
     GroupList:
       type: array
       items:
-        type: object
-        properties:
-          groupId:
-            type: string
-          groupName:
-            type: string
-      example: [{groupId: group_01, groupName: dev_env}]
+        type: string
+      example: [group_01, group_02]
+
     NodeList:
       type: array
       items:
         type: object
         properties:
-          id:
+          nodeId:
             type: string
             description: "node id."
-          isActive:
-            type: boolean
-            description: "Is node active."
           details:
-            type: array
-            description: Array contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
-            items:
-              $ref: '#/components/schemas/KeyValue'
-      example: [{ id: node_01,
-                  isActive: true,
-                  details: [{ key:  serverName,
-                              value:  WSO2 micro integrator },
-                            { key: version,
-                              value: 1.2.0  },
-                            { key: javaVersion,
-                              value: 1.8.0_191 },
-                            { key: javaVendor, value: Oracle}]
+            type: string
+            description: String contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName
+      example: [{ nodeId: node_01,
+                  details: {\"productVersion\":\"1.2.0\",\"osVersion\":\"10.15.7\",\"javaVersion\":\"1.8.0_191\"}
                 }]
-    ProxyList:
+
+    ArtifactDetails:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        details:
+          type: string
+
+    Artifacts:
       type: array
       items:
         type: object
         properties:
-          ServiceName:
+          name:
             type: string
           nodes:
             type: array
             items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                isActive:
-                  type: boolean
-                endpoints:
-                  type: array
-                  items:
-                    type: string
-                details:
-                  type: array
-                  description: Array contains wsdl1.1, statistics, tracing, configuration etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-        example: [
-        { ServiceName: HospitalProxy,
-          nodes: [
-          { nodeId: node_01,
-            isActive: true,
-            endpoints: ["http://localhost:8290/services/HospitalProxy","https://localhost:8253/services/HospitalProxy"],
-            details: [
-            { key: statistics,
-              value: disabled },
-            { key: tracing,
-              value: false  }
-            ]
-          },
-          ]
-        }
-        ]
-    ProxyUpdateRequestBody:
+              $ref: '#/components/schemas/ArtifactDetails'
+
+    ArtifactUpdateRequest:
       type: object
       properties:
-        serviceName:
+        artifactName:
           type: string
         nodeId:
           type: string
-        isActive:
-          type: boolean
-        tracing:
-          type: boolean
-    EndpointList:
-      type: array
-      items:
-        type: object
-        properties:
-          endpointName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                isActive:
-                  type: boolean
-                details:
-                  type: array
-                  description: Array contains type, tracing, configuration etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                properties:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    EndpointUpdateRequestBody:
-      type: object
-      properties:
-        epName:
+        type:
           type: string
-        nodeId:
-          type: string
-        isActive:
-          type: boolean
-        tracing:
-          type: boolean
-    InboundEpList:
-      type: array
-      items:
-        type: object
-        properties:
-          inboundEpName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains protocol, tracing, statistics, sequence, onError etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                parameters:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    InboundEpUpdateRequestBody:
-      type: object
-      properties:
-        inboundEpName:
-          type: string
-        nodeId:
-          type: string
-        tracing:
+        value:
           type: boolean
     MessageProcessorList:
       type: array
@@ -1156,7 +1123,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains type, isActive, messageStore, configuration etc.
+                  description: Array contains type, isActive, messageStore etc.
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 paramaters:
@@ -1188,88 +1155,13 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains type, messageCount, configuration
+                  description: Array contains type, messageCount
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 paramaters:
                   type: array
                   items:
                     $ref: '#/components/schemas/KeyValue'
-    ApiList:
-      type: array
-      items:
-        type: object
-        properties:
-          apiName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains contex, hostName, port, url, tracing, configuration etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    ApiUpdateRequestBody:
-      type: object
-      properties:
-        apiName:
-          type: string
-        nodeId:
-          type: string
-        tracing:
-          type: boolean
-    TemplateList:
-      type: array
-      items:
-        type: object
-        properties:
-          templateName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                type:
-                  type: string
-                  enum:
-                    - Endpoint Template
-                    - Sequence Template
-    SequenceList:
-      type: array
-      items:
-        type: object
-        properties:
-          sequenceName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains statistics, tracing, configuration etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    SequenceUpdateRequestBody:
-      type: object
-      properties:
-        sequenceName:
-          type: string
-        nodeId:
-          type: string
-        tracing:
-          type: boolean
     TaskList:
       type: array
       items:
@@ -1286,7 +1178,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains group, implementation, configuration etc
+                  description: Array contains group, implementation etc
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 triggerDetails:
@@ -1329,7 +1221,7 @@ components:
                   type: string
                 details:
                   type: array
-                  description: Array contains wsdl1.1, swaggerUrl, configuration etc
+                  description: Array contains wsdl1.1, swaggerUrl etc
                   items:
                     $ref: '#/components/schemas/KeyValue'
                 datasources:
@@ -1578,6 +1470,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/KeyValue'
+    Configuration:
+      type: object
+      properties:
+        configuration:
+          type: string
     SuccessStatus:
       type: object
       properties:
@@ -1600,44 +1497,21 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HeatbeatSignalRequestBody'
+            $ref: '#/components/schemas/HeartbeatRequest'
       description: "The request body to update proxy."
-    Proxy:
+
+    ArtifactUpdate:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProxyUpdateRequestBody'
-      description: "The request body to update proxy."
-    Endpoint:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/EndpointUpdateRequestBody'
-      description: "The request body to update endpoint."
-    InboundEp:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InboundEpUpdateRequestBody'
-      description: "The request body to update inbound endpoint."
+            $ref: '#/components/schemas/ArtifactUpdateRequest'
+      description: "The request body to update artifact."
     MessageProcessor:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/MessageProcessorUpdateRequestBody'
       description: "The request body to update message processor."
-    Api:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiUpdateRequestBody'
-      description: "The request body to update API."
-    Sequence:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SequenceUpdateRequestBody'
-      description: "The request body to update sequence."
     Logger:
       content:
         application/json:

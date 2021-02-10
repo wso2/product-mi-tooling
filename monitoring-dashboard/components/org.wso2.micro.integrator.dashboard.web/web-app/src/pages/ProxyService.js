@@ -19,63 +19,41 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class ProxyService extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "proxyPage",
-                title: "Proxy Services",
-                headCells: [
-                    {id: 'service', label: 'Service'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'wsdlUrl', label: 'WSDL 1.1'}],
-                tableOrderBy: 'service'
-            },
-            proxyList: [{
-                service: "HospitalProxy",
-                nodes: [
-                    { nodeId: "node_01",
-                        isActive: false,
-                        wsdlUrl : "http://dulanjali:8290/services/Hospital?wsdl",
-                        endpoints: ["http://localhost:8290/services/HospitalProxy","https://localhost:8253/services/HospitalProxy"],
-                        source: '<proxy xmlns=\"http://ws.apache.org/ns/synapse\" name=\"Calculator\" transports=\"http https\" startOnLoad=\"true\"><target><inSequence/><outSequence/><faultSequence/></target></proxy>',
-                        details: { "statistics": "disabled",
-                            "tracing": true  }
-                    },
-                    { nodeId: "node_02",
-                        isActive: true,
-                        wsdlUrl : "http://dulanjali:8291/services/Hospital?wsdl",
-                        endpoints: ["http://localhost:8291/services/HospitalProxy","https://localhost:8254/services/HospitalProxy"],
-                        details: { "statistics": "disabled",
-                            "tracing": false  }
-                    }
-                ]
-            },
+export default function ProxyService() {
+    const [pageInfo] = React.useState({
+        pageId: "proxy-services",
+        title: "Proxy Services",
+        headCells: [
+            {id: 'name', label: 'Service Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'wsdlUrl', label: 'WSDL 1.1'},
+            {id: 'isRunning', label: 'State'}
+        ],
+        tableOrderBy: 'name'
+    });
+    const [proxyList, setProxyList] = React.useState([]);
 
-                {
-                    service: "SchoolProxy",
-                    nodes: [
-                        { nodeId: "node_03",
-                            isActive: true,
-                            wsdlUrl : "http://dulanjali:8290/services/School?wsdl",
-                            endpoints: ["http://localhost:8290/services/SchoolProxy","https://localhost:8253/services/SchoolProxy"],
-                            details: { "statistics": "disabled",
-                                "tracing": true  }
-                        },
-                        { nodeId: "node_04",
-                            isActive: true,
-                            wsdlUrl : "http://dulanjali:8291/services/School?wsdl",
-                            endpoints: ["http://localhost:8291/services/SchoolProxy","https://localhost:8254/services/SchoolProxy"],
-                            details: { "statistics": "disabled",
-                                "tracing": true  }
-                        }
-                    ]
-                }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.proxyList}/>;
-    }
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
+    
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setProxyList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={proxyList}/>
 }

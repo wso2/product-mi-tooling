@@ -73,6 +73,9 @@
   }, {
     "name" : "Users",
     "description" : "Access users details"
+  }, {
+    "name" : "configuration",
+    "description" : "Access configurations"
   } ],
   "paths" : {
     "/heartbeat" : {
@@ -212,7 +215,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ProxyList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -229,7 +232,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "proxyServices" ],
         "summary" : "Update proxy service",
         "operationId" : "updateProxyService",
@@ -245,7 +248,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Proxy"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -253,7 +256,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -307,7 +310,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EndpointList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -324,7 +327,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "endpoints" ],
         "summary" : "Update endpoint",
         "operationId" : "updateEndpoint",
@@ -340,7 +343,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Endpoint"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -348,7 +351,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -646,7 +649,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ApiList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -663,7 +666,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "apis" ],
         "summary" : "Update API",
         "operationId" : "updateApi",
@@ -679,7 +682,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Api"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -687,7 +690,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -1454,13 +1457,86 @@
           }
         }
       }
+    },
+    "/configuration" : {
+      "get" : {
+        "tags" : [ "configuration" ],
+        "summary" : "Get configurations using management api",
+        "operationId" : "RetrieveConfiguration",
+        "parameters" : [ {
+          "name" : "groupId",
+          "in" : "query",
+          "description" : "Group id of the node",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "nodeId",
+          "in" : "query",
+          "description" : "Node id of the node",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "artifactType",
+          "in" : "query",
+          "description" : "Type of the artifact",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "artifactName",
+          "in" : "query",
+          "description" : "Name of the artifact",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The configuration of the relevant artifact",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Configuration"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
     "schemas" : {
-      "HeatbeatSignalRequestBody" : {
+      "HeartbeatRequest" : {
         "type" : "object",
         "properties" : {
+          "product" : {
+            "type" : "string"
+          },
           "groupId" : {
             "type" : "string"
           },
@@ -1469,12 +1545,34 @@
           },
           "interval" : {
             "type" : "integer"
+          },
+          "mgtApiUrl" : {
+            "type" : "string"
+          },
+          "changeNotification" : {
+            "$ref" : "#/components/schemas/HeartbeatRequest_changeNotification"
           }
         },
         "example" : {
+          "type" : "mi",
           "groupId" : "mi_dev",
           "nodeId" : "node_01",
-          "interval" : 30
+          "interval" : 30,
+          "mgtApiUrl" : "https://10.100.0.64:9164/management/"
+        }
+      },
+      "UpdatedArtifact" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "version" : {
+            "type" : "string"
+          }
         }
       },
       "Ack" : {
@@ -1490,79 +1588,55 @@
       },
       "GroupList" : {
         "type" : "array",
-        "example" : [ {
-          "groupId" : "group_01",
-          "groupName" : "dev_env"
-        } ],
+        "example" : [ "group_01", "group_02" ],
         "items" : {
-          "$ref" : "#/components/schemas/GroupList_inner"
+          "type" : "string"
         }
       },
       "NodeList" : {
         "type" : "array",
         "example" : [ {
-          "id" : "node_01",
-          "isActive" : true,
-          "details" : [ {
-            "key" : "serverName",
-            "value" : "WSO2 micro integrator"
-          }, {
-            "key" : "version",
-            "value" : "1.2.0"
-          }, {
-            "key" : "javaVersion",
-            "value" : "1.8.0_191"
-          }, {
-            "key" : "javaVendor",
-            "value" : "Oracle"
-          } ]
+          "nodeId" : "node_01",
+          "details" : {
+            "\\\"productVersion\\\":\\\"1.2.0\\\"" : null,
+            "\\\"osVersion\\\":\\\"10.15.7\\\"" : null,
+            "\\\"javaVersion\\\":\\\"1.8.0_191\\\"" : null
+          }
         } ],
         "items" : {
           "$ref" : "#/components/schemas/NodeList_inner"
         }
       },
-      "ProxyList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/ProxyList_inner"
-        }
-      },
-      "ProxyUpdateRequestBody" : {
+      "ArtifactDetails" : {
         "type" : "object",
         "properties" : {
-          "serviceName" : {
-            "type" : "string"
-          },
           "nodeId" : {
             "type" : "string"
           },
-          "isActive" : {
-            "type" : "boolean"
-          },
-          "tracing" : {
-            "type" : "boolean"
+          "details" : {
+            "type" : "string"
           }
         }
       },
-      "EndpointList" : {
+      "Artifacts" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/EndpointList_inner"
+          "$ref" : "#/components/schemas/Artifacts_inner"
         }
       },
-      "EndpointUpdateRequestBody" : {
+      "ArtifactUpdateRequest" : {
         "type" : "object",
         "properties" : {
-          "epName" : {
+          "artifactName" : {
             "type" : "string"
           },
           "nodeId" : {
             "type" : "string"
           },
-          "isActive" : {
-            "type" : "boolean"
+          "type" : {
+            "type" : "string"
           },
-          "tracing" : {
+          "value" : {
             "type" : "boolean"
           }
         }
@@ -1611,26 +1685,6 @@
         "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/MessageStoreList_inner"
-        }
-      },
-      "ApiList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/ApiList_inner"
-        }
-      },
-      "ApiUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "apiName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "tracing" : {
-            "type" : "boolean"
-          }
         }
       },
       "TemplateList" : {
@@ -1854,6 +1908,14 @@
           }
         }
       },
+      "Configuration" : {
+        "type" : "object",
+        "properties" : {
+          "configuration" : {
+            "type" : "string"
+          }
+        }
+      },
       "SuccessStatus" : {
         "type" : "object",
         "properties" : {
@@ -1878,118 +1940,46 @@
           "message" : "Internal server error"
         }
       },
-      "GroupList_inner" : {
+      "HeartbeatRequest_changeNotification" : {
         "type" : "object",
         "properties" : {
-          "groupId" : {
-            "type" : "string"
+          "deployedArtifacts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/UpdatedArtifact"
+            }
           },
-          "groupName" : {
-            "type" : "string"
+          "undeployedArtifacts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/UpdatedArtifact"
+            }
           }
         }
       },
       "NodeList_inner" : {
         "type" : "object",
         "properties" : {
-          "id" : {
+          "nodeId" : {
             "type" : "string",
             "description" : "node id."
           },
-          "isActive" : {
-            "type" : "boolean",
-            "description" : "Is node active."
-          },
           "details" : {
-            "type" : "array",
-            "description" : "Array contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName",
-            "items" : {
-              "$ref" : "#/components/schemas/KeyValue"
-            }
+            "type" : "string",
+            "description" : "String contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName"
           }
         }
       },
-      "ProxyList_inner" : {
+      "Artifacts_inner" : {
         "type" : "object",
         "properties" : {
-          "ServiceName" : {
+          "name" : {
             "type" : "string"
           },
           "nodes" : {
             "type" : "array",
             "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "isActive" : {
-                  "type" : "boolean"
-                },
-                "endpoints" : {
-                  "type" : "array",
-                  "items" : {
-                    "type" : "string"
-                  }
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains wsdl1.1, statistics, tracing, configuration etc.",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "example" : [ {
-          "ServiceName" : "HospitalProxy",
-          "nodes" : [ {
-            "nodeId" : "node_01",
-            "isActive" : true,
-            "endpoints" : [ "http://localhost:8290/services/HospitalProxy", "https://localhost:8253/services/HospitalProxy" ],
-            "details" : [ {
-              "key" : "statistics",
-              "value" : "disabled"
-            }, {
-              "key" : "tracing",
-              "value" : false
-            } ]
-          } ]
-        } ]
-      },
-      "EndpointList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "endpointName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "isActive" : {
-                  "type" : "boolean"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, tracing, configuration etc.",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "properties" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
+              "$ref" : "#/components/schemas/ArtifactDetails"
             }
           }
         }
@@ -2042,7 +2032,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains type, isActive, messageStore, configuration etc.",
+                  "description" : "Array contains type, isActive, messageStore etc.",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2074,39 +2064,13 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains type, messageCount, configuration",
+                  "description" : "Array contains type, messageCount",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
                 },
                 "paramaters" : {
                   "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "ApiList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "apiName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains contex, hostName, port, url, tracing, configuration etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2155,7 +2119,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains statistics, tracing, configuration etc",
+                  "description" : "Array contains statistics, tracing etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2181,7 +2145,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains group, implementation, configuration etc",
+                  "description" : "Array contains group, implementation etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2240,7 +2204,7 @@
                 },
                 "details" : {
                   "type" : "array",
-                  "description" : "Array contains wsdl1.1, swaggerUrl, configuration etc",
+                  "description" : "Array contains wsdl1.1, swaggerUrl etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2428,27 +2392,17 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/HeatbeatSignalRequestBody"
+              "$ref" : "#/components/schemas/HeartbeatRequest"
             }
           }
         }
       },
-      "Proxy" : {
-        "description" : "The request body to update proxy.",
+      "ArtifactUpdate" : {
+        "description" : "The request body to update artifact.",
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/ProxyUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "Endpoint" : {
-        "description" : "The request body to update endpoint.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/EndpointUpdateRequestBody"
+              "$ref" : "#/components/schemas/ArtifactUpdateRequest"
             }
           }
         }
@@ -2469,16 +2423,6 @@
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/MessageProcessorUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "Api" : {
-        "description" : "The request body to update API.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/ApiUpdateRequestBody"
             }
           }
         }

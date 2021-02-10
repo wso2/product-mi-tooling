@@ -19,39 +19,40 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class InboundEndpoints extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "inbound_endpoints",
-                title: "Inbound Endpoints",
-                headCells: [
-                    {id: 'name', label: 'Inbound Endpoint Name'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'protocol', label: 'Protocol'},
-                    {id: 'port', label: 'Port'}],
-                tableOrderBy: 'service'
-            },
-            inboundEndpointList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        protocol: "http",
-                        port: 8000
+export default function InboundEndpoints() {
+    const [pageInfo] = React.useState({
+        pageId: "inbound-endpoints",
+        title: "Inbound Endpoints",
+        headCells: [
+            {id: 'name', label: 'Inbound Endpoint Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'protocol', label: 'Protocol'}],
+        tableOrderBy: 'name'
+    });
 
-                    },
-                    { nodeId: "node_02",
-                        protocol: "http",
-                        port: 9000
+    const [inboundEpList, setInboundEpList] = React.useState([]);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.inboundEndpointList}/>;
-    }
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
+
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/inbound-endpoints?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setInboundEpList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={inboundEpList}/>
 }

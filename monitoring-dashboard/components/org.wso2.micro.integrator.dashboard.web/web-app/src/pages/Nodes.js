@@ -19,37 +19,35 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
-export default class Nodes extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "nodes",
-                title: "Nodes",
-                headCells: [
-                    {id: 'nodeId', label: 'Node ID'},
-                    {id: 'node_status', label: 'Status'},
-                    {id: 'role', label: 'Role'},
-                    {id: 'upTime', label: 'Up Time'}],
-                tableOrderBy: 'service'
-            },
-            nodeList: [{
-                name: "Calculator EP",
-                nodeId: "Node_1",
-                node_status: "Active",
-                role: "Member",
-                upTime: "22 min"
-            },{
-                name: "Calculator EP2",
-                nodeId: "Node_1",
-                node_status: "Inactive",
-                role: "Member",
-                upTime: "4 min"
-            }
+import { useSelector } from 'react-redux';
 
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.nodeList}/>;
-    }
+export default function Nodes () {
+
+    const [pageInfo, setpageInfo] = React.useState({
+        pageId: "nodesPage",
+        title: "Nodes",
+        headCells: [
+            {id: 'nodeId', label: 'Node ID'},
+            {id: 'node_status', label: 'Status'},
+            {id: 'role', label: 'Role'}],
+        tableOrderBy: 'service'
+    });
+    const [nodeList, setNodeList] = React.useState([]);
+
+    const globalGroupId = useSelector(state => state.groupId);
+    const basePath = useSelector(state => state.basePath);
+
+    React.useEffect(()=>{
+        if (globalGroupId !== "") {
+            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/nodes");
+            axios.get(url).then(response => {
+                response.data.map(data => data.details = JSON.parse(data.details))
+                setNodeList(response.data)
+            })
+        }
+    },[globalGroupId])
+
+    return (<EnhancedTable pageInfo={pageInfo} dataSet={nodeList}/>);
 }
