@@ -285,14 +285,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InboundEpList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "inboundEndpoints"
       summary: "Update inbound endpoint"
@@ -305,14 +305,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/InboundEp'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Inbound endpoint update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -1107,39 +1107,6 @@ components:
           type: string
         value:
           type: boolean
-
-    InboundEpList:
-      type: array
-      items:
-        type: object
-        properties:
-          inboundEpName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains protocol, tracing, statistics, sequence, onError etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                parameters:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    InboundEpUpdateRequestBody:
-      type: object
-      properties:
-        inboundEpName:
-          type: string
-        nodeId:
-          type: string
-        tracing:
-          type: boolean
     MessageProcessorList:
       type: array
       items:
@@ -1539,13 +1506,6 @@ components:
           schema:
             $ref: '#/components/schemas/ArtifactUpdateRequest'
       description: "The request body to update artifact."
-
-    InboundEp:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InboundEpUpdateRequestBody'
-      description: "The request body to update inbound endpoint."
     MessageProcessor:
       content:
         application/json:

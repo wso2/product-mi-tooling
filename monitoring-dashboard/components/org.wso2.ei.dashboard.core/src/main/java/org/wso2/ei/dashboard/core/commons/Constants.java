@@ -31,12 +31,13 @@ public final class Constants {
 
     public static final String PROXY_SERVICES = "proxy-services";
     public static final String ENDPOINTS = "endpoints";
+    public static final String INBOUND_ENDPOINTS = "inbound-endpoints";
     public static final String APIS = "apis";
     public static final String TEMPLATES = "templates";
+    public static final String SEQUENCES = "sequences";
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";
-    public static final String SEQUENCES = "sequences";
 
     // todo change this structure
 

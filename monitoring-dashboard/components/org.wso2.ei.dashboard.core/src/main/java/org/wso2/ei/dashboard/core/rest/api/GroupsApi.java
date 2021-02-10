@@ -28,8 +28,6 @@ import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
-import org.wso2.ei.dashboard.core.rest.model.InboundEpList;
-import org.wso2.ei.dashboard.core.rest.model.InboundEpUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.LocalEntryList;
 import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
@@ -60,6 +58,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
@@ -230,17 +229,18 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get inbound endpoints by node ids", description = "", tags={ "inboundEndpoints" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of inbound endpoints deployed in provided nodes", content = @Content(schema = @Schema(implementation = InboundEpList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of inbound endpoints deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getInboundEpsByNodeIds( @PathParam("group-id")
+    public Response getInboundEpsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
+        Artifacts inboundEndpointList = inboundEndpointDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(inboundEndpointList).build();
     }
     @GET
     @Path("/{group-id}/local-entries")
@@ -471,20 +471,21 @@ public class GroupsApi {
         EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
         return endpointsDelegate.updateArtifact(groupId, request);
     }
-    @PUT
+    @PATCH
     @Path("/{group-id}/inbound-endpoints")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @Operation(summary = "Update inbound endpoint", description = "", tags={ "inboundEndpoints" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Inbound endpoint update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response updateInboundEp( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid InboundEpUpdateRequestBody body) {
-        return Response.ok().entity("magic!").build();
+        @ApiResponse(responseCode = "200", description = "Inbound endpoint update status",
+                     content = @Content(schema = @Schema(implementation = Ack.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Ack updateInboundEp(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) {
+        InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
+        return inboundEndpointDelegate.updateArtifact(groupId, request);
     }
     @PUT
     @Path("/{group-id}/message-processors")

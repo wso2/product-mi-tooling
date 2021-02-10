@@ -464,6 +464,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 return "PROXY_SERVICES";
             case Constants.ENDPOINTS:
                 return "ENDPOINTS";
+            case Constants.INBOUND_ENDPOINTS:
+                return "INBOUND_ENDPOINTS";
             case Constants.APIS:
                 return "APIS";
             case Constants.TEMPLATES:

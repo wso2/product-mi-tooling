@@ -69,6 +69,8 @@ public class ConfigurationDelegate {
                 return "proxyServiceName";
             case Constants.ENDPOINTS:
                 return "endpointName";
+            case Constants.INBOUND_ENDPOINTS:
+                return "inboundEndpointName";
             case Constants.APIS:
                 return "apiName";
             case Constants.SEQUENCES:

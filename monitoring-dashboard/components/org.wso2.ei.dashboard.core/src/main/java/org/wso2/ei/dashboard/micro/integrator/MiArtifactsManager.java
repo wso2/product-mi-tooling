@@ -46,6 +46,7 @@ import java.util.concurrent.Executors;
 
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
+import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
 import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
@@ -57,7 +58,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final Log log = LogFactory.getLog(MiArtifactsManager.class);
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS, TEMPLATES, SEQUENCES)));
+            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS, TEMPLATES, SEQUENCES, INBOUND_ENDPOINTS)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -204,6 +205,10 @@ public class MiArtifactsManager implements ArtifactsManager {
                 break;
             case ENDPOINTS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(ENDPOINTS).concat("?endpointName=").concat(artifactName);
+                break;
+            case INBOUND_ENDPOINTS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(INBOUND_ENDPOINTS).concat("?inboundEndpointName=")
+                                                 .concat(artifactName);
                 break;
             case APIS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(APIS).concat("?apiName=").concat(artifactName);
