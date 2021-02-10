@@ -53,7 +53,9 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     public JDBCDatabaseManager() {
         HikariConfig config = new HikariConfig();
 
-        config.setJdbcUrl(Constants.DATABASE_URL);
+        String databaseURL = Constants.DATABASE_URL.replace("\\", "\\\\");
+
+        config.setJdbcUrl(databaseURL);
         config.setUsername(Constants.DATABASE_USERNAME);
         config.setPassword(Constants.DATABASE_PASSWORD);
 
