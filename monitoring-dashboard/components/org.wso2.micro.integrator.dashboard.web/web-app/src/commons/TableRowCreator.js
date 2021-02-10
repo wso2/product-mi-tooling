@@ -37,6 +37,9 @@ export default function TableRowCreator(props) {
                 return <TableCell>{data.name}</TableCell>
             case 'nodes':
                 return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} />)}</table></TableCell>
+            
+            case 'type':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
 
             // Proxy Services
             case 'wsdlUrl':
@@ -45,8 +48,6 @@ export default function TableRowCreator(props) {
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
                         nodeId={node.nodeId} status={node.details.isRunning}/>)}</TableCell>
             // Endpoints
-            case 'type':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
             case 'state':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
                         nodeId={node.nodeId} status={node.details.isActive}/>)}</TableCell>
@@ -54,6 +55,15 @@ export default function TableRowCreator(props) {
             // Inbound Endpoints
             case 'protocol':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.protocol} />)}</table></TableCell>
+
+            // Message Stores
+            case 'message_count':
+                return <TableCell>{data.nodes.map(node=><StringCell data={node.details.size === '-1' ? "Not Supported" : node.details.size}/>)}</TableCell>
+
+            // Message Processors
+            case 'status':
+                return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
+                        nodeId={node.nodeId} status={node.details.status === 'active' ? true : false}/>)}</TableCell>
 
             // Apis
             case 'url':
@@ -77,8 +87,6 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.description} />)}</table></TableCell>
             case 'data_source_status':
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
-            case 'message_count':
-                return <TableCell>{data.nodes.map(node=><StringCell data={node.message_count}/>)}</TableCell>
             case 'port':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
             

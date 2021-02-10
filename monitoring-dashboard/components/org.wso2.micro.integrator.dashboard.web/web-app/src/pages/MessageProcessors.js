@@ -19,39 +19,41 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class MessageProcessors extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "message_processors",
-                title: "Message Processors",
-                headCells: [
-                    {id: 'name', label: 'Endpoint Name'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'type', label: 'Type'},
-                    {id: 'state', label: 'State'}],
-                tableOrderBy: 'service'
-            },
-            messageProcessorsList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        type: "http",
-                        state: true
+export default function MessageProcessors() {
+    const [pageInfo] = React.useState({
+        pageId: "message-processors",
+        title: "Message Processors",
+        headCells: [
+            {id: 'name', label: 'Message Processor Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'type', label: 'Type'},
+            {id: 'status', label: 'Status'}],
+        tableOrderBy: 'name'
+    })
+    
+    const [messageProcessorList, setMessageProcessorList] = React.useState([]);
 
-                    },
-                    { nodeId: "node_02",
-                        type: "http",
-                        state: false
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.messageProcessorsList}/>;
-    }
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/message-processors?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setMessageProcessorList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={messageProcessorList}/>
 }

@@ -19,39 +19,41 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class MessageStores extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "message_stores",
-                title: "Message Stores",
-                headCells: [
-                    {id: 'name', label: 'Message Store Name'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'type', label: 'Type'},
-                    {id: 'message_count', label: 'Message Count'}],
-                tableOrderBy: 'service'
-            },
-            messageStoreList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        type: "jms-message-store",
-                        message_count: 2
+export default function MessageStores() {
+    const [pageInfo] = React.useState({
+        pageId: "message-stores",
+        title: "Message Stores",
+        headCells: [
+            {id: 'name', label: 'Message Store Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'type', label: 'Type'},
+            {id: 'message_count', label: 'Message Count'}],
+        tableOrderBy: 'name'
+    });
 
-                    },
-                    { nodeId: "node_02",
-                        type: "jms_message",
-                        message_count: 3
+    const [messageStoreList, setMessageStoreList] = React.useState([]);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.messageStoreList}/>;
-    }
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
+
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/message-stores?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setMessageStoreList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={messageStoreList}/>
 }
