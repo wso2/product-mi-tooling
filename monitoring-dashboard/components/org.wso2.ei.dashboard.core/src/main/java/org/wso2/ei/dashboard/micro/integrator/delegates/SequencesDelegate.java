@@ -38,7 +38,7 @@ import java.util.List;
  * Delegate class to handle requests from sequences page.
  */
 public class SequencesDelegate implements ArtifactDelegate {
-    private static final Log log = LogFactory.getLog(ArtifactDelegate.class);
+    private static final Log log = LogFactory.getLog(SequencesDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     @Override
