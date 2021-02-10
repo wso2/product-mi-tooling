@@ -76,6 +76,10 @@ export default function TableRowCreator(props) {
             // Sequences
             case 'statistic':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.stats} />)}</table></TableCell>
+            
+            // Tasks
+            case 'group':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.taskGroup} />)}</table></TableCell>
 
             case 'version':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>

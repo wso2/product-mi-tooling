@@ -29,8 +29,9 @@ import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
 import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
 import SequenceSideDrawer from './sideDrawers/SequenceSideDrawer';
 import InboundEpSideDrawer from './sideDrawers/InboundEpSideDrawer';
-import MessageStoreSideDrawer from './sideDrawers/MessageStoreSideDrawer'
-import MessageProcessorSideDrawer from './sideDrawers/MessageProcessorSideDrawer'
+import MessageStoreSideDrawer from './sideDrawers/MessageStoreSideDrawer';
+import MessageProcessorSideDrawer from './sideDrawers/MessageProcessorSideDrawer';
+import TasksSideDrawer from './sideDrawers/TasksSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -71,6 +72,8 @@ function SideDrawer(props) {
             return <MessageStoreSideDrawer nodeData={props.nodeData} />
         case 'message-processors':
             return <MessageProcessorSideDrawer nodeData={props.nodeData} />
+        case 'tasks':
+            return <TasksSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }

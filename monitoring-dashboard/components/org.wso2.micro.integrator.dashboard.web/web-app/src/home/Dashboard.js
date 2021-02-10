@@ -50,6 +50,7 @@ import MessageStores from '../pages/MessageStores'
 import APIs from '../pages/APIs'
 import Templates from '../pages/Templates'
 import Sequences from '../pages/Sequences';
+import Tasks from '../pages/Tasks';
 import DataServices from '../pages/DataServices';
 import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
@@ -149,6 +150,7 @@ export default function Dashboard() {
                                         <Route exact path='/apis' component={APIs}/>
                                         <Route exact path='/templates' component={Templates}/>
                                         <Route exact path='/sequences' component={Sequences}/>
+                                        <Route exact path='/tasks' component={Tasks}/>
                                         <Route exact path='/data_services' component={DataServices}/>
                                         <Route exact path='/datasources' component={Datasources}/>
                                         <Route exact path='/connectors' component={Connectors}/>
