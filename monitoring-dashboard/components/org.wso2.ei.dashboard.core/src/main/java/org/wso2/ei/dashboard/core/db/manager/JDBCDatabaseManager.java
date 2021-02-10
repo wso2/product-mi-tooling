@@ -483,6 +483,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 return "SEQUENCES";
             case Constants.TASKS:
                 return "TASKS";
+            case Constants.LOCAL_ENTRIES:
+                return "LOCAL_ENTRIES";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }

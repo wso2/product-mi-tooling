@@ -40,6 +40,7 @@ public final class Constants {
     public static final String TEMPLATES = "templates";
     public static final String SEQUENCES = "sequences";
     public static final String TASKS = "tasks";
+    public static final String LOCAL_ENTRIES = "local-entries";
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";

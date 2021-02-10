@@ -638,7 +638,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LocalEntryList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -1107,25 +1107,6 @@ components:
           type: string
         value:
           type: boolean
-    LocalEntryList:
-      type: array
-      items:
-        type: object
-        properties:
-          entryName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains type, value etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
     DataserviceList:
       type: array
       items:

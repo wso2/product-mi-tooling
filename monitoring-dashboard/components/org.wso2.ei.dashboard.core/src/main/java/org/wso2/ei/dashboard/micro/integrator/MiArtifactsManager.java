@@ -48,6 +48,7 @@ import java.util.concurrent.Executors;
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
+import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
 import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
 import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
@@ -63,7 +64,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, INBOUND_ENDPOINTS, MESSAGE_PROCESSORS,
-                                        MESSAGE_STORES, APIS, TEMPLATES, SEQUENCES, TASKS)));
+                                        MESSAGE_STORES, APIS, TEMPLATES, SEQUENCES, TASKS, LOCAL_ENTRIES)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -243,6 +244,9 @@ public class MiArtifactsManager implements ArtifactsManager {
                 break;
             case TASKS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(TASKS).concat("?taskName=").concat(artifactName);
+                break;
+            case LOCAL_ENTRIES:
+                getArtifactDetailsUrl = mgtApiUrl.concat(LOCAL_ENTRIES).concat("?name=").concat(artifactName);
                 break;
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");

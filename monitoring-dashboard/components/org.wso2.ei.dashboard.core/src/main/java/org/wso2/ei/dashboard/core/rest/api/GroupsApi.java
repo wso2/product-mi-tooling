@@ -28,7 +28,6 @@ import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
-import org.wso2.ei.dashboard.core.rest.model.LocalEntryList;
 import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
@@ -55,6 +54,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.LocalEntriesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
@@ -246,17 +246,17 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get local entries by node ids", description = "", tags={ "localEntries" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of local entries deployed in provided nodes", content = @Content(schema = @Schema(implementation = LocalEntryList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getLocalEntriesByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of local entries deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getLocalEntriesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
+        Artifacts localEntriesList = localEntriesDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(localEntriesList).build();
     }
     @GET
     @Path("/{group-id}/log-configs")
