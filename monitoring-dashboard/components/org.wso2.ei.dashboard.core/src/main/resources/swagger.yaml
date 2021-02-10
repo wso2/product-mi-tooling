@@ -347,14 +347,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageProcessorList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "messageProcessors"
       summary: "Update message processor"
@@ -367,14 +367,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/MessageProcessor'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Message processor update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -409,7 +409,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageStoreList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -1107,61 +1107,6 @@ components:
           type: string
         value:
           type: boolean
-    MessageProcessorList:
-      type: array
-      items:
-        type: object
-        properties:
-          processorName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains type, isActive, messageStore etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                paramaters:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    MessageProcessorUpdateRequestBody:
-      type: object
-      properties:
-        processorName:
-          type: string
-        nodeId:
-          type: string
-        isActive:
-          type: boolean
-    MessageStoreList:
-      type: array
-      items:
-        type: object
-        properties:
-          storeName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains type, messageCount
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                paramaters:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
     TaskList:
       type: array
       items:
@@ -1506,12 +1451,6 @@ components:
           schema:
             $ref: '#/components/schemas/ArtifactUpdateRequest'
       description: "The request body to update artifact."
-    MessageProcessor:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MessageProcessorUpdateRequestBody'
-      description: "The request body to update message processor."
     Logger:
       content:
         application/json:

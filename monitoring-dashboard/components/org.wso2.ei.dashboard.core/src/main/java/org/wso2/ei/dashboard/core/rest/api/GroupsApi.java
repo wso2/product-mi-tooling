@@ -31,8 +31,6 @@ import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.LocalEntryList;
 import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
-import org.wso2.ei.dashboard.core.rest.model.MessageProcessorList;
-import org.wso2.ei.dashboard.core.rest.model.MessageProcessorUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 import org.wso2.ei.dashboard.core.rest.model.TaskList;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
@@ -43,7 +41,6 @@ import org.wso2.ei.dashboard.core.rest.model.DataserviceList;
 import java.io.File;
 
 import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.MessageStoreList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.User;
 
@@ -59,6 +56,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
@@ -295,34 +294,35 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get message processors by node ids", description = "", tags={ "messageProcessors" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of message processorss deployed in provided nodes", content = @Content(schema = @Schema(implementation = MessageProcessorList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getMessageProcessorsByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of message processorss deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getMessageProcessorsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
+        Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(messageProcessorList).build();
     }
     @GET
     @Path("/{group-id}/message-stores")
     @Produces({ "application/json" })
     @Operation(summary = "Get message stores by node ids", description = "", tags={ "messageStores" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of message stores deployed in provided nodes", content = @Content(schema = @Schema(implementation = MessageStoreList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of message stores deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getMessageStoresByNodeIds( @PathParam("group-id")
+    public Response getMessageStoresByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        MessageStoresDelegate messageStoresDelegate = new MessageStoresDelegate();
+        Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(messageStoresList).build();
     }
 
     @GET
@@ -487,20 +487,22 @@ public class GroupsApi {
         InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
         return inboundEndpointDelegate.updateArtifact(groupId, request);
     }
-    @PUT
+    @PATCH
     @Path("/{group-id}/message-processors")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @Operation(summary = "Update message processor", description = "", tags={ "messageProcessors" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Message processor update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response updateMessageProcessor( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "Message processor update status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Ack updateMessageProcessor(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) {
 
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid MessageProcessorUpdateRequestBody body) {
-        return Response.ok().entity("magic!").build();
+        MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
+        return messageProcessorsDelegate.updateArtifact(groupId, request);
     }
     @PATCH
     @Path("/{group-id}/proxy-services")

@@ -471,6 +471,10 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 return "ENDPOINTS";
             case Constants.INBOUND_ENDPOINTS:
                 return "INBOUND_ENDPOINTS";
+            case Constants.MESSAGE_STORES:
+                return "MESSAGE_STORES";
+            case Constants.MESSAGE_PROCESSORS:
+                return "MESSAGE_PROCESSORS";
             case Constants.APIS:
                 return "APIS";
             case Constants.TEMPLATES:
