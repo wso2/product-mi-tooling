@@ -21,6 +21,7 @@
 package org.wso2.ei.dashboard.micro.integrator;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -109,35 +110,39 @@ public class MiArtifactsManager implements ArtifactsManager {
             CloseableHttpResponse response = doGet(accessToken, url);
             JsonObject artifacts = HttpUtils.getJsonResponse(response);
             if (artifactType.equals(TEMPLATES)) {
-                JsonArray sequences = artifacts.get("sequenceTemplateList").getAsJsonArray();
-                JsonArray endpoints = artifacts.get("endpointTemplateList").getAsJsonArray();
-
-                for (int i = 0; i < sequences.size(); i++) {
-                    final String artifactName = sequences.get(i).getAsJsonObject().get("name").getAsString();
-                    JsonObject artifactDetails = new JsonObject();
-                    artifactDetails.addProperty("name", artifactName);
-                    artifactDetails.addProperty("type", "Sequence Template");
-                    insertArtifact(artifactType, artifactName, artifactDetails);
-                }
-
-                for (int i = 0; i < endpoints.size(); i++) {
-                    final String artifactName = endpoints.get(i).getAsJsonObject().get("name").getAsString();
-                    JsonObject artifactDetails = new JsonObject();
-                    artifactDetails.addProperty("name", artifactName);
-                    artifactDetails.addProperty("type", "Endpoint Template");
-                    insertArtifact(artifactType, artifactName, artifactDetails);
-                }
-
+                processTemplates(artifactType, artifacts);
             } else {
-                JsonArray list = artifacts.get("list").getAsJsonArray();
-                for (int i = 0; i < list.size(); i++) {
-                    final String artifactName = list.get(i).getAsJsonObject().get("name").getAsString();
-                    JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
-                    insertArtifact(artifactType, artifactName, artifactDetails);
-                }
+                processArtifacts(accessToken, artifactType, artifacts);
             }
         }
         fetchAndStoreServers(accessToken);
+    }
+
+    private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts) {
+        JsonArray list = artifacts.get("list").getAsJsonArray();
+        for (JsonElement element : list) {
+            final String artifactName = element.getAsJsonObject().get("name").getAsString();
+            JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+            insertArtifact(artifactType, artifactName, artifactDetails);
+        }
+    }
+
+    private void processTemplates(String artifactType, JsonObject artifacts) {
+        JsonArray sequences = artifacts.get("sequenceTemplateList").getAsJsonArray();
+        JsonArray endpoints = artifacts.get("endpointTemplateList").getAsJsonArray();
+
+        processTemplates(artifactType, sequences, "Sequence Template");
+        processTemplates(artifactType, endpoints, "Endpoint Template");
+    }
+
+    private void processTemplates(String artifactType, JsonArray templates, String templateType) {
+        for (JsonElement template : templates) {
+            final String artifactName = template.getAsJsonObject().get("name").getAsString();
+            JsonObject artifactDetails = new JsonObject();
+            artifactDetails.addProperty("name", artifactName);
+            artifactDetails.addProperty("type", templateType);
+            insertArtifact(artifactType, artifactName, artifactDetails);
+        }
     }
 
     private void insertArtifact(String artifactType, String artifactName, JsonObject artifactDetails) {

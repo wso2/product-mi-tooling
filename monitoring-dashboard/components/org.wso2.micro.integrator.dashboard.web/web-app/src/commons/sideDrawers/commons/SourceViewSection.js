@@ -52,7 +52,7 @@ export default function SourceViewSection(props) {
         axios.get(url, {params}).then(response => {
             setSource(response.data.configuration);
         })
-    })
+    },[])
 
     const openSourceViewPopup = () => {
         setOpen(true);

@@ -183,7 +183,12 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     @Override
     public Artifacts fetchArtifacts(String artifactType, String groupId, List<String> nodeList) {
         Artifacts artifacts = new Artifacts();
+
         String nodeSearch = "";
+        String nodeSearchTmp = nodeSearch;
+        nodeList.forEach(node-> nodeSearchTmp.concat("NODE_ID=? OR "));
+        nodeSearch = nodeSearchTmp;
+
         for (int i = 0; i < nodeList.size(); i++) {
             nodeSearch = nodeSearch.concat("NODE_ID=? OR ");
         }
