@@ -42,6 +42,7 @@ public final class Constants {
     public static final String TASKS = "tasks";
     public static final String LOCAL_ENTRIES = "local-entries";
     public static final String CONNECTORS = "connectors";
+    public static final String CARBON_APPLICATIONS = "applications";
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";

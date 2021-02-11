@@ -778,7 +778,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CAppList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -1216,43 +1216,6 @@ components:
                   description: Array contains default auto commit, default read only, test on borrow, test on return, test while idle etc.
                   items:
                     $ref: '#/components/schemas/KeyValue'
-    CAppList:
-      type: array
-      items:
-        type: object
-        properties:
-          cAppName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains isFaulty, version etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                artifacts:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArray'
-      example: [
-      { cAppName: "helloworldCompositeExporter",
-        nodes: [
-        { nodeId: "node_01",
-          details: [
-          { key: "version", value: "1.0.0"}
-          ],
-          artifacts: [
-          { key: "API", value: ["InitialWelcome","ABC_api"]},
-          { key: "Connectors", value: ["FileConnector", "CSV"]}]
-        }
-        ]
-      }
-      ]
     LogList:
       type: array
       items:

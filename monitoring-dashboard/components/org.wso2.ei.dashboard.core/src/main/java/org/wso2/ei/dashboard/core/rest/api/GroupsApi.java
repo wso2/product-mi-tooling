@@ -32,7 +32,6 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.CAppList;
 import org.wso2.ei.dashboard.core.rest.model.DataserviceList;
 
 import java.io.File;
@@ -51,6 +50,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
@@ -142,17 +142,18 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get carbon applications by node ids", description = "", tags={ "carbonApplications" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of carbon applications deployed in provided nodes", content = @Content(schema = @Schema(implementation = CAppList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of carbon applications deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getCarbonApplicationsByNodeIds( @PathParam("group-id")
+    public Response getCarbonApplicationsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        CarbonAppsDelegate cappsDelegate = new CarbonAppsDelegate();
+        Artifacts cappList = cappsDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(cappList).build();
     }
     @GET
     @Path("/{group-id}/connectors")
