@@ -69,8 +69,9 @@ export default function TableRowCreator(props) {
             case 'url':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.url} />)}</table></TableCell>
 
-            // Templates
+            // Templates and Connectors
             case 'template_nodes':
+            case 'connector_nodes':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.nodeId} />)}</table></TableCell>
 
             // Sequences
@@ -81,14 +82,20 @@ export default function TableRowCreator(props) {
             case 'group':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.taskGroup} />)}</table></TableCell>
 
+            // Connectors
+            case 'package':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.package} />)}</table></TableCell>
+            case 'description':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.description} />)}</table></TableCell>
+            case 'connector_status':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.status} />)}</table></TableCell>
+
+
             case 'version':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>
             case 'size':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.size} />)}</table></TableCell>
-            case 'package':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.package} />)}</table></TableCell>
-            case 'description':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.description} />)}</table></TableCell>
+            
             case 'data_source_status':
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
             case 'port':
