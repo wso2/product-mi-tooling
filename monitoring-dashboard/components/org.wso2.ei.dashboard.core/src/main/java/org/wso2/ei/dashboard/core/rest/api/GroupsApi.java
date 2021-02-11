@@ -32,7 +32,6 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfig;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.DataserviceList;
 
 import java.io.File;
 
@@ -52,6 +51,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.DataServicesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LocalEntriesDelegate;
@@ -174,21 +174,21 @@ public class GroupsApi {
         return Response.ok().entity(connectorList).build();
     }
     @GET
-    @Path("/{group-id}/dataservices")
+    @Path("/{group-id}/data-services")
     @Produces({ "application/json" })
-    @Operation(summary = "Get dataservices by node ids", description = "", tags={ "dataservices" })
+    @Operation(summary = "Get data-services by node ids", description = "", tags={ "data-services" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of dataservices deployed in provided nodes", content = @Content(schema = @Schema(implementation = DataserviceList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getDataservicesByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of data-services deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getDataServicesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        DataServicesDelegate dataServicesDelegate = new DataServicesDelegate();
+        Artifacts dataServicesList = dataServicesDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(dataServicesList).build();
     }
     @GET
     @Path("/{group-id}/datasources")

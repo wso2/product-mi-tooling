@@ -48,6 +48,7 @@ import java.util.concurrent.Executors;
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
 import static org.wso2.ei.dashboard.core.commons.Constants.CARBON_APPLICATIONS;
 import static org.wso2.ei.dashboard.core.commons.Constants.CONNECTORS;
+import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
@@ -67,7 +68,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, INBOUND_ENDPOINTS, MESSAGE_PROCESSORS,
                                         MESSAGE_STORES, APIS, TEMPLATES, SEQUENCES, TASKS, LOCAL_ENTRIES, CONNECTORS,
-                                        CARBON_APPLICATIONS)));
+                                        CARBON_APPLICATIONS, DATA_SERVICES)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -273,6 +274,10 @@ public class MiArtifactsManager implements ArtifactsManager {
                 break;
             case CARBON_APPLICATIONS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(CARBON_APPLICATIONS).concat("?carbonAppName=")
+                                                 .concat(artifactName);
+                break;
+            case DATA_SERVICES:
+                getArtifactDetailsUrl = mgtApiUrl.concat(DATA_SERVICES).concat("?dataServiceName=")
                                                  .concat(artifactName);
                 break;
             default:

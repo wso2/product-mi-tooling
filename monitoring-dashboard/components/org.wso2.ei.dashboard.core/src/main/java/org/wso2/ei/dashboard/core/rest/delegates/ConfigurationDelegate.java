@@ -80,6 +80,8 @@ public class ConfigurationDelegate {
                 return "sequenceName";
             case Constants.TASKS:
                 return "taskName";
+            case Constants.DATA_SERVICES:
+                return "dataServiceName";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");        }
     }

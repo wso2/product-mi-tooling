@@ -49,7 +49,7 @@ tags:
     description: "Access tasks details"
   - name: "localEntries"
     description: "Access local entries details"
-  - name: "dataservices"
+  - name: "data-services"
     description: "Access data services details"
   - name: "datasources"
     description: "Access datasources details"
@@ -645,12 +645,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /groups/{group-id}/dataservices:
+  /groups/{group-id}/data-services:
     get:
       tags:
-        - "dataservices"
-      summary: "Get dataservices by node ids"
-      operationId: "getDataservicesByNodeIds"
+        - "data-services"
+      summary: "Get data-services by node ids"
+      operationId: "getDataServicesByNodeIds"
       parameters:
         - name: "group-id"
           in: path
@@ -669,11 +669,11 @@ paths:
               default: all
       responses:
         200:
-          description: "List of dataservices deployed in provided nodes"
+          description: "List of data-services deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataserviceList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -1107,91 +1107,6 @@ components:
           type: string
         value:
           type: boolean
-    DataserviceList:
-      type: array
-      items:
-        type: object
-        properties:
-          dataserviceName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains wsdl1.1, swaggerUrl etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                datasources:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-                queries:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-                resources:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-                operations:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-      example: [
-      { dataserviceName: "StudentDataService",
-        nodes: [
-        { nodeId: "node_01",
-          details: [
-          { key: "WSDL 1.1", value: "http://localhost:8290/services/StudentDataService?wsdl" },
-          { key: "Swagger URL", value: "http://localhost:8290/services/StudentDataService?swagger.json" }
-          ],
-          datasources: [
-          { key: "StudentsDatasource",
-            value: [
-            { key: "dataSourceId",
-              value: "StudentsDatasource"},
-            { key: "dataSourceType",
-              value: "RDBMS" }
-            ]
-          }],
-          queries: [
-          { key: "CreateStudents",
-            value: [
-            { key: "id",
-              value: "CreateStudents" },
-            { key: "dataSourceId",
-              value: "StudentsDatasource" },
-            { key: "namespace",
-              value: "http://ws.wso2.org/dataservice"}
-            ]
-          }],
-          resources: [
-          { key: "createStudents",
-            value: [
-            { key: "path",
-              value: "student/{id}" },
-            { key: "method",
-              value: "et" }
-            ]
-          }],
-          operations: [
-          { key: "CreateStudents",
-            value: [
-            { key: "operationName",
-              value: "CreateStudents" },
-            { key: "queryId",
-              value: "createStudents" }
-            ]
-          }]
-        }]
-
-
-      },{}]
     DatasourceList:
       type: array
       items:

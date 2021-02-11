@@ -489,6 +489,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 return "CONNECTORS";
             case Constants.CARBON_APPLICATIONS:
                 return "CARBON_APPS";
+            case Constants.DATA_SERVICES:
+                return "DATA_SERVICES";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }
