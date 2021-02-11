@@ -34,6 +34,7 @@ import MessageProcessorSideDrawer from './sideDrawers/MessageProcessorSideDrawer
 import TasksSideDrawer from './sideDrawers/TasksSideDrawer';
 import LocalEntriesSideDrawer from './sideDrawers/LocalEntriesSideDrawer';
 import CarbonApplicationsSideDrawer from './sideDrawers/CarbonApplicationsSideDrawer';
+import DataServicesSideDrawer from './sideDrawers/DataServicesSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -80,12 +81,14 @@ function SideDrawer(props) {
             return <LocalEntriesSideDrawer nodeData={props.nodeData} />
         case 'carbonapps':
             return <CarbonApplicationsSideDrawer nodeData={props.nodeData} />
+        case 'data-services':
+            return <DataServicesSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     tableCell : {
         padding: '1px',
         borderBottom: 'none',

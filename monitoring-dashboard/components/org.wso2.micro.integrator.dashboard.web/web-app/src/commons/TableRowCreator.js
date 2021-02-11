@@ -41,9 +41,11 @@ export default function TableRowCreator(props) {
             case 'type':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
 
-            // Proxy Services
+            // Proxy Services and dataservices
             case 'wsdlUrl':
                 return <TableCell><table>{data.nodes.map(node=><LinkCell data={node.details.wsdl1_1} />)}</table></TableCell>
+
+            // Proxy Services
             case 'isRunning':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
                         nodeId={node.nodeId} status={node.details.isRunning}/>)}</TableCell>
