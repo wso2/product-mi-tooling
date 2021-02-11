@@ -33,7 +33,6 @@ import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.CAppList;
-import org.wso2.ei.dashboard.core.rest.model.ConnectorList;
 import org.wso2.ei.dashboard.core.rest.model.DataserviceList;
 
 import java.io.File;
@@ -52,6 +51,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LocalEntriesDelegate;
@@ -159,17 +159,18 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get connectors by node ids", description = "", tags={ "connectors" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of connectors deployed in provided nodes", content = @Content(schema = @Schema(implementation = ConnectorList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of connectors deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getConnectorsByNodeIds( @PathParam("group-id")
+    public Response getConnectorsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        ConnectorsDelegate connectorsDelegate = new ConnectorsDelegate();
+        Artifacts connectorList = connectorsDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(connectorList).build();
     }
     @GET
     @Path("/{group-id}/dataservices")

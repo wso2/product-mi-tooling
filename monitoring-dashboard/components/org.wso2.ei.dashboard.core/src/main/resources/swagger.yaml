@@ -743,7 +743,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConnectorList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -1216,26 +1216,6 @@ components:
                   description: Array contains default auto commit, default read only, test on borrow, test on return, test while idle etc.
                   items:
                     $ref: '#/components/schemas/KeyValue'
-    ConnectorList:
-      type: array
-      items:
-        type: object
-        properties:
-          connectorName:
-            type: string
-          package:
-            type: string
-          description:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                isFaulty:
-                  type: boolean
     CAppList:
       type: array
       items:

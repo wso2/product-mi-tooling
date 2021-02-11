@@ -46,6 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
+import static org.wso2.ei.dashboard.core.commons.Constants.CONNECTORS;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
@@ -64,7 +65,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, INBOUND_ENDPOINTS, MESSAGE_PROCESSORS,
-                                        MESSAGE_STORES, APIS, TEMPLATES, SEQUENCES, TASKS, LOCAL_ENTRIES)));
+                                        MESSAGE_STORES, APIS, TEMPLATES, SEQUENCES, TASKS, LOCAL_ENTRIES, CONNECTORS)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -114,13 +115,33 @@ public class MiArtifactsManager implements ArtifactsManager {
             final String url = heartbeat.getMgtApiUrl().concat(artifactType);
             CloseableHttpResponse response = doGet(accessToken, url);
             JsonObject artifacts = HttpUtils.getJsonResponse(response);
-            if (artifactType.equals(TEMPLATES)) {
-                processTemplates(artifactType, artifacts);
-            } else {
-                processArtifacts(accessToken, artifactType, artifacts);
+            switch (artifactType) {
+                case TEMPLATES:
+                    processTemplates(artifactType, artifacts);
+                    break;
+                case CONNECTORS:
+                    processConnectors(artifacts);
+                    break;
+                default:
+                    processArtifacts(accessToken, artifactType, artifacts);
+                    break;
             }
         }
         fetchAndStoreServers(accessToken);
+    }
+
+    private void processConnectors(JsonObject artifacts) {
+        JsonArray list = artifacts.get("list").getAsJsonArray();
+        for (JsonElement element : list) {
+            final String artifactName = element.getAsJsonObject().get("name").getAsString();
+            JsonObject artifactDetails = new JsonObject();
+            artifactDetails.addProperty("name", artifactName);
+            artifactDetails.addProperty("package", element.getAsJsonObject().get("package").getAsString());
+            artifactDetails.addProperty(
+                    "description", element.getAsJsonObject().get("description").getAsString());
+            artifactDetails.addProperty("status", element.getAsJsonObject().get("status").getAsString());
+            insertArtifact(CONNECTORS, artifactName, artifactDetails);
+        }
     }
 
     private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts) {
