@@ -27,6 +27,8 @@ import StatusCell from '../commons/StatusCell';
 import Switch from "react-switch";
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
+import EnabledIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
+import DisabledIcon from '@material-ui/icons/BlockOutlined';
 
 export default function TableRowCreator(props) {
     const { pageId, data, headers } = props;
@@ -90,7 +92,7 @@ export default function TableRowCreator(props) {
             case 'description':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.description} />)}</table></TableCell>
             case 'connector_status':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.status} />)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><ConnectorStatus status={node.details.status} />)}</table></TableCell>
 
             //carbon apps
             case 'version':
@@ -126,6 +128,14 @@ function LinkCell(props) {
     const classes = useStyles();
     var data = props.data
     return <tr><td><a className={classes.tableCell} href={data}>{data}</a></td></tr>
+}
+
+function ConnectorStatus(props) {
+    return (
+        <tr>
+            {props.status === 'enable' ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}
+        </tr>
+    )
 }
 
 function SwitchStatusCell(props) {
