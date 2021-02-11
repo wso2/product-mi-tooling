@@ -90,9 +90,10 @@ export default function TableRowCreator(props) {
             case 'connector_status':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.status} />)}</table></TableCell>
 
-
+            //carbon apps
             case 'version':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.version} />)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.version} />)}</table></TableCell>
+
             case 'size':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.size} />)}</table></TableCell>
             

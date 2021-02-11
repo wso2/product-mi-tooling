@@ -33,6 +33,7 @@ import MessageStoreSideDrawer from './sideDrawers/MessageStoreSideDrawer';
 import MessageProcessorSideDrawer from './sideDrawers/MessageProcessorSideDrawer';
 import TasksSideDrawer from './sideDrawers/TasksSideDrawer';
 import LocalEntriesSideDrawer from './sideDrawers/LocalEntriesSideDrawer';
+import CarbonApplicationsSideDrawer from './sideDrawers/CarbonApplicationsSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -77,6 +78,8 @@ function SideDrawer(props) {
             return <TasksSideDrawer nodeData={props.nodeData} />
         case 'local-entries':
             return <LocalEntriesSideDrawer nodeData={props.nodeData} />
+        case 'carbonapps':
+            return <CarbonApplicationsSideDrawer nodeData={props.nodeData} />
         default :
             return <HomePageSideDrawer nodeData={props.nodeData} />
     }
