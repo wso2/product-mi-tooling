@@ -22,9 +22,10 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import { Table, TableCell, TableRow } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import SourceViewSection from './commons/SourceViewSection'
+import Typography from '@material-ui/core/Typography';
 
 export default function MessageProcessorSideDrawer(props) {
     var nodeData = props.nodeData;
@@ -41,6 +42,7 @@ export default function MessageProcessorSideDrawer(props) {
                         <MessageProcessorDetailTable nodeData={nodeData}/>
                     </Paper>
                 </Grid>
+                <ParametersSection parameters={nodeData.details.parameters}/>
                 <SourceViewSection artifactType="message-processors" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
@@ -65,6 +67,28 @@ function MessageProcessorDetailTable(props) {
             </Table> 
 }
 
+function ParametersSection(props) {
+    const parameters = props.parameters;
+    const classes = useStyles();
+    return <Grid item xs={12}>
+                <Paper className={classes.paper} square>
+                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                        Parameters
+                    </Typography>
+                    <hr className={classes.horizontalLine}></hr>
+                    <Table size="small">
+                        <TableBody>
+                            {Object.keys(parameters).map(key => (
+                                <TableRow>
+                                    <TableCell>{key}</TableCell>
+                                    <TableCell>{parameters[key]}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Paper>
+            </Grid>
+}
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
@@ -72,5 +96,13 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(2),
         color: theme.palette.text.secondary,
+    },
+    subTopic: {
+        color: '#3f51b5'
+    },
+    horizontalLine : {
+        backgroundColor : '#3f51b5',
+        borderWidth: '0px',
+        height: '1px'
     }
 }));
