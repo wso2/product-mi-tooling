@@ -77,9 +77,7 @@ function TriggerDetails(props) {
                         TriggerDetails
                     </Typography>
                     <hr className={classes.horizontalLine}></hr>
-                </Paper>
-                <Paper className={classes.paper} square>
-                    <Table>
+                    <Table size="small">
                         <TableRow>
                             <TableCell>Trigger</TableCell>
                             <TableCell>{task.triggerType}</TableCell>

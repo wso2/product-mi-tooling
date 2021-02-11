@@ -78,8 +78,6 @@ function EndpointsSection(props) {
                         Endpoints
                     </Typography>
                     <hr className={classes.horizontalLine}></hr>
-                </Paper>
-                <Paper className={classes.paper} square>
                     <Table>
                         {endpoints.map(ep =>
                             <TableRow>{ep}
