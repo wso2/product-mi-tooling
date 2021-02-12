@@ -133,7 +133,7 @@ function LinkCell(props) {
 function ConnectorStatus(props) {
     return (
         <tr>
-            {props.status === 'enable' ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}
+            {props.status === 'enabled' ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}
         </tr>
     )
 }
