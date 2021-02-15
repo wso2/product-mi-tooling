@@ -60,6 +60,7 @@ public class Bootstrap {
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
+    private static final String WEBAPP_UI = "org.wso2.micro.integrator.dashboard.web.war";
 
     private static final Logger logger = LogManager.getLogger(Bootstrap.class);
 
@@ -90,7 +91,9 @@ public class Bootstrap {
         }
         WebAppContext wwwApp = new WebAppContext();
         wwwApp.setContextPath("/");
-        wwwApp.setResourceBase(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR);
+        wwwApp.setExtractWAR(true);
+        wwwApp.setWar(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR + File.separator
+                + WEBAPP_UI);
         wwwApp.setParentLoaderPriority(true);
         handlers.addHandler(wwwApp);
         server.setHandler(handlers);
