@@ -19,34 +19,36 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class LogFiles extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "logfiles",
-                title: "Log Files",
-                headCells: [
-                    {id: 'name', label: 'Log File Name'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'size', label: 'size'}],
-                tableOrderBy: 'service'
-            },
-            logFileList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        size: "6.5B",
-                    },
-                    { nodeId: "node_02",
-                        size: "6B",
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.logFileList}/>;
-    }
+export default function LogFiles() {
+    const [pageInfo] = React.useState({
+        pageId: "logs",
+        title: "Log Files",
+        headCells: [
+            {id: 'name', label: 'Log File Name'},
+            {id: 'nodes_logs', label: 'Nodes'}],
+        tableOrderBy: 'name'
+    });
+
+    const [logList, setlogList] = React.useState([]);
+
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
+
+    React.useEffect(() => {
+        if (selectedNodeList.length > 0) {
+            var nodeListQueryParams="";
+            selectedNodeList.filter(node => {
+                nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+            })
+            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/logs?nodes=").concat(nodeListQueryParams.slice(0,-7));
+            axios.get(url).then(response => setlogList(response.data))
+        }
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={logList} />
 }

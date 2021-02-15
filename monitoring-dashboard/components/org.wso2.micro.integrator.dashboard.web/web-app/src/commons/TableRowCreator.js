@@ -23,6 +23,7 @@ import axios from 'axios';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import NodesCell from './NodesCell';
+import LogsNodeCell from './LogsNodeCell';
 import StatusCell from '../commons/StatusCell';
 import Switch from "react-switch";
 import { makeStyles } from '@material-ui/core/styles';
@@ -113,6 +114,8 @@ export default function TableRowCreator(props) {
                 return <TableCell>Active</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
+            case 'nodes_logs':
+                return <TableCell><table>{data.nodes.map(node=><LogsNodeCell nodeId={node} fileName={data.name} />)}</table></TableCell>
             default:
                 <TableCell>Table data not available</TableCell>
         }})}
