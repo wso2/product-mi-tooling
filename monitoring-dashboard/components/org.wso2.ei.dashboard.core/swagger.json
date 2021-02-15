@@ -53,7 +53,7 @@
     "name" : "localEntries",
     "description" : "Access local entries details"
   }, {
-    "name" : "dataservices",
+    "name" : "data-services",
     "description" : "Access data services details"
   }, {
     "name" : "datasources",
@@ -405,7 +405,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/InboundEpList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -422,7 +422,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "inboundEndpoints" ],
         "summary" : "Update inbound endpoint",
         "operationId" : "updateInboundEp",
@@ -438,7 +438,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/InboundEp"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -446,7 +446,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -500,7 +500,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/MessageProcessorList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -517,7 +517,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "messageProcessors" ],
         "summary" : "Update message processor",
         "operationId" : "updateMessageProcessor",
@@ -533,7 +533,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/MessageProcessor"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -541,7 +541,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -595,7 +595,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/MessageStoreList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -744,7 +744,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TemplateList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -798,7 +798,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SequenceList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -815,7 +815,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "sequences" ],
         "summary" : "Update sequence",
         "operationId" : "updateSequence",
@@ -831,7 +831,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Sequence"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -839,7 +839,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -893,7 +893,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -947,7 +947,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/LocalEntryList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -965,11 +965,11 @@
         }
       }
     },
-    "/groups/{group-id}/dataservices" : {
+    "/groups/{group-id}/data-services" : {
       "get" : {
-        "tags" : [ "dataservices" ],
-        "summary" : "Get dataservices by node ids",
-        "operationId" : "getDataservicesByNodeIds",
+        "tags" : [ "data-services" ],
+        "summary" : "Get data-services by node ids",
+        "operationId" : "getDataServicesByNodeIds",
         "parameters" : [ {
           "name" : "group-id",
           "in" : "path",
@@ -997,11 +997,11 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "List of dataservices deployed in provided nodes",
+            "description" : "List of data-services deployed in provided nodes",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/DataserviceList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1109,7 +1109,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ConnectorList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1163,7 +1163,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/CAppList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1641,185 +1641,10 @@
           }
         }
       },
-      "InboundEpList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/InboundEpList_inner"
-        }
-      },
-      "InboundEpUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "inboundEpName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "tracing" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "MessageProcessorList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/MessageProcessorList_inner"
-        }
-      },
-      "MessageProcessorUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "processorName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "isActive" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "MessageStoreList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/MessageStoreList_inner"
-        }
-      },
-      "TemplateList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/TemplateList_inner"
-        }
-      },
-      "SequenceList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/SequenceList_inner"
-        }
-      },
-      "SequenceUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "sequenceName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "tracing" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "TaskList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/TaskList_inner"
-        }
-      },
-      "LocalEntryList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/LocalEntryList_inner"
-        }
-      },
-      "DataserviceList" : {
-        "type" : "array",
-        "example" : [ {
-          "dataserviceName" : "StudentDataService",
-          "nodes" : [ {
-            "nodeId" : "node_01",
-            "details" : [ {
-              "key" : "WSDL 1.1",
-              "value" : "http://localhost:8290/services/StudentDataService?wsdl"
-            }, {
-              "key" : "Swagger URL",
-              "value" : "http://localhost:8290/services/StudentDataService?swagger.json"
-            } ],
-            "datasources" : [ {
-              "key" : "StudentsDatasource",
-              "value" : [ {
-                "key" : "dataSourceId",
-                "value" : "StudentsDatasource"
-              }, {
-                "key" : "dataSourceType",
-                "value" : "RDBMS"
-              } ]
-            } ],
-            "queries" : [ {
-              "key" : "CreateStudents",
-              "value" : [ {
-                "key" : "id",
-                "value" : "CreateStudents"
-              }, {
-                "key" : "dataSourceId",
-                "value" : "StudentsDatasource"
-              }, {
-                "key" : "namespace",
-                "value" : "http://ws.wso2.org/dataservice"
-              } ]
-            } ],
-            "resources" : [ {
-              "key" : "createStudents",
-              "value" : [ {
-                "key" : "path",
-                "value" : "student/{id}"
-              }, {
-                "key" : "method",
-                "value" : "et"
-              } ]
-            } ],
-            "operations" : [ {
-              "key" : "CreateStudents",
-              "value" : [ {
-                "key" : "operationName",
-                "value" : "CreateStudents"
-              }, {
-                "key" : "queryId",
-                "value" : "createStudents"
-              } ]
-            } ]
-          } ]
-        }, { } ],
-        "items" : {
-          "$ref" : "#/components/schemas/DataserviceList_inner"
-        }
-      },
       "DatasourceList" : {
         "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/DatasourceList_inner"
-        }
-      },
-      "ConnectorList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/ConnectorList_inner"
-        }
-      },
-      "CAppList" : {
-        "type" : "array",
-        "example" : [ {
-          "cAppName" : "helloworldCompositeExporter",
-          "nodes" : [ {
-            "nodeId" : "node_01",
-            "details" : [ {
-              "key" : "version",
-              "value" : "1.0.0"
-            } ],
-            "artifacts" : [ {
-              "key" : "API",
-              "value" : [ "InitialWelcome", "ABC_api" ]
-            }, {
-              "key" : "Connectors",
-              "value" : [ "FileConnector", "CSV" ]
-            } ]
-          } ]
-        } ],
-        "items" : {
-          "$ref" : "#/components/schemas/CAppList_inner"
         }
       },
       "LogList" : {
@@ -1984,260 +1809,6 @@
           }
         }
       },
-      "InboundEpList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "inboundEpName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains protocol, tracing, statistics, sequence, onError etc.",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "parameters" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "MessageProcessorList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "processorName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, isActive, messageStore etc.",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "paramaters" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "MessageStoreList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "storeName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, messageCount",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "paramaters" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "TemplateList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "templateName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "type" : {
-                  "type" : "string",
-                  "enum" : [ "Endpoint Template", "Sequence Template" ]
-                }
-              }
-            }
-          }
-        }
-      },
-      "SequenceList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "sequenceName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains statistics, tracing etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "TaskList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "taskName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains group, implementation etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "triggerDetails" : {
-                  "type" : "array",
-                  "description" : "Array contains trigger, count, interval etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "LocalEntryList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "entryName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, value etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "DataserviceList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "dataserviceName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains wsdl1.1, swaggerUrl etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "datasources" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                },
-                "queries" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                },
-                "resources" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                },
-                "operations" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "DatasourceList_inner" : {
         "type" : "object",
         "properties" : {
@@ -2271,70 +1842,10 @@
           }
         }
       },
-      "ConnectorList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "connectorName" : {
-            "type" : "string"
-          },
-          "package" : {
-            "type" : "string"
-          },
-          "description" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "isFaulty" : {
-                  "type" : "boolean"
-                }
-              }
-            }
-          }
-        }
-      },
-      "CAppList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "cAppName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains isFaulty, version etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "artifacts" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArray"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "LogList_inner" : {
         "type" : "object",
         "properties" : {
-          "logFileName" : {
+          "name" : {
             "type" : "string"
           },
           "nodes" : {
@@ -2403,36 +1914,6 @@
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/ArtifactUpdateRequest"
-            }
-          }
-        }
-      },
-      "InboundEp" : {
-        "description" : "The request body to update inbound endpoint.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/InboundEpUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "MessageProcessor" : {
-        "description" : "The request body to update message processor.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/MessageProcessorUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "Sequence" : {
-        "description" : "The request body to update sequence.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/SequenceUpdateRequestBody"
             }
           }
         }

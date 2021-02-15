@@ -98,7 +98,7 @@ export default function SourceViewSection(props) {
             </Grid>
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     sourceView: {
         backgroundColor: 'red',
         width: '2000px',

@@ -39,14 +39,13 @@ import ConnectorIcon from '@material-ui/icons/CastConnected';
 import CappIcon from '@material-ui/icons/Dashboard';
 import UserIcon from '@material-ui/icons/People';
 import LogFileIcon from '@material-ui/icons/Description';
-import LayersIcon from '@material-ui/icons/Layers';
 import {makeStyles} from "@material-ui/core/styles/index";
 
 export function NavMenuItems() {
     const classes = useStyles();
     return (
         <div>
-            <Link to={'/proxy_services'} className={classes.navLink}>
+            <Link to={'/proxy-services'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <ProxyIcon/>
@@ -62,7 +61,7 @@ export function NavMenuItems() {
                     <ListItemText primary="Endpoints"/>
                 </ListItem>
             </Link>
-            <Link to={'/inbound_endpoints'} className={classes.navLink}>
+            <Link to={'/inbound-endpoints'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <InbountEpIcon/>
@@ -70,7 +69,7 @@ export function NavMenuItems() {
                     <ListItemText primary="Inbound Endpoints"/>
                 </ListItem>
             </Link>
-            <Link to={'/message_processors'} className={classes.navLink}>
+            <Link to={'/message-processors'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <MessageProcessorIcon/>
@@ -78,7 +77,7 @@ export function NavMenuItems() {
                     <ListItemText primary="Message Processors"/>
                 </ListItem>
             </Link>
-            <Link to={'/message_stores'} className={classes.navLink}>
+            <Link to={'/message-stores'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <MessageStoreIcon/>
@@ -118,7 +117,7 @@ export function NavMenuItems() {
                     <ListItemText primary="Tasks"/>
                 </ListItem>
             </Link>
-            <Link to={'/local_entries'} className={classes.navLink}>
+            <Link to={'/local-entries'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <LocalEntriesIcon/>
@@ -126,20 +125,12 @@ export function NavMenuItems() {
                     <ListItemText primary="Local Entries"/>
                 </ListItem>
             </Link>
-            <Link to={'/data_services'} className={classes.navLink}>
+            <Link to={'/data_-ervices'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <DssIcon/>
                     </ListItemIcon>
                     <ListItemText primary="Data Services"/>
-                </ListItem>
-            </Link>
-            <Link to={'/datasources'} className={classes.navLink}>
-                <ListItem button>
-                    <ListItemIcon>
-                        <LayersIcon/>
-                    </ListItemIcon>
-                    <ListItemText primary="Datasources"/>
                 </ListItem>
             </Link>
             <Link to={'/connectors'} className={classes.navLink}>
@@ -150,7 +141,7 @@ export function NavMenuItems() {
                     <ListItemText primary="Connectors"/>
                 </ListItem>
             </Link>
-            <Link to={'/carbon_applications'} className={classes.navLink}>
+            <Link to={'/carbon-applications'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <CappIcon/>
@@ -158,7 +149,7 @@ export function NavMenuItems() {
                     <ListItemText primary="Carbon Applications"/>
                 </ListItem>
             </Link>
-            <Link to={'/log_files'} className={classes.navLink}>
+            <Link to={'/log-files'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <LogFileIcon/>
