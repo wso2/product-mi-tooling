@@ -1,0 +1,125 @@
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
+import { withStyles } from '@material-ui/core/styles';
+import Divider from '@material-ui/core/Divider';
+import Drawer from '@material-ui/core/Drawer';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import { Link as MUILink } from '@material-ui/core';
+import { categories } from './NavigatorLinks';
+
+
+const styles = (theme) => ({
+    categoryHeader: {
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
+    },
+    categoryHeaderPrimary: {
+        color: theme.palette.common.white,
+    },
+    item: {
+        paddingTop: 1,
+        paddingBottom: 1,
+        color: 'rgba(255, 255, 255, 0.7)',
+        '&:hover,&:focus': {
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        },
+        '& a': {
+            color: 'rgba(255, 255, 255, 0.7)',
+        }
+    },
+    itemCategory: {
+        backgroundColor: '#232f3e',
+        boxShadow: '0 -1px 0 #404854 inset',
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
+    },
+    firebase: {
+        fontSize: 24,
+        color: theme.palette.common.white,
+    },
+    itemActiveItem: {
+        color: '#4fc3f7',
+        '& a': {
+            color: '#4fc3f7',
+        }
+    },
+    itemPrimary: {
+        fontSize: 'inherit',
+    },
+    itemIcon: {
+        minWidth: 'auto',
+        marginRight: theme.spacing(2),
+    },
+    divider: {
+        marginTop: theme.spacing(2),
+    },
+});
+
+function Navigator(props) {
+    const { classes, ...other } = props;
+    const defaultRoute = categories[0].children[0].to;
+    const location = useLocation(defaultRoute);
+    const [selected, setSelected] = useState();
+    useEffect(() => {
+        setSelected(location.pathname === '/' ? defaultRoute : location.pathname);
+    }, [location]);
+    return (
+        <Drawer variant="permanent" {...other}>
+            <List disablePadding>
+                <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>
+                    <MUILink component={Link} to='/'>
+                        <img
+                            alt='logo'
+                            src='/logo.svg'
+                            width={200}
+                        />
+                    </MUILink>
+                </ListItem>
+                {categories.map(({ id, children }) => (
+                    <React.Fragment key={id}>
+                        <ListItem className={classes.categoryHeader}>
+                            <ListItemText
+                                classes={{
+                                    primary: classes.categoryHeaderPrimary,
+                                }}
+                            >
+                                {id}
+                            </ListItemText>
+                        </ListItem>
+                        {children.map(({ id: childId, icon, to }) => (
+                            <ListItem
+                                key={childId}
+                                button
+                                className={clsx(classes.item, selected === to && classes.itemActiveItem)}
+                                to={to} 
+                                component={Link}
+                            >
+                                <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
+                                <ListItemText
+                                    classes={{
+                                        primary: classes.itemPrimary,
+                                    }}
+                                >
+                                    <MUILink>{childId}</MUILink>
+                                </ListItemText>
+                            </ListItem>
+                        ))}
+
+                        <Divider className={classes.divider} />
+                    </React.Fragment>
+                ))}
+            </List>
+        </Drawer>
+    );
+}
+
+Navigator.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(Navigator);
