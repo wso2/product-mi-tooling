@@ -820,12 +820,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /groups/{group-id}/logs/{file-name}/nodes/{node-id}:
+  /groups/{group-id}/nodes/{node-id}/logs/{file-name}:
     get:
       tags:
         - "logFiles"
-      summary: "Download log file"
-      operationId: "downloadLogFile"
+      summary: "Get log content"
+      operationId: "getLogContent"
       parameters:
         - name: "group-id"
           in: path
@@ -847,12 +847,11 @@ paths:
             type: string
       responses:
         200:
-          description: "Get log file in .log format"
+          description: "Get log file content."
           content:
-            binary/octet-stream:
+            text/plain:
               schema:
                 type: string
-                format: binary
         default:
           description: "Unexpected error"
           content:
@@ -1136,7 +1135,7 @@ components:
       items:
         type: object
         properties:
-          logFileName:
+          name:
             type: string
           nodes:
             type: array

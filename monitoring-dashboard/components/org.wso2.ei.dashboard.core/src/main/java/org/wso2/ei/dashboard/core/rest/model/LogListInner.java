@@ -1,27 +1,8 @@
-/*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- *
- *
- */
-
 package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -31,25 +12,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class LogListInner   {
-  private @Valid String logFileName = null;
+  private @Valid String name = null;
   private @Valid List<Object> nodes = new ArrayList<Object>();
 
   /**
    **/
-  public LogListInner logFileName(String logFileName) {
-    this.logFileName = logFileName;
+  public LogListInner name(String name) {
+    this.name = name;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("logFileName")
+  @JsonProperty("name")
 
-  public String getLogFileName() {
-    return logFileName;
+  public String getName() {
+    return name;
   }
-  public void setLogFileName(String logFileName) {
-    this.logFileName = logFileName;
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
@@ -80,13 +61,13 @@ public class LogListInner   {
       return false;
     }
     LogListInner logListInner = (LogListInner) o;
-    return Objects.equals(logFileName, logListInner.logFileName) &&
+    return Objects.equals(name, logListInner.name) &&
         Objects.equals(nodes, logListInner.nodes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(logFileName, nodes);
+    return Objects.hash(name, nodes);
   }
 
   @Override
@@ -94,7 +75,7 @@ public class LogListInner   {
     StringBuilder sb = new StringBuilder();
     sb.append("class LogListInner {\n");
     
-    sb.append("    logFileName: ").append(toIndentedString(logFileName)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    nodes: ").append(toIndentedString(nodes)).append("\n");
     sb.append("}");
     return sb.toString();
