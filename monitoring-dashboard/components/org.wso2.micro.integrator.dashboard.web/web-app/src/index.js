@@ -18,18 +18,42 @@
  *
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Dashboard from './home/Dashboard'
+import { BrowserRouter} from 'react-router-dom';
+import { Route, Switch } from 'react-router';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux'
 import Reducers from './redux/Reducers';
 
+import Login from './auth/Login';
+import Logout from './auth/Logout';
+import Dashboard from './home/Dashboard'
+
 const store = createStore (Reducers)
+
+class App extends Component {
+    constructor() {
+        super();
+    }
+    render() {
+        return (
+            <BrowserRouter basename={window.contextPath}>
+                <Switch>
+                    {/* Authentication */}
+                    <Route exact path='/login' component={Login} />
+                    <Route exact path='/logout' component={Logout} />
+                    {/* Secured routes */}
+                    <Route component={Dashboard} />
+                </Switch>
+            </BrowserRouter>
+        );
+    }
+};
 
 ReactDOM.render(
   <Provider store = {store}>
-    <Dashboard />
+    <App />
   </Provider>,
   document.getElementById('root')
 );
