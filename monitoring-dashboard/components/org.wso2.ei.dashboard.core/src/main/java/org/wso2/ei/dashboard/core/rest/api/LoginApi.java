@@ -20,31 +20,28 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.wso2.ei.dashboard.core.rest.delegates.auth.LoginDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.Token;
 import org.wso2.ei.dashboard.core.rest.model.UnauthorizedError;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
-import java.util.Map;
-import java.util.List;
-import javax.validation.constraints.*;
-import javax.validation.Valid;
 
 @Path("/login")
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJAXRSSpecServerCodegen", date = "2021-02-15T11:57:53.518+05:30[Asia/Colombo]")
 public class LoginApi {
+    LoginDelegate loginDelegate = new LoginDelegate();
 
     @POST
     @Consumes({ "application/x-www-form-urlencoded" })
@@ -56,5 +53,5 @@ public class LoginApi {
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
     public Response receiveLogin(@FormParam(value = "username")  String username,@FormParam(value = "password")  String password) {
-        return Response.ok().entity("magic!").build();
+        return loginDelegate.authenticateUser(username, password);
     }}

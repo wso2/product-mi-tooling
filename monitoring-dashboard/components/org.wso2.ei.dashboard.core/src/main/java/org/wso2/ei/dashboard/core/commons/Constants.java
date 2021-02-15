@@ -48,4 +48,6 @@ public final class Constants {
     public static final String DATABASE_USERNAME = System.getProperty("db_username");
     public static final String DATABASE_PASSWORD = System.getProperty("db_password");
 
+    public static final int TOKEN_CACHE_TIMEOUT = 60;
+
 }

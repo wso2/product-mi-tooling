@@ -20,32 +20,30 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.wso2.ei.dashboard.core.rest.delegates.auth.LogoutDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
-import java.util.Map;
-import java.util.List;
-import javax.validation.constraints.*;
-import javax.validation.Valid;
 
 @Path("/logout")
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJAXRSSpecServerCodegen", date = "2021-02-15T11:57:53.518+05:30[Asia/Colombo]")
 public class LogoutApi {
+    LogoutDelegate logoutDelegate = new LogoutDelegate();
 
-    @POST
+    @GET
     @Produces({ "application/json" })
     @Operation(summary = "Receive logouts to the dashboard", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "logout" })
@@ -53,6 +51,11 @@ public class LogoutApi {
         @ApiResponse(responseCode = "200", description = "Logout successful", content = @Content(schema = @Schema(implementation = Ack.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response receiveLogout() {
-        return Response.ok().entity("magic!").build();
+    public Response receiveLogout(@Context HttpHeaders httpHeaders) {
+        String authorizationHeader = httpHeaders.getHeaderString("Authorization");
+        if (authorizationHeader != null) {
+            String token = authorizationHeader.split(" ")[1];
+            return logoutDelegate.logoutUser(token);
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).build();
     }}
