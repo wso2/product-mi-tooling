@@ -23,6 +23,10 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
+  - name: "login"
+    description: "Login Management"
+  - name: "logout"
+    description: "Logout Management"
   - name: "heartbeat"
     description: "Heartbeat Management"
   - name: "groups"
@@ -67,6 +71,54 @@ tags:
     description: "Access configurations"
 
 paths:
+  /login:
+    post:
+      tags:
+        - "login"
+      summary: "Receive logins to the dashboard"
+      operationId: "ReceiveLogin"
+      requestBody:
+        $ref: '#/components/requestBodies/Login'
+      responses:
+        '200':
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /logout:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "logout"
+      summary: "Receive logouts to the dashboard"
+      operationId: "ReceiveLogout"
+      responses:
+        200:
+          description: "Logout successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /heartbeat:
     post:
       tags:
@@ -1013,6 +1065,16 @@ paths:
 
 components:
   schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      example:
+        username: admin
+        password: admin
     HeartbeatRequest:
       type: object
       properties:
@@ -1490,9 +1552,38 @@ components:
           type: string
       example:
         {code: 500, message: Internal server error}
-
-
+    UnauthorizedError:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      example:
+        code: 401
+        message: Unauthorized
+    Token:
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_in:
+          type: integer
+      example:
+        access_token: 2YotnFZFEjr1zCsicMWpAA
+        expires_in: 3600
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   requestBodies:
+    Login:
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            $ref: '#/components/schemas/LoginRequest'
+      description: "The request body to login."
     Heartbeat:
       content:
         application/json:

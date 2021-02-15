@@ -14,6 +14,12 @@
     "description" : "SwaggerHub API Auto Mocking"
   } ],
   "tags" : [ {
+    "name" : "login",
+    "description" : "Login Management"
+  }, {
+    "name" : "logout",
+    "description" : "Logout Management"
+  }, {
     "name" : "heartbeat",
     "description" : "Heartbeat Management"
   }, {
@@ -78,6 +84,80 @@
     "description" : "Access configurations"
   } ],
   "paths" : {
+    "/login" : {
+      "post" : {
+        "tags" : [ "login" ],
+        "summary" : "Receive logins to the dashboard",
+        "operationId" : "ReceiveLogin",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Login"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Login successful",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout" : {
+      "post" : {
+        "tags" : [ "logout" ],
+        "summary" : "Receive logouts to the dashboard",
+        "operationId" : "ReceiveLogout",
+        "responses" : {
+          "200" : {
+            "description" : "Logout successful",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Ack"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
     "/heartbeat" : {
       "post" : {
         "tags" : [ "heartbeat" ],
@@ -405,7 +485,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/InboundEpList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -422,7 +502,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "inboundEndpoints" ],
         "summary" : "Update inbound endpoint",
         "operationId" : "updateInboundEp",
@@ -438,7 +518,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/InboundEp"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -446,7 +526,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -744,7 +824,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TemplateList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -798,7 +878,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SequenceList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -815,7 +895,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "sequences" ],
         "summary" : "Update sequence",
         "operationId" : "updateSequence",
@@ -831,7 +911,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Sequence"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -839,7 +919,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -1531,6 +1611,21 @@
   },
   "components" : {
     "schemas" : {
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string"
+          },
+          "password" : {
+            "type" : "string"
+          }
+        },
+        "example" : {
+          "username" : "admin",
+          "password" : "admin"
+        }
+      },
       "HeartbeatRequest" : {
         "type" : "object",
         "properties" : {
@@ -1641,26 +1736,6 @@
           }
         }
       },
-      "InboundEpList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/InboundEpList_inner"
-        }
-      },
-      "InboundEpUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "inboundEpName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "tracing" : {
-            "type" : "boolean"
-          }
-        }
-      },
       "MessageProcessorList" : {
         "type" : "array",
         "items" : {
@@ -1685,32 +1760,6 @@
         "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/MessageStoreList_inner"
-        }
-      },
-      "TemplateList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/TemplateList_inner"
-        }
-      },
-      "SequenceList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/SequenceList_inner"
-        }
-      },
-      "SequenceUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "sequenceName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "tracing" : {
-            "type" : "boolean"
-          }
         }
       },
       "TaskList" : {
@@ -1940,6 +1989,36 @@
           "message" : "Internal server error"
         }
       },
+      "UnauthorizedError" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          }
+        },
+        "example" : {
+          "code" : 401,
+          "message" : "Unauthorized"
+        }
+      },
+      "Token" : {
+        "type" : "object",
+        "properties" : {
+          "access_token" : {
+            "type" : "string"
+          },
+          "expires_in" : {
+            "type" : "integer"
+          }
+        },
+        "example" : {
+          "access_token" : "2YotnFZFEjr1zCsicMWpAA",
+          "expires_in" : 3600
+        }
+      },
       "HeartbeatRequest_changeNotification" : {
         "type" : "object",
         "properties" : {
@@ -1980,38 +2059,6 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/ArtifactDetails"
-            }
-          }
-        }
-      },
-      "InboundEpList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "inboundEpName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains protocol, tracing, statistics, sequence, onError etc.",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "parameters" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
             }
           }
         }
@@ -2071,55 +2118,6 @@
                 },
                 "paramaters" : {
                   "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "TemplateList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "templateName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "type" : {
-                  "type" : "string",
-                  "enum" : [ "Endpoint Template", "Sequence Template" ]
-                }
-              }
-            }
-          }
-        }
-      },
-      "SequenceList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "sequenceName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains statistics, tracing etc",
                   "items" : {
                     "$ref" : "#/components/schemas/KeyValue"
                   }
@@ -2387,6 +2385,16 @@
       }
     },
     "requestBodies" : {
+      "Login" : {
+        "description" : "The request body to login.",
+        "content" : {
+          "application/x-www-form-urlencoded" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/LoginRequest"
+            }
+          }
+        }
+      },
       "Heartbeat" : {
         "description" : "The request body to update proxy.",
         "content" : {
@@ -2407,32 +2415,12 @@
           }
         }
       },
-      "InboundEp" : {
-        "description" : "The request body to update inbound endpoint.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/InboundEpUpdateRequestBody"
-            }
-          }
-        }
-      },
       "MessageProcessor" : {
         "description" : "The request body to update message processor.",
         "content" : {
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/MessageProcessorUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "Sequence" : {
-        "description" : "The request body to update sequence.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/SequenceUpdateRequestBody"
             }
           }
         }
@@ -2456,6 +2444,13 @@
             }
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }
