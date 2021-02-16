@@ -156,14 +156,24 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${version.log4j.core}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.log4j.wso2</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${wso2.log4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${version.log4j.core}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${version.log4j.core}</version>
             </dependency>
 
             <!-- Metrics -->
@@ -346,7 +356,7 @@
 
         <!-- Logging/SLF4J -->
         <slf4j.version>1.7.5</slf4j.version>
-        <wso2.log4j.version>1.2.17.wso2v1</wso2.log4j.version>
+        <version.log4j.core>2.12.0</version.log4j.core>
 
         <!-- Databridge -->
         <carbon.analytics-common.version>6.1.26</carbon.analytics-common.version>

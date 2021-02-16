@@ -21,15 +21,19 @@ package org.wso2.ei.dashboard.bootstrap;
 
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
@@ -92,8 +96,9 @@ public class Bootstrap {
         server.setHandler(handlers);
         try {
             server.start();
-            server.join();
+            writePID(dashboardHome);
             logger.info("Server started in port " + serverPort);
+            server.join();
         } catch (Exception ex) {
             logger.error("Error while starting up the server", ex);
         }
@@ -119,5 +124,28 @@ public class Bootstrap {
         properties.put(MI_USERNAME , miUsername);
         properties.put(MI_PASSWORD, miPassword);
         System.setProperties(properties);
+    }
+
+    /**
+     * Write the process ID of this process to the file.
+     *
+     * @param runtimePath DASHBOARD_HOME sys property value.
+     */
+    private static void writePID(String runtimePath) {
+        // Adopted from: https://stackoverflow.com/a/7690178
+        String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        int indexOfAt = jvmName.indexOf('@');
+        if (indexOfAt < 1) {
+            logger.warn("Cannot extract current process ID from JVM name '" + jvmName + "'.");
+            return;
+        }
+        String pid = jvmName.substring(0, indexOfAt);
+
+        Path runtimePidFile = Paths.get(runtimePath, "runtime.pid");
+        try {
+            Files.write(runtimePidFile, pid.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.warn("Cannot write process ID '" + pid + "' to '" + runtimePidFile.toString() + "' file.", e);
+        }
     }
 }

@@ -21,8 +21,8 @@
 package org.wso2.ei.dashboard.micro.integrator.delegates;
 
 import com.google.gson.JsonObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
@@ -38,18 +38,18 @@ import java.util.List;
  * Delegate class to handle requests from endpoints page.
  */
 public class EndpointsDelegate implements ArtifactDelegate {
-    private static final Log log = LogFactory.getLog(EndpointsDelegate.class);
+    private static final Logger logger = LogManager.getLogger(EndpointsDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     @Override
     public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-        log.debug("Fetching Endpoints from database.");
+        logger.debug("Fetching Endpoints from database.");
         return databaseManager.fetchArtifacts(Constants.ENDPOINTS, groupId, nodeList);
     }
 
     @Override
     public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) {
-        log.debug("Updating Endpoint " + request.getArtifactName() + " in node " + request.getNodeId() + " in group "
+        logger.debug("Updating Endpoint " + request.getArtifactName() + " in node " + request.getNodeId() + " in group "
                   + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         boolean isSuccess = updateEndpoint(groupId, request);

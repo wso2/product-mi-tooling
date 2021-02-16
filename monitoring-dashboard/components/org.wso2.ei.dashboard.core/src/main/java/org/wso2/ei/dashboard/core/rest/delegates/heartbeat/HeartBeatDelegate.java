@@ -20,8 +20,8 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * Manages heartbeats received to the dashboard.
  */
 public class HeartBeatDelegate {
-    private static final Log log = LogFactory.getLog(HeartBeatDelegate.class);
+    private static final Logger logger = LogManager.getLogger(HeartBeatDelegate.class);
     private static final String PRODUCT_MI = "mi";
     private static final String PRODUCT_SI = "si";
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
@@ -82,15 +82,15 @@ public class HeartBeatDelegate {
     }
 
     private boolean updateHeartbeat(HeartbeatObject heartbeat) {
-        if (log.isDebugEnabled()) {
-            log.debug("Updating heartbeat information of node " + heartbeat.getNodeId() + " in group : " +
+        if (logger.isDebugEnabled()) {
+            logger.debug("Updating heartbeat information of node " + heartbeat.getNodeId() + " in group : " +
                       heartbeat.getGroupId());
         }
         return databaseManager.updateHeartbeat(heartbeat);
     }
 
     private boolean registerNode(HeartbeatObject heartbeat) {
-        log.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
+        logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
         return databaseManager.insertHeartbeat(heartbeat);
     }
@@ -101,7 +101,7 @@ public class HeartBeatDelegate {
         Runnable runnableTask = () -> {
             boolean isNodeDeregistered = isNodeShutDown(heartbeat, timestampOfRegisteredNode);
             if (isNodeDeregistered) {
-                log.info("Node : " + heartbeat.getNodeId() + " of group : " + heartbeat.getGroupId() + " has " +
+                logger.info("Node : " + heartbeat.getNodeId() + " of group : " + heartbeat.getGroupId() + " has " +
                          "de-registered. Hence deleting node information");
                 deleteNode(productName, heartbeat);
             }
@@ -117,7 +117,7 @@ public class HeartBeatDelegate {
     private void deleteNode(String productName, HeartbeatObject heartbeat) {
         int rowCount = databaseManager.deleteHeartbeat(heartbeat);
         if (rowCount > 0) {
-            log.info("Successfully deleted node where group_id : " + heartbeat.getGroupId() + " and node_id : "
+            logger.info("Successfully deleted node where group_id : " + heartbeat.getGroupId() + " and node_id : "
                      + heartbeat.getNodeId() + ".");
             deleteAllNodeData(productName, heartbeat);
         } else {
@@ -128,7 +128,7 @@ public class HeartBeatDelegate {
     }
 
     private void deleteAllNodeData(String productName, HeartbeatObject heartbeat) {
-        log.info("Deleting all artifacts and server information in node : " + heartbeat.getNodeId() + " in group: "
+        logger.info("Deleting all artifacts and server information in node : " + heartbeat.getNodeId() + " in group: "
                  + heartbeat.getGroupId());
         ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
         artifactsManager.runDeleteAllExecutorService();

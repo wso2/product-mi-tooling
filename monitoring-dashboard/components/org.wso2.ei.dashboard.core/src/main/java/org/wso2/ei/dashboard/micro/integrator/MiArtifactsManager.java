@@ -23,10 +23,10 @@ package org.wso2.ei.dashboard.micro.integrator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
@@ -56,7 +56,7 @@ import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
  * Fetch, store, update and delete artifact information of registered micro integrator nodes.
  */
 public class MiArtifactsManager implements ArtifactsManager {
-    private static final Log log = LogFactory.getLog(MiArtifactsManager.class);
+    private static final Logger logger = LogManager.getLogger(MiArtifactsManager.class);
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS, TEMPLATES, SEQUENCES, INBOUND_ENDPOINTS)));
@@ -150,7 +150,7 @@ public class MiArtifactsManager implements ArtifactsManager {
                                                            artifactType, artifactName,
                                                            artifactDetails.toString());
         if (!isSuccess) {
-            log.error("Error occurred while adding " + artifactName);
+            logger.error("Error occurred while adding " + artifactName);
             addToDelayedQueue();
         }
     }
@@ -165,7 +165,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     private void storeServerInfo(String stringResponse, HeartbeatObject heartbeat) {
         boolean isSuccess = databaseManager.insertServerInformation(heartbeat, stringResponse);
         if (!isSuccess) {
-            log.error("Error occurred while adding server details of node: " + heartbeat.getNodeId() + " in group "
+            logger.error("Error occurred while adding server details of node: " + heartbeat.getNodeId() + " in group "
                       + heartbeat.getGroupId());
             addToDelayedQueue();
         }

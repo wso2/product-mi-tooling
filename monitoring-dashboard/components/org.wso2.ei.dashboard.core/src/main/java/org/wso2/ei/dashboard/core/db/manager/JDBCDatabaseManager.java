@@ -22,8 +22,8 @@ package org.wso2.ei.dashboard.core.db.manager;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
@@ -40,6 +40,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.sql.DataSource;
 
 /**
@@ -47,13 +48,15 @@ import javax.sql.DataSource;
  */
 public final class JDBCDatabaseManager implements DatabaseManager {
 
-    private static final Log log = LogFactory.getLog(JDBCDatabaseManager.class);
+    private static final Logger logger = LogManager.getLogger(JDBCDatabaseManager.class);
     private final DataSource dataSource;
 
     public JDBCDatabaseManager() {
         HikariConfig config = new HikariConfig();
 
-        config.setJdbcUrl(Constants.DATABASE_URL);
+        String databaseURL = Constants.DATABASE_URL.replace("\\", "\\\\");
+
+        config.setJdbcUrl(databaseURL);
         config.setUsername(Constants.DATABASE_USERNAME);
         config.setPassword(Constants.DATABASE_PASSWORD);
 
@@ -365,7 +368,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean deleteServerInformation(String groupId, String nodeId) {
-        log.debug("Deleting server information of node: " + nodeId + " in group : " + groupId);
+        logger.debug("Deleting server information of node: " + nodeId + " in group : " + groupId);
         String query = "DELETE FROM SERVERS WHERE GROUP_ID=? AND NODE_ID=?;";
         Connection con = null;
         PreparedStatement statement = null;
@@ -385,7 +388,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean deleteAllArtifacts(String artifactType, String groupId, String nodeId) {
-        log.debug("Deleting all " + artifactType + " in node: " + nodeId + " in group : " + groupId);
+        logger.debug("Deleting all " + artifactType + " in node: " + nodeId + " in group : " + groupId);
         String tableName = getTableName(artifactType);
         String query = "DELETE FROM " + tableName + " WHERE GROUP_ID=? AND NODE_ID=?;";
         Connection con = null;
@@ -408,7 +411,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     @Override
     public boolean deleteArtifact(String artifactType, String artifactName, String groupId, String nodeId) {
 
-        log.debug("Deleting " + artifactType + " : " + artifactName + " in node: " + nodeId + " in group : " + groupId);
+        logger.debug("Deleting " + artifactType + " : " + artifactName + " in node: " + nodeId +
+                " in group : " + groupId);
 
         String tableName = getTableName(artifactType);
 
@@ -492,7 +496,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 statement.close();
             }
         } catch (SQLException e) {
-            log.error("Error occurred while closing the statement.", e);
+            logger.error("Error occurred while closing the statement.", e);
         }
     }
 
@@ -502,7 +506,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 con.close();
             }
         } catch (SQLException e) {
-            log.error("Error occurred while closing the connection.", e);
+            logger.error("Error occurred while closing the connection.", e);
         }
     }
 }
