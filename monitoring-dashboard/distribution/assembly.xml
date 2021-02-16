@@ -69,10 +69,10 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/www</directory>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/</directory>
             <outputDirectory>server/www</outputDirectory>
             <includes>
-                <include>**</include>
+                <include>org.wso2.micro.integrator.dashboard.web.war</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -106,6 +106,7 @@
                 <include>org.apache.logging.log4j:log4j-api:jar</include>
                 <include>org.slf4j:slf4j-api:jar</include>
                 <include>org.apache.logging.log4j:log4j-slf4j-impl:jar</include>
+                <include>com.google.guava:guava:jar</include>
             </includes>
         </dependencySet>
     </dependencySets>

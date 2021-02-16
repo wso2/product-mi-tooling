@@ -30,17 +30,20 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 import { filterNodes } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
+import {Constants} from '../auth/Constants';
 
 export default function NodeFilter () {
 
     const [nodeList, setNodeList] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
     const basePath = useSelector(state => state.basePath);
+    var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
 
     React.useEffect(()=>{
         if (globalGroupId !== '') {
             const url = basePath.concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(url).then(response => {
+            axios.get(url, { headers: { Authorization: authBearer }}).then(response => {
                 var list = [];
                 response.data.map(data => list.push(data.nodeId))
                 setNodeList(list)

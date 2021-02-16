@@ -26,6 +26,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
 
 import java.util.Base64;
 
@@ -47,6 +48,10 @@ public class ManagementApiUtils {
     public static String getAccessToken(String mgtApiUrl) {
         String username = System.getProperty("mi_username");
         String password = System.getProperty("mi_password");
+        return getToken(mgtApiUrl, username, password);
+    }
+
+    public static String getToken(String mgtApiUrl, String username, String password) {
         String usernamePassword = username + ":" + password;
         String encodedUsernamePassword = Base64.getEncoder().encodeToString(usernamePassword.getBytes());
         String loginUrl = mgtApiUrl + "login";
@@ -55,6 +60,11 @@ public class ManagementApiUtils {
         httpGet.setHeader("Accept", "application/json");
         httpGet.setHeader("Authorization", "Basic " + encodedUsernamePassword);
         CloseableHttpResponse response = HttpUtils.doGet(httpGet);
+
+        if (response.getStatusLine().getStatusCode() == 401) {
+            throw new UnAuthorizedException("Invalid Credentials");
+        }
+
         JsonObject jsonResponse = HttpUtils.getJsonResponse(response);
 
         if (jsonResponse.has("AccessToken")) {

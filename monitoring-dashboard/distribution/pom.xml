@@ -49,14 +49,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
         </dependency>
         <dependency>
@@ -98,6 +90,10 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
     <build>

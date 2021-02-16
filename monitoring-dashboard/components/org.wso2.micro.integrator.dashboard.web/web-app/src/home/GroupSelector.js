@@ -4,6 +4,8 @@ import Box from '@material-ui/core/Box';
 import Select from '@material-ui/core/Select';
 import { changeGroup } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
+import {Constants} from '../auth/Constants';
 
 export default function GroupSelector() {
 
@@ -14,8 +16,8 @@ export default function GroupSelector() {
     React.useEffect(()=>{
         const url = basePath.concat('/groups/');
         let groups = [];
-        
-        axios.get(url).then(response => {
+        var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
+        axios.get(url, { headers: { Authorization: authBearer }}).then(response => {
             response.data.filter(groupName => {
                 var group = {
                     label : groupName,
