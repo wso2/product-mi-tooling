@@ -18,42 +18,55 @@
  *
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter} from 'react-router-dom';
-import { Route, Switch } from 'react-router';
-import { createStore } from 'redux';
-import { Provider } from 'react-redux'
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {createStore} from 'redux';
+import {Provider} from 'react-redux'
 import Reducers from './redux/Reducers';
 
 import Login from './auth/Login';
 import Logout from './auth/Logout';
 import Dashboard from './home/Dashboard'
+import interceptor from "./auth/Interceptor";
 
-const store = createStore (Reducers)
+const store = createStore(Reducers)
 
 class App extends Component {
-    constructor() {
-        super();
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            loggedOut: false
+        }
+        interceptor(this.logout);
     }
+
+    logout = () => {
+        this.setState({
+            loggedOut: true
+        });
+    }
+
     render() {
+
         return (
             <BrowserRouter basename={window.contextPath}>
                 <Switch>
-                    {/* Authentication */}
-                    <Route exact path='/login' component={Login} />
-                    <Route exact path='/logout' component={Logout} />
-                    {/* Secured routes */}
-                    <Route component={Dashboard} />
+                    <Route exact path='/login' component={Login}/>
+                    <Route exact path='/logout' component={Logout}/>
+                    <Route component={Dashboard}/>
+                    )}/>
                 </Switch>
             </BrowserRouter>
         );
+
     }
-};
+}
 
 ReactDOM.render(
-  <Provider store = {store}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
+    <Provider store={store}>
+        <App/>
+    </Provider>,
+    document.getElementById('root')
 );
