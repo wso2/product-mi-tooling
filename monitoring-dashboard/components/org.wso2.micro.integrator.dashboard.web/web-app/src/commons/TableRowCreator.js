@@ -33,6 +33,12 @@ import DisabledIcon from '@material-ui/icons/BlockOutlined';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import { Button } from '@material-ui/core';
 
 export default function TableRowCreator(props) {
     const { pageId, data, headers } = props;
@@ -176,9 +182,37 @@ function SwitchStatusCell(props) {
 
 function LogConfigLevelDrowDown(props) {
     const classes = useStyles();
-    const [level, setLevel] = React.useState(props.level);
-    const changeLogLevel = (level) => {
-        setLevel(level);
+    const name = props.name;
+    const globalGroupId = useSelector(state => state.groupId);
+    const basePath = useSelector(state => state.basePath);
+    const [ level, setLevel ] = React.useState(props.level);
+    const [dialog, setDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+    const handleDialogClose = () => {
+        setDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+    }
+    const changeLogLevel = (loggerLevel) => {
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/log-configs");
+        axios.patch(url, {
+            "name": name,
+            "level": loggerLevel
+        }).then(response => {
+            if (response.data.status === 'fail') {
+                setDialog({
+                    open: true, 
+                    title: 'Error',
+                    message: response.data.message
+                })
+            }
+        })
+        setLevel(loggerLevel);
     };
     
     return <FormControl variant="outlined" className={classes.formControl}>
@@ -197,6 +231,20 @@ function LogConfigLevelDrowDown(props) {
                         <option value={'ERROR'}>ERROR</option>
                         <option value={'FATAL'}>FATAL</option>
                     </Select>
+                    <Dialog open={dialog.open} onClose={() => handleDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                        <DialogTitle id="alert-dialog-title">{dialog.title}</DialogTitle>
+                        <DialogContent dividers>
+                            <DialogContentText id="alert-dialog-description">
+                                {dialog.message}
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => handleDialogClose()} variant="contained" autoFocus>
+                                OK
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
             </FormControl>
 }
 

@@ -48,8 +48,8 @@ export const categories = [
     {
       id: 'Global Settings',
       children: [
-        { id: 'Log Configs', to: 'log-configs', icon: <LocalEntriesIcon /> },
-        { id: 'Users', to: 'users', icon: <UserIcon /> },
+        { id: 'Log Configs', to: '/log-configs', icon: <LocalEntriesIcon /> },
+        { id: 'Users', to: '/users', icon: <UserIcon /> },
       ],
     },
   ];

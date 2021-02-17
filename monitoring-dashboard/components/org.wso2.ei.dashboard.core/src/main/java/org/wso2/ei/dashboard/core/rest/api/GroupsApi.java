@@ -108,7 +108,9 @@ public class GroupsApi {
     public Response updateLogLevel(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @Valid LogConfigUpdateRequest request) {
-        return Response.ok().entity("magic!").build();
+        LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
+        Ack ack = logConfigDelegate.updateLogLevel(groupId, request);
+        return Response.ok().entity(ack).build();
     }
 
     @POST
