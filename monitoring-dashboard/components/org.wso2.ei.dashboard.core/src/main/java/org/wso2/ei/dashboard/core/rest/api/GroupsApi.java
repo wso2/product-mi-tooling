@@ -39,7 +39,6 @@ import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
 import java.io.File;
 
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
-import org.wso2.ei.dashboard.core.rest.model.User;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -50,6 +49,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
@@ -65,6 +65,7 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.UsersDelegate;
 
 import java.util.List;
 import javax.validation.constraints.*;
@@ -425,14 +426,16 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get users", description = "", tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of users", content = @Content(schema = @Schema(implementation = User.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getUsers( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of users",
+                     content = @Content(schema = @Schema(implementation = Users.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getUsers(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) {
 
- @Parameter(description = "Group ID of the node") String groupId
-) {
-        return Response.ok().entity("magic!").build();
+        UsersDelegate usersDelegate = new UsersDelegate();
+        Users users = usersDelegate.fetchUsers(groupId);
+        return Response.ok().entity(users).build();
     }
     @GET
     @Produces({ "application/json" })

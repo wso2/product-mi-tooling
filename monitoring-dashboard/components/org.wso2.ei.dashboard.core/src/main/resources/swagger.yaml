@@ -1000,7 +1000,7 @@ paths:
       parameters:
         - name: "group-id"
           in: path
-          description: "Group ID of the node"
+          description: "Group ID"
           required: true
           schema:
             type: string
@@ -1010,7 +1010,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Users'
         default:
           description: "Unexpected error"
           content:
@@ -1265,12 +1265,10 @@ components:
           type: string
         level:
           type: string
-    User:
+    Users:
       type: array
       items:
-        type: object
-        properties:
-          userId:
+        type: string
             type: string
           isAdmin:
             type: boolean

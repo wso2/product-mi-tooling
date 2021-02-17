@@ -22,9 +22,6 @@ import React from 'react';
 import axios from 'axios';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import NodesCell from './NodesCell';
-import LogsNodeCell from './LogsNodeCell';
-import StatusCell from '../commons/StatusCell';
 import Switch from "react-switch";
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
@@ -39,6 +36,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core';
+import NodesCell from './NodesCell';
+import LogsNodeCell from './LogsNodeCell';
+import StatusCell from '../commons/StatusCell';
+import UserIdCell from '../commons/UserIdCell';
 
 export default function TableRowCreator(props) {
     const { pageId, data, headers } = props;
@@ -121,6 +122,10 @@ export default function TableRowCreator(props) {
             
             case 'level':
                 return <TableCell><LogConfigLevelDrowDown name={data.name} level={data.level}/></TableCell>
+
+            // users page
+            case 'userId':
+                return <TableCell><table><UserIdCell id={data} /></table></TableCell>
             
             // Node page
             case 'nodeId':

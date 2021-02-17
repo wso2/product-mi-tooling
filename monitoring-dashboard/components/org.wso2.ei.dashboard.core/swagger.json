@@ -1505,7 +1505,7 @@
         "parameters" : [ {
           "name" : "group-id",
           "in" : "path",
-          "description" : "Group ID of the node",
+          "description" : "Group ID",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -1519,7 +1519,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/User"
+                  "$ref" : "#/components/schemas/Users"
                 }
               }
             }
@@ -1823,10 +1823,10 @@
           }
         }
       },
-      "User" : {
+      "Users" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/User_inner"
+          "type" : "string"
         }
       },
       "UserAddRequestBody" : {
