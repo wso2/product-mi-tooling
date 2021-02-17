@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { Component } from 'react';
+import React, {useEffect, useState} from 'react';
 import {Helmet} from "react-helmet";
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -25,15 +25,13 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Redirect } from 'react-router';
+import {Redirect} from 'react-router';
 import AuthManager from './AuthManager'
 
 const styles = theme => ({
@@ -55,47 +53,36 @@ const styles = theme => ({
         margin: theme.spacing(3, 0, 2),
     },
 });
-/**
- * Login page.
- */
-class Login extends Component {
-    /**
-     * Constructor.
-     *
-     * @param {{}} props Props
-     */
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: '',
-            password: '',
-            authenticated: false
-        };
-        this.authenticate = this.authenticate.bind(this);
-        this.handleLoginErrorDialogClose = this.handleLoginErrorDialogClose.bind(this);
-    }
 
-    componentWillMount() {
-        this.initAuthenticationFlow();
-    }
+function Login(props){
+
+    const [userName, setUserName] = useState('');
+    const [password, setPassword] = useState('');
+    const [authenticated, setAuthenticated] = useState(false);
+    const [loginErrorMessage, setLoginErrorMessage] = useState('')
+    const [loginError, setLoginError] = useState(false)
+
+    useEffect(() => {
+        initAuthenticationFlow();
+    }, [])
 
     /**
      * Check if the user has already signed in and remember me is set
      */
-    initAuthenticationFlow() {
+    const initAuthenticationFlow = () => {
         if (!AuthManager.isLoggedIn()) {
-            this.setState({ authenticated: false })
+            setAuthenticated(false)
         } else {
-            this.setState({ authenticated: true })
+            setAuthenticated(true)
         }
     }
 
-    authenticate(e) {
-        const { username, password } = this.state;
+    const authenticate = (e)  => {
+
         e.preventDefault();
 
-        AuthManager.authenticate(username, password, false)
-            .then(() => { this.setState({ authenticated: true }) })
+        AuthManager.authenticate(userName, password, false)
+            .then(() => { setAuthenticated(true)})
             .catch((error) => {
                 console.log("Authentication failed with error :: " + error);
                 let errorMessage;
@@ -104,28 +91,22 @@ class Login extends Component {
                 } else {
                     errorMessage = "Error occurred in communication. Please check server logs."
                 }
-                this.setState({
-                    username: '',
-                    password: '',
-                    loginErrorMessage: errorMessage,
-                    loginError: true,
-                });
+                setUserName('')
+                setPassword('')
+                setLoginErrorMessage(errorMessage)
+                setLoginError(true)
+
             });
     }
 
-    handleLoginErrorDialogClose() {
-        this.setState({ loginError: false, loginErrorMessage: '' });
+    const handleLoginErrorDialogClose = () => {
+        setLoginError(false)
+        setLoginErrorMessage('')
     }
 
-    /**
-     * Render default login page.
-     *
-     * @return {XML} HTML content
-     */
-    renderDefaultLogin() {
-        const { classes } = this.props;
+    const renderDefaultLogin = () => {
+        const { classes } = props;
 
-        const { username, password } = this.state;
         return (
             <Container component="main" maxWidth="xs">
                 <Helmet>
@@ -154,12 +135,8 @@ class Login extends Component {
                             label="Username"
                             name="username"
                             autoComplete="off"
-                            value={username}
-                            onChange={(e) => {
-                                this.setState({
-                                    username: e.target.value,
-                                });
-                            }}
+                            value={userName}
+                            onChange={(e) => { setUserName(e.target.value)}}
                             autoFocus
                         />
                         <TextField
@@ -173,11 +150,7 @@ class Login extends Component {
                             id="password"
                             value={password}
                             autoComplete="off"
-                            onChange={(e) => {
-                                this.setState({
-                                    password: e.target.value,
-                                });
-                            }}
+                            onChange={(e) => {setPassword(e.target.value)}}
                         />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
@@ -189,12 +162,12 @@ class Login extends Component {
                             variant="contained"
                             color="primary"
                             className={classes.submit}
-                            disabled={username === '' || password === ''}
-                            onClick={this.authenticate}
+                            disabled={userName === '' || password === ''}
+                            onClick={authenticate}
                         >
                             Sign In
                 </Button>
-                        <Grid container>
+{/*                        <Grid container>
                             <Grid item xs>
                                 <Link href="#" variant="body2">
                                     Forgot password?
@@ -205,7 +178,7 @@ class Login extends Component {
                                     {"Don't have an account? Sign Up"}
                                 </Link>
                             </Grid>
-                        </Grid>
+                        </Grid>*/}
                     </form>
                 </div>
                 <Box mt={8}>
@@ -213,16 +186,16 @@ class Login extends Component {
                         {`© 2005 - ${new Date().getFullYear()} WSO2 Inc. All Rights Reserved.`}
                     </Typography>
                 </Box>
-                <Dialog open={this.state.loginError} onClose={this.handleLoginErrorDialogClose}
+                <Dialog open={loginError} onClose={handleLoginErrorDialogClose}
                     aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
                     <DialogTitle id="alert-dialog-title">{"Login Failed"}</DialogTitle>
                     <DialogContent dividers>
                         <DialogContentText id="alert-dialog-description">
-                            {this.state.loginErrorMessage}
+                            {loginErrorMessage}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleLoginErrorDialogClose} color="primary" autoFocus>
+                        <Button onClick={handleLoginErrorDialogClose} color="primary" autoFocus>
                             OK
                         </Button>
                     </DialogActions>
@@ -232,13 +205,11 @@ class Login extends Component {
         );
     }
 
-    render() {
-        const authenticated = this.state.authenticated;
-        if (authenticated) {
-            return <Redirect to="/" />
-        }
-        return this.renderDefaultLogin();
+    if (authenticated) {
+        return <Redirect to="/" />
     }
+    return renderDefaultLogin();
+
 }
 
 export default withStyles(styles)(Login);

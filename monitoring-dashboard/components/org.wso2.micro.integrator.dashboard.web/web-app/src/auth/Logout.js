@@ -16,32 +16,25 @@
  * under the License.
  */
 
-import React, { Component } from 'react';
+import React, {useEffect, useState} from 'react';
 import AuthManager from './AuthManager';
 import {Redirect} from 'react-router';
 
-export default class Logout extends Component {
+export default function Logout() {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            loggedOut: false
-        }
-    }
+    const [loggedOut, setLoggedOut] = useState(false)
 
-    componentWillMount() {
+    useEffect(() => {
         AuthManager.logout()
             .then(() => {
-               this.setState({
-                   loggedOut: true
-               });
+                setLoggedOut(true);
             });
-    }
+    }, [])
 
-    render() {
-        if (this.state.loggedOut) {
-            return <Redirect to={{pathname: '/login'}}/>
-        }
-        return "";
+
+    if (loggedOut) {
+        return <Redirect to={{pathname: '/login'}}/>
     }
+    return "";
+
 }
