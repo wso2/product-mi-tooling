@@ -28,14 +28,15 @@ import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
-import org.wso2.ei.dashboard.core.rest.model.LogConfig;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
 
 import java.io.File;
 
-import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.User;
 
@@ -55,6 +56,7 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.DataServicesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LocalEntriesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.LogConfigDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LogsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
@@ -78,15 +80,35 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Add logger", description = "", tags={ "logConfigs" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Logger insert status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "Logger insert status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response addLogger( @PathParam("group-id")
+    public Response addLogger(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid LogConfigAddRequest request) {
+        LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
+        Ack ack = logConfigDelegate.addLogger(groupId, request);
+        return Response.ok().entity(ack).build();
+    }
 
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid LogConfigAddRequestBody body) {
+    @PATCH
+    @Path("/{group-id}/log-configs")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @Operation(summary = "Update log level", description = "", tags={ "logConfigs" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logger update status",
+                         content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response updateLogLevel(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid LogConfigUpdateRequest request) {
         return Response.ok().entity("magic!").build();
     }
+
     @POST
     @Path("/{group-id}/users")
     @Consumes({ "application/json" })
@@ -263,14 +285,15 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get log configs", description = "", tags={ "logConfigs" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of log configs", content = @Content(schema = @Schema(implementation = LogConfig.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getLogConfigs( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-) {
-        return Response.ok().entity("magic!").build();
+        @ApiResponse(responseCode = "200", description = "List of log configs",
+                     content = @Content(schema = @Schema(implementation = LogConfigs.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response getLogConfigs(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) {
+        LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
+        LogConfigs logConfigs = logConfigDelegate.fetchLogConfigs(groupId);
+        return Response.ok().entity(logConfigs).build();
     }
     @GET
     @Path("/{group-id}/logs")

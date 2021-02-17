@@ -48,6 +48,8 @@ public final class Constants {
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";
 
+    public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
+
     // todo change this structure
 
     public static final String DASHBOARD_HOME = System.getenv("DASHBOARD_HOME");

@@ -1235,11 +1235,11 @@
         }
       }
     },
-    "/groups/{group-id}/logs/{file-name}/nodes/{node-id}" : {
+    "/groups/{group-id}/nodes/{node-id}/logs/{file-name}" : {
       "get" : {
         "tags" : [ "logFiles" ],
-        "summary" : "Download log file",
-        "operationId" : "downloadLogFile",
+        "summary" : "Get log content",
+        "operationId" : "getLogContent",
         "parameters" : [ {
           "name" : "group-id",
           "in" : "path",
@@ -1273,12 +1273,11 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Get log file in .log format",
+            "description" : "Get log file content.",
             "content" : {
-              "binary/octet-stream" : {
+              "text/plain" : {
                 "schema" : {
-                  "type" : "string",
-                  "format" : "binary"
+                  "type" : "string"
                 }
               }
             }
@@ -1296,7 +1295,7 @@
         }
       }
     },
-    "/groups/{group-id}/log-configs" : {
+    "/groups22/{group-id}/log-configs" : {
       "get" : {
         "tags" : [ "logConfigs" ],
         "summary" : "Get log configs",
@@ -1318,7 +1317,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/LogConfig"
+                  "$ref" : "#/components/schemas/LogConfigs"
                 }
               }
             }
@@ -1351,11 +1350,52 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Logger"
+          "$ref" : "#/components/requestBodies/AddLogger"
         },
         "responses" : {
           "200" : {
             "description" : "Logger insert status",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SuccessStatus"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "logConfigs" ],
+        "summary" : "Update log level",
+        "operationId" : "updateLogLevel",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/UpdateLogger"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Logger update status",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1580,10 +1620,14 @@
         "properties" : {
           "status" : {
             "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
           }
         },
         "example" : {
-          "status" : "ok"
+          "status" : "success",
+          "message" : "Successfully updated"
         }
       },
       "GroupList" : {
@@ -1653,24 +1697,34 @@
           "$ref" : "#/components/schemas/LogList_inner"
         }
       },
-      "LogConfig" : {
+      "LogConfigs" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/LogConfig_inner"
+          "$ref" : "#/components/schemas/LogConfigs_inner"
         }
       },
-      "LogConfigAddRequestBody" : {
+      "LogConfigAddRequest" : {
         "type" : "object",
         "properties" : {
-          "loggerName" : {
+          "name" : {
             "type" : "string"
           },
-          "className" : {
+          "loggerClass" : {
             "type" : "string"
           },
           "level" : {
-            "type" : "string",
-            "enum" : [ "false", "Trace", "DEBUG", "INFO", "WARN", "ERROR", "FATAL" ]
+            "type" : "string"
+          }
+        }
+      },
+      "LogConfigUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "level" : {
+            "type" : "string"
           }
         }
       },
@@ -1864,18 +1918,17 @@
           }
         }
       },
-      "LogConfig_inner" : {
+      "LogConfigs_inner" : {
         "type" : "object",
         "properties" : {
-          "loggerName" : {
+          "name" : {
             "type" : "string"
           },
-          "className" : {
+          "componentName" : {
             "type" : "string"
           },
           "level" : {
-            "type" : "string",
-            "enum" : [ "false", "Trace", "DEBUG", "INFO", "WARN", "ERROR", "FATAL" ]
+            "type" : "string"
           }
         }
       },
@@ -1918,12 +1971,22 @@
           }
         }
       },
-      "Logger" : {
+      "AddLogger" : {
         "description" : "The request body to add logger.",
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/LogConfigAddRequestBody"
+              "$ref" : "#/components/schemas/LogConfigAddRequest"
+            }
+          }
+        }
+      },
+      "UpdateLogger" : {
+        "description" : "The request body to add logger.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/LogConfigUpdateRequest"
             }
           }
         }

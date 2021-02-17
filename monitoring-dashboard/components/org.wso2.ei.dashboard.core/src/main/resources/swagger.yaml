@@ -877,7 +877,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogConfig'
+                $ref: '#/components/schemas/LogConfigs'
         default:
           description: "Unexpected error"
           content:
@@ -897,7 +897,7 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Logger'
+        $ref: '#/components/requestBodies/AddLogger'
       responses:
         200:
           description: "Logger insert status"
@@ -911,6 +911,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - "logConfigs"
+      summary: "Update log level"
+      operationId: "updateLogLevel"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateLogger'
+      responses:
+        200:
+          description: "Logger update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /groups/{group-id}/users:
     get:
       tags:
@@ -1052,7 +1080,9 @@ components:
       properties:
         status:
           type: string
-      example: {status: ok}
+        message:
+          type: string
+      example: {status: success, message: Successfully updated}
 
     GroupList:
       type: array
@@ -1146,42 +1176,33 @@ components:
                   type: string
                 size:
                   type: boolean
-    LogConfig:
+    LogConfigs:
       type: array
       items:
         type: object
         properties:
-          loggerName:
+          name:
             type: string
-          className:
+          componentName:
             type: string
           level:
             type: string
-            enum:
-              - OFF
-              - Trace
-              - DEBUG
-              - INFO
-              - WARN
-              - ERROR
-              - FATAL
-    LogConfigAddRequestBody:
+    LogConfigAddRequest:
       type: object
       properties:
-        loggerName:
+        name:
           type: string
-        className:
+        loggerClass:
           type: string
         level:
           type: string
-          enum:
-            - OFF
-            - Trace
-            - DEBUG
-            - INFO
-            - WARN
-            - ERROR
-            - FATAL
+    LogConfigUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        level:
+          type: string
     User:
       type: array
       items:
@@ -1265,11 +1286,17 @@ components:
           schema:
             $ref: '#/components/schemas/ArtifactUpdateRequest'
       description: "The request body to update artifact."
-    Logger:
+    AddLogger:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/LogConfigAddRequestBody'
+            $ref: '#/components/schemas/LogConfigAddRequest'
+      description: "The request body to add logger."
+    UpdateLogger:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LogConfigUpdateRequest'
       description: "The request body to add logger."
     User:
       content:
