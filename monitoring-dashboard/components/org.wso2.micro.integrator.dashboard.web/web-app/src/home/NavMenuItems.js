@@ -161,27 +161,33 @@ export function NavMenuItems() {
     )
 
 }
+
+export function GlobalSettingsSection() {
+    const classes = useStyles();
+    return <div>
+                <ListSubheader>GLOBAL SETTINGS</ListSubheader>
+                <Link to={'/log-configs'} className={classes.navLink}>
+                    <ListItem button>
+                        <ListItemIcon>
+                            <LocalEntriesIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Log Configs" />
+                    </ListItem>
+                </Link>
+                <Link to={'/users'} className={classes.navLink}>
+                    <ListItem button>
+                        <ListItemIcon>
+                            <UserIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Users" />
+                    </ListItem>
+                </Link>
+            </div>
+}
+
 const useStyles = makeStyles((theme) => ({
     navLink: {
         textDecoration: 'none',
         color: 'rgba(0, 0, 0, 0.87)'
     }
 }));
-
-export const globalSettings = (
-    <div>
-        <ListSubheader>GLOBAL SETTINGS</ListSubheader>
-        <ListItem button>
-            <ListItemIcon>
-                <LocalEntriesIcon />
-            </ListItemIcon>
-            <ListItemText primary="Log Configs" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <UserIcon />
-            </ListItemIcon>
-            <ListItemText primary="Users" />
-        </ListItem>
-    </div>
-);

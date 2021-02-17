@@ -28,6 +28,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TablePagination from '@material-ui/core/TablePagination';
 import EnhancedTableHead from './TableHeaderCreater';
 import TableRowCreator from './TableRowCreator';
+import AddGlobalConfigsButton from './AddGlobalConfigsButton'
 
 export default function EnhancedTable(props) {
     const { pageInfo, dataSet } = props;
@@ -60,7 +61,7 @@ export default function EnhancedTable(props) {
             <Typography component="h1" variant="h6" color="inherit" noWrap className="title">
                 {pageInfo.title}
             </Typography><br/>
-
+            <AddGlobalConfigsButton pageId={pageInfo.pageId}/>
             <Paper className={classes.paper}>
                 <TableContainer>
                     <Table

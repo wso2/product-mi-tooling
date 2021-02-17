@@ -36,7 +36,7 @@ import Paper from '@material-ui/core/Paper';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
-import { NavMenuItems, globalSettings } from './NavMenuItems';
+import { NavMenuItems, GlobalSettingsSection } from './NavMenuItems';
 import clsx from 'clsx';
 import Avatar from '@material-ui/core/Avatar';
 import GroupSelector from './GroupSelector';
@@ -57,6 +57,7 @@ import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
+import LogConfigs from '../pages/LogConfigs'
 import logo from '../images/logo.svg';
 import { useDispatch } from 'react-redux';
 import { setBasePath } from '../redux/Actions';
@@ -131,9 +132,9 @@ export default function Dashboard() {
                     </IconButton>
                 </div>
                 <Divider />
-                <List><NavMenuItems></NavMenuItems></List>
+                <List><NavMenuItems /></List>
                 <Divider />
-                <List>{globalSettings}</List>
+                <List><GlobalSettingsSection /></List>
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
@@ -157,6 +158,7 @@ export default function Dashboard() {
                                         <Route exact path='/connectors' component={Connectors}/>
                                         <Route exact path='/carbon-applications' component={CarbonApplications}/>
                                         <Route exact path='/log-files' component={LogFiles}/>
+                                        <Route exact path='/log-configs' component={LogConfigs}/>
                                     </Switch>
                             </Paper>
                         </Grid>

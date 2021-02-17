@@ -30,6 +30,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
 import EnabledIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import DisabledIcon from '@material-ui/icons/BlockOutlined';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 
 export default function TableRowCreator(props) {
     const { pageId, data, headers } = props;
@@ -40,7 +43,6 @@ export default function TableRowCreator(props) {
                 return <TableCell>{data.name}</TableCell>
             case 'nodes':
                 return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} />)}</table></TableCell>
-            
             case 'type':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
 
@@ -106,6 +108,13 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
             case 'port':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
+
+            // log-configs page
+            case 'componentName':
+                return <TableCell><StringCell data={data.componentName}/></TableCell>
+            
+            case 'level':
+                return <TableCell><LogConfigLevelDrowDown name={data.name} level={data.level}/></TableCell>
             
             // Node page
             case 'nodeId':
@@ -165,9 +174,39 @@ function SwitchStatusCell(props) {
     return <tr><td><Switch checked={isActive} onChange={changeState}/></td></tr>
 }
 
+function LogConfigLevelDrowDown(props) {
+    const classes = useStyles();
+    const [level, setLevel] = React.useState(props.level);
+    const changeLogLevel = (level) => {
+        setLevel(level);
+    };
+    
+    return <FormControl variant="outlined" className={classes.formControl}>
+                <InputLabel>Level</InputLabel>
+                    <Select
+                        native
+                        value={level}
+                        onChange={(e) => changeLogLevel(e.target.value)}
+                        label="Level"
+                    >
+                        <option value={'OFF'}>OFF</option>
+                        <option value={'TRACE'}>TRACE</option>
+                        <option value={'DEBUG'}>DEBUG</option>
+                        <option value={'INFO'}>INFO</option>
+                        <option value={'WARN'}>WARN</option>
+                        <option value={'ERROR'}>ERROR</option>
+                        <option value={'FATAL'}>FATAL</option>
+                    </Select>
+            </FormControl>
+}
+
 const useStyles = makeStyles((theme) => ({
     tableCell : {
         paddingLeft: '15px',
         color: '#3f51b5'
+    },
+    formControl: {
+        minWidth: 10,
+        minHeight: 10
     }
 }));
