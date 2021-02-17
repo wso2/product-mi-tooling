@@ -21,10 +21,10 @@
 package org.wso2.ei.dashboard.core.rest.delegates;
 
 import com.google.gson.JsonObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
@@ -40,6 +40,8 @@ public class ConfigurationDelegate {
     private String artifactType;
     private String artifactName;
 
+    private static final Logger logger = LogManager.getLogger(ConfigurationDelegate.class);
+
     public ConfigurationDelegate(String groupId, String nodeId, String artifactType, String artifactName) {
         this.groupId = groupId;
         this.nodeId = nodeId;
@@ -47,10 +49,8 @@ public class ConfigurationDelegate {
         this.artifactName = artifactName;
     }
 
-    private static final Log log = LogFactory.getLog(ConfigurationDelegate.class);
-
     public ModelConfiguration getConfiguration() {
-        log.debug("Fetching configuration of " + artifactName + " in node " + nodeId + " of group " + groupId);
+        logger.debug("Fetching configuration of " + artifactName + " in node " + nodeId + " of group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
         String queryParamName = getQueryParam(artifactType);

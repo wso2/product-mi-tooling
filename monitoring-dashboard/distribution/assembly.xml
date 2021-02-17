@@ -34,6 +34,7 @@
             <outputDirectory>conf</outputDirectory>
             <includes>
                 <include>deployment.toml</include>
+                <include>log4j2.properties</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -41,8 +42,17 @@
             <outputDirectory>bin</outputDirectory>
             <includes>
                 <include>dashboard.sh</include>
+                <include>dashboard.bat</include>
             </includes>
             <fileMode>755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/target/classes</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>version.txt</include>
+            </includes>
+            <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources/dbscripts</directory>
@@ -59,10 +69,10 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/www</directory>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/</directory>
             <outputDirectory>server/www</outputDirectory>
             <includes>
-                <include>**</include>
+                <include>org.wso2.micro.integrator.dashboard.web.war</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -84,8 +94,6 @@
                 <include>org.eclipse.jetty:jetty-server:jar</include>
                 <include>org.eclipse.jetty:jetty-servlet:jar</include>
                 <include>org.eclipse.jetty:jetty-webapp:jar</include>
-                <include>org.eclipse.jetty:jetty-server:jar</include>
-                <include>org.eclipse.jetty:jetty-servlet:jar</include>
                 <include>org.eclipse.jetty:jetty-util:jar</include>
                 <include>org.eclipse.jetty:jetty-http:jar</include>
                 <include>org.eclipse.jetty:jetty-io:jar</include>
@@ -94,7 +102,11 @@
                 <include>javax.servlet:javax.servlet-api:jar</include>
                 <include>net.consensys.cava:cava-toml:jar</include>
                 <include>org.antlr:antlr4-runtime:jar</include>
-                <include>log4j:log4j:jar</include>
+                <include>org.apache.logging.log4j:log4j-core:jar</include>
+                <include>org.apache.logging.log4j:log4j-api:jar</include>
+                <include>org.slf4j:slf4j-api:jar</include>
+                <include>org.apache.logging.log4j:log4j-slf4j-impl:jar</include>
+                <include>com.google.guava:guava:jar</include>
             </includes>
         </dependencySet>
     </dependencySets>

@@ -25,22 +25,26 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import ListItemText from '@material-ui/core/ListItemText';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 import { filterNodes } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
+import {Constants} from '../auth/Constants';
 
 export default function NodeFilter () {
 
     const [nodeList, setNodeList] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
     const basePath = useSelector(state => state.basePath);
+    var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
 
     React.useEffect(()=>{
         if (globalGroupId !== '') {
             const url = basePath.concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(url).then(response => {
+            axios.get(url, { headers: { Authorization: authBearer }}).then(response => {
                 var list = [];
                 response.data.map(data => list.push(data.nodeId))
                 setNodeList(list)
@@ -65,8 +69,8 @@ function MultipleSelect(props) {
     return (
         <div>
             <FormControl className={classes.formControl}>
-                <InputLabel>Select Nodes</InputLabel>
                 <Select
+                    classes={{root: classes.selectRoot}}
                     multiple
                     value={nodeList}
                     onChange={handleChange}
@@ -86,12 +90,16 @@ function MultipleSelect(props) {
                         </MenuItem>
                     ))}
                 </Select>
+                <FormHelperText>Select Nodes</FormHelperText>
             </FormControl>
         </div>
     );
 }
 
 const useStyles = makeStyles((theme) => ({
+    selectRoot: {
+        minHeight: 25,
+    },
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
@@ -103,6 +111,7 @@ const useStyles = makeStyles((theme) => ({
     },
     chip: {
         margin: 2,
+        height: 20,
     },
     noLabel: {
         marginTop: theme.spacing(3),

@@ -19,28 +19,17 @@
  */
 
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
+import { Switch, Route, BrowserRouter as Router, Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
+import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
-import Drawer from '@material-ui/core/Drawer';
-import Divider from '@material-ui/core/Divider';
-import List from '@material-ui/core/List';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import Box from '@material-ui/core/Box';
-import Link from '@material-ui/core/Link';
-import { NavMenuItems, GlobalSettingsSection } from './NavMenuItems';
-import clsx from 'clsx';
-import Avatar from '@material-ui/core/Avatar';
-import GroupSelector from './GroupSelector';
-import NodeFilter from './NodeFilter';
+import Navigator from './layout/Navigator';
+import Content from './layout/Content';
+import Header from './layout/Header';
+import { useDispatch } from 'react-redux';
+import { setBasePath } from '../redux/Actions';
 import ProxyService from '../pages/ProxyService';
 import Endpoints from '../pages/Endpoints';
 import Nodes from '../pages/Nodes';
@@ -50,220 +39,115 @@ import MessageStores from '../pages/MessageStores'
 import APIs from '../pages/APIs'
 import Templates from '../pages/Templates'
 import Sequences from '../pages/Sequences';
-import Tasks from '../pages/Tasks';
-import LocalEntries from '../pages/LocalEntries';
 import DataServices from '../pages/DataServices';
 import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
 import LogConfigs from '../pages/LogConfigs'
-import logo from '../images/logo.svg';
-import { useDispatch } from 'react-redux';
-import { setBasePath } from '../redux/Actions';
+import AuthManager from '../auth/AuthManager';
 
-export default function Dashboard() {
-    const classes = useStyles();
-    const [open, setOpen] = React.useState(true);
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
 
-    const windowLocation = window.location.href;
-    const dispatch = useDispatch();
-    dispatch(setBasePath(windowLocation))
+const drawerWidth = 256;
 
-    return (
-        <div className={classes.root}>
-            <CssBaseline />
-            <Router>
-            <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-                <Toolbar className={classes.toolbar}>
-                    <div style={{ width: '100%' }}>
-                        <Box display="flex" p={1}>
-                            <Box flexGrow={0} p={1}>
-                                <IconButton
-                                    edge="start"
-                                    color="inherit"
-                                    aria-label="open drawer"
-                                    onClick={handleDrawerOpen}
-                                    className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
-                                >
-                                    <MenuIcon />
-                                </IconButton>
-                                <Link style={{height: '17px'}} to={'/'}><img
-                                    height='17'
-                                    src={logo}
-                                    alt='logo'
-                                /></Link>
-                            </Box>
-                            <Box flexGrow={10}>
-                                <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.typography}>
-                                    Micro Integrator Dashboard
-                                </Typography>
-                            </Box>
-                            <GroupSelector/>
-                            <Box p={1}>
-                                <Avatar alt="Remy Sharp" src="/broken-image.jpg" className={classes.orange}>
-                                    B
-                                </Avatar>
-                            </Box>
-                            <Box p={1} style={{padding: '13px'}}>
-                                Admin
-                            </Box>
-                        </Box>
-                    </div>
-                </Toolbar>
-            </AppBar>
-            <Drawer
-                variant="permanent"
-                classes={{
-                    paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-                }}
-                open={open}
-            >
-                <div className={classes.toolbarIcon}>
-                    <div><NodeFilter/></div>
-                    <IconButton onClick={handleDrawerClose}>
-                        <ChevronLeftIcon />
-                    </IconButton>
-                </div>
-                <Divider />
-                <List><NavMenuItems /></List>
-                <Divider />
-                <List><GlobalSettingsSection /></List>
-            </Drawer>
-            <main className={classes.content}>
-                <div className={classes.appBarSpacer} />
-                <Container maxWidth="lg" className={classes.container}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12}>
-                            <Paper className={classes.paper}>
-                                    <Switch>
-                                        <Route exact path='/' component={Nodes}/>
-                                        <Route exact path='/proxy-services' component={ProxyService}/>
-                                        <Route exact path='/endpoints' component={Endpoints}/>
-                                        <Route exact path='/inbound-endpoints' component={InboundEndpoints}/>
-                                        <Route exact path='/message-processors' component={MessageProcessors}/>
-                                        <Route exact path='/message-stores' component={MessageStores}/>
-                                        <Route exact path='/apis' component={APIs}/>
-                                        <Route exact path='/templates' component={Templates}/>
-                                        <Route exact path='/sequences' component={Sequences}/>
-                                        <Route exact path='/tasks' component={Tasks}/>
-                                        <Route exact path='/local-entries' component={LocalEntries}/>
-                                        <Route exact path='/data-services' component={DataServices}/>
-                                        <Route exact path='/connectors' component={Connectors}/>
-                                        <Route exact path='/carbon-applications' component={CarbonApplications}/>
-                                        <Route exact path='/log-files' component={LogFiles}/>
-                                        <Route exact path='/log-configs' component={LogConfigs}/>
-                                    </Switch>
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                    <Box>
-                        <Typography variant="body2" color="textSecondary" className={classes.fixedFooter}>
-                            {'© 2005 - 2020 WSO2 Inc. All Rights Reserved.'}
-                        </Typography>
-                    </Box>
-                </Container>
-            </main>
-            </Router>
-        </div>
-    )
-}
-
-const useStyles = makeStyles((theme) => ({
+const styles = (theme) => ({
     root: {
         display: 'flex',
+        minHeight: '100vh',
     },
-    toolbar: {
-        paddingRight: 24, // keep right padding when drawer closed
-    },
-    typography: {
-        marginLeft: '12px',
-    },
-    toolbarIcon: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: '0 8px',
-        ...theme.mixins.toolbar,
-    },
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    appBarShift: {
-        marginLeft: 240,
-        width: `calc(100% - 240px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    menuButton: {
-        marginRight: 36,
-    },
-    menuButtonHidden: {
-        display: 'none',
-    },
-    title: {
-        flexGrow: 1,
-        fontSize: 50
-    },
-    drawerPaper: {
-        position: 'relative',
-        whiteSpace: 'nowrap',
-        width: 240,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    drawerPaperClose: {
-        overflowX: 'hidden',
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing(7),
+    drawer: {
         [theme.breakpoints.up('sm')]: {
-            width: theme.spacing(9),
+            width: drawerWidth,
+            flexShrink: 0,
         },
     },
-    appBarSpacer: theme.mixins.toolbar,
-    content: {
-        flexGrow: 1,
-        height: '100vh',
-        overflow: 'auto',
-    },
-    container: {
-        paddingTop: theme.spacing(4),
-        paddingBottom: theme.spacing(4),
-    },
-    paper: {
-        padding: theme.spacing(2),
+    app: {
+        flex: 1,
         display: 'flex',
-        overflow: 'auto',
         flexDirection: 'column',
     },
-    fixedHeight: {
-        height: 240,
+    main: {
+        flex: 1,
+        padding: theme.spacing(6, 4),
+        background: '#eaeff1',
     },
-    fixedFooter: {
-        height: '40px',
-        padding: '10px 0',
-        bottom: '0',
-        marginBottom: '1px',
-        textAlign: 'center',
-        position: 'fixed',
-        left: '50%',
+    footer: {
+        padding: theme.spacing(2),
+        background: '#eaeff1',
     },
+});
 
-}));
+function Layout(props) {
+    const { classes } = props;
+    const [mobileOpen, setMobileOpen] = React.useState(false);
+
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
+    const windowLocation = window.location.href;
+    const dispatch = useDispatch();
+    dispatch(setBasePath(windowLocation));
+    // if the user is not logged in Redirect to login
+    if (!AuthManager.isLoggedIn()) {
+        return (
+            <Redirect to={{ pathname: '/login' }} />
+        );
+    }
+
+    return (
+        <Router>
+
+            <div className={classes.root}>
+                <CssBaseline />
+                <nav className={classes.drawer}>
+                    <Hidden smUp implementation="js">
+                        <Navigator
+                            PaperProps={{ style: { width: drawerWidth } }}
+                            variant="temporary"
+                            open={mobileOpen}
+                            onClose={handleDrawerToggle}
+                        />
+                    </Hidden>
+                    <Hidden xsDown implementation="css">
+                        <Navigator PaperProps={{ style: { width: drawerWidth } }} />
+                    </Hidden>
+                </nav>
+                <div className={classes.app}>
+                    <Header onDrawerToggle={handleDrawerToggle} />
+                    <main className={classes.main}>
+                        <Content>
+                            <Switch>
+                                <Route exact path='/' component={Nodes} />
+                                <Route exact path='/proxy-services' component={ProxyService} />
+                                <Route exact path='/endpoints' component={Endpoints} />
+                                <Route exact path='/inbound-endpoints' component={InboundEndpoints} />
+                                <Route exact path='/message-processors' component={MessageProcessors} />
+                                <Route exact path='/message-stores' component={MessageStores} />
+                                <Route exact path='/apis' component={APIs} />
+                                <Route exact path='/templates' component={Templates} />
+                                <Route exact path='/sequences' component={Sequences} />
+                                <Route exact path='/data-services' component={DataServices} />
+                                <Route exact path='/datasources' component={Datasources} />
+                                <Route exact path='/connectors' component={Connectors} />
+                                <Route exact path='/carbon-applications' component={CarbonApplications} />
+                                <Route exact path='/log-files' component={LogFiles} />
+                                <Route exact path='/log-configs' component={LogConfigs}/>
+                            </Switch>
+                        </Content>
+                    </main>
+                    <footer className={classes.footer}>
+                        <Typography variant="body2" color="textSecondary" align="center">
+                            {`© 2005 - ${new Date().getFullYear()} WSO2 Inc. All Rights Reserved.`}
+                        </Typography>
+                    </footer>
+                </div>
+            </div>
+        </Router>
+    );
+}
+
+Layout.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(Layout);

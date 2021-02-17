@@ -43,7 +43,7 @@ export default function InboundEpSideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper}>
+                    <Paper className={classes.paper} elevation={0} square>
                         <InboundEpDetailTable nodeData={nodeData}/>
                     </Paper>
                 </Grid>

@@ -14,6 +14,12 @@
     "description" : "SwaggerHub API Auto Mocking"
   } ],
   "tags" : [ {
+    "name" : "login",
+    "description" : "Login Management"
+  }, {
+    "name" : "logout",
+    "description" : "Logout Management"
+  }, {
     "name" : "heartbeat",
     "description" : "Heartbeat Management"
   }, {
@@ -78,6 +84,80 @@
     "description" : "Access configurations"
   } ],
   "paths" : {
+    "/login" : {
+      "post" : {
+        "tags" : [ "login" ],
+        "summary" : "Receive logins to the dashboard",
+        "operationId" : "ReceiveLogin",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Login"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Login successful",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout" : {
+      "get" : {
+        "tags" : [ "logout" ],
+        "summary" : "Receive logouts to the dashboard",
+        "operationId" : "ReceiveLogout",
+        "responses" : {
+          "200" : {
+            "description" : "Logout successful",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Ack"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
     "/heartbeat" : {
       "post" : {
         "tags" : [ "heartbeat" ],
@@ -1295,7 +1375,7 @@
         }
       }
     },
-    "/groups22/{group-id}/log-configs" : {
+    "/groups/{group-id}/log-configs" : {
       "get" : {
         "tags" : [ "logConfigs" ],
         "summary" : "Get log configs",
@@ -1571,6 +1651,21 @@
   },
   "components" : {
     "schemas" : {
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string"
+          },
+          "password" : {
+            "type" : "string"
+          }
+        },
+        "example" : {
+          "username" : "admin",
+          "password" : "admin"
+        }
+      },
       "HeartbeatRequest" : {
         "type" : "object",
         "properties" : {
@@ -1819,6 +1914,36 @@
           "message" : "Internal server error"
         }
       },
+      "UnauthorizedError" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer"
+          },
+          "message" : {
+            "type" : "string"
+          }
+        },
+        "example" : {
+          "code" : 401,
+          "message" : "Unauthorized"
+        }
+      },
+      "Token" : {
+        "type" : "object",
+        "properties" : {
+          "access_token" : {
+            "type" : "string"
+          },
+          "expires_in" : {
+            "type" : "integer"
+          }
+        },
+        "example" : {
+          "access_token" : "2YotnFZFEjr1zCsicMWpAA",
+          "expires_in" : 3600
+        }
+      },
       "HeartbeatRequest_changeNotification" : {
         "type" : "object",
         "properties" : {
@@ -1951,6 +2076,16 @@
       }
     },
     "requestBodies" : {
+      "Login" : {
+        "description" : "The request body to login.",
+        "content" : {
+          "application/x-www-form-urlencoded" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/LoginRequest"
+            }
+          }
+        }
+      },
       "Heartbeat" : {
         "description" : "The request body to update proxy.",
         "content" : {
@@ -2000,6 +2135,13 @@
             }
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }

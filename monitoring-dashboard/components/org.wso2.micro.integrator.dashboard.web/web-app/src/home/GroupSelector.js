@@ -1,9 +1,14 @@
 import React from 'react';
 import axios from 'axios';
-import Box from '@material-ui/core/Box';
+import { makeStyles } from '@material-ui/core/styles';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { changeGroup } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
+import { Constants } from '../auth/Constants';
 
 export default function GroupSelector() {
 
@@ -11,15 +16,15 @@ export default function GroupSelector() {
     const dispatch = useDispatch();
     const basePath = useSelector(state => state.basePath);
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         const url = basePath.concat('/groups/');
         let groups = [];
-        
-        axios.get(url).then(response => {
+        var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
+        axios.get(url, { headers: { Authorization: authBearer } }).then(response => {
             response.data.filter(groupName => {
                 var group = {
-                    label : groupName,
-                    value : groupName
+                    label: groupName,
+                    value: groupName
                 }
                 groups.push(group);
             })
@@ -28,33 +33,39 @@ export default function GroupSelector() {
                 dispatch(changeGroup(groups[0].value))
             }
         })
-    },[])
+    }, [])
 
     return (
-        <Box component="span" m={1}>
-            <Box style={{padding: '13px'}}>Group ID  <SelectComponent groupList={groupList}/></Box>
-        </Box>
+        <SelectComponent groupList={groupList} />
     );
 }
 
 function SelectComponent(props) {
+    const classes = useStyles();
 
     var options = props.groupList;
     const dispatch = useDispatch();
-    let select;
+    return <FormControl style={{ width: 150 }}>
+        <Select
+            classes={{ root: classes.selectRoot }}
 
-    if(options.length > 0) {
-        select = <Select native
-                    label="Group Id"
-                    onChange={(e) => dispatch(changeGroup(e.target.value))}
-                    style={{ textDecoration: 'none' , color: '#fff'}} >
-                    {options.map((option) => (
-                        <option value={option.value}>{option.label}</option>
-                    ))}
-                </Select>
-    } else {
-        select = <Select native
-                    style={{ textDecoration: 'none' , color: '#fff'}} />
-    }
-    return select;
+            labelId="group-id-select-label"
+            id="group-id-select"
+            onChange={(e) => dispatch(changeGroup(e.target.value))}
+        >
+            {options.map((option) => (
+                <MenuItem value={option.value}>{option.label}</MenuItem>
+            ))}
+
+        </Select>
+        <FormHelperText>Group ID</FormHelperText>
+
+    </FormControl>;
 }
+
+const useStyles = makeStyles((theme) => ({
+    selectRoot: {
+        minHeight: '25px',
+        lineHeight: '25px',
+    },
+}));

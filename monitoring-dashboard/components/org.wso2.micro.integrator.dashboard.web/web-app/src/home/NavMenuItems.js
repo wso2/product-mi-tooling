@@ -125,7 +125,7 @@ export function NavMenuItems() {
                     <ListItemText primary="Local Entries"/>
                 </ListItem>
             </Link>
-            <Link to={'/data_-ervices'} className={classes.navLink}>
+            <Link to={'/data_services'} className={classes.navLink}>
                 <ListItem button>
                     <ListItemIcon>
                         <DssIcon/>

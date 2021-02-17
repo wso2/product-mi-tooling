@@ -20,8 +20,8 @@
 
 package org.wso2.ei.dashboard.micro.integrator.delegates;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
@@ -36,12 +36,12 @@ import java.util.List;
  * Delegate class to handle requests from templates page.
  */
 public class TemplatesDelegate implements ArtifactDelegate {
-    private static final Log log = LogFactory.getLog(TemplatesDelegate.class);
+    private static final Logger logger = LogManager.getLogger(TemplatesDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     @Override
     public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-        log.debug("Fetching templates from database.");
+        logger.debug("Fetching templates from database.");
         return databaseManager.fetchArtifacts(Constants.TEMPLATES, groupId, nodeList);
     }
 

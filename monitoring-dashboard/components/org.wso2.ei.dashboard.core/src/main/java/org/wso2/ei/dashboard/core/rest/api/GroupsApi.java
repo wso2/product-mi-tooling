@@ -20,6 +20,7 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
@@ -69,6 +70,7 @@ import java.util.List;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 
+@Secured
 @Path("/groups")
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJAXRSSpecServerCodegen", date = "2020-12-15T14:16:00.637+05:30[Asia/Colombo]")

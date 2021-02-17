@@ -22,6 +22,8 @@ import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
+import {Constants} from '../auth/Constants';
 
 export default function ProxyService() {
     const [pageInfo] = React.useState({
@@ -47,12 +49,13 @@ export default function ProxyService() {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
         const url = basePath.concat('/groups/').concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
-        axios.get(url).then(response => {
+        axios.get(url, {}).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))
             )
             setProxyList(response.data)
         })
+        // Need to handle 401 errors
     },[globalGroupId, selectedNodeList])
 
     return <EnhancedTable pageInfo={pageInfo} dataSet={proxyList}/>
