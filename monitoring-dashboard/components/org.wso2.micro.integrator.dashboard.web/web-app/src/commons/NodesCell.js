@@ -23,12 +23,12 @@ import TableCell from "@material-ui/core/TableCell";
 import Drawer from '@material-ui/core/Drawer';
 import TableRow from '@material-ui/core/TableRow'
 import { makeStyles } from '@material-ui/core/styles';
-import ProxySideDrawer from './sideDrawers/ProxySideDrawer';
-import EndpointSideDrawer from './sideDrawers/EndpointSideDrawer';
-import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
-import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
-import SequenceSideDrawer from './sideDrawers/SequenceSideDrawer';
-import InboundEpSideDrawer from './sideDrawers/InboundEpSideDrawer';
+import ProxySideDrawer from './sidedrawers/ProxySideDrawer';
+import EndpointSideDrawer from './sidedrawers/EndpointSideDrawer';
+import HomePageSideDrawer from './sidedrawers/HomePageSideDrawer';
+import ApiSideDrawer from './sidedrawers/ApiSideDrawer';
+import SequenceSideDrawer from './sidedrawers/SequenceSideDrawer';
+import InboundEpSideDrawer from './sidedrawers/InboundEpSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();

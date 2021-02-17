@@ -48,7 +48,7 @@ export default function HomePageSideDrawer(props) {
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <Paper className={classes.sideDrawerHeading} square>
+                    <Paper className={classes.sideDrawerHeading} square elevation={0}>
                         <Typography variant="h6" color="inherit" noWrap>
                             {nodeData.nodeId} Information
                         </Typography>

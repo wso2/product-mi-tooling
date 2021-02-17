@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     sideDrawerHeading: {
         padding: theme.spacing(1),
         height: '64px',
-        backgroundColor: '#3f51b5',
+        backgroundColor: theme.palette.background.appBar,
         color: '#ffffff'
     }
 }));
