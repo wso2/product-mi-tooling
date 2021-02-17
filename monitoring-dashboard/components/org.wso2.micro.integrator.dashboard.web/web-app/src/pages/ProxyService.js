@@ -48,9 +48,8 @@ export default function ProxyService() {
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
-        var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
         const url = basePath.concat('/groups/').concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
-        axios.get(url, { headers: { Authorization: authBearer }}).then(response => {
+        axios.get(url, {}).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))
             )
