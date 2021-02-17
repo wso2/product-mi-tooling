@@ -25,6 +25,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import ListItemText from '@material-ui/core/ListItemText';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
@@ -68,8 +69,8 @@ function MultipleSelect(props) {
     return (
         <div>
             <FormControl className={classes.formControl}>
-                <InputLabel>Select Nodes</InputLabel>
                 <Select
+                    classes={{root: classes.selectRoot}}
                     multiple
                     value={nodeList}
                     onChange={handleChange}
@@ -89,12 +90,16 @@ function MultipleSelect(props) {
                         </MenuItem>
                     ))}
                 </Select>
+                <FormHelperText>Select Nodes</FormHelperText>
             </FormControl>
         </div>
     );
 }
 
 const useStyles = makeStyles((theme) => ({
+    selectRoot: {
+        minHeight: 25,
+    },
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
@@ -106,6 +111,7 @@ const useStyles = makeStyles((theme) => ({
     },
     chip: {
         margin: 2,
+        height: 20,
     },
     noLabel: {
         marginTop: theme.spacing(3),

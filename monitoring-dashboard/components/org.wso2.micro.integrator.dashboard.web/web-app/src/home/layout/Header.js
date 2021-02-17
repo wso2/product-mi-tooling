@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from "react-helmet";
 import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import HelpIcon from '@material-ui/icons/Help';
 import Hidden from '@material-ui/core/Hidden';
@@ -49,9 +49,13 @@ const styles = (theme) => ({
 function Header(props) {
   const { classes, onDrawerToggle } = props;
   const location = useLocation();
-  const [selected, setSelected] = useState(categories[0].children[0]);
+  const [selected, setSelected] = useState(null);
   useEffect(() => {
-    setSelected(getIdFromRoute(location.pathname));
+    if (location.pathname !== '/') {
+      setSelected(getIdFromRoute(location.pathname));
+    } else {
+      setSelected(null);
+    }
   }, [location]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -63,8 +67,11 @@ function Header(props) {
   };
 
   return (
-    <React.Fragment>
-      <AppBar color="primary" position="sticky" elevation={0}>
+    <>
+      <Helmet>
+        <title>{selected ? `${selected.id} - ` : 'Nodes - '}Micro Integrator Dashboard</title>
+      </Helmet>
+      <AppBar color="default" position="sticky" elevation={0}>
         <Toolbar>
           <Grid container spacing={1} alignItems="center">
             <Hidden smUp>
@@ -122,7 +129,7 @@ function Header(props) {
       <AppBar
         component="div"
         className={classes.secondaryBar}
-        color="primary"
+        color="default"
         position="static"
         elevation={0}
       >
@@ -130,7 +137,7 @@ function Header(props) {
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
-                {selected.id}
+                {selected ? selected.id : 'Nodes'}
               </Typography>
             </Grid>
             {/* <Grid item>
@@ -148,7 +155,7 @@ function Header(props) {
           </Grid>
         </Toolbar>
       </AppBar>
-    </React.Fragment>
+    </>
   );
 }
 

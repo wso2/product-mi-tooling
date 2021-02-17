@@ -10,6 +10,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Link as MUILink } from '@material-ui/core';
+import HomeIcon from '@material-ui/icons/Home';
 import { categories } from './NavigatorLinks';
 
 
@@ -35,8 +36,8 @@ const styles = (theme) => ({
     itemCategory: {
         backgroundColor: '#232f3e',
         boxShadow: '0 -1px 0 #404854 inset',
-        paddingTop: theme.spacing(2),
-        paddingBottom: theme.spacing(2),
+        paddingTop: 10,
+        paddingBottom: 10,
     },
     firebase: {
         fontSize: 24,
@@ -62,11 +63,10 @@ const styles = (theme) => ({
 
 function Navigator(props) {
     const { classes, ...other } = props;
-    const defaultRoute = categories[0].children[0].to;
-    const location = useLocation(defaultRoute);
-    const [selected, setSelected] = useState();
+    const location = useLocation();
+    const [selected, setSelected] = useState('/');
     useEffect(() => {
-        setSelected(location.pathname === '/' ? defaultRoute : location.pathname);
+        setSelected(location.pathname);
     }, [location]);
     return (
         <Drawer variant="permanent" {...other}>
@@ -79,6 +79,21 @@ function Navigator(props) {
                             width={200}
                         />
                     </MUILink>
+                </ListItem>
+                <ListItem 
+                    className={clsx(classes.item, classes.itemCategory, selected === '/' && classes.itemActiveItem)} 
+                    to='/'
+                    component={Link}>
+                    <ListItemIcon className={classes.itemIcon}>
+                        <HomeIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                        classes={{
+                            primary: classes.itemPrimary,
+                        }}
+                    >
+                        Nodes
+                </ListItemText>
                 </ListItem>
                 {categories.map(({ id, children }) => (
                     <React.Fragment key={id}>
@@ -96,7 +111,7 @@ function Navigator(props) {
                                 key={childId}
                                 button
                                 className={clsx(classes.item, selected === to && classes.itemActiveItem)}
-                                to={to} 
+                                to={to}
                                 component={Link}
                             >
                                 <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
