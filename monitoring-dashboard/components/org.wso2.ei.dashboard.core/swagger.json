@@ -59,7 +59,7 @@
     "name" : "localEntries",
     "description" : "Access local entries details"
   }, {
-    "name" : "dataservices",
+    "name" : "data-services",
     "description" : "Access data services details"
   }, {
     "name" : "datasources",
@@ -127,7 +127,7 @@
       }
     },
     "/logout" : {
-      "post" : {
+      "get" : {
         "tags" : [ "logout" ],
         "summary" : "Receive logouts to the dashboard",
         "operationId" : "ReceiveLogout",
@@ -580,7 +580,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/MessageProcessorList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -597,7 +597,7 @@
           }
         }
       },
-      "put" : {
+      "patch" : {
         "tags" : [ "messageProcessors" ],
         "summary" : "Update message processor",
         "operationId" : "updateMessageProcessor",
@@ -613,7 +613,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/MessageProcessor"
+          "$ref" : "#/components/requestBodies/ArtifactUpdate"
         },
         "responses" : {
           "200" : {
@@ -621,7 +621,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SuccessStatus"
+                  "$ref" : "#/components/schemas/Ack"
                 }
               }
             }
@@ -675,7 +675,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/MessageStoreList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -973,7 +973,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1027,7 +1027,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/LocalEntryList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1045,11 +1045,11 @@
         }
       }
     },
-    "/groups/{group-id}/dataservices" : {
+    "/groups/{group-id}/data-services" : {
       "get" : {
-        "tags" : [ "dataservices" ],
-        "summary" : "Get dataservices by node ids",
-        "operationId" : "getDataservicesByNodeIds",
+        "tags" : [ "data-services" ],
+        "summary" : "Get data-services by node ids",
+        "operationId" : "getDataServicesByNodeIds",
         "parameters" : [ {
           "name" : "group-id",
           "in" : "path",
@@ -1077,11 +1077,11 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "List of dataservices deployed in provided nodes",
+            "description" : "List of data-services deployed in provided nodes",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/DataserviceList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1189,7 +1189,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ConnectorList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1243,7 +1243,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/CAppList"
+                  "$ref" : "#/components/schemas/Artifacts"
                 }
               }
             }
@@ -1315,11 +1315,11 @@
         }
       }
     },
-    "/groups/{group-id}/logs/{file-name}/nodes/{node-id}" : {
+    "/groups/{group-id}/nodes/{node-id}/logs/{file-name}" : {
       "get" : {
         "tags" : [ "logFiles" ],
-        "summary" : "Download log file",
-        "operationId" : "downloadLogFile",
+        "summary" : "Get log content",
+        "operationId" : "getLogContent",
         "parameters" : [ {
           "name" : "group-id",
           "in" : "path",
@@ -1353,12 +1353,11 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Get log file in .log format",
+            "description" : "Get log file content.",
             "content" : {
-              "binary/octet-stream" : {
+              "text/plain" : {
                 "schema" : {
-                  "type" : "string",
-                  "format" : "binary"
+                  "type" : "string"
                 }
               }
             }
@@ -1398,7 +1397,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/LogConfig"
+                  "$ref" : "#/components/schemas/LogConfigs"
                 }
               }
             }
@@ -1431,11 +1430,52 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/Logger"
+          "$ref" : "#/components/requestBodies/AddLogger"
         },
         "responses" : {
           "200" : {
             "description" : "Logger insert status",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SuccessStatus"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "logConfigs" ],
+        "summary" : "Update log level",
+        "operationId" : "updateLogLevel",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/UpdateLogger"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Logger update status",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1675,10 +1715,14 @@
         "properties" : {
           "status" : {
             "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
           }
         },
         "example" : {
-          "status" : "ok"
+          "status" : "success",
+          "message" : "Successfully updated"
         }
       },
       "GroupList" : {
@@ -1736,139 +1780,10 @@
           }
         }
       },
-      "MessageProcessorList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/MessageProcessorList_inner"
-        }
-      },
-      "MessageProcessorUpdateRequestBody" : {
-        "type" : "object",
-        "properties" : {
-          "processorName" : {
-            "type" : "string"
-          },
-          "nodeId" : {
-            "type" : "string"
-          },
-          "isActive" : {
-            "type" : "boolean"
-          }
-        }
-      },
-      "MessageStoreList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/MessageStoreList_inner"
-        }
-      },
-      "TaskList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/TaskList_inner"
-        }
-      },
-      "LocalEntryList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/LocalEntryList_inner"
-        }
-      },
-      "DataserviceList" : {
-        "type" : "array",
-        "example" : [ {
-          "dataserviceName" : "StudentDataService",
-          "nodes" : [ {
-            "nodeId" : "node_01",
-            "details" : [ {
-              "key" : "WSDL 1.1",
-              "value" : "http://localhost:8290/services/StudentDataService?wsdl"
-            }, {
-              "key" : "Swagger URL",
-              "value" : "http://localhost:8290/services/StudentDataService?swagger.json"
-            } ],
-            "datasources" : [ {
-              "key" : "StudentsDatasource",
-              "value" : [ {
-                "key" : "dataSourceId",
-                "value" : "StudentsDatasource"
-              }, {
-                "key" : "dataSourceType",
-                "value" : "RDBMS"
-              } ]
-            } ],
-            "queries" : [ {
-              "key" : "CreateStudents",
-              "value" : [ {
-                "key" : "id",
-                "value" : "CreateStudents"
-              }, {
-                "key" : "dataSourceId",
-                "value" : "StudentsDatasource"
-              }, {
-                "key" : "namespace",
-                "value" : "http://ws.wso2.org/dataservice"
-              } ]
-            } ],
-            "resources" : [ {
-              "key" : "createStudents",
-              "value" : [ {
-                "key" : "path",
-                "value" : "student/{id}"
-              }, {
-                "key" : "method",
-                "value" : "et"
-              } ]
-            } ],
-            "operations" : [ {
-              "key" : "CreateStudents",
-              "value" : [ {
-                "key" : "operationName",
-                "value" : "CreateStudents"
-              }, {
-                "key" : "queryId",
-                "value" : "createStudents"
-              } ]
-            } ]
-          } ]
-        }, { } ],
-        "items" : {
-          "$ref" : "#/components/schemas/DataserviceList_inner"
-        }
-      },
       "DatasourceList" : {
         "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/DatasourceList_inner"
-        }
-      },
-      "ConnectorList" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/ConnectorList_inner"
-        }
-      },
-      "CAppList" : {
-        "type" : "array",
-        "example" : [ {
-          "cAppName" : "helloworldCompositeExporter",
-          "nodes" : [ {
-            "nodeId" : "node_01",
-            "details" : [ {
-              "key" : "version",
-              "value" : "1.0.0"
-            } ],
-            "artifacts" : [ {
-              "key" : "API",
-              "value" : [ "InitialWelcome", "ABC_api" ]
-            }, {
-              "key" : "Connectors",
-              "value" : [ "FileConnector", "CSV" ]
-            } ]
-          } ]
-        } ],
-        "items" : {
-          "$ref" : "#/components/schemas/CAppList_inner"
         }
       },
       "LogList" : {
@@ -1877,24 +1792,34 @@
           "$ref" : "#/components/schemas/LogList_inner"
         }
       },
-      "LogConfig" : {
+      "LogConfigs" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/LogConfig_inner"
+          "$ref" : "#/components/schemas/LogConfigs_inner"
         }
       },
-      "LogConfigAddRequestBody" : {
+      "LogConfigAddRequest" : {
         "type" : "object",
         "properties" : {
-          "loggerName" : {
+          "name" : {
             "type" : "string"
           },
-          "className" : {
+          "loggerClass" : {
             "type" : "string"
           },
           "level" : {
-            "type" : "string",
-            "enum" : [ "false", "Trace", "DEBUG", "INFO", "WARN", "ERROR", "FATAL" ]
+            "type" : "string"
+          }
+        }
+      },
+      "LogConfigUpdateRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "level" : {
+            "type" : "string"
           }
         }
       },
@@ -2063,179 +1988,6 @@
           }
         }
       },
-      "MessageProcessorList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "processorName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, isActive, messageStore etc.",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "paramaters" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "MessageStoreList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "storeName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, messageCount",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "paramaters" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "TaskList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "taskName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains group, implementation etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "triggerDetails" : {
-                  "type" : "array",
-                  "description" : "Array contains trigger, count, interval etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "LocalEntryList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "entryName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains type, value etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "DataserviceList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "dataserviceName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains wsdl1.1, swaggerUrl etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "datasources" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                },
-                "queries" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                },
-                "resources" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                },
-                "operations" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArrayOfObject"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "DatasourceList_inner" : {
         "type" : "object",
         "properties" : {
@@ -2269,70 +2021,10 @@
           }
         }
       },
-      "ConnectorList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "connectorName" : {
-            "type" : "string"
-          },
-          "package" : {
-            "type" : "string"
-          },
-          "description" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "isFaulty" : {
-                  "type" : "boolean"
-                }
-              }
-            }
-          }
-        }
-      },
-      "CAppList_inner" : {
-        "type" : "object",
-        "properties" : {
-          "cAppName" : {
-            "type" : "string"
-          },
-          "nodes" : {
-            "type" : "array",
-            "items" : {
-              "type" : "object",
-              "properties" : {
-                "nodeId" : {
-                  "type" : "string"
-                },
-                "details" : {
-                  "type" : "array",
-                  "description" : "Array contains isFaulty, version etc",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValue"
-                  }
-                },
-                "artifacts" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/KeyValueAsArray"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "LogList_inner" : {
         "type" : "object",
         "properties" : {
-          "logFileName" : {
+          "name" : {
             "type" : "string"
           },
           "nodes" : {
@@ -2351,18 +2043,17 @@
           }
         }
       },
-      "LogConfig_inner" : {
+      "LogConfigs_inner" : {
         "type" : "object",
         "properties" : {
-          "loggerName" : {
+          "name" : {
             "type" : "string"
           },
-          "className" : {
+          "componentName" : {
             "type" : "string"
           },
           "level" : {
-            "type" : "string",
-            "enum" : [ "false", "Trace", "DEBUG", "INFO", "WARN", "ERROR", "FATAL" ]
+            "type" : "string"
           }
         }
       },
@@ -2415,22 +2106,22 @@
           }
         }
       },
-      "MessageProcessor" : {
-        "description" : "The request body to update message processor.",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/MessageProcessorUpdateRequestBody"
-            }
-          }
-        }
-      },
-      "Logger" : {
+      "AddLogger" : {
         "description" : "The request body to add logger.",
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/LogConfigAddRequestBody"
+              "$ref" : "#/components/schemas/LogConfigAddRequest"
+            }
+          }
+        }
+      },
+      "UpdateLogger" : {
+        "description" : "The request body to add logger.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/LogConfigUpdateRequest"
             }
           }
         }

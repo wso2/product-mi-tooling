@@ -23,14 +23,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 
-export default function ProxySideDrawer(props) {
+export default function TasksSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name; 
@@ -41,50 +38,58 @@ export default function ProxySideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                            <ProxyServiceDetailPage nodeData={nodeData}/>
+                    <Paper className={classes.paper}>
+                        <TasksDetailTable nodeData={nodeData}/>
                     </Paper>
                 </Grid>
-                <EndpointsSection endpoints={nodeData.details.eprs}/>
-                <SourceViewSection artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId}/>
+                <TriggerDetails details={nodeData.details}/>
+                <SourceViewSection artifactType="tasks" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
 }
 
-function ProxyServiceDetailPage(props) {
+function TasksDetailTable(props) {
     const nodeData = props.nodeData;
-    const artifactName = nodeData.details.name
-    const pageId = "proxy-services";
+
     return <Table>
                 <TableRow>
-                    <TableCell>Service Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
+                    <TableCell>Task Name</TableCell>
+                    <TableCell>{nodeData.details.name}</TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
+                    <TableCell>Task Group</TableCell>
+                    <TableCell>{nodeData.details.taskGroup}</TableCell>
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-            </Table>
+                <TableRow>
+                    <TableCell>Task Implementation</TableCell>
+                    <TableCell>{nodeData.details.implementation}</TableCell>
+                </TableRow>
+            </Table> 
 }
 
-function EndpointsSection(props) {
-    const endpoints = props.endpoints;
+function TriggerDetails(props) {
+    const task = props.details;
     const classes = useStyles();
     return <Grid item xs={12}>
                 <Paper className={classes.paper} square>
                     <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Endpoints
+                        TriggerDetails
                     </Typography>
                     <hr className={classes.horizontalLine}></hr>
-                    <Table>
-                        {endpoints.map(ep =>
-                            <TableRow>{ep}
-                                <CopyToClipboard text={ep} className={classes.clipboard}>
-                                    <Button><FileCopyIcon/></Button>
-                                </CopyToClipboard>
-                            </TableRow>)}
+                    <Table size="small">
+                        <TableRow>
+                            <TableCell>Trigger</TableCell>
+                            <TableCell>{task.triggerType}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Count</TableCell>
+                            <TableCell>{task.triggerCount}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Interval (In seconds)</TableCell>
+                            <TableCell>{task.triggerInterval}</TableCell>
+                        </TableRow>
                     </Table>
                 </Paper>
             </Grid>
@@ -105,8 +110,5 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor : '#3f51b5',
         borderWidth: '0px',
         height: '1px'
-    },
-    clipboard: {
-        color: '#3f51b5'
     }
 }));

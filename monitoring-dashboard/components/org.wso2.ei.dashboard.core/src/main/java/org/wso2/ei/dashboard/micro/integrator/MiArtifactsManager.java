@@ -46,10 +46,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
+import static org.wso2.ei.dashboard.core.commons.Constants.CARBON_APPLICATIONS;
+import static org.wso2.ei.dashboard.core.commons.Constants.CONNECTORS;
+import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
+import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
+import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
+import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
+import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
 import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
 
 /**
@@ -59,7 +66,9 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final Logger logger = LogManager.getLogger(MiArtifactsManager.class);
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, APIS, TEMPLATES, SEQUENCES, INBOUND_ENDPOINTS)));
+            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, INBOUND_ENDPOINTS, MESSAGE_PROCESSORS,
+                                        MESSAGE_STORES, APIS, TEMPLATES, SEQUENCES, TASKS, LOCAL_ENTRIES, CONNECTORS,
+                                        CARBON_APPLICATIONS, DATA_SERVICES)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
     private UpdateArtifactObject updateArtifactObject = null;
@@ -109,20 +118,47 @@ public class MiArtifactsManager implements ArtifactsManager {
             final String url = heartbeat.getMgtApiUrl().concat(artifactType);
             CloseableHttpResponse response = doGet(accessToken, url);
             JsonObject artifacts = HttpUtils.getJsonResponse(response);
-            if (artifactType.equals(TEMPLATES)) {
-                processTemplates(artifactType, artifacts);
-            } else {
-                processArtifacts(accessToken, artifactType, artifacts);
+            switch (artifactType) {
+                case TEMPLATES:
+                    processTemplates(artifactType, artifacts);
+                    break;
+                case CONNECTORS:
+                    processConnectors(artifacts);
+                    break;
+                default:
+                    processArtifacts(accessToken, artifactType, artifacts);
+                    break;
             }
         }
         fetchAndStoreServers(accessToken);
+    }
+
+    private void processConnectors(JsonObject artifacts) {
+        JsonArray list = artifacts.get("list").getAsJsonArray();
+        for (JsonElement element : list) {
+            final String artifactName = element.getAsJsonObject().get("name").getAsString();
+            JsonObject artifactDetails = new JsonObject();
+            artifactDetails.addProperty("name", artifactName);
+            artifactDetails.addProperty("package", element.getAsJsonObject().get("package").getAsString());
+            artifactDetails.addProperty(
+                    "description", element.getAsJsonObject().get("description").getAsString());
+            artifactDetails.addProperty("status", element.getAsJsonObject().get("status").getAsString());
+            insertArtifact(CONNECTORS, artifactName, artifactDetails);
+        }
     }
 
     private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts) {
         JsonArray list = artifacts.get("list").getAsJsonArray();
         for (JsonElement element : list) {
             final String artifactName = element.getAsJsonObject().get("name").getAsString();
-            JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+            JsonObject artifactDetails = new JsonObject();
+            if (artifactType.equals(MESSAGE_STORES)) {
+                artifactDetails.addProperty("name", artifactName);
+                artifactDetails.addProperty("type", element.getAsJsonObject().get("type").getAsString());
+                artifactDetails.addProperty("size", element.getAsJsonObject().get("size").getAsString());
+            } else {
+                artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+            }
             insertArtifact(artifactType, artifactName, artifactDetails);
         }
     }
@@ -215,6 +251,12 @@ public class MiArtifactsManager implements ArtifactsManager {
                 getArtifactDetailsUrl = mgtApiUrl.concat(INBOUND_ENDPOINTS).concat("?inboundEndpointName=")
                                                  .concat(artifactName);
                 break;
+            case MESSAGE_STORES:
+                getArtifactDetailsUrl = mgtApiUrl.concat(MESSAGE_STORES).concat("?name=").concat(artifactName);
+                break;
+            case MESSAGE_PROCESSORS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(MESSAGE_PROCESSORS).concat("?name=").concat(artifactName);
+                break;
             case APIS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(APIS).concat("?apiName=").concat(artifactName);
                 break;
@@ -223,6 +265,20 @@ public class MiArtifactsManager implements ArtifactsManager {
                 break;
             case SEQUENCES:
                 getArtifactDetailsUrl = mgtApiUrl.concat(SEQUENCES).concat("?sequenceName=").concat(artifactName);
+                break;
+            case TASKS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(TASKS).concat("?taskName=").concat(artifactName);
+                break;
+            case LOCAL_ENTRIES:
+                getArtifactDetailsUrl = mgtApiUrl.concat(LOCAL_ENTRIES).concat("?name=").concat(artifactName);
+                break;
+            case CARBON_APPLICATIONS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(CARBON_APPLICATIONS).concat("?carbonAppName=")
+                                                 .concat(artifactName);
+                break;
+            case DATA_SERVICES:
+                getArtifactDetailsUrl = mgtApiUrl.concat(DATA_SERVICES).concat("?dataServiceName=")
+                                                 .concat(artifactName);
                 break;
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");

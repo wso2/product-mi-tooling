@@ -44,6 +44,7 @@ import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
+import LogConfigs from '../pages/LogConfigs'
 import AuthManager from '../auth/AuthManager';
 
 
@@ -117,19 +118,20 @@ function Layout(props) {
                         <Content>
                             <Switch>
                                 <Route exact path='/' component={Nodes} />
-                                <Route exact path='/proxy_services' component={ProxyService} />
+                                <Route exact path='/proxy-services' component={ProxyService} />
                                 <Route exact path='/endpoints' component={Endpoints} />
-                                <Route exact path='/inbound_endpoints' component={InboundEndpoints} />
-                                <Route exact path='/message_processors' component={MessageProcessors} />
-                                <Route exact path='/message_stores' component={MessageStores} />
+                                <Route exact path='/inbound-endpoints' component={InboundEndpoints} />
+                                <Route exact path='/message-processors' component={MessageProcessors} />
+                                <Route exact path='/message-stores' component={MessageStores} />
                                 <Route exact path='/apis' component={APIs} />
                                 <Route exact path='/templates' component={Templates} />
                                 <Route exact path='/sequences' component={Sequences} />
-                                <Route exact path='/data_services' component={DataServices} />
+                                <Route exact path='/data-services' component={DataServices} />
                                 <Route exact path='/datasources' component={Datasources} />
                                 <Route exact path='/connectors' component={Connectors} />
-                                <Route exact path='/carbon_applications' component={CarbonApplications} />
-                                <Route exact path='/log_files' component={LogFiles} />
+                                <Route exact path='/carbon-applications' component={CarbonApplications} />
+                                <Route exact path='/log-files' component={LogFiles} />
+                                <Route exact path='/log-configs' component={LogConfigs}/>
                             </Switch>
                         </Content>
                     </main>
@@ -141,7 +143,6 @@ function Layout(props) {
                 </div>
             </div>
         </Router>
-
     );
 }
 

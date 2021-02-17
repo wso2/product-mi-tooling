@@ -19,36 +19,40 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class DataServices extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "dataservices",
-                title: "Data Services",
-                headCells: [
-                    {id: 'name', label: 'Data Service'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'wsdlUrl', label: 'WSDL 1.1'}],
-                tableOrderBy: 'service'
-            },
-            dataserviceList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        wsdlURL: "http://localhost8280/services/?wsdl"
+export default function DataServices() {
+    const [pageInfo] = React.useState({
+        pageId: "data-services",
+        title: "Data Services",
+        headCells: [
+            {id: 'name', label: 'Data Service Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'wsdlUrl', label: 'WSDL 1.1'}],
+        tableOrderBy: 'name'
+    });
 
-                    },
-                    { nodeId: "node_02",
-                        wsdlUrl: "http://localhost8280/services/?wsdl"
+    const [dataServicesList, setDataServicesList] = React.useState([]);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.dataserviceList}/>;
-    }
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
+
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/data-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setDataServicesList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={dataServicesList}/>
 }

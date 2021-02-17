@@ -19,39 +19,42 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class Connectors extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "connectors",
-                title: "Connectors",
-                headCells: [
-                    {id: 'name', label: 'Library Name'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'package', label: 'Package'},
-                    {id: 'description', label: 'Description'}],
-                tableOrderBy: 'service'
-            },
-            connectorList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        protocol: "http",
-                        package: "org.wso2.carbon.file.connector",
-                        description: "File connector"
-                    },
-                    { nodeId: "node_02",
-                        protocol: "http",
-                        package: "org.wso2.carbon.ftp.connector",
-                        description: "FTP connector"
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.connectorList}/>;
-    }
+export default function Connectors() {
+    const [pageInfo] = React.useState({
+        pageId: "connectors",
+        title: "Connectors",
+        headCells: [
+            {id: 'name', label: 'Library Name'},
+            {id: 'connector_nodes', label: 'Nodes'},
+            {id: 'package', label: 'Package'},
+            {id: 'description', label: 'Description'},
+            {id: 'connector_status', label: 'Status'}],
+        tableOrderBy: 'name'
+    });
+
+    const [connectorList, setConnectorList] = React.useState([]);
+
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
+
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/connectors?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setConnectorList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={connectorList}/>
 }

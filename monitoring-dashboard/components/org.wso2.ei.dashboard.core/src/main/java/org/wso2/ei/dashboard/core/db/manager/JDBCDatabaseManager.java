@@ -475,12 +475,26 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                 return "ENDPOINTS";
             case Constants.INBOUND_ENDPOINTS:
                 return "INBOUND_ENDPOINTS";
+            case Constants.MESSAGE_STORES:
+                return "MESSAGE_STORES";
+            case Constants.MESSAGE_PROCESSORS:
+                return "MESSAGE_PROCESSORS";
             case Constants.APIS:
                 return "APIS";
             case Constants.TEMPLATES:
                 return "TEMPLATES";
             case Constants.SEQUENCES:
                 return "SEQUENCES";
+            case Constants.TASKS:
+                return "TASKS";
+            case Constants.LOCAL_ENTRIES:
+                return "LOCAL_ENTRIES";
+            case Constants.CONNECTORS:
+                return "CONNECTORS";
+            case Constants.CARBON_APPLICATIONS:
+                return "CARBON_APPS";
+            case Constants.DATA_SERVICES:
+                return "DATA_SERVICES";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }

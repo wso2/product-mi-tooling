@@ -23,14 +23,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import TracingRow from './commons/TracingRow'
-import SourceViewSection from './commons/SourceViewSection'
+import Box from '@material-ui/core/Box';
 
-export default function ProxySideDrawer(props) {
+export default function LocalEntriesSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name; 
@@ -41,51 +38,42 @@ export default function ProxySideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                            <ProxyServiceDetailPage nodeData={nodeData}/>
+                    <Paper className={classes.paper}>
+                        <LocalEntriesDetailTable nodeData={nodeData}/>
                     </Paper>
                 </Grid>
-                <EndpointsSection endpoints={nodeData.details.eprs}/>
-                <SourceViewSection artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId}/>
+                <ValueSection value={nodeData.details.value}/>
             </Grid>
         </div>
     );
 }
 
-function ProxyServiceDetailPage(props) {
+function LocalEntriesDetailTable(props) {
     const nodeData = props.nodeData;
-    const artifactName = nodeData.details.name
-    const pageId = "proxy-services";
+
     return <Table>
                 <TableRow>
-                    <TableCell>Service Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
+                    <TableCell>Local Entry Name</TableCell>
+                    <TableCell>{nodeData.details.name}</TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{nodeData.details.type}</TableCell>
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-            </Table>
+            </Table> 
 }
 
-function EndpointsSection(props) {
-    const endpoints = props.endpoints;
+function ValueSection(props) {
     const classes = useStyles();
     return <Grid item xs={12}>
                 <Paper className={classes.paper} square>
                     <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Endpoints
+                        Value
                     </Typography>
                     <hr className={classes.horizontalLine}></hr>
-                    <Table>
-                        {endpoints.map(ep =>
-                            <TableRow>{ep}
-                                <CopyToClipboard text={ep} className={classes.clipboard}>
-                                    <Button><FileCopyIcon/></Button>
-                                </CopyToClipboard>
-                            </TableRow>)}
-                    </Table>
+                </Paper>
+                <Paper className={classes.paper} square>
+                    <Box>{props.value}</Box>
                 </Paper>
             </Grid>
 }
@@ -105,8 +93,5 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor : '#3f51b5',
         borderWidth: '0px',
         height: '1px'
-    },
-    clipboard: {
-        color: '#3f51b5'
     }
 }));

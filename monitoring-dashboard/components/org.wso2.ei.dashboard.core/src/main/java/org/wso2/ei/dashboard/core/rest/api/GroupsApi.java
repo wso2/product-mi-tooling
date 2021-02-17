@@ -29,22 +29,15 @@ import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
-import org.wso2.ei.dashboard.core.rest.model.LocalEntryList;
-import org.wso2.ei.dashboard.core.rest.model.LogConfig;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
-import org.wso2.ei.dashboard.core.rest.model.MessageProcessorList;
-import org.wso2.ei.dashboard.core.rest.model.MessageProcessorUpdateRequestBody;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
-import org.wso2.ei.dashboard.core.rest.model.TaskList;
 import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.CAppList;
-import org.wso2.ei.dashboard.core.rest.model.ConnectorList;
-import org.wso2.ei.dashboard.core.rest.model.DataserviceList;
 
 import java.io.File;
 
-import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequestBody;
-import org.wso2.ei.dashboard.core.rest.model.MessageStoreList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.User;
 
@@ -58,10 +51,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.DataServicesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.LocalEntriesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.LogConfigDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.LogsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
 
 import java.util.List;
@@ -80,15 +82,35 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Add logger", description = "", tags={ "logConfigs" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Logger insert status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "Logger insert status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response addLogger( @PathParam("group-id")
+    public Response addLogger(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid LogConfigAddRequest request) {
+        LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
+        Ack ack = logConfigDelegate.addLogger(groupId, request);
+        return Response.ok().entity(ack).build();
+    }
 
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid LogConfigAddRequestBody body) {
+    @PATCH
+    @Path("/{group-id}/log-configs")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @Operation(summary = "Update log level", description = "", tags={ "logConfigs" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logger update status",
+                         content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response updateLogLevel(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid LogConfigUpdateRequest request) {
         return Response.ok().entity("magic!").build();
     }
+
     @POST
     @Path("/{group-id}/users")
     @Consumes({ "application/json" })
@@ -105,24 +127,21 @@ public class GroupsApi {
         return Response.ok().entity("magic!").build();
     }
     @GET
-    @Path("/{group-id}/logs/{file-name}/nodes/{node-id}")
-    @Produces({ "binary/octet-stream", "application/json" })
-    @Operation(summary = "Download log file", description = "", tags={ "logFiles" })
+    @Path("/{group-id}/nodes/{node-id}/logs/{file-name}")
+    @Produces({ "text/plain" })
+    @Operation(summary = "Get log content", description = "", tags={ "logFiles" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Get log file in .log format", content = @Content(schema = @Schema(implementation = File.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response downloadLogFile( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-, @PathParam("file-name")
-
- @Parameter(description = "Log file name") String fileName
-, @PathParam("node-id")
-
- @Parameter(description = "Node id of the file") String nodeId
-) {
-        return Response.ok().entity("magic!").build();
+        @ApiResponse(responseCode = "200", description = "Get log file content.",
+                     content = @Content(schema = @Schema(implementation = File.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response getLogContent(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @PathParam("node-id") @Parameter(description = "Node id of the file") String nodeId,
+            @PathParam("file-name") @Parameter(description = "Log file name") String fileName) {
+        LogsDelegate logsDelegate = new LogsDelegate();
+        String logContent = logsDelegate.getLogByName(groupId, nodeId, fileName);
+        return Response.ok().entity(logContent).build();
     }
     @GET
     @Path("/{group-id}/apis")
@@ -145,51 +164,53 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get carbon applications by node ids", description = "", tags={ "carbonApplications" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of carbon applications deployed in provided nodes", content = @Content(schema = @Schema(implementation = CAppList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of carbon applications deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getCarbonApplicationsByNodeIds( @PathParam("group-id")
+    public Response getCarbonApplicationsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        CarbonAppsDelegate cappsDelegate = new CarbonAppsDelegate();
+        Artifacts cappList = cappsDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(cappList).build();
     }
     @GET
     @Path("/{group-id}/connectors")
     @Produces({ "application/json" })
     @Operation(summary = "Get connectors by node ids", description = "", tags={ "connectors" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of connectors deployed in provided nodes", content = @Content(schema = @Schema(implementation = ConnectorList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of connectors deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getConnectorsByNodeIds( @PathParam("group-id")
+    public Response getConnectorsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        ConnectorsDelegate connectorsDelegate = new ConnectorsDelegate();
+        Artifacts connectorList = connectorsDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(connectorList).build();
     }
     @GET
-    @Path("/{group-id}/dataservices")
+    @Path("/{group-id}/data-services")
     @Produces({ "application/json" })
-    @Operation(summary = "Get dataservices by node ids", description = "", tags={ "dataservices" })
+    @Operation(summary = "Get data-services by node ids", description = "", tags={ "data-services" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of dataservices deployed in provided nodes", content = @Content(schema = @Schema(implementation = DataserviceList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getDataservicesByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of data-services deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getDataServicesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        DataServicesDelegate dataServicesDelegate = new DataServicesDelegate();
+        Artifacts dataServicesList = dataServicesDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(dataServicesList).build();
     }
     @GET
     @Path("/{group-id}/datasources")
@@ -249,82 +270,84 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get local entries by node ids", description = "", tags={ "localEntries" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of local entries deployed in provided nodes", content = @Content(schema = @Schema(implementation = LocalEntryList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getLocalEntriesByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of local entries deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getLocalEntriesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
+        Artifacts localEntriesList = localEntriesDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(localEntriesList).build();
     }
     @GET
     @Path("/{group-id}/log-configs")
     @Produces({ "application/json" })
     @Operation(summary = "Get log configs", description = "", tags={ "logConfigs" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of log configs", content = @Content(schema = @Schema(implementation = LogConfig.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getLogConfigs( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-) {
-        return Response.ok().entity("magic!").build();
+        @ApiResponse(responseCode = "200", description = "List of log configs",
+                     content = @Content(schema = @Schema(implementation = LogConfigs.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response getLogConfigs(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) {
+        LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
+        LogConfigs logConfigs = logConfigDelegate.fetchLogConfigs(groupId);
+        return Response.ok().entity(logConfigs).build();
     }
     @GET
     @Path("/{group-id}/logs")
     @Produces({ "application/json" })
     @Operation(summary = "Get log files by node ids", description = "", tags={ "logFiles" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of log files of provided nodes", content = @Content(schema = @Schema(implementation = LogList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getLogFilesByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of log files of provided nodes",
+                     content = @Content(schema = @Schema(implementation = LogList.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getLogFilesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        LogsDelegate logsDelegate = new LogsDelegate();
+        LogList logList = logsDelegate.getLogsList(groupId, nodes);
+        return Response.ok().entity(logList).build();
     }
     @GET
     @Path("/{group-id}/message-processors")
     @Produces({ "application/json" })
     @Operation(summary = "Get message processors by node ids", description = "", tags={ "messageProcessors" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of message processorss deployed in provided nodes", content = @Content(schema = @Schema(implementation = MessageProcessorList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getMessageProcessorsByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of message processorss deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getMessageProcessorsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
+        Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(messageProcessorList).build();
     }
     @GET
     @Path("/{group-id}/message-stores")
     @Produces({ "application/json" })
     @Operation(summary = "Get message stores by node ids", description = "", tags={ "messageStores" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of message stores deployed in provided nodes", content = @Content(schema = @Schema(implementation = MessageStoreList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+        @ApiResponse(responseCode = "200", description = "List of message stores deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getMessageStoresByNodeIds( @PathParam("group-id")
+    public Response getMessageStoresByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        MessageStoresDelegate messageStoresDelegate = new MessageStoresDelegate();
+        Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(messageStoresList).build();
     }
 
     @GET
@@ -366,17 +389,17 @@ public class GroupsApi {
     @Produces({ "application/json" })
     @Operation(summary = "Get tasks by node ids", description = "", tags={ "tasks" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of tasks deployed in provided nodes", content = @Content(schema = @Schema(implementation = TaskList.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response getTasksByNodeIds( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "List of tasks deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getTasksByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+        TasksDelegate tasksDelegate = new TasksDelegate();
+        Artifacts tasksList = tasksDelegate.getArtifactsList(groupId, nodes);
+        return Response.ok().entity(tasksList).build();
     }
     @GET
     @Path("/{group-id}/templates")
@@ -489,20 +512,22 @@ public class GroupsApi {
         InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
         return inboundEndpointDelegate.updateArtifact(groupId, request);
     }
-    @PUT
+    @PATCH
     @Path("/{group-id}/message-processors")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @Operation(summary = "Update message processor", description = "", tags={ "messageProcessors" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Message processor update status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
-    })
-    public Response updateMessageProcessor( @PathParam("group-id")
+        @ApiResponse(responseCode = "200", description = "Message processor update status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Ack updateMessageProcessor(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) {
 
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid MessageProcessorUpdateRequestBody body) {
-        return Response.ok().entity("magic!").build();
+        MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
+        return messageProcessorsDelegate.updateArtifact(groupId, request);
     }
     @PATCH
     @Path("/{group-id}/proxy-services")

@@ -22,15 +22,12 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
+import Typography from '@material-ui/core/Typography';
 
-export default function ProxySideDrawer(props) {
+export default function MessageProcessorSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name; 
@@ -41,55 +38,57 @@ export default function ProxySideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                            <ProxyServiceDetailPage nodeData={nodeData}/>
+                    <Paper className={classes.paper}>
+                        <MessageProcessorDetailTable nodeData={nodeData}/>
                     </Paper>
                 </Grid>
-                <EndpointsSection endpoints={nodeData.details.eprs}/>
-                <SourceViewSection artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId}/>
+                <ParametersSection parameters={nodeData.details.parameters}/>
+                <SourceViewSection artifactType="message-processors" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
 }
 
-function ProxyServiceDetailPage(props) {
+function MessageProcessorDetailTable(props) {
     const nodeData = props.nodeData;
-    const artifactName = nodeData.details.name
-    const pageId = "proxy-services";
     return <Table>
                 <TableRow>
-                    <TableCell>Service Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
+                    <TableCell>Message Processor Name</TableCell>
+                    <TableCell>{nodeData.details.name}</TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
+                    <TableCell>Message Store</TableCell>
+                    <TableCell>{nodeData.details.messageStore}</TableCell>
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-            </Table>
+                <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{nodeData.details.type}</TableCell>
+                </TableRow>
+            </Table> 
 }
 
-function EndpointsSection(props) {
-    const endpoints = props.endpoints;
+function ParametersSection(props) {
+    const parameters = props.parameters;
     const classes = useStyles();
     return <Grid item xs={12}>
                 <Paper className={classes.paper} square>
                     <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Endpoints
+                        Parameters
                     </Typography>
                     <hr className={classes.horizontalLine}></hr>
-                    <Table>
-                        {endpoints.map(ep =>
-                            <TableRow>{ep}
-                                <CopyToClipboard text={ep} className={classes.clipboard}>
-                                    <Button><FileCopyIcon/></Button>
-                                </CopyToClipboard>
-                            </TableRow>)}
+                    <Table size="small">
+                        <TableBody>
+                            {Object.keys(parameters).map(key => (
+                                <TableRow>
+                                    <TableCell>{key}</TableCell>
+                                    <TableCell>{parameters[key]}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
                     </Table>
                 </Paper>
             </Grid>
 }
-
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
@@ -105,8 +104,5 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor : '#3f51b5',
         borderWidth: '0px',
         height: '1px'
-    },
-    clipboard: {
-        color: '#3f51b5'
     }
 }));

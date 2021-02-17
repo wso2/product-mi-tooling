@@ -71,10 +71,17 @@ public class ConfigurationDelegate {
                 return "endpointName";
             case Constants.INBOUND_ENDPOINTS:
                 return "inboundEndpointName";
+            case Constants.MESSAGE_STORES:
+            case Constants.MESSAGE_PROCESSORS:
+                return "name";
             case Constants.APIS:
                 return "apiName";
             case Constants.SEQUENCES:
                 return "sequenceName";
+            case Constants.TASKS:
+                return "taskName";
+            case Constants.DATA_SERVICES:
+                return "dataServiceName";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");        }
     }

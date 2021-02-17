@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,32 +23,28 @@ import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
 
-export default function LogFiles() {
+export default function LogConfigs() {
     const [pageInfo] = React.useState({
-        pageId: "logs",
-        title: "Log Files",
+        pageId: "log-configs",
+        title: "LogConfigs",
         headCells: [
-            {id: 'name', label: 'Log File Name'},
-            {id: 'nodes_logs', label: 'Nodes'}],
+            {id: 'name', label: 'Logger Name'},
+            {id: 'componentName', label: 'Component Name'},
+            {id: 'level', label: 'Level'}],
         tableOrderBy: 'name'
     });
 
-    const [logList, setlogList] = React.useState([]);
+    const [logConfigs, setLogConfigs] = React.useState([]);
 
     const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
     const basePath = useSelector(state => state.basePath);
 
     React.useEffect(() => {
-        if (selectedNodeList.length > 0) {
-            var nodeListQueryParams="";
-            selectedNodeList.filter(node => {
-                nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
-            })
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/logs?nodes=").concat(nodeListQueryParams.slice(0,-7));
-            axios.get(url).then(response => setlogList(response.data))
-        }
-    },[globalGroupId, selectedNodeList])
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/log-configs");
+        axios.get(url).then(response => {
+            setLogConfigs(response.data)
+        })
+    },[globalGroupId])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={logList} />
+    return <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs} />
 }

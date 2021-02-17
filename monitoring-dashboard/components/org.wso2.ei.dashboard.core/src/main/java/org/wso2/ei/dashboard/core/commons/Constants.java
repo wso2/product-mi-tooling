@@ -20,6 +20,8 @@
 
 package org.wso2.ei.dashboard.core.commons;
 
+import java.io.File;
+
 /**
  * Constants for the dashboard core.
  */
@@ -32,19 +34,29 @@ public final class Constants {
     public static final String PROXY_SERVICES = "proxy-services";
     public static final String ENDPOINTS = "endpoints";
     public static final String INBOUND_ENDPOINTS = "inbound-endpoints";
+    public static final String MESSAGE_STORES = "message-stores";
+    public static final String MESSAGE_PROCESSORS = "message-processors";
     public static final String APIS = "apis";
     public static final String TEMPLATES = "templates";
     public static final String SEQUENCES = "sequences";
+    public static final String TASKS = "tasks";
+    public static final String LOCAL_ENTRIES = "local-entries";
+    public static final String CONNECTORS = "connectors";
+    public static final String CARBON_APPLICATIONS = "applications";
+    public static final String DATA_SERVICES = "data-services";
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";
+
+    public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
 
     // todo change this structure
 
     public static final String DASHBOARD_HOME = System.getenv("DASHBOARD_HOME");
     public static final String HEARTBEAT_POOL_SIZE = System.getProperty("heartbeat_pool_size");
     public static final String DATABASE_URL = "jdbc:h2:mem:ei-dashboard-db;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM '"
-            + Constants.DASHBOARD_HOME + "/dbscripts/h2.sql'";
+                                              + Constants.DASHBOARD_HOME + File.separator + "dbscripts" + File.separator
+                                              + "h2.sql'";
     public static final String DATABASE_USERNAME = System.getProperty("db_username");
     public static final String DATABASE_PASSWORD = System.getProperty("db_password");
 

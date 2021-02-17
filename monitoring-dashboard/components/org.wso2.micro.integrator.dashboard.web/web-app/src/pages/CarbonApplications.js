@@ -19,36 +19,40 @@
  */
 
 import React from 'react';
+import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
 
-export default class CarbonApplications extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "carbon_applications",
-                title: "Carbon Applications",
-                headCells: [
-                    {id: 'name', label: 'Carbon Application'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'version', label: 'Version'}],
-                tableOrderBy: 'service'
-            },
-            carbonApplicationtList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        version: "1.0.0",
+export default function CarbonApplications() {
+    const [pageInfo] = React.useState({
+        pageId: "carbonapps",
+        title: "Carbon Applications",
+        headCells: [
+            {id: 'name', label: 'Carbon Application'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'version', label: 'Version'}],
+        tableOrderBy: 'name'
+    });
+    
+    const [carbonAppsList, setCarbonAppsList] = React.useState([]);
 
-                    },
-                    { nodeId: "node_02",
-                        version: "1.0.1",
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+    const basePath = useSelector(state => state.basePath);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.carbonApplicationtList}/>;
-    }
+    React.useEffect(() => {
+        var nodeListQueryParams="";
+        selectedNodeList.filter(node => {
+            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
+        })
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/capps?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        axios.get(url).then(response => {
+            response.data.map(data => 
+                data.nodes.map(node => node.details = JSON.parse(node.details))
+            )
+            setCarbonAppsList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={carbonAppsList}/>
 }

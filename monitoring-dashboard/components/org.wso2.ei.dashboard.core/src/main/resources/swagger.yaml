@@ -53,7 +53,7 @@ tags:
     description: "Access tasks details"
   - name: "localEntries"
     description: "Access local entries details"
-  - name: "dataservices"
+  - name: "data-services"
     description: "Access data services details"
   - name: "datasources"
     description: "Access datasources details"
@@ -399,14 +399,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageProcessorList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
+    patch:
       tags:
         - "messageProcessors"
       summary: "Update message processor"
@@ -419,14 +419,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/MessageProcessor'
+        $ref: '#/components/requestBodies/ArtifactUpdate'
       responses:
         200:
           description: "Message processor update status"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessStatus'
+                $ref: '#/components/schemas/Ack'
         default:
           description: "Unexpected error"
           content:
@@ -461,7 +461,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageStoreList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -655,7 +655,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TaskList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -690,19 +690,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LocalEntryList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /groups/{group-id}/dataservices:
+  /groups/{group-id}/data-services:
     get:
       tags:
-        - "dataservices"
-      summary: "Get dataservices by node ids"
-      operationId: "getDataservicesByNodeIds"
+        - "data-services"
+      summary: "Get data-services by node ids"
+      operationId: "getDataServicesByNodeIds"
       parameters:
         - name: "group-id"
           in: path
@@ -721,11 +721,11 @@ paths:
               default: all
       responses:
         200:
-          description: "List of dataservices deployed in provided nodes"
+          description: "List of data-services deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataserviceList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -795,7 +795,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConnectorList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -830,7 +830,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CAppList'
+                $ref: '#/components/schemas/Artifacts'
         default:
           description: "Unexpected error"
           content:
@@ -872,12 +872,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /groups/{group-id}/logs/{file-name}/nodes/{node-id}:
+  /groups/{group-id}/nodes/{node-id}/logs/{file-name}:
     get:
       tags:
         - "logFiles"
-      summary: "Download log file"
-      operationId: "downloadLogFile"
+      summary: "Get log content"
+      operationId: "getLogContent"
       parameters:
         - name: "group-id"
           in: path
@@ -899,12 +899,11 @@ paths:
             type: string
       responses:
         200:
-          description: "Get log file in .log format"
+          description: "Get log file content."
           content:
-            binary/octet-stream:
+            text/plain:
               schema:
                 type: string
-                format: binary
         default:
           description: "Unexpected error"
           content:
@@ -930,7 +929,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogConfig'
+                $ref: '#/components/schemas/LogConfigs'
         default:
           description: "Unexpected error"
           content:
@@ -950,7 +949,7 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/Logger'
+        $ref: '#/components/requestBodies/AddLogger'
       responses:
         200:
           description: "Logger insert status"
@@ -964,6 +963,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - "logConfigs"
+      summary: "Update log level"
+      operationId: "updateLogLevel"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateLogger'
+      responses:
+        200:
+          description: "Logger update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /groups/{group-id}/users:
     get:
       tags:
@@ -1115,7 +1142,9 @@ components:
       properties:
         status:
           type: string
-      example: {status: ok}
+        message:
+          type: string
+      example: {status: success, message: Successfully updated}
 
     GroupList:
       type: array
@@ -1169,189 +1198,6 @@ components:
           type: string
         value:
           type: boolean
-    MessageProcessorList:
-      type: array
-      items:
-        type: object
-        properties:
-          processorName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains type, isActive, messageStore etc.
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                paramaters:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    MessageProcessorUpdateRequestBody:
-      type: object
-      properties:
-        processorName:
-          type: string
-        nodeId:
-          type: string
-        isActive:
-          type: boolean
-    MessageStoreList:
-      type: array
-      items:
-        type: object
-        properties:
-          storeName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains type, messageCount
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                paramaters:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    TaskList:
-      type: array
-      items:
-        type: object
-        properties:
-          taskName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains group, implementation etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                triggerDetails:
-                  type: array
-                  description: Array contains trigger, count, interval etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    LocalEntryList:
-      type: array
-      items:
-        type: object
-        properties:
-          entryName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains type, value etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-    DataserviceList:
-      type: array
-      items:
-        type: object
-        properties:
-          dataserviceName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains wsdl1.1, swaggerUrl etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                datasources:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-                queries:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-                resources:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-                operations:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArrayOfObject'
-      example: [
-      { dataserviceName: "StudentDataService",
-        nodes: [
-        { nodeId: "node_01",
-          details: [
-          { key: "WSDL 1.1", value: "http://localhost:8290/services/StudentDataService?wsdl" },
-          { key: "Swagger URL", value: "http://localhost:8290/services/StudentDataService?swagger.json" }
-          ],
-          datasources: [
-          { key: "StudentsDatasource",
-            value: [
-            { key: "dataSourceId",
-              value: "StudentsDatasource"},
-            { key: "dataSourceType",
-              value: "RDBMS" }
-            ]
-          }],
-          queries: [
-          { key: "CreateStudents",
-            value: [
-            { key: "id",
-              value: "CreateStudents" },
-            { key: "dataSourceId",
-              value: "StudentsDatasource" },
-            { key: "namespace",
-              value: "http://ws.wso2.org/dataservice"}
-            ]
-          }],
-          resources: [
-          { key: "createStudents",
-            value: [
-            { key: "path",
-              value: "student/{id}" },
-            { key: "method",
-              value: "et" }
-            ]
-          }],
-          operations: [
-          { key: "CreateStudents",
-            value: [
-            { key: "operationName",
-              value: "CreateStudents" },
-            { key: "queryId",
-              value: "createStudents" }
-            ]
-          }]
-        }]
-
-
-      },{}]
     DatasourceList:
       type: array
       items:
@@ -1376,69 +1222,12 @@ components:
                   description: Array contains default auto commit, default read only, test on borrow, test on return, test while idle etc.
                   items:
                     $ref: '#/components/schemas/KeyValue'
-    ConnectorList:
-      type: array
-      items:
-        type: object
-        properties:
-          connectorName:
-            type: string
-          package:
-            type: string
-          description:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                isFaulty:
-                  type: boolean
-    CAppList:
-      type: array
-      items:
-        type: object
-        properties:
-          cAppName:
-            type: string
-          nodes:
-            type: array
-            items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                details:
-                  type: array
-                  description: Array contains isFaulty, version etc
-                  items:
-                    $ref: '#/components/schemas/KeyValue'
-                artifacts:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/KeyValueAsArray'
-      example: [
-      { cAppName: "helloworldCompositeExporter",
-        nodes: [
-        { nodeId: "node_01",
-          details: [
-          { key: "version", value: "1.0.0"}
-          ],
-          artifacts: [
-          { key: "API", value: ["InitialWelcome","ABC_api"]},
-          { key: "Connectors", value: ["FileConnector", "CSV"]}]
-        }
-        ]
-      }
-      ]
     LogList:
       type: array
       items:
         type: object
         properties:
-          logFileName:
+          name:
             type: string
           nodes:
             type: array
@@ -1449,42 +1238,33 @@ components:
                   type: string
                 size:
                   type: boolean
-    LogConfig:
+    LogConfigs:
       type: array
       items:
         type: object
         properties:
-          loggerName:
+          name:
             type: string
-          className:
+          componentName:
             type: string
           level:
             type: string
-            enum:
-              - OFF
-              - Trace
-              - DEBUG
-              - INFO
-              - WARN
-              - ERROR
-              - FATAL
-    LogConfigAddRequestBody:
+    LogConfigAddRequest:
       type: object
       properties:
-        loggerName:
+        name:
           type: string
-        className:
+        loggerClass:
           type: string
         level:
           type: string
-          enum:
-            - OFF
-            - Trace
-            - DEBUG
-            - INFO
-            - WARN
-            - ERROR
-            - FATAL
+    LogConfigUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        level:
+          type: string
     User:
       type: array
       items:
@@ -1597,17 +1377,17 @@ components:
           schema:
             $ref: '#/components/schemas/ArtifactUpdateRequest'
       description: "The request body to update artifact."
-    MessageProcessor:
+    AddLogger:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/MessageProcessorUpdateRequestBody'
-      description: "The request body to update message processor."
-    Logger:
+            $ref: '#/components/schemas/LogConfigAddRequest'
+      description: "The request body to add logger."
+    UpdateLogger:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/LogConfigAddRequestBody'
+            $ref: '#/components/schemas/LogConfigUpdateRequest'
       description: "The request body to add logger."
     User:
       content:

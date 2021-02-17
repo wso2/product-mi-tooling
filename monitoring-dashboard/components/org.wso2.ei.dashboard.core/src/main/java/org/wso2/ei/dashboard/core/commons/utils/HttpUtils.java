@@ -20,11 +20,13 @@
 
 package org.wso2.ei.dashboard.core.commons.utils;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -69,9 +71,23 @@ public class HttpUtils {
         }
     }
 
+    public static CloseableHttpResponse doPatch(HttpPatch httpPatch) {
+        CloseableHttpClient httpClient = getHttpClient();
+        try {
+            return httpClient.execute(httpPatch);
+        } catch (IOException e) {
+            throw new DashboardServerException("Error occurred while sending http patch request.", e);
+        }
+    }
+
     public static JsonObject getJsonResponse(CloseableHttpResponse response) {
         String stringResponse = getStringResponse(response);
         return JsonParser.parseString(stringResponse).getAsJsonObject();
+    }
+
+    public static JsonArray getJsonArray(CloseableHttpResponse response) {
+        String stringResponse = getStringResponse(response);
+        return JsonParser.parseString(stringResponse).getAsJsonArray();
     }
 
     public static String getStringResponse(CloseableHttpResponse response) {

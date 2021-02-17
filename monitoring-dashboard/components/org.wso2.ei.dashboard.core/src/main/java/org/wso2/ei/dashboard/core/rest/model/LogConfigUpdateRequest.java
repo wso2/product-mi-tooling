@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -20,8 +20,7 @@
 
 package org.wso2.ei.dashboard.core.rest.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -30,44 +29,44 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class MessageProcessorListInner   {
-  private @Valid String processorName = null;
-  private @Valid List<Object> nodes = new ArrayList<Object>();
+public class LogConfigUpdateRequest   {
+  private @Valid String name = null;
+  private @Valid String level = null;
 
   /**
    **/
-  public MessageProcessorListInner processorName(String processorName) {
-    this.processorName = processorName;
+  public LogConfigUpdateRequest name(String name) {
+    this.name = name;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("processorName")
+  @JsonProperty("name")
 
-  public String getProcessorName() {
-    return processorName;
+  public String getName() {
+    return name;
   }
-  public void setProcessorName(String processorName) {
-    this.processorName = processorName;
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
    **/
-  public MessageProcessorListInner nodes(List<Object> nodes) {
-    this.nodes = nodes;
+  public LogConfigUpdateRequest level(String level) {
+    this.level = level;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("nodes")
+  @JsonProperty("level")
 
-  public List<Object> getNodes() {
-    return nodes;
+  public String getLevel() {
+    return level;
   }
-  public void setNodes(List<Object> nodes) {
-    this.nodes = nodes;
+  public void setLevel(String level) {
+    this.level = level;
   }
 
 
@@ -79,23 +78,23 @@ public class MessageProcessorListInner   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    MessageProcessorListInner messageProcessorListInner = (MessageProcessorListInner) o;
-    return Objects.equals(processorName, messageProcessorListInner.processorName) &&
-        Objects.equals(nodes, messageProcessorListInner.nodes);
+    LogConfigUpdateRequest logConfigUpdateRequest = (LogConfigUpdateRequest) o;
+    return Objects.equals(name, logConfigUpdateRequest.name) &&
+        Objects.equals(level, logConfigUpdateRequest.level);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(processorName, nodes);
+    return Objects.hash(name, level);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class MessageProcessorListInner {\n");
+    sb.append("class LogConfigUpdateRequest {\n");
     
-    sb.append("    processorName: ").append(toIndentedString(processorName)).append("\n");
-    sb.append("    nodes: ").append(toIndentedString(nodes)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    level: ").append(toIndentedString(level)).append("\n");
     sb.append("}");
     return sb.toString();
   }

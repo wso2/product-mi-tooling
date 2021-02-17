@@ -26,6 +26,11 @@ import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
+import Typography from '@material-ui/core/Typography';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 export default function InboundEpSideDrawer(props) {
     var nodeData = props.nodeData;
@@ -42,6 +47,7 @@ export default function InboundEpSideDrawer(props) {
                         <InboundEpDetailTable nodeData={nodeData}/>
                     </Paper>
                 </Grid>
+                <ParametersSection parameters={nodeData.details.parameters}/>
                 <SourceViewSection artifactType="inbound-endpoints" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
@@ -78,6 +84,31 @@ function InboundEpDetailTable(props) {
             </Table> 
 }
 
+function ParametersSection(props) {
+    const parameters = props.parameters;
+    const classes = useStyles();
+    return <Grid item xs={12}>
+                <ExpansionPanel>
+                    <ExpansionPanelSummary
+                        expandIcon={<ExpandMoreIcon/>}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header">
+                        <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                            Parameters
+                        </Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <Table size="small">
+                            {parameters.map(parameter => <TableRow>
+                                <TableCell>{parameter.name}</TableCell>
+                                <TableCell>{parameter.value}</TableCell>
+                            </TableRow>)}
+                        </Table>
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+            </Grid>
+}
+
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
@@ -85,5 +116,8 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(2),
         color: theme.palette.text.secondary,
+    },
+    subTopic: {
+        color: '#3f51b5'
     }
 }));

@@ -23,19 +23,18 @@ import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
 
-export default function MessageStores() {
+export default function LocalEntries() {
     const [pageInfo] = React.useState({
-        pageId: "message-stores",
-        title: "Message Stores",
+        pageId: "local-entries",
+        title: "Local Entries",
         headCells: [
-            {id: 'name', label: 'Message Store Name'},
+            {id: 'name', label: 'Local Entry Name'},
             {id: 'nodes', label: 'Nodes'},
-            {id: 'type', label: 'Type'},
-            {id: 'message_count', label: 'Message Count'}],
+            {id: 'type', label: 'Type'}],
         tableOrderBy: 'name'
     });
 
-    const [messageStoreList, setMessageStoreList] = React.useState([]);
+    const [localEntryList, setLocalEntryList] = React.useState([]);
 
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
@@ -46,14 +45,14 @@ export default function MessageStores() {
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/message-stores?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/local-entries?nodes=").concat(nodeListQueryParams.slice(0,-7));
         axios.get(url).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))
             )
-            setMessageStoreList(response.data)
+            setLocalEntryList(response.data)
         })
     },[globalGroupId, selectedNodeList])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={messageStoreList}/>
+    return <EnhancedTable pageInfo={pageInfo} dataSet={localEntryList}/>
 }

@@ -22,15 +22,11 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import { Table, TableHead, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import TracingRow from './commons/TracingRow'
-import SourceViewSection from './commons/SourceViewSection'
+import Typography from '@material-ui/core/Typography';
 
-export default function ProxySideDrawer(props) {
+export default function CarbonApplicationsSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name; 
@@ -41,50 +37,50 @@ export default function ProxySideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                            <ProxyServiceDetailPage nodeData={nodeData}/>
+                    <Paper className={classes.paper}>
+                            <CarbonAppsDetailTable nodeData={nodeData.details}/>
                     </Paper>
+                    <ArtifactsSection artifacts={nodeData.details.artifacts}/>
                 </Grid>
-                <EndpointsSection endpoints={nodeData.details.eprs}/>
-                <SourceViewSection artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
 }
 
-function ProxyServiceDetailPage(props) {
+function CarbonAppsDetailTable(props) {
     const nodeData = props.nodeData;
-    const artifactName = nodeData.details.name
-    const pageId = "proxy-services";
     return <Table>
                 <TableRow>
-                    <TableCell>Service Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
+                    <TableCell>Carbon Application Name</TableCell>
+                    <TableCell>{nodeData.name}</TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
+                    <TableCell>Version</TableCell>
+                    <TableCell>{nodeData.version}</TableCell>
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
             </Table>
 }
 
-function EndpointsSection(props) {
-    const endpoints = props.endpoints;
+function ArtifactsSection(props) {
+    const artifacts = props.artifacts;
     const classes = useStyles();
     return <Grid item xs={12}>
                 <Paper className={classes.paper} square>
                     <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Endpoints
+                        Artifacts
                     </Typography>
                     <hr className={classes.horizontalLine}></hr>
                     <Table>
-                        {endpoints.map(ep =>
-                            <TableRow>{ep}
-                                <CopyToClipboard text={ep} className={classes.clipboard}>
-                                    <Button><FileCopyIcon/></Button>
-                                </CopyToClipboard>
-                            </TableRow>)}
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Artifact Name</TableCell>
+                                <TableCell>Artifact Type</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        {artifacts.map(artifact => <TableRow>
+                            <TableCell>{artifact.name}</TableCell>
+                            <TableCell>{artifact.type === 'lib' ? 'connector' : artifact.type}</TableCell>
+                        </TableRow>)}
                     </Table>
                 </Paper>
             </Grid>
@@ -105,8 +101,5 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor : '#3f51b5',
         borderWidth: '0px',
         height: '1px'
-    },
-    clipboard: {
-        color: '#3f51b5'
     }
 }));

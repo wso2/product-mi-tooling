@@ -29,48 +29,63 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class Ack   {
-  private @Valid String status = null;
-  private @Valid String message = null;
-
-  public Ack(String status) {
-    this.status = status;
-  }
+public class LogConfigsInner   {
+  private @Valid String name = null;
+  private @Valid String componentName = null;
+  private @Valid String level = null;
 
   /**
    **/
-  public Ack status(String status) {
-    this.status = status;
+  public LogConfigsInner name(String name) {
+    this.name = name;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("status")
+  @JsonProperty("name")
 
-  public String getStatus() {
-    return status;
+  public String getName() {
+    return name;
   }
-  public void setStatus(String status) {
-    this.status = status;
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
    **/
-  public Ack message(String message) {
-    this.message = message;
+  public LogConfigsInner componentName(String componentName) {
+    this.componentName = componentName;
     return this;
   }
 
   
   @ApiModelProperty(value = "")
-  @JsonProperty("message")
+  @JsonProperty("componentName")
 
-  public String getMessage() {
-    return message;
+  public String getComponentName() {
+    return componentName;
   }
-  public void setMessage(String message) {
-    this.message = message;
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
+  }
+
+  /**
+   **/
+  public LogConfigsInner level(String level) {
+    this.level = level;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("level")
+
+  public String getLevel() {
+    return level;
+  }
+  public void setLevel(String level) {
+    this.level = level;
   }
 
 
@@ -82,23 +97,25 @@ public class Ack   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Ack ack = (Ack) o;
-    return Objects.equals(status, ack.status) &&
-        Objects.equals(message, ack.message);
+    LogConfigsInner logConfigsInner = (LogConfigsInner) o;
+    return Objects.equals(name, logConfigsInner.name) &&
+        Objects.equals(componentName, logConfigsInner.componentName) &&
+        Objects.equals(level, logConfigsInner.level);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(status, message);
+    return Objects.hash(name, componentName, level);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Ack {\n");
+    sb.append("class LogConfigsInner {\n");
     
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    message: ").append(toIndentedString(message)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    level: ").append(toIndentedString(level)).append("\n");
     sb.append("}");
     return sb.toString();
   }
