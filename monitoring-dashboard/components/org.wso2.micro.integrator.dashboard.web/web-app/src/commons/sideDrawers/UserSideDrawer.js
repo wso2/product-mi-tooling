@@ -27,7 +27,6 @@ import { Table, TableCell, TableBody, TableRow } from '@material-ui/core';
 
 export default function UserSideDrawer(props) {
     var user = props.user;
-    console.log("user",user)
     const classes = useStyles();
 
     return (

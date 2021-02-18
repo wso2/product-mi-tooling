@@ -40,7 +40,6 @@ export default function Users() {
     React.useEffect(() => {
         const url = basePath.concat('/groups/').concat(globalGroupId).concat("/users");
         axios.get(url).then(response => {
-            console.log(response.data)
             setUsers(response.data)
         })
     },[globalGroupId])

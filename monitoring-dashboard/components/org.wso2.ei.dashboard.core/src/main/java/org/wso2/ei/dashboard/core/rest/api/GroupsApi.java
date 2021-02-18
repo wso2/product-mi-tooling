@@ -24,6 +24,7 @@ import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
+import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
@@ -34,7 +35,6 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
-import org.wso2.ei.dashboard.core.rest.model.UserAddRequestBody;
 
 import java.io.File;
 
@@ -123,12 +123,14 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "User insert status", content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response addUser( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-,@Valid UserAddRequestBody body) {
-        return Response.ok().entity("magic!").build();
+    public Response addUser(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid AddUserRequest request) {
+        UsersDelegate usersDelegate = new UsersDelegate();
+        Ack ack = usersDelegate.addUser(groupId, request);
+        return Response.ok().entity(ack).build();
     }
+
     @GET
     @Path("/{group-id}/nodes/{node-id}/logs/{file-name}")
     @Produces({ "text/plain" })

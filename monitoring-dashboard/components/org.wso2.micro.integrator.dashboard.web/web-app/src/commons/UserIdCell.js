@@ -44,17 +44,12 @@ export default function UserIdCell(props) {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
             return;
         }
-        console.log("user before", user);
         if (open) {      
             const url = basePath.concat('/groups/').concat(globalGroupId).concat("/users/").concat(userId);
-            console.log("url", url)
             axios.get(url).then(response => {
-                console.log("Ssssss")
-                console.log("response.data", response.data);
                 setUser(response.data);
             })
         }
-        console.log("user after", user);
         setState({ ...state, openSideDrawer: open });
     };
 

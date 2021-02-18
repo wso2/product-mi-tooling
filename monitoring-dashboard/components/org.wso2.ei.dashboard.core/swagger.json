@@ -1552,7 +1552,7 @@
           }
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/User"
+          "$ref" : "#/components/requestBodies/AddUser"
         },
         "responses" : {
           "200" : {
@@ -1829,10 +1829,10 @@
           "type" : "string"
         }
       },
-      "UserAddRequestBody" : {
+      "AddUserRequest" : {
         "type" : "object",
         "properties" : {
-          "user" : {
+          "userId" : {
             "type" : "string"
           },
           "password" : {
@@ -2056,23 +2056,6 @@
             "type" : "string"
           }
         }
-      },
-      "User_inner" : {
-        "type" : "object",
-        "properties" : {
-          "userId" : {
-            "type" : "string"
-          },
-          "isAdmin" : {
-            "type" : "boolean"
-          },
-          "roles" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }
       }
     },
     "requestBodies" : {
@@ -2126,12 +2109,12 @@
           }
         }
       },
-      "User" : {
+      "AddUser" : {
         "description" : "The request body to add user.",
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/UserAddRequestBody"
+              "$ref" : "#/components/schemas/AddUserRequest"
             }
           }
         }
