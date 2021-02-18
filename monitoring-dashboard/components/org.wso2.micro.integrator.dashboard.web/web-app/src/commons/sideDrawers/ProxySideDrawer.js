@@ -23,8 +23,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import HeadingSection from './commons/HeadingSection'
 import TracingRow from './commons/TracingRow'
@@ -33,20 +34,25 @@ import SourceViewSection from './commons/SourceViewSection'
 export default function ProxySideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                            <ProxyServiceDetailPage nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        designContent={<>
+                            <Paper className={classes.paper} elevation={0} square>
+                                <ProxyServiceDetailPage nodeData={nodeData} />
+                            </Paper>
+                            <Box pl={4}>
+                                <EndpointsSection endpoints={nodeData.details.eprs} />
+                            </Box>
+                        </>}
+                        artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
-                <EndpointsSection endpoints={nodeData.details.eprs}/>
-                <SourceViewSection artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
@@ -57,41 +63,42 @@ function ProxyServiceDetailPage(props) {
     const artifactName = nodeData.details.name
     const pageId = "proxy-services";
     return <Table>
-                <TableRow>
-                    <TableCell>Service Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
-                </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-            </Table>
+        <TableRow>
+            <TableCell>Service Name</TableCell>
+            <TableCell>{artifactName}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Statistics</TableCell>
+            <TableCell>{nodeData.details.stats}</TableCell>
+        </TableRow>
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+    </Table>
 }
 
 function EndpointsSection(props) {
     const endpoints = props.endpoints;
     const classes = useStyles();
     return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Endpoints
+        <Paper className={classes.paper} square>
+            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                Endpoints
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                    <Table>
-                        {endpoints.map(ep =>
-                            <TableRow>{ep}
-                                <CopyToClipboard text={ep} className={classes.clipboard}>
-                                    <Button><FileCopyIcon/></Button>
-                                </CopyToClipboard>
-                            </TableRow>)}
-                    </Table>
-                </Paper>
-            </Grid>
+            <hr className={classes.horizontalLine}></hr>
+            <Table>
+                {endpoints.map(ep =>
+                    <TableRow>{ep}
+                        <CopyToClipboard text={ep} className={classes.clipboard}>
+                            <Button><FileCopyIcon /></Button>
+                        </CopyToClipboard>
+                    </TableRow>)}
+            </Table>
+        </Paper>
+    </Grid>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        maxWidth: 700,
         flexGrow: 1,
     },
     paper: {
@@ -101,8 +108,8 @@ const useStyles = makeStyles((theme) => ({
     subTopic: {
         color: '#3f51b5'
     },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
+    horizontalLine: {
+        backgroundColor: '#3f51b5',
         borderWidth: '0px',
         height: '1px'
     },

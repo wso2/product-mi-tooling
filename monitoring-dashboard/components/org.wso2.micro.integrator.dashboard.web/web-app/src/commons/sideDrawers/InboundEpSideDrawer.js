@@ -21,6 +21,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
@@ -35,20 +36,26 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 export default function InboundEpSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                        <InboundEpDetailTable nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        artifactType="inbound-endpoints" artifactName={artifactName} nodeId={nodeId}
+                        designContent={<>
+                            <Paper className={classes.paper} elevation={0} square>
+                                <InboundEpDetailTable nodeData={nodeData} />
+                            </Paper>
+                            <Box pl={4}>
+                                <ParametersSection parameters={nodeData.details.parameters} />
+                            </Box>
+                        </>}
+                    />
                 </Grid>
-                <ParametersSection parameters={nodeData.details.parameters}/>
-                <SourceViewSection artifactType="inbound-endpoints" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
@@ -60,58 +67,59 @@ function InboundEpDetailTable(props) {
     const pageId = "inbound-endpoints";
 
     return <Table>
-                <TableRow>
-                    <TableCell>Inbound Endpoint Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Protocol</TableCell>
-                    <TableCell>{nodeData.details.protocol}</TableCell>
-                </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-                <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Sequence</TableCell>
-                    <TableCell>{nodeData.details.sequence}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>On Error</TableCell>
-                    <TableCell>{nodeData.details.error}</TableCell>
-                </TableRow>
-            </Table> 
+        <TableRow>
+            <TableCell>Inbound Endpoint Name</TableCell>
+            <TableCell>{artifactName}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Protocol</TableCell>
+            <TableCell>{nodeData.details.protocol}</TableCell>
+        </TableRow>
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+        <TableRow>
+            <TableCell>Statistics</TableCell>
+            <TableCell>{nodeData.details.stats}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Sequence</TableCell>
+            <TableCell>{nodeData.details.sequence}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>On Error</TableCell>
+            <TableCell>{nodeData.details.error}</TableCell>
+        </TableRow>
+    </Table>
 }
 
 function ParametersSection(props) {
     const parameters = props.parameters;
     const classes = useStyles();
     return <Grid item xs={12}>
-                <ExpansionPanel>
-                    <ExpansionPanelSummary
-                        expandIcon={<ExpandMoreIcon/>}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header">
-                        <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                            Parameters
+        <ExpansionPanel>
+            <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header">
+                <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                    Parameters
                         </Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <Table size="small">
-                            {parameters.map(parameter => <TableRow>
-                                <TableCell>{parameter.name}</TableCell>
-                                <TableCell>{parameter.value}</TableCell>
-                            </TableRow>)}
-                        </Table>
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-            </Grid>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <Table size="small">
+                    {parameters.map(parameter => <TableRow>
+                        <TableCell>{parameter.name}</TableCell>
+                        <TableCell>{parameter.value}</TableCell>
+                    </TableRow>)}
+                </Table>
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+    </Grid>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
+        maxWidth: 700,
     },
     paper: {
         padding: theme.spacing(2),

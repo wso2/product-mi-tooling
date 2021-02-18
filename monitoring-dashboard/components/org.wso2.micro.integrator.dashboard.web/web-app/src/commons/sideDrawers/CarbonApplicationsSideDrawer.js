@@ -21,6 +21,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableHead, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
@@ -40,7 +41,9 @@ export default function CarbonApplicationsSideDrawer(props) {
                     <Paper className={classes.paper}>
                             <CarbonAppsDetailTable nodeData={nodeData.details}/>
                     </Paper>
-                    <ArtifactsSection artifacts={nodeData.details.artifacts}/>
+                    <Box pl={4}>
+                        <ArtifactsSection artifacts={nodeData.details.artifacts}/>
+                    </Box>
                 </Grid>
             </Grid>
         </div>
@@ -89,6 +92,7 @@ function ArtifactsSection(props) {
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
+        maxWidth: 700,
     },
     paper: {
         padding: theme.spacing(2),

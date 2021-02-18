@@ -27,40 +27,37 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
 import XMLViewer from 'react-xml-viewer';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
 
 export default function SourceViewSection(props) {
-    const { artifactType, artifactName, nodeId } = props;
+    const { artifactType, artifactName, nodeId, designContent } = props;
     const globalGroupId = useSelector(state => state.groupId);
     const basePath = useSelector(state => state.basePath);
     const [source, setSource] = React.useState("");
-    
+    const [selectedTab, setSelectedTab] = React.useState(0);
+
     const params = {
         groupId: globalGroupId,
         nodeId: nodeId,
-        artifactType : artifactType,
-        artifactName : artifactName
+        artifactType: artifactType,
+        artifactName: artifactName
     };
 
     const [open, setOpen] = React.useState(false);
 
     React.useEffect(() => {
         const url = basePath.concat('/configuration');
-        
-        axios.get(url, {params}).then(response => {
+
+        axios.get(url, { params }).then(response => {
             setSource(response.data.configuration);
         })
-    },[])
-
-    const openSourceViewPopup = () => {
-        setOpen(true);
-    }
-
-    const closeSourceViewPopup = () => {
-        setOpen(false);
-    };
+    }, [])
 
     const descriptionElementRef = React.useRef(null);
     React.useEffect(() => {
@@ -72,35 +69,25 @@ export default function SourceViewSection(props) {
         }
     }, [open]);
 
+    const changeTab = (e, tab) => {
+        setSelectedTab(tab);
+    }
     const classes = useStyles();
-
-    return <Grid item xs={12}>
-                <Box textAlign='center'>
-                    <Button onClick={() => openSourceViewPopup()} variant="contained" color="primary">Source View</Button>
-                    <Dialog
-                        open={open}
-                        onClose={closeSourceViewPopup}
-                        aria-labelledby="scroll-dialog-title"
-                        aria-describedby="scroll-dialog-description"
-                        classes={classes.sourceView}
-                    >
-                        <DialogTitle id="scroll-dialog-title">{artifactName}</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText
-                                id="scroll-dialog-description"
-                                ref={descriptionElementRef}
-                                tabIndex={-1}>
-                                <XMLViewer xml={source} />
-                            </DialogContentText>
-                        </DialogContent>
-                    </Dialog>
-                </Box>
-            </Grid>
+    if (designContent) {
+        return (<><AppBar position="static" classes={{root: classes.tabsAppBar}}>
+            <Tabs value={selectedTab} onChange={changeTab} aria-label="design source selection">
+                <Tab label="Design" />
+                <Tab label="Source" />
+            </Tabs>
+        </AppBar>
+            {selectedTab === 0 && (<>{designContent}</>)}
+            {selectedTab === 1 && (<Box p={5}><XMLViewer xml={source} /></Box>)}
+        </>)
+    }
 }
 
 const useStyles = makeStyles(() => ({
-    sourceView: {
-        backgroundColor: 'red',
-        width: '2000px',
+    tabsAppBar: {
+        backgroundColor: '#000',
     }
 }));

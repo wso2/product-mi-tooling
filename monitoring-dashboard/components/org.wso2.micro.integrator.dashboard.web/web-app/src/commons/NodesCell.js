@@ -53,7 +53,7 @@ export default function NodesCell(props) {
 
     return <TableRow hover role="presentation">
         <TableCell onClick={toggleDrawer(true)} className={classes.tableCell}>{nodeData.nodeId}</TableCell>
-        <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
+        <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} classes={{paper: classes.drawerPaper}}>
             <SideDrawer pageId={pageId} nodeData={nodeData} />
         </Drawer>
     </TableRow>;
@@ -93,5 +93,8 @@ const useStyles = makeStyles(() => ({
         padding: '1px',
         borderBottom: 'none',
         color: '#3f51b5'
-    }
+    },
+    drawerPaper: {
+        backgroundColor: '#fff',
+    },
 }));

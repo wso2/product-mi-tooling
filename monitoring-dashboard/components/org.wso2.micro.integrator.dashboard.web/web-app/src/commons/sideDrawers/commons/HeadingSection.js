@@ -38,8 +38,11 @@ export default function HeadingSection(props) {
 const useStyles = makeStyles((theme) => ({
     sideDrawerHeading: {
         padding: theme.spacing(1),
-        height: '64px',
+        height: '72px',
         backgroundColor: theme.palette.background.appBar,
-        color: '#ffffff'
+        color: '#ffffff',
+        width: '100%',
+        paddingLeft: 40,
+        paddingTop: 20,
     }
 }));

@@ -23,6 +23,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import SourceViewSection from './commons/SourceViewSection'
@@ -30,20 +31,25 @@ import SourceViewSection from './commons/SourceViewSection'
 export default function TasksSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper}>
-                        <TasksDetailTable nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        designContent={<>
+                            <Paper className={classes.paper}>
+                                <TasksDetailTable nodeData={nodeData} />
+                            </Paper>
+                            <Box pl={4}>
+                                <TriggerDetails details={nodeData.details} />
+                            </Box>
+                        </>}
+                        artifactType="tasks" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
-                <TriggerDetails details={nodeData.details}/>
-                <SourceViewSection artifactType="tasks" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
@@ -53,50 +59,51 @@ function TasksDetailTable(props) {
     const nodeData = props.nodeData;
 
     return <Table>
-                <TableRow>
-                    <TableCell>Task Name</TableCell>
-                    <TableCell>{nodeData.details.name}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Task Group</TableCell>
-                    <TableCell>{nodeData.details.taskGroup}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Task Implementation</TableCell>
-                    <TableCell>{nodeData.details.implementation}</TableCell>
-                </TableRow>
-            </Table> 
+        <TableRow>
+            <TableCell>Task Name</TableCell>
+            <TableCell>{nodeData.details.name}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Task Group</TableCell>
+            <TableCell>{nodeData.details.taskGroup}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Task Implementation</TableCell>
+            <TableCell>{nodeData.details.implementation}</TableCell>
+        </TableRow>
+    </Table>
 }
 
 function TriggerDetails(props) {
     const task = props.details;
     const classes = useStyles();
     return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        TriggerDetails
+        <Paper className={classes.paper} square>
+            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                TriggerDetails
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                    <Table size="small">
-                        <TableRow>
-                            <TableCell>Trigger</TableCell>
-                            <TableCell>{task.triggerType}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Count</TableCell>
-                            <TableCell>{task.triggerCount}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Interval (In seconds)</TableCell>
-                            <TableCell>{task.triggerInterval}</TableCell>
-                        </TableRow>
-                    </Table>
-                </Paper>
-            </Grid>
+            <hr className={classes.horizontalLine}></hr>
+            <Table size="small">
+                <TableRow>
+                    <TableCell>Trigger</TableCell>
+                    <TableCell>{task.triggerType}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Count</TableCell>
+                    <TableCell>{task.triggerCount}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Interval (In seconds)</TableCell>
+                    <TableCell>{task.triggerInterval}</TableCell>
+                </TableRow>
+            </Table>
+        </Paper>
+    </Grid>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        maxWidth: 700,
         flexGrow: 1,
     },
     paper: {
@@ -106,8 +113,8 @@ const useStyles = makeStyles((theme) => ({
     subTopic: {
         color: '#3f51b5'
     },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
+    horizontalLine: {
+        backgroundColor: '#3f51b5',
         borderWidth: '0px',
         height: '1px'
     }

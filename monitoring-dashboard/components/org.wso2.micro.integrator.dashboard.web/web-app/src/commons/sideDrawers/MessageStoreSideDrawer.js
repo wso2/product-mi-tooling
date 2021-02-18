@@ -29,19 +29,22 @@ import SourceViewSection from './commons/SourceViewSection'
 export default function MessageStoreSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper}>
-                        <MessageStoreDetailTable nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        designContent={<>
+                            <Paper className={classes.paper}>
+                                <MessageStoreDetailTable nodeData={nodeData} />
+                            </Paper>
+                        </>}
+                        artifactType="message-stores" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
-                <SourceViewSection artifactType="message-stores" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
@@ -52,19 +55,20 @@ function MessageStoreDetailTable(props) {
     const artifactName = nodeData.details.name
 
     return <Table>
-                <TableRow>
-                    <TableCell>Message Store Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Message Count</TableCell>
-                    <TableCell>{nodeData.details.size === '-1' ? "Not Supported" : nodeData.details.size}</TableCell>
-                </TableRow>
-            </Table> 
+        <TableRow>
+            <TableCell>Message Store Name</TableCell>
+            <TableCell>{artifactName}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Message Count</TableCell>
+            <TableCell>{nodeData.details.size === '-1' ? "Not Supported" : nodeData.details.size}</TableCell>
+        </TableRow>
+    </Table>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        maxWidth: 700,
         flexGrow: 1,
     },
     paper: {
