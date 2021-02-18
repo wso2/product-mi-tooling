@@ -39,8 +39,9 @@ import MessageStores from '../pages/MessageStores'
 import APIs from '../pages/APIs'
 import Templates from '../pages/Templates'
 import Sequences from '../pages/Sequences';
+import Tasks from '../pages/Tasks';
+import LocalEntries from '../pages/LocalEntries';
 import DataServices from '../pages/DataServices';
-import Datasources from '../pages/Datasources';
 import Connectors from '../pages/Connectors';
 import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
@@ -126,8 +127,9 @@ function Layout(props) {
                                 <Route exact path='/apis' component={APIs} />
                                 <Route exact path='/templates' component={Templates} />
                                 <Route exact path='/sequences' component={Sequences} />
-                                <Route exact path='/data-services' component={DataServices} />
-                                <Route exact path='/datasources' component={Datasources} />
+                                <Route exact path='/tasks' component={Tasks}/>
+                                <Route exact path='/local-entries' component={LocalEntries}/>
+                                <Route exact path='/data-services' component={DataServices}/>
                                 <Route exact path='/connectors' component={Connectors} />
                                 <Route exact path='/carbon-applications' component={CarbonApplications} />
                                 <Route exact path='/log-files' component={LogFiles} />
