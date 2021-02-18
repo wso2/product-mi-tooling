@@ -21,11 +21,11 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import Box from '@material-ui/core/Box';
 
 export default function LocalEntriesSideDrawer(props) {
     var nodeData = props.nodeData;
@@ -41,8 +41,10 @@ export default function LocalEntriesSideDrawer(props) {
                     <Paper className={classes.paper}>
                         <LocalEntriesDetailTable nodeData={nodeData}/>
                     </Paper>
+                    <Box pl={4}>
+                        <ValueSection value={nodeData.details.value}/>
+                    </Box>
                 </Grid>
-                <ValueSection value={nodeData.details.value}/>
             </Grid>
         </div>
     );
@@ -80,6 +82,7 @@ function ValueSection(props) {
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        maxWidth: 700,
         flexGrow: 1,
     },
     paper: {

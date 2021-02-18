@@ -21,6 +21,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
@@ -31,19 +32,25 @@ import SourceViewSection from './commons/SourceViewSection'
 export default function EndpointSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                            <EndpointsDetailTable nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        artifactType="endpoints"
+                        artifactName={artifactName}
+                        nodeId={nodeId}
+                        designContent={<>
+                            <Paper className={classes.paper} elevation={0} square>
+                                <EndpointsDetailTable nodeData={nodeData} />
+                            </Paper>
+                        </>}
+                    />
                 </Grid>
-                <SourceViewSection artifactType="endpoints" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
@@ -51,89 +58,90 @@ export default function EndpointSideDrawer(props) {
 
 function EndpointsDetailTable(props) {
     const nodeData = props.nodeData;
-    const artifactName=nodeData.details.name
-    const artifactType=nodeData.details.type
+    const artifactName = nodeData.details.name
+    const artifactType = nodeData.details.type
     const pageId = "endpoints";
 
     switch (artifactType) {
         case 'HTTP Endpoint':
             return <Table>
-                        <TableRow>
-                            <TableCell>Endpoint Name</TableCell>
-                            <TableCell>{artifactName}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Type</TableCell>
-                            <TableCell>{artifactType}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Method</TableCell>
-                            <TableCell>{nodeData.details.method}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>URI Template</TableCell>
-                            <CopyToClipboardCell text={nodeData.details.uriTemplate}/>
-                        </TableRow>
-                        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-                    </Table>  
+                <TableRow>
+                    <TableCell>Endpoint Name</TableCell>
+                    <TableCell>{artifactName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{artifactType}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Method</TableCell>
+                    <TableCell>{nodeData.details.method}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>URI Template</TableCell>
+                    <CopyToClipboardCell text={nodeData.details.uriTemplate} />
+                </TableRow>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+            </Table>
         case 'Address Endpoint':
             return <Table>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>{artifactName}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Type</TableCell>
-                            <TableCell>{artifactType}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Address</TableCell>
-                            <CopyToClipboardCell text={nodeData.details.address} />
-                        </TableRow>
-                        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-                    </Table> 
+                <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>{artifactName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{artifactType}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Address</TableCell>
+                    <CopyToClipboardCell text={nodeData.details.address} />
+                </TableRow>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+            </Table>
         case 'WSDL Endpoint':
             return <Table>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>{artifactName}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Type</TableCell>
-                            <TableCell>{artifactType}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>WSDL URI</TableCell>
-                            <CopyToClipboardCell text={nodeData.details.wsdlUri} />
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Service</TableCell>
-                            <TableCell>{nodeData.details.serviceName}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Port</TableCell>
-                            <TableCell>{nodeData.details.portName}</TableCell>
-                        </TableRow>
-                        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-                    </Table> 
+                <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>{artifactName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{artifactType}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>WSDL URI</TableCell>
+                    <CopyToClipboardCell text={nodeData.details.wsdlUri} />
+                </TableRow>
+                <TableRow>
+                    <TableCell>Service</TableCell>
+                    <TableCell>{nodeData.details.serviceName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Port</TableCell>
+                    <TableCell>{nodeData.details.portName}</TableCell>
+                </TableRow>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+            </Table>
         default:
             return <Table>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>{artifactName}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Type</TableCell>
-                            <TableCell>{artifactType}</TableCell>
-                        </TableRow>
-                        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-                    </Table>    
+                <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>{artifactName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{artifactType}</TableCell>
+                </TableRow>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+            </Table>
     }
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
+        maxWidth: 700,
     },
     paper: {
         padding: theme.spacing(2),
@@ -142,8 +150,8 @@ const useStyles = makeStyles((theme) => ({
     subTopic: {
         color: '#3f51b5'
     },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
+    horizontalLine: {
+        backgroundColor: '#3f51b5',
         borderWidth: '0px',
         height: '1px'
     }

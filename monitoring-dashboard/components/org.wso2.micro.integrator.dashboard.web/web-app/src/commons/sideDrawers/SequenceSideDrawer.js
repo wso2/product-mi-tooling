@@ -22,6 +22,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import TracingRow from './commons/TracingRow'
@@ -30,19 +31,22 @@ import SourceViewSection from './commons/SourceViewSection'
 export default function SequenceSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                        <SequenceDetailTable nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        designContent={<>
+                            <Paper className={classes.paper} elevation={0} square>
+                                <SequenceDetailTable nodeData={nodeData} />
+                            </Paper>
+                        </>}
+                        artifactType="sequences" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
-                <SourceViewSection artifactType="sequences" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
@@ -54,20 +58,21 @@ function SequenceDetailTable(props) {
     const pageId = "sequences";
 
     return <Table>
-                <TableRow>
-                    <TableCell>Sequence Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
-                </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-            </Table> 
+        <TableRow>
+            <TableCell>Sequence Name</TableCell>
+            <TableCell>{artifactName}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Statistics</TableCell>
+            <TableCell>{nodeData.details.stats}</TableCell>
+        </TableRow>
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+    </Table>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        maxWidth: 700,
         flexGrow: 1,
     },
     paper: {

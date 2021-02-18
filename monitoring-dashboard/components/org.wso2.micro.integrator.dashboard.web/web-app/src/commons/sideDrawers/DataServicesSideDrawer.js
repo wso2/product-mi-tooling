@@ -22,6 +22,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
 import { Table, TableCell, TableRow, TableBody } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import SourceViewSection from './commons/SourceViewSection'
@@ -41,15 +42,23 @@ export default function DataServicesSideDrawer(props) {
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper}>
-                            <DataServicesDetailTable nodeData={nodeData.details}/>
-                    </Paper>
-                    <DataSourcesSection dataSources={nodeData.details.dataSources}/>
-                    <QueriesSection queries={nodeData.details.queries}/>
-                    <ResourcesSection resources={nodeData.details.resources}/>
-                    <OperationsSection operations={nodeData.details.operations}/>
-                    <SourceViewSection artifactType="data-services" artifactName={artifactName} nodeId={nodeId}/>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        artifactType="data-services"
+                        artifactName={artifactName}
+                        nodeId={nodeId}
+                        designContent={<>
+                            <Paper className={classes.paper}>
+                                <DataServicesDetailTable nodeData={nodeData.details} />
+                            </Paper>
+                            <Box pl={4}>
+                                <DataSourcesSection dataSources={nodeData.details.dataSources} />
+                                <QueriesSection queries={nodeData.details.queries} />
+                                <ResourcesSection resources={nodeData.details.resources} />
+                                <OperationsSection operations={nodeData.details.operations} />
+                            </Box>
+                        </>}
+                    />
                 </Grid>
             </Grid>
         </div>
@@ -61,76 +70,76 @@ function DataServicesDetailTable(props) {
     const wsdl1_1 = nodeData.wsdl1_1;
     const swagger_url = nodeData.swagger_url;
     return <Table>
-                <TableBody>
-                    <TableRow>
-                        <TableCell>Data Service Name</TableCell>
-                        <TableCell>{nodeData.serviceName}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>WSDL 1.1</TableCell>
-                        <TableCell><a href={wsdl1_1}>{wsdl1_1}</a></TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Swagger URL</TableCell>
-                        <TableCell><a href={swagger_url}>{swagger_url}</a></TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
+        <TableBody>
+            <TableRow>
+                <TableCell>Data Service Name</TableCell>
+                <TableCell>{nodeData.serviceName}</TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell>WSDL 1.1</TableCell>
+                <TableCell><a href={wsdl1_1}>{wsdl1_1}</a></TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell>Swagger URL</TableCell>
+                <TableCell><a href={swagger_url}>{swagger_url}</a></TableCell>
+            </TableRow>
+        </TableBody>
+    </Table>
 }
 
 function DataSourcesSection(props) {
     const classes = useStyles();
     return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Data Sources
+        <Paper className={classes.paper} square>
+            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                Data Sources
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                </Paper>
-                <DataSourcesDetailTable dataSources={props.dataSources}/>
-            </Grid>
+            <hr className={classes.horizontalLine}></hr>
+        </Paper>
+        <DataSourcesDetailTable dataSources={props.dataSources} />
+    </Grid>
 }
 
 function DataSourcesDetailTable(props) {
     const dataSources = props.dataSources;
     return (dataSources.map(dataSource => (
-            <ExpansionPanel>
-                <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon/>}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header">
-                    {dataSource.dataSourceId}
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                    <Table size="small">
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>Data Source ID</TableCell>
-                                <TableCell>{dataSource.dataSourceId}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Data Source Type</TableCell>
-                                <TableCell>{dataSource.dataSourceType}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
-        ))
+        <ExpansionPanel>
+            <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header">
+                {dataSource.dataSourceId}
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <Table size="small">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>Data Source ID</TableCell>
+                            <TableCell>{dataSource.dataSourceId}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Data Source Type</TableCell>
+                            <TableCell>{dataSource.dataSourceType}</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+    ))
     );
 }
 
 function QueriesSection(props) {
     const classes = useStyles();
     return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Queries
+        <Paper className={classes.paper} square>
+            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                Queries
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                </Paper>
-                <QueriesDetailTable queries={props.queries}/>
-            </Grid>
+            <hr className={classes.horizontalLine}></hr>
+        </Paper>
+        <QueriesDetailTable queries={props.queries} />
+    </Grid>
 }
 
 function QueriesDetailTable(props) {
@@ -140,7 +149,7 @@ function QueriesDetailTable(props) {
         queries.map(query => (
             <ExpansionPanel>
                 <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon/>}
+                    expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header">
                     {query.id}
@@ -171,14 +180,14 @@ function QueriesDetailTable(props) {
 function ResourcesSection(props) {
     const classes = useStyles();
     return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Resources
+        <Paper className={classes.paper} square>
+            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                Resources
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                </Paper>
-                <ResourcesDetailTable resources={props.resources}/>
-            </Grid>
+            <hr className={classes.horizontalLine}></hr>
+        </Paper>
+        <ResourcesDetailTable resources={props.resources} />
+    </Grid>
 }
 
 function ResourcesDetailTable(props) {
@@ -188,7 +197,7 @@ function ResourcesDetailTable(props) {
         resources.map(resource => (
             <ExpansionPanel>
                 <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon/>}
+                    expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header">
                     {resource.resourcePath}
@@ -219,14 +228,14 @@ function ResourcesDetailTable(props) {
 function OperationsSection(props) {
     const classes = useStyles();
     return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Operations
+        <Paper className={classes.paper} square>
+            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                Operations
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                </Paper>
-                <OperationsDetailTable operations={props.operations}/>
-            </Grid>
+            <hr className={classes.horizontalLine}></hr>
+        </Paper>
+        <OperationsDetailTable operations={props.operations} />
+    </Grid>
 }
 
 function OperationsDetailTable(props) {
@@ -236,7 +245,7 @@ function OperationsDetailTable(props) {
         operations.map(operation => (
             <ExpansionPanel>
                 <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon/>}
+                    expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header">
                     {operation.operationName}
@@ -263,6 +272,7 @@ function OperationsDetailTable(props) {
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
+        maxWidth: 700,
     },
     paper: {
         padding: theme.spacing(2),
@@ -271,8 +281,8 @@ const useStyles = makeStyles((theme) => ({
     subTopic: {
         color: '#3f51b5'
     },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
+    horizontalLine: {
+        backgroundColor: '#3f51b5',
         borderWidth: '0px',
         height: '1px'
     }

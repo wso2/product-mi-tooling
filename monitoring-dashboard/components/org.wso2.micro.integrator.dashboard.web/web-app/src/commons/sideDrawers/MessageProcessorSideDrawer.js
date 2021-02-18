@@ -21,6 +21,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
@@ -30,20 +31,25 @@ import Typography from '@material-ui/core/Typography';
 export default function MessageProcessorSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper}>
-                        <MessageProcessorDetailTable nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        designContent={<>
+                            <Paper className={classes.paper}>
+                                <MessageProcessorDetailTable nodeData={nodeData} />
+                            </Paper>
+                            <Box pl={4}>
+                                <ParametersSection parameters={nodeData.details.parameters} />
+                            </Box>
+                        </>}
+                        artifactType="message-processors" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
-                <ParametersSection parameters={nodeData.details.parameters}/>
-                <SourceViewSection artifactType="message-processors" artifactName={artifactName} nodeId={nodeId}/>
             </Grid>
         </div>
     );
@@ -52,45 +58,46 @@ export default function MessageProcessorSideDrawer(props) {
 function MessageProcessorDetailTable(props) {
     const nodeData = props.nodeData;
     return <Table>
-                <TableRow>
-                    <TableCell>Message Processor Name</TableCell>
-                    <TableCell>{nodeData.details.name}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Message Store</TableCell>
-                    <TableCell>{nodeData.details.messageStore}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Type</TableCell>
-                    <TableCell>{nodeData.details.type}</TableCell>
-                </TableRow>
-            </Table> 
+        <TableRow>
+            <TableCell>Message Processor Name</TableCell>
+            <TableCell>{nodeData.details.name}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Message Store</TableCell>
+            <TableCell>{nodeData.details.messageStore}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Type</TableCell>
+            <TableCell>{nodeData.details.type}</TableCell>
+        </TableRow>
+    </Table>
 }
 
 function ParametersSection(props) {
     const parameters = props.parameters;
     const classes = useStyles();
     return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Parameters
+        <Paper className={classes.paper} square>
+            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                Parameters
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                    <Table size="small">
-                        <TableBody>
-                            {Object.keys(parameters).map(key => (
-                                <TableRow>
-                                    <TableCell>{key}</TableCell>
-                                    <TableCell>{parameters[key]}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </Paper>
-            </Grid>
+            <hr className={classes.horizontalLine}></hr>
+            <Table size="small">
+                <TableBody>
+                    {Object.keys(parameters).map(key => (
+                        <TableRow>
+                            <TableCell>{key}</TableCell>
+                            <TableCell>{parameters[key]}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </Paper>
+    </Grid>
 }
 const useStyles = makeStyles((theme) => ({
     root: {
+        maxWidth: 700,
         flexGrow: 1,
     },
     paper: {
@@ -100,8 +107,8 @@ const useStyles = makeStyles((theme) => ({
     subTopic: {
         color: '#3f51b5'
     },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
+    horizontalLine: {
+        backgroundColor: '#3f51b5',
         borderWidth: '0px',
         height: '1px'
     }

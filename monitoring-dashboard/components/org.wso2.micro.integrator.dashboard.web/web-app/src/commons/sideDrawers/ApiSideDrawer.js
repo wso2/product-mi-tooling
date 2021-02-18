@@ -22,6 +22,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableCell, TableBody, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
@@ -36,28 +37,35 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 export default function ApiSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper} elevation={0} square>
-                            <ApiDetailTable nodeData={nodeData}/>
-                    </Paper>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <SourceViewSection
+                        artifactType="apis"
+                        artifactName={artifactName}
+                        nodeId={nodeId}
+                        designContent={<>
+                            <Paper className={classes.paper} elevation={0} square>
+                                <ApiDetailTable nodeData={nodeData} />
+                            </Paper>
+                            <Box pl={4}>
+                                <Paper className={classes.paper} elevation={0} square>
+                                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+                                        Resources
+                                    </Typography>
+                                    <hr className={classes.horizontalLine}></hr>
+                                </Paper>
+                                <ResourcesDetailTable resources={nodeData.details.resources} />
+                            </Box>
+                        </>}
+                    />
                 </Grid>
-                <Grid item xs={12}>
-                    <Paper className={classes.paper} square>
-                        <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                            Resources
-                        </Typography>
-                        <hr className={classes.horizontalLine}></hr>
-                    </Paper>
-                    <ResourcesDetailTable resources={nodeData.details.resources} />
-                </Grid>
-                <SourceViewSection artifactType="apis" artifactName={artifactName} nodeId={nodeId}/>
+
             </Grid>
         </div>
     );
@@ -65,58 +73,59 @@ export default function ApiSideDrawer(props) {
 
 function ApiDetailTable(props) {
     const nodeData = props.nodeData;
-    const artifactName=nodeData.details.name
+    const artifactName = nodeData.details.name
     const pageId = "apis";
 
     return <Table>
-                <TableRow>
-                    <TableCell>API Name</TableCell>
-                    <TableCell>{artifactName}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Context</TableCell>
-                    <TableCell>{nodeData.details.context}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>URL</TableCell>
-                    <CopyToClipboardCell text={nodeData.details.url}/>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Statistics</TableCell>
-                    <TableCell>{nodeData.details.stats}</TableCell>
-                </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing}/>
-            </Table>
+        <TableRow>
+            <TableCell>API Name</TableCell>
+            <TableCell>{artifactName}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Context</TableCell>
+            <TableCell>{nodeData.details.context}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>URL</TableCell>
+            <CopyToClipboardCell text={nodeData.details.url} />
+        </TableRow>
+        <TableRow>
+            <TableCell>Statistics</TableCell>
+            <TableCell>{nodeData.details.stats}</TableCell>
+        </TableRow>
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+    </Table>
 }
 
 function ResourcesDetailTable(props) {
     const resources = props.resources;
     return (resources.map(resource => (
-            <ExpansionPanel>
-                <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon/>}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header">
-                    {resource.url}
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                    <Table size="small">
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>Methods</TableCell>
-                                <TableCell>{resource.methods.toString()}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
-        ))
+        <ExpansionPanel>
+            <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header">
+                {resource.url}
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <Table size="small">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>Methods</TableCell>
+                            <TableCell>{resource.methods.toString()}</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+    ))
     );
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
+        maxWidth: 700,
     },
     paper: {
         padding: theme.spacing(2),
@@ -125,8 +134,8 @@ const useStyles = makeStyles((theme) => ({
     subTopic: {
         color: '#3f51b5'
     },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
+    horizontalLine: {
+        backgroundColor: '#3f51b5',
         borderWidth: '0px',
         height: '1px'
     }
