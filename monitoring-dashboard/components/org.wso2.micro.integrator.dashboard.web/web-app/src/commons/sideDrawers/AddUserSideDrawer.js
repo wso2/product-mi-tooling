@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -20,64 +20,31 @@
 
 import React from 'react';
 import axios from 'axios';
-import Paper from '@material-ui/core/Paper';
-import Drawer from '@material-ui/core/Drawer';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
-import TextField from '@material-ui/core/TextField';
-import Select from '@material-ui/core/Select';
-import { useSelector } from 'react-redux';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import AddUserSideDrawer from './sideDrawers/AddUserSideDrawer'
+import Select from '@material-ui/core/Select';
+import Box from '@material-ui/core/Box';
+import TextField from '@material-ui/core/TextField';
+import { Button } from '@material-ui/core';
+import { useSelector } from 'react-redux';
 
-export default function AddGlobalConfigsButton(props) {
-    const { pageId } = props;
-    const [state, setState] = React.useState({
-        openSideDrawer: false
-    });
-
-    const toggleDrawer = (open) => (event) => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
-        setState({ ...state, openSideDrawer: open });
-    };
-
-    if (pageId === 'log-configs') {
-        return <div>
-                    <Button onClick={toggleDrawer(true)} variant="contained" color="primary">Add Loggers</Button>
-                    <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
-                        <LogConfigsSideDrawer />
-                    </Drawer>
-                </div>
-    } else if (pageId === 'users') {
-        return <div>
-                    <Button onClick={toggleDrawer(true)} variant="contained" color="primary">Add Users</Button>
-                    <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
-                        <AddUserSideDrawer />
-                    </Drawer>
-                </div>
-    } else {
-        return <div />
-    } 
-}
-
-function LogConfigsSideDrawer() {
-    const classes = useStyles();
+export default function AddUserSideDrawer() {
     const globalGroupId = useSelector(state => state.groupId);
     const basePath = useSelector(state => state.basePath);
-    const [logConfig, setLogConfig] = React.useState({
-        loggerName: "",
-        loggerClass: "",
-        loggerLevel: "OFF"
+    const [user, setUser] = React.useState({
+        userId: "",
+        password: "",
+        passwordRepeat: "",
+        isAdmin: "false"
     });
+
     const [dialog, setDialog] = React.useState({
         open : false,
         title: '',
@@ -88,7 +55,7 @@ function LogConfigsSideDrawer() {
         const target = event.target;
         const name = target.name;
         const value = target.value;
-        setLogConfig({ ...logConfig, [name]: value });
+        setUser({ ...user, [name]: value });
     }
 
     const handleDialogClose = () => {
@@ -99,27 +66,33 @@ function LogConfigsSideDrawer() {
         })
     }
 
-    const addLogger = () => {
-        const {loggerName, loggerClass, loggerLevel} = logConfig;
+    const addUser = () => {
+        const {userId, password, passwordRepeat, isAdmin} = user
 
-        if (loggerName === '') {
+        if (userId === '') {
             setDialog({
                 open: true, 
                 title: 'Error',
-                message: 'Logger name is missing.'
+                message: 'User id is missing.'
             })
-        } else if (loggerClass ==='') {
+        } else if (password ==='') {
             setDialog({
                 open: true, 
                 title: 'Error',
-                message: 'Logger class is missing.'
+                message: 'Password is missing.'
+            })
+        } else if (password !== passwordRepeat) {
+            setDialog({
+                open: true, 
+                title: 'Error',
+                message: 'Repeat password must match the password  '
             })
         } else {
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/log-configs");
+            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/users");
             axios.post(url, {
-                "name": loggerName,
-                "loggerClass": loggerClass,
-                "level": loggerLevel
+                "userId": userId,
+                "password": password,
+                "isAdmin": isAdmin
             }).then(response => {
                 if (response.data.status === 'fail') {
                     setDialog({
@@ -131,39 +104,38 @@ function LogConfigsSideDrawer() {
                     setDialog({
                         open: true, 
                         title: 'Success',
-                        message: 'Successfully added logger'
+                        message: 'Successfully added user'
                     })
                 }
-            });
-        } 
+            })
+        }
     }
+
+    const classes = useStyles();
+
     return <div className={classes.root}>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <Paper className={classes.sideDrawerHeading} square>
-                            <Typography variant="h6" color="inherit" noWrap>Add Loggers</Typography>
+                            <Typography variant="h6" color="inherit" noWrap>Add Users</Typography>
                         </Paper>
                         <Paper className={classes.paper}>
-                            <TextField onChange={(e) => handleUserInput(e)} name="loggerName" label="Logger Name" value={logConfig.loggerName}/>   
-                            <TextField onChange={(e) => handleUserInput(e)} name="loggerClass" label="Logger Class" value={logConfig.loggerClass}/>
+                            <TextField onChange={(e) => handleUserInput(e)} name="userId" label="User" value={user.userId}/>   
+                            <TextField onChange={(e) => handleUserInput(e)} name="password" label="Password" type="password" value={user.password}/>
+                            <TextField onChange={(e) => handleUserInput(e)} name="passwordRepeat" label="Repeat Password" type="password" value={user.passwordRepeat}/>
                             <Select
                                 native
-                                name="loggerLevel"
-                                value={logConfig.loggerLevel}
+                                name="isAdmin"
+                                value={user.isAdmin}
                                 onChange={(e) => handleUserInput(e)}
-                                label="Level"
+                                label="Is Admin"
                             >
-                                <option value={'OFF'}>OFF</option>
-                                <option value={'TRACE'}>TRACE</option>
-                                <option value={'DEBUG'}>DEBUG</option>
-                                <option value={'INFO'}>INFO</option>
-                                <option value={'WARN'}>WARN</option>
-                                <option value={'ERROR'}>ERROR</option>
-                                <option value={'FATAL'}>FATAL</option>
+                                <option value={"true"}>True</option>
+                                <option value={"false"}>False</option>
                             </Select>
                             <br /> <br/>
                             <Box textAlign='right'>
-                                <Button onClick={() => addLogger()} variant="contained" color="primary">Add Logger</Button>
+                                <Button onClick={() => addUser()} variant="contained" color="primary">Add User</Button>
                             </Box>
 
                             <Dialog open={dialog.open} onClose={() => handleDialogClose()}

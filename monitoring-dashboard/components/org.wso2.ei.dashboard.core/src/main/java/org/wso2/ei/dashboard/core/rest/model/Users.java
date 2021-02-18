@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,10 +21,17 @@
 package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
+import javax.validation.Valid;
 
+
+import io.swagger.annotations.*;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class User extends ArrayList<UserInner>  {
+
+public class Users extends ArrayList<String>  {
 
 
   @Override
@@ -35,7 +42,7 @@ public class User extends ArrayList<UserInner>  {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    User user = (User) o;
+    Users users = (Users) o;
     return true;
   }
 
@@ -47,7 +54,7 @@ public class User extends ArrayList<UserInner>  {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class User {\n");
+    sb.append("class Users {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("}");
     return sb.toString();

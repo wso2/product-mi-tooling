@@ -37,6 +37,7 @@ import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigsInner;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
@@ -62,10 +63,34 @@ public class LogConfigDelegate {
         return logConfigs;
     }
 
+    public Ack updateLogLevel(String groupId, LogConfigUpdateRequest request) {
+        log.debug("Updating logger " + request.getName() + " for all nodes in group " + groupId);
+        Ack ack = new Ack(Constants.FAIL_STATUS);
+        JsonObject payload = createUpdateLoggerPayload(request);
+
+        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        for (NodeListInner node : nodeList) {
+            String nodeId = node.getNodeId();
+            String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+            String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+            String updateLoggerUrl = mgtApiUrl.concat("logging");
+            log.debug("Updating logger on node " + nodeId);
+            CloseableHttpResponse httpResponse = doPatch(updateLoggerUrl, accessToken, payload);
+            if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                log.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
+                String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+                ack.setMessage(message);
+                return ack;
+            }
+        }
+        ack.setStatus(Constants.SUCCESS_STATUS);
+        return ack;
+    }
+
     public Ack addLogger(String groupId, LogConfigAddRequest request) {
         log.debug("Adding new Logger " + request.getName() + " for all nodes in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
-        JsonObject payload = createPayload(request);
+        JsonObject payload = createAddLoggerPayload(request);
 
         NodeList nodeList = databaseManager.fetchNodes(groupId);
 
@@ -87,7 +112,14 @@ public class LogConfigDelegate {
         return ack;
     }
 
-    private JsonObject createPayload(LogConfigAddRequest request) {
+    private JsonObject createUpdateLoggerPayload(LogConfigUpdateRequest request) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("loggerName", request.getName());
+        payload.addProperty("loggingLevel", request.getLevel());
+        return payload;
+    }
+
+    private JsonObject createAddLoggerPayload(LogConfigAddRequest request) {
         JsonObject payload = new JsonObject();
         payload.addProperty("loggerName", request.getName());
         payload.addProperty("loggerClass", request.getLoggerClass());

@@ -1000,7 +1000,7 @@ paths:
       parameters:
         - name: "group-id"
           in: path
-          description: "Group ID of the node"
+          description: "Group ID"
           required: true
           schema:
             type: string
@@ -1010,7 +1010,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Users'
         default:
           description: "Unexpected error"
           content:
@@ -1030,7 +1030,7 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: '#/components/requestBodies/User'
+        $ref: '#/components/requestBodies/AddUser'
       responses:
         200:
           description: "User insert status"
@@ -1265,23 +1265,14 @@ components:
           type: string
         level:
           type: string
-    User:
+    Users:
       type: array
       items:
-        type: object
-        properties:
-          userId:
-            type: string
-          isAdmin:
-            type: boolean
-          roles:
-            type: array
-            items:
-              type: string
-    UserAddRequestBody:
+        type: string
+    AddUserRequest:
       type: object
       properties:
-        user:
+        userId:
           type: string
         password:
           type: string
@@ -1389,11 +1380,11 @@ components:
           schema:
             $ref: '#/components/schemas/LogConfigUpdateRequest'
       description: "The request body to add logger."
-    User:
+    AddUser:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UserAddRequestBody'
+            $ref: '#/components/schemas/AddUserRequest'
       description: "The request body to add user."
 servers:
   # Added by API Auto Mocking Plugin
