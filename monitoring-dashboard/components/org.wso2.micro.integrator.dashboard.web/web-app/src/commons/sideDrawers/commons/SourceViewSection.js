@@ -20,17 +20,10 @@
 
 import React from 'react';
 import axios from 'axios';
-import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import { Button } from '@material-ui/core';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import XMLViewer from 'react-xml-viewer';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
@@ -49,7 +42,7 @@ export default function SourceViewSection(props) {
         artifactName: artifactName
     };
 
-    const [open, setOpen] = React.useState(false);
+    const [open] = React.useState(false);
 
     React.useEffect(() => {
         const url = basePath.concat('/configuration');
@@ -81,7 +74,7 @@ export default function SourceViewSection(props) {
             </Tabs>
         </AppBar>
             {selectedTab === 0 && (<>{designContent}</>)}
-            {selectedTab === 1 && (<Box p={5}><XMLViewer xml={source} /></Box>)}
+            {selectedTab === 1 && (<Box p={5} overflow='auto'><XMLViewer xml={source} /></Box>)}
         </>)
     }
 }

@@ -51,7 +51,12 @@ export default function InboundEpSideDrawer(props) {
                                 <InboundEpDetailTable nodeData={nodeData} />
                             </Paper>
                             <Box pl={4}>
-                                <ParametersSection parameters={nodeData.details.parameters} />
+                                <Typography variant="h6" color="inherit" noWrap>
+                                    Parameters
+                                </Typography>
+                                <Box pr={2}>
+                                    <ParametersSection parameters={nodeData.details.parameters} />
+                                </Box>
                             </Box>
                         </>}
                     />
@@ -93,39 +98,22 @@ function InboundEpDetailTable(props) {
 
 function ParametersSection(props) {
     const parameters = props.parameters;
-    const classes = useStyles();
-    return <Grid item xs={12}>
-        <ExpansionPanel>
-            <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header">
-                <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                    Parameters
-                        </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-                <Table size="small">
-                    {parameters.map(parameter => <TableRow>
-                        <TableCell>{parameter.name}</TableCell>
-                        <TableCell>{parameter.value}</TableCell>
-                    </TableRow>)}
-                </Table>
-            </ExpansionPanelDetails>
-        </ExpansionPanel>
-    </Grid>
+    return <Table size="small" style={{width: '100%'}}>
+        {parameters.map(parameter => <TableRow>
+            <TableCell>{parameter.name}</TableCell>
+            <TableCell>{parameter.value}</TableCell>
+        </TableRow>)}
+    </Table>
+
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        maxWidth: 700,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
     },
-    subTopic: {
-        color: '#3f51b5'
-    }
 }));

@@ -41,7 +41,7 @@ export default function TasksSideDrawer(props) {
                     <HeadingSection name={artifactName} nodeId={nodeId} />
                     <SourceViewSection
                         designContent={<>
-                            <Paper className={classes.paper}>
+                            <Paper className={classes.paper} elevation={0} square>
                                 <TasksDetailTable nodeData={nodeData} />
                             </Paper>
                             <Box pl={4}>
@@ -76,13 +76,11 @@ function TasksDetailTable(props) {
 
 function TriggerDetails(props) {
     const task = props.details;
-    const classes = useStyles();
-    return <Grid item xs={12}>
-        <Paper className={classes.paper} square>
-            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                TriggerDetails
-                    </Typography>
-            <hr className={classes.horizontalLine}></hr>
+    return <>
+        <Typography variant="h6" color="inherit" noWrap>
+            TriggerDetails
+        </Typography>
+        <Box pr={2}>
             <Table size="small">
                 <TableRow>
                     <TableCell>Trigger</TableCell>
@@ -97,25 +95,18 @@ function TriggerDetails(props) {
                     <TableCell>{task.triggerInterval}</TableCell>
                 </TableRow>
             </Table>
-        </Paper>
-    </Grid>
+        </Box>
+
+    </>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 700,
         flexGrow: 1,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
     },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine: {
-        backgroundColor: '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
-    }
 }));

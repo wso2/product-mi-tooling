@@ -54,7 +54,7 @@ export default function TracingRow(props) {
                 <TableCell>Tracing</TableCell>
                 <TableCell>
                     <label>
-                        <Switch checked={isTracingEnabled} onChange={changeTracingStatus}/>
+                        <Switch checked={isTracingEnabled} onChange={changeTracingStatus} height={16} width={36} />
                     </label>
                 </TableCell>
             </TableRow>

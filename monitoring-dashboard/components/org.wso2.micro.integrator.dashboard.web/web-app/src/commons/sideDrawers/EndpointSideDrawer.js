@@ -141,18 +141,10 @@ function EndpointsDetailTable(props) {
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        maxWidth: 700,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
     },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine: {
-        backgroundColor: '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
-    }
 }));

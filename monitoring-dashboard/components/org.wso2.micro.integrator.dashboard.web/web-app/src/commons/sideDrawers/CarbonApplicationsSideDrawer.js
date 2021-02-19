@@ -30,19 +30,19 @@ import Typography from '@material-ui/core/Typography';
 export default function CarbonApplicationsSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper}>
-                            <CarbonAppsDetailTable nodeData={nodeData.details}/>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <Paper className={classes.paper} elevation={0} square>
+                        <CarbonAppsDetailTable nodeData={nodeData.details} />
                     </Paper>
                     <Box pl={4}>
-                        <ArtifactsSection artifacts={nodeData.details.artifacts}/>
+                        <ArtifactsSection artifacts={nodeData.details.artifacts} />
                     </Box>
                 </Grid>
             </Grid>
@@ -53,57 +53,47 @@ export default function CarbonApplicationsSideDrawer(props) {
 function CarbonAppsDetailTable(props) {
     const nodeData = props.nodeData;
     return <Table>
-                <TableRow>
-                    <TableCell>Carbon Application Name</TableCell>
-                    <TableCell>{nodeData.name}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Version</TableCell>
-                    <TableCell>{nodeData.version}</TableCell>
-                </TableRow>
-            </Table>
+        <TableRow>
+            <TableCell>Carbon Application Name</TableCell>
+            <TableCell>{nodeData.name}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Version</TableCell>
+            <TableCell>{nodeData.version}</TableCell>
+        </TableRow>
+    </Table>
 }
 
 function ArtifactsSection(props) {
     const artifacts = props.artifacts;
-    const classes = useStyles();
-    return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Artifacts
+    return <>
+        <Typography variant="h6" color="inherit" noWrap>
+            Artifacts
                     </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Artifact Name</TableCell>
-                                <TableCell>Artifact Type</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        {artifacts.map(artifact => <TableRow>
-                            <TableCell>{artifact.name}</TableCell>
-                            <TableCell>{artifact.type === 'lib' ? 'connector' : artifact.type}</TableCell>
-                        </TableRow>)}
-                    </Table>
-                </Paper>
-            </Grid>
+        <Box>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Artifact Name</TableCell>
+                        <TableCell>Artifact Type</TableCell>
+                    </TableRow>
+                </TableHead>
+                {artifacts.map(artifact => <TableRow>
+                    <TableCell>{artifact.name}</TableCell>
+                    <TableCell>{artifact.type === 'lib' ? 'connector' : artifact.type}</TableCell>
+                </TableRow>)}
+            </Table>
+        </Box>
+    </>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        maxWidth: 700,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
     },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
-    }
 }));

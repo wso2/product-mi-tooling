@@ -39,7 +39,7 @@ export default function MessageStoreSideDrawer(props) {
                     <HeadingSection name={artifactName} nodeId={nodeId} />
                     <SourceViewSection
                         designContent={<>
-                            <Paper className={classes.paper}>
+                            <Paper className={classes.paper} elevation={0} square>
                                 <MessageStoreDetailTable nodeData={nodeData} />
                             </Paper>
                         </>}
@@ -68,11 +68,11 @@ function MessageStoreDetailTable(props) {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 700,
         flexGrow: 1,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
-    }
+    },
 }));

@@ -48,7 +48,7 @@ export default function DataServicesSideDrawer(props) {
                         artifactName={artifactName}
                         nodeId={nodeId}
                         designContent={<>
-                            <Paper className={classes.paper}>
+                            <Paper className={classes.paper} elevation={0} square>
                                 <DataServicesDetailTable nodeData={nodeData.details} />
                             </Paper>
                             <Box pl={4}>
@@ -130,16 +130,14 @@ function DataSourcesDetailTable(props) {
 }
 
 function QueriesSection(props) {
-    const classes = useStyles();
-    return <Grid item xs={12}>
-        <Paper className={classes.paper} square>
-            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                Queries
-                    </Typography>
-            <hr className={classes.horizontalLine}></hr>
-        </Paper>
-        <QueriesDetailTable queries={props.queries} />
-    </Grid>
+    return <>
+        <Typography variant="h6" color="inherit" noWrap>
+            Queries
+            </Typography>
+        <Box pr={2}>
+            <QueriesDetailTable queries={props.queries} />
+        </Box>
+    </>
 }
 
 function QueriesDetailTable(props) {
@@ -178,16 +176,14 @@ function QueriesDetailTable(props) {
 }
 
 function ResourcesSection(props) {
-    const classes = useStyles();
-    return <Grid item xs={12}>
-        <Paper className={classes.paper} square>
-            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                Resources
-                    </Typography>
-            <hr className={classes.horizontalLine}></hr>
-        </Paper>
-        <ResourcesDetailTable resources={props.resources} />
-    </Grid>
+    return <>
+        <Typography variant="h6" color="inherit" noWrap>
+            Resources
+            </Typography>
+        <Box pr={2}>
+            <ResourcesDetailTable resources={props.resources} />
+        </Box>
+    </>
 }
 
 function ResourcesDetailTable(props) {
@@ -272,18 +268,10 @@ function OperationsDetailTable(props) {
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        maxWidth: 700,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
     },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine: {
-        backgroundColor: '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
-    }
 }));

@@ -18,11 +18,11 @@
  *
  */
 
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import {createStore} from 'redux';
-import {Provider} from 'react-redux'
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux'
 import Reducers from './redux/Reducers';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
@@ -110,6 +110,12 @@ let theme = createMuiTheme({
                     boxShadow: 'none',
                 },
             },
+            root: {
+                '& .MuiSvgIcon-root': {
+                    color: '#4fc3f7',
+                    fontSize: '16px',
+                }
+            }
         },
         MuiTabs: {
             root: {
@@ -202,16 +208,16 @@ class App extends Component {
     render() {
 
         return (
-        <ThemeProvider theme={theme}>
-            <BrowserRouter basename={window.contextPath}>
-                <Switch>
-                    <Route exact path='/login' component={Login}/>
-                    <Route exact path='/logout' component={Logout}/>
-                    <Route component={Dashboard}/>
+            <ThemeProvider theme={theme}>
+                <BrowserRouter basename={window.contextPath}>
+                    <Switch>
+                        <Route exact path='/login' component={Login} />
+                        <Route exact path='/logout' component={Logout} />
+                        <Route component={Dashboard} />
                     )}/>
                 </Switch>
-            </BrowserRouter>
-        </ThemeProvider>
+                </BrowserRouter>
+            </ThemeProvider>
         );
 
     }
@@ -219,7 +225,7 @@ class App extends Component {
 
 ReactDOM.render(
     <Provider store={store}>
-        <App/>
+        <App />
     </Provider>,
     document.getElementById('root')
 );
