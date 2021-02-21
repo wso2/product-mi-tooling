@@ -22,6 +22,7 @@ package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.ei.dashboard.core.rest.model.UsersInner;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 
@@ -31,7 +32,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class Users extends ArrayList<String>  {
+public class Users extends ArrayList<UsersInner>  {
 
 
   @Override

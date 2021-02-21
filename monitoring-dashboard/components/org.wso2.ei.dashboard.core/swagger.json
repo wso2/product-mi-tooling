@@ -1826,7 +1826,7 @@
       "Users" : {
         "type" : "array",
         "items" : {
-          "type" : "string"
+          "$ref" : "#/components/schemas/Users_inner"
         }
       },
       "AddUserRequest" : {
@@ -2053,6 +2053,17 @@
             "type" : "string"
           },
           "level" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Users_inner" : {
+        "type" : "object",
+        "properties" : {
+          "userId" : {
+            "type" : "string"
+          },
+          "details" : {
             "type" : "string"
           }
         }

@@ -1268,7 +1268,12 @@ components:
     Users:
       type: array
       items:
-        type: string
+        type: object
+        properties:
+          userId:
+            type: string
+          details:
+            type: string
     AddUserRequest:
       type: object
       properties:
