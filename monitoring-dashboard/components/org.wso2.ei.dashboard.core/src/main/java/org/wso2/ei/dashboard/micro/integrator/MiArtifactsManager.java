@@ -285,7 +285,10 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private void deleteArtifact(String artifactType, String name) {
-        databaseManager.deleteArtifact(artifactType, name, heartbeat.getGroupId(), heartbeat.getNodeId());
+        String nodeId = heartbeat.getNodeId();
+        String groupId = heartbeat.getGroupId();
+        logger.info("Deleting artifact " + name + " in node " + heartbeat.getNodeId() + " in group " + groupId);
+        databaseManager.deleteArtifact(artifactType, name, groupId, nodeId);
     }
 
     private void deleteAllArtifacts() {
