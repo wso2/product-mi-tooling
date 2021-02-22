@@ -39,7 +39,6 @@ import { Button } from '@material-ui/core';
 import NodesCell from './NodesCell';
 import LogsNodeCell from './LogsNodeCell';
 import StatusCell from '../commons/StatusCell';
-import UserIdCell from '../commons/UserIdCell';
 
 export default function TableRowCreator(props) {
     const { pageId, data, headers } = props;
@@ -125,7 +124,9 @@ export default function TableRowCreator(props) {
 
             // users page
             case 'userId':
-                return <TableCell><table><UserIdCell id={data} /></table></TableCell>
+                return <TableCell>{data.userId}</TableCell>
+            case 'isAdmin':
+                return <TableCell>{data.details.isAdmin ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}</TableCell>
             
             // Node page
             case 'nodeId':

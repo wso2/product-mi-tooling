@@ -28,7 +28,8 @@ export default function Users() {
         pageId: "users",
         title: "Users",
         headCells: [
-            {id: 'userId', label: 'User Id'}],
+            {id: 'userId', label: 'User Id'},
+            {id: 'isAdmin', label: 'Admin'}],
         tableOrderBy: 'name'
     });
 
@@ -40,6 +41,7 @@ export default function Users() {
     React.useEffect(() => {
         const url = basePath.concat('/groups/').concat(globalGroupId).concat("/users");
         axios.get(url).then(response => {
+            response.data.map(data => data.details = JSON.parse(data.details))
             setUsers(response.data)
         })
     },[globalGroupId])

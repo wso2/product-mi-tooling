@@ -122,29 +122,12 @@ public class MiArtifactsManager implements ArtifactsManager {
                 case TEMPLATES:
                     processTemplates(artifactType, artifacts);
                     break;
-                case CONNECTORS:
-                    processConnectors(artifacts);
-                    break;
                 default:
                     processArtifacts(accessToken, artifactType, artifacts);
                     break;
             }
         }
         fetchAndStoreServers(accessToken);
-    }
-
-    private void processConnectors(JsonObject artifacts) {
-        JsonArray list = artifacts.get("list").getAsJsonArray();
-        for (JsonElement element : list) {
-            final String artifactName = element.getAsJsonObject().get("name").getAsString();
-            JsonObject artifactDetails = new JsonObject();
-            artifactDetails.addProperty("name", artifactName);
-            artifactDetails.addProperty("package", element.getAsJsonObject().get("package").getAsString());
-            artifactDetails.addProperty(
-                    "description", element.getAsJsonObject().get("description").getAsString());
-            artifactDetails.addProperty("status", element.getAsJsonObject().get("status").getAsString());
-            insertArtifact(CONNECTORS, artifactName, artifactDetails);
-        }
     }
 
     private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts) {
@@ -272,6 +255,9 @@ public class MiArtifactsManager implements ArtifactsManager {
             case LOCAL_ENTRIES:
                 getArtifactDetailsUrl = mgtApiUrl.concat(LOCAL_ENTRIES).concat("?name=").concat(artifactName);
                 break;
+            case CONNECTORS:
+                getArtifactDetailsUrl = mgtApiUrl.concat(CONNECTORS).concat("?connectorName=").concat(artifactName);
+                break;
             case CARBON_APPLICATIONS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(CARBON_APPLICATIONS).concat("?carbonAppName=")
                                                  .concat(artifactName);
@@ -284,17 +270,25 @@ public class MiArtifactsManager implements ArtifactsManager {
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }
         CloseableHttpResponse artifactDetails = doGet(accessToken, getArtifactDetailsUrl);
-        return removeConfigurationFromResponse(artifactDetails);
+        JsonObject jsonResponse = HttpUtils.getJsonResponse(artifactDetails);
+        if (artifactType.equals(CONNECTORS) || artifactType.equals(CARBON_APPLICATIONS)) {
+            return jsonResponse;
+        } else {
+            return removeConfigurationFromResponse(jsonResponse);
+        }
     }
 
-    private JsonObject removeConfigurationFromResponse(CloseableHttpResponse proxyDetails) {
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(proxyDetails);
-        jsonResponse.remove("configuration");
-        return jsonResponse;
+    private JsonObject removeConfigurationFromResponse(JsonObject artifact) {
+        logger.debug("Removing config from artifact " + artifact.get("name").getAsString());
+        artifact.remove("configuration");
+        return artifact;
     }
 
     private void deleteArtifact(String artifactType, String name) {
-        databaseManager.deleteArtifact(artifactType, name, heartbeat.getGroupId(), heartbeat.getNodeId());
+        String nodeId = heartbeat.getNodeId();
+        String groupId = heartbeat.getGroupId();
+        logger.info("Deleting artifact " + name + " in node " + heartbeat.getNodeId() + " in group " + groupId);
+        databaseManager.deleteArtifact(artifactType, name, groupId, nodeId);
     }
 
     private void deleteAllArtifacts() {

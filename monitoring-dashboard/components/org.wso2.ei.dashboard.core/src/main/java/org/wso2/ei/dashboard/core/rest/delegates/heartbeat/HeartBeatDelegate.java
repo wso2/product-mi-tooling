@@ -45,7 +45,7 @@ public class HeartBeatDelegate {
     private static final String PRODUCT_SI = "si";
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private final int heartbeatPoolSize = Integer.parseInt(Constants.HEARTBEAT_POOL_SIZE);
-    private ScheduledExecutorService heartbeatScheduledExecutorService =
+    private final ScheduledExecutorService heartbeatScheduledExecutorService =
             Executors.newScheduledThreadPool(heartbeatPoolSize);
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) {

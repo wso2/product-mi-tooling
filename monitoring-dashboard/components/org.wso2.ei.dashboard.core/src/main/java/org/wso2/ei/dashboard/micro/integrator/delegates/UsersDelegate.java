@@ -40,6 +40,7 @@ import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
 import org.wso2.ei.dashboard.core.rest.model.Users;
+import org.wso2.ei.dashboard.core.rest.model.UsersInner;
 
 import java.io.UnsupportedEncodingException;
 
@@ -52,12 +53,7 @@ public class UsersDelegate {
 
     public Users fetchUsers(String groupId) {
         log.debug("Fetching users via management api.");
-        JsonArray usersList = getUsers(groupId);
-        Users users = new Users();
-        for (JsonElement user : usersList) {
-            users.add(user.getAsJsonObject().get("userId").getAsString());
-        }
-        return users;
+        return getUsers(groupId);
     }
 
     public Ack addUser(String groupId, AddUserRequest request) {
@@ -92,15 +88,32 @@ public class UsersDelegate {
         return payload;
     }
 
-    private JsonArray getUsers(String groupId) {
+    private Users getUsers(String groupId) {
+        Users users = new Users();
         NodeList nodeList = databaseManager.fetchNodes(groupId);
         // assumption - In a group, users of all nodes in the group should be identical
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
-        String url = mgtApiUrl.concat("users");
+        String url = mgtApiUrl.concat("users/");
         CloseableHttpResponse httpResponse = doGet(accessToken, url);
-        return HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();
+        JsonArray userList = HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();
+        for (JsonElement user : userList) {
+            UsersInner usersInner = getUserDetails(accessToken, url, user);
+            users.add(usersInner);
+        }
+        return users;
+    }
+
+    private UsersInner getUserDetails(String accessToken, String url, JsonElement user) {
+        String userId = user.getAsJsonObject().get("userId").getAsString();
+        UsersInner usersInner = new UsersInner();
+        usersInner.setUserId(userId);
+        String getUsersDetails = url.concat(userId);
+        CloseableHttpResponse userDetailResponse = doGet(accessToken, getUsersDetails);
+        String userDetail = HttpUtils.getStringResponse(userDetailResponse);
+        usersInner.setDetails(userDetail);
+        return usersInner;
     }
 
     private CloseableHttpResponse doGet(String accessToken, String url) {
@@ -129,4 +142,3 @@ public class UsersDelegate {
         }
     }
 }
-
