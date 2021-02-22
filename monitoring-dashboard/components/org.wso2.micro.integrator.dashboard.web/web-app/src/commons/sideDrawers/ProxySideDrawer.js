@@ -78,12 +78,11 @@ function ProxyServiceDetailPage(props) {
 function EndpointsSection(props) {
     const endpoints = props.endpoints;
     const classes = useStyles();
-    return <Grid item xs={12}>
-        <Paper className={classes.paper} square>
-            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                Endpoints
-                    </Typography>
-            <hr className={classes.horizontalLine}></hr>
+    return <>
+        <Typography variant="h6" color="inherit" noWrap>
+            Endpoints
+            </Typography>
+        <Box pr={2}>
             <Table>
                 {endpoints.map(ep =>
                     <TableRow>{ep}
@@ -92,26 +91,18 @@ function EndpointsSection(props) {
                         </CopyToClipboard>
                     </TableRow>)}
             </Table>
-        </Paper>
-    </Grid>
+        </Box>
+    </>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 700,
         flexGrow: 1,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
-    },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine: {
-        backgroundColor: '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
     },
     clipboard: {
         color: '#3f51b5'

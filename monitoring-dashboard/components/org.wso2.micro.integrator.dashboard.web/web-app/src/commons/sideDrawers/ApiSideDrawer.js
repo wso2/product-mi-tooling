@@ -54,13 +54,12 @@ export default function ApiSideDrawer(props) {
                                 <ApiDetailTable nodeData={nodeData} />
                             </Paper>
                             <Box pl={4}>
-                                <Paper className={classes.paper} elevation={0} square>
-                                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                                        Resources
-                                    </Typography>
-                                    <hr className={classes.horizontalLine}></hr>
-                                </Paper>
-                                <ResourcesDetailTable resources={nodeData.details.resources} />
+                                <Typography variant="h6" color="inherit" noWrap>
+                                    Resources
+                                </Typography>
+                                <Box pr={2}>
+                                    <ResourcesDetailTable resources={nodeData.details.resources} />
+                                </Box>
                             </Box>
                         </>}
                     />
@@ -125,18 +124,10 @@ function ResourcesDetailTable(props) {
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        maxWidth: 700,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
     },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine: {
-        backgroundColor: '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
-    }
 }));

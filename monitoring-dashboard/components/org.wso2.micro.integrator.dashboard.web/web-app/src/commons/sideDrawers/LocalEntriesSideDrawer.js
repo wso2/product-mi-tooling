@@ -30,19 +30,19 @@ import HeadingSection from './commons/HeadingSection'
 export default function LocalEntriesSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name; 
+    const artifactName = nodeData.details.name;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
-                    <Paper className={classes.paper}>
-                        <LocalEntriesDetailTable nodeData={nodeData}/>
+                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <Paper className={classes.paper} elevation={0} square>
+                        <LocalEntriesDetailTable nodeData={nodeData} />
                     </Paper>
                     <Box pl={4}>
-                        <ValueSection value={nodeData.details.value}/>
+                        <ValueSection value={nodeData.details.value} />
                     </Box>
                 </Grid>
             </Grid>
@@ -54,47 +54,34 @@ function LocalEntriesDetailTable(props) {
     const nodeData = props.nodeData;
 
     return <Table>
-                <TableRow>
-                    <TableCell>Local Entry Name</TableCell>
-                    <TableCell>{nodeData.details.name}</TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Type</TableCell>
-                    <TableCell>{nodeData.details.type}</TableCell>
-                </TableRow>
-            </Table> 
+        <TableRow>
+            <TableCell>Local Entry Name</TableCell>
+            <TableCell>{nodeData.details.name}</TableCell>
+        </TableRow>
+        <TableRow>
+            <TableCell>Type</TableCell>
+            <TableCell>{nodeData.details.type}</TableCell>
+        </TableRow>
+    </Table>
 }
 
 function ValueSection(props) {
     const classes = useStyles();
-    return <Grid item xs={12}>
-                <Paper className={classes.paper} square>
-                    <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                        Value
-                    </Typography>
-                    <hr className={classes.horizontalLine}></hr>
-                </Paper>
-                <Paper className={classes.paper} square>
-                    <Box>{props.value}</Box>
-                </Paper>
-            </Grid>
+    return <>
+        <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
+            Value
+        </Typography>
+        <Box pr={2}>{props.value}</Box>
+    </>
 }
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 700,
         flexGrow: 1,
+        width: 700,
+        overflowX: 'hidden',
     },
     paper: {
         padding: theme.spacing(2),
-        color: theme.palette.text.secondary,
     },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
-    }
 }));

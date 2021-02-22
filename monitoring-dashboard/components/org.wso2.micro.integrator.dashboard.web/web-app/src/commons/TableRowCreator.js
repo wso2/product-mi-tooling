@@ -182,7 +182,7 @@ function SwitchStatusCell(props) {
         });
     }
 
-    return <tr><td><Switch checked={isActive} onChange={changeState}/></td></tr>
+    return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} /></td></tr>
 }
 
 function LogConfigLevelDrowDown(props) {

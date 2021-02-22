@@ -58,9 +58,6 @@ export default function EnhancedTable(props) {
 
     return (
         <div className={classes.root}>
-            <Typography component="h1" variant="h6" color="inherit" noWrap className="title">
-                {pageInfo.title}
-            </Typography><br/>
             <AddGlobalConfigsButton pageId={pageInfo.pageId}/>
             <Paper className={classes.paper}>
                 <TableContainer>

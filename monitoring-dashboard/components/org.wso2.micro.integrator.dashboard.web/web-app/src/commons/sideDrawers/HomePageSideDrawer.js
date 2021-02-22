@@ -54,7 +54,7 @@ export default function HomePageSideDrawer(props) {
                             {nodeData.nodeId} Information
                         </Typography>
                     </Paper>
-                    <Paper className={classes.paper}>
+                    <Paper className={classes.paper} square elevation={0}>
                         <Table>
                             <TableRow>
                                 <TableCell>Server Name</TableCell>
@@ -115,23 +115,17 @@ const useStyles = makeStyles((theme) => ({
     },
     sideDrawerHeading: {
         padding: theme.spacing(1),
-        height: '64px',
-        backgroundColor: '#3f51b5',
-        color: '#ffffff'
+        height: '72px',
+        backgroundColor: theme.palette.background.appBar,
+        color: '#ffffff',
+        width: '100%',
+        paddingLeft: 40,
+        paddingTop: 20,
     },
-    subTopic: {
-        color: '#3f51b5'
-    },
-    horizontalLine : {
-        backgroundColor : '#3f51b5',
-        borderWidth: '0px',
-        height: '1px'
-    },
+
+
     clipboard: {
         color: '#3f51b5'
     },
-    sourceView: {
-        backgroundColor: 'red',
-        width: '2000px',
-    }
+
 }));
