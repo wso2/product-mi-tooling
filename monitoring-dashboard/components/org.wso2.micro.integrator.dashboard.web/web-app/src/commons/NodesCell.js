@@ -92,7 +92,8 @@ const useStyles = makeStyles(() => ({
     tableCell : {
         padding: '1px',
         borderBottom: 'none',
-        color: '#3f51b5'
+        color: '#3f51b5',
+        cursor: "pointer"
     },
     drawerPaper: {
         backgroundColor: '#fff',
