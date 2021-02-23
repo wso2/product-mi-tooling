@@ -39,13 +39,21 @@ export default function GroupSelector() {
 
 function SelectComponent(props) {
     const classes = useStyles();
-
     var options = props.groupList;
+
+    const [selectedGroupId, setselectedGroupId] = React.useState('');
+
+    React.useEffect(()=>{
+        if (options.length !== 0) {
+            setselectedGroupId(options[0].value)
+        }
+    },[props.groupList]);
+
     const dispatch = useDispatch();
     return <FormControl style={{ width: 150 }}>
         <Select
             classes={{ root: classes.selectRoot }}
-
+            value={selectedGroupId}
             labelId="group-id-select-label"
             id="group-id-select"
             onChange={(e) => dispatch(changeGroup(e.target.value))}
