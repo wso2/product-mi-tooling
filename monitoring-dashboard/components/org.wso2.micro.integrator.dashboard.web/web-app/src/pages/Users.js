@@ -22,6 +22,8 @@ import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
+import AuthManager from "../auth/AuthManager";
+import {Redirect} from "react-router-dom";
 
 export default function Users() {
     const [pageInfo] = React.useState({
@@ -45,6 +47,12 @@ export default function Users() {
             setUsers(response.data)
         })
     },[globalGroupId])
+
+    if (AuthManager.getUser().scope !== "admin") {
+        return (
+            <Redirect to={{ pathname: '/' }} />
+        );
+    }
 
     return <EnhancedTable pageInfo={pageInfo} dataSet={users} />
 }

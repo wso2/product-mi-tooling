@@ -33,6 +33,7 @@ import AddLogConfigs from '../commons/AddLogConfigs';
 import AuthManager from '../auth/AuthManager';
 import { Constants } from '../auth/Constants';
 import { useSelector } from 'react-redux';
+import {Redirect} from "react-router-dom";
 
 export default function LogConfigs() {
     const [pageInfo, setPageInfo] = React.useState({
@@ -52,8 +53,6 @@ export default function LogConfigs() {
     const [selectedNodeId, setSelectedNodeId] = React.useState('All');
     const [logConfigs, setLogConfigs] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
-
-
     const [selectedTab, setSelectedTab] = React.useState(0);
     const changeTab = (e, tab) => {
         setSelectedTab(tab);
@@ -86,6 +85,12 @@ export default function LogConfigs() {
             })
         }
     },[globalGroupId])
+
+    if (AuthManager.getUser().scope !== "admin") {
+        return (
+            <Redirect to={{ pathname: '/' }} />
+        );
+    }
 
     const getLogConfigs = (nodeId) => {
         setSelectedNodeId(nodeId);
@@ -127,6 +132,9 @@ export default function LogConfigs() {
                 {selectedTab === 0 && (<>{viewLogs}</>)}
                 {selectedTab === 1 && (<AddLogConfigs pageId={pageInfo.pageId}/>)}
             </>)
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs} />
+
 }
 
 const useStyles = makeStyles((theme) => ({

@@ -18,7 +18,14 @@
 
 package org.wso2.ei.dashboard.core.commons.auth;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
+
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -37,7 +44,10 @@ import javax.ws.rs.ext.Provider;
 public class AuthenticationFilter implements ContainerRequestFilter {
 
     private static final String AUTHENTICATION_SCHEME = "Bearer";
-
+    private static final Base64.Decoder decoder = Base64.getUrlDecoder();
+    private static final List<String> adminOnlyPaths = Arrays.asList("groups/mi_test/log-configs",
+                                                                     "groups/mi_test/users");
+    
     @Override
     public void filter(ContainerRequestContext requestContext) {
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
@@ -49,6 +59,32 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         if (inValidToken(token)) {
             abortWithUnauthorized(requestContext);
         }
+        
+        if (!isAuthorized(token, requestContext)) {
+            abortWithUnauthorized(requestContext);
+        }
+    }
+
+    private boolean isAuthorized(String token, ContainerRequestContext requestContext) {
+
+        String path = ((ContainerRequest) requestContext).getPath(false);
+        
+        if (adminOnlyPaths.contains(path)) {
+            String[] parts = token.split("\\.");
+            if (parts.length >= 2) {
+                String payloadJson = new String(decoder.decode(parts[1]));
+                JsonElement jsonElementPayload = JsonParser.parseString(payloadJson);
+                JsonElement scopeElement = jsonElementPayload.getAsJsonObject().get("scope");
+                if (scopeElement != null) {
+                    String scope = scopeElement.getAsString();
+                    return scope.equals("admin");
+                }
+            }
+        } else {
+            return true;
+        }
+
+        return false;
     }
 
     private boolean isTokenBasedAuthentication(String authorizationHeader) {

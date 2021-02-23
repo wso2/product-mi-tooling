@@ -23,14 +23,20 @@ import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,42 +67,40 @@ public class Bootstrap {
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
     private static final String WEBAPP_UI = "org.wso2.micro.integrator.dashboard.web.war";
+    private static final String DASHBOARD_HOME = "DASHBOARD_HOME";
 
     private static final Logger logger = LogManager.getLogger(Bootstrap.class);
 
     public static void main(String[] args) {
-        String dashboardHome = System.getenv("DASHBOARD_HOME");
+
+        startServerWithConfigs();
+    }
+
+    private static void startServerWithConfigs() {
+
+        String dashboardHome = System.getenv(DASHBOARD_HOME);
         int serverPort = 9743;
         String tomlFile = dashboardHome + File.separator + CONF_DIR + File.separator + DEPLOYMENT_TOML;
+        
         try {
             TomlParseResult parseResult = Toml.parse(Paths.get(tomlFile));
-            serverPort = parseResult.getLong(TOML_CONF_PORT).intValue();
+            
+            Long serverPortConfig = parseResult.getLong(TOML_CONF_PORT);
+            if (serverPortConfig != null) {
+                serverPort = serverPortConfig.intValue();
+            }
+            
             loadConfigurations(parseResult);
         } catch (IOException e) {
-            logger.warn("Error while reading TOML file in " + tomlFile + ". Using default port " + serverPort, e);
+            logger.warn(
+                    String.format("Error while reading TOML file in %s. Using default port %d", tomlFile,
+                            serverPort), e);
         }
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(serverPort);
-        Server server = new Server(inetSocketAddress);
-        HandlerCollection handlers = new HandlerCollection();
-        String webAppsPath = dashboardHome + File.separator + SERVER_DIR + File.separator + WEBAPPS_DIR;
-        File f = new File(webAppsPath);
-        String[] pathnames = f.list();
-        for (String pathname : pathnames) {
-            WebAppContext webApp = new WebAppContext();
-            webApp.setContextPath("/dashboard/");
-            File warFile = new File(webAppsPath + File.separator + pathname);
-            webApp.setExtractWAR(true);
-            webApp.setWar(warFile.getAbsolutePath());
-            handlers.addHandler(webApp);
-        }
-        WebAppContext wwwApp = new WebAppContext();
-        wwwApp.setContextPath("/");
-        wwwApp.setExtractWAR(true);
-        wwwApp.setWar(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR + File.separator
-                + WEBAPP_UI);
-        wwwApp.setParentLoaderPriority(true);
-        handlers.addHandler(wwwApp);
-        server.setHandler(handlers);
+        
+        Server server = new Server();
+        setServerConnectors(serverPort, server);
+        setServerHandlers(dashboardHome, server);
+        
         try {
             server.start();
             writePID(dashboardHome);
@@ -107,6 +111,51 @@ public class Bootstrap {
         }
 
         logger.info("Stopping the server");
+    }
+
+    private static void setServerConnectors(int serverPort, Server server) {
+
+        HttpConfiguration https = new HttpConfiguration();
+        https.addCustomizer(new SecureRequestCustomizer());
+
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
+        sslContextFactory.setKeyStorePath(Bootstrap.class.getResource(
+                "/dashboard.jks").toExternalForm());
+        sslContextFactory.setKeyStorePassword("wso2carbon");
+        sslContextFactory.setKeyManagerPassword("wso2carbon");
+
+        ServerConnector sslConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory, "http/1.1"),
+                new HttpConnectionFactory(https));
+        sslConnector.setPort(serverPort);
+
+        server.setConnectors(new Connector[] { sslConnector });
+    }
+
+    private static void setServerHandlers(String dashboardHome, Server server) {
+
+        String webAppsPath = dashboardHome + File.separator + SERVER_DIR + File.separator + WEBAPPS_DIR;
+        File webAppFilePath = new File(webAppsPath);
+
+        HandlerCollection handlers = new HandlerCollection();
+        String[] pathnames = webAppFilePath.list();
+        for (String pathname : pathnames) {
+            WebAppContext webApp = new WebAppContext();
+            webApp.setContextPath("/dashboard/");
+            File warFile = new File(webAppsPath + File.separator + pathname);
+            webApp.setExtractWAR(true);
+            webApp.setWar(warFile.getAbsolutePath());
+            handlers.addHandler(webApp);
+        }
+        
+        WebAppContext wwwApp = new WebAppContext();
+        wwwApp.setContextPath("/");
+        wwwApp.setExtractWAR(true);
+        wwwApp.setWar(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR + File.separator
+                + WEBAPP_UI);
+        wwwApp.setParentLoaderPriority(true);
+        handlers.addHandler(wwwApp);
+        server.setHandler(handlers);
     }
 
     private static void loadConfigurations(TomlParseResult parseResult) {

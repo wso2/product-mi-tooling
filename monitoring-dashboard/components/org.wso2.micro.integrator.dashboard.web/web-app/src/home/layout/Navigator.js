@@ -12,6 +12,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { Link as MUILink } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import { categories } from './NavigatorLinks';
+import AuthManager from "../../auth/AuthManager";
 
 
 const styles = (theme) => ({
@@ -68,6 +69,15 @@ function Navigator(props) {
     useEffect(() => {
         setSelected(location.pathname);
     }, [location]);
+
+    const getCategories = () => {
+        const userScope = AuthManager.getUser().scope;
+        if(userScope !== "admin"){
+            return categories.filter(category => category.id ===  "General");
+        }
+        return categories;
+    }
+
     return (
         <Drawer variant="permanent" {...other}>
             <List disablePadding>
@@ -95,7 +105,7 @@ function Navigator(props) {
                         Nodes
                 </ListItemText>
                 </ListItem>
-                {categories.map(({ id, children }) => (
+                {getCategories().map(({ id, children }) => (
                     <React.Fragment key={id}>
                         <ListItem className={classes.categoryHeader}>
                             <ListItemText

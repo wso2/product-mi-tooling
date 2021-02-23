@@ -19,6 +19,7 @@
 import {Constants} from './Constants';
 import qs from 'qs'
 import axios from 'axios'
+import jwt_decode from "jwt-decode";
 
 export default class AuthManager {
 
@@ -45,7 +46,12 @@ export default class AuthManager {
             })
             .then((response) => {
                 var accessToken = response.data
-                AuthManager.setUser({username: username}, isSecure);
+                const decodedToken = jwt_decode(accessToken);
+                let scope = "default"
+                if (decodedToken !== undefined) {
+                    scope = decodedToken.scope;
+                }
+                AuthManager.setUser({username: username, scope: scope}, isSecure);
                 AuthManager.setCookie(Constants.JWT_TOKEN_COOKIE, accessToken, 3600, window.contextPath, isSecure);
                 resolve();
             })
