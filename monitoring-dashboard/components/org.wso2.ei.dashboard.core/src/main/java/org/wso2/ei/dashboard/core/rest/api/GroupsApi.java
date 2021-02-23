@@ -302,6 +302,43 @@ public class GroupsApi {
         LogConfigs logConfigs = logConfigDelegate.fetchLogConfigs(groupId);
         return Response.ok().entity(logConfigs).build();
     }
+
+    @GET
+    @Path("/{group-id}/log-configs/nodes/{node-id}")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get log configs by node id", description = "", tags={ "logConfigs" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of log configs in provided node id",
+                         content = @Content(schema = @Schema(implementation = LogConfigs.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response getLogConfigsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @PathParam("node-id") @Parameter(description = "NodeId") String nodeId) {
+        LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
+        LogConfigs logConfigs = logConfigDelegate.fetchLogConfigsByNodeId(groupId, nodeId);
+        return Response.ok().entity(logConfigs).build();
+    }
+
+    @PATCH
+    @Path("/{group-id}/log-configs/nodes/{node-id}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @Operation(summary = "Update log level by nodeId", description = "", tags={ "logConfigs" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logger update status",
+                         content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response updateLogLevelByNodeId(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @PathParam("node-id") @Parameter(description = "NodeId") String nodeId,
+            @Valid LogConfigUpdateRequest request) {
+        LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
+        Ack ack = logConfigDelegate.updateLogLevelByNodeId(groupId, nodeId, request);
+        return Response.ok().entity(ack).build();
+    }
+
     @GET
     @Path("/{group-id}/logs")
     @Produces({ "application/json" })

@@ -45,7 +45,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     private static final String AUTHENTICATION_SCHEME = "Bearer";
     private static final Base64.Decoder decoder = Base64.getUrlDecoder();
-    private static final List<String> adminOnlyPaths = Arrays.asList("groups/mi_test/log-configs","groups/mi_test/users");
+    private static final List<String> adminOnlyPaths = Arrays.asList("groups/mi_test/log-configs",
+                                                                     "groups/mi_test/users");
     
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -59,7 +60,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             abortWithUnauthorized(requestContext);
         }
         
-        if(!isAuthorized(token, requestContext)){
+        if (!isAuthorized(token, requestContext)) {
             abortWithUnauthorized(requestContext);
         }
     }

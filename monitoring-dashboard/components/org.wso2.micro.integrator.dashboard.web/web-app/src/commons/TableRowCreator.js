@@ -23,13 +23,11 @@ import axios from 'axios';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Switch from "react-switch";
+import ReactSelect from 'react-select';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
 import EnabledIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import DisabledIcon from '@material-ui/icons/BlockOutlined';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -39,9 +37,11 @@ import { Button } from '@material-ui/core';
 import NodesCell from './NodesCell';
 import LogsNodeCell from './LogsNodeCell';
 import StatusCell from '../commons/StatusCell';
+import AuthManager from '../auth/AuthManager';
 
 export default function TableRowCreator(props) {
-    const { pageId, data, headers } = props;
+    const { pageInfo, data, headers } = props;
+    const pageId = pageInfo.pageId
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             // common
@@ -120,7 +120,7 @@ export default function TableRowCreator(props) {
                 return <TableCell><StringCell data={data.componentName}/></TableCell>
             
             case 'level':
-                return <TableCell><LogConfigLevelDrowDown name={data.name} level={data.level}/></TableCell>
+                return <TableCell><LogConfigLevelDropDown selectedNode={pageInfo.additionalParams.selectedNodeId} name={data.name} level={data.level}/></TableCell>
 
             // users page
             case 'userId':
@@ -186,72 +186,186 @@ function SwitchStatusCell(props) {
     return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} /></td></tr>
 }
 
-function LogConfigLevelDrowDown(props) {
-    const classes = useStyles();
-    const name = props.name;
+function LogConfigLevelDropDown(props) {
+    const { selectedNode, name } = props;
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
-    const [ level, setLevel ] = React.useState(props.level);
-    const [dialog, setDialog] = React.useState({
+
+    var [ level, setLevel ] = React.useState(
+                { label: props.level, value: props.level }
+        );
+    var [ tmpLevel, setTmpLevel ] = React.useState(
+            { label: props.level, value: props.level }
+    );
+
+    const [confirmationDialog, setConfirmationDialog] = React.useState({
         open : false,
         title: '',
         message: ''
     });
-    const handleDialogClose = () => {
-        setDialog({
+
+    const [completionStatusDialog, setCompletionStatusDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+
+    React.useEffect(()=>{
+        setLevel({ label: props.level, value: props.level })
+    },[props.level]);
+
+    const options = [
+        {
+            label: 'OFF',
+            value: 'OFF'
+        },
+        {
+            label: 'TRACE',
+            value: 'TRACE'
+        },
+        {
+            label: 'DEBUG',
+            value: 'DEBUG'
+        },
+        {
+            label: 'INFO',
+            value: 'INFO'
+        },
+        {
+            label: 'WARN',
+            value: 'WARN'
+        },
+        {
+            label: 'ERROR',
+            value: 'ERROR'
+        },
+        {
+            label: 'FATAL',
+            value: 'FATAL'
+        }
+    ];
+
+    const handleConfirmationDialogClose = () => {
+        setConfirmationDialog({
             open: false,
             title: '',
             message: ''
         })
     }
+
+    const handlecompletionStatusDialogClose = () => {
+        setCompletionStatusDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+    }
+
     const changeLogLevel = (loggerLevel) => {
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/log-configs");
+        setTmpLevel(loggerLevel)
+        var message = 'Are you sure you want to change '.concat(name).concat(' log level to ').concat(loggerLevel.value).concat('?')
+        setConfirmationDialog({
+            open: true,
+            title: 'Confirmation',
+            message: message
+        })
+    }
+
+    const updateAllNodes = () => {
+        handleConfirmationDialogClose();
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs");
         axios.patch(url, {
             "name": name,
-            "level": loggerLevel
+            "level": tmpLevel.value
         }).then(response => {
-            if (response.data.status === 'fail') {
-                setDialog({
+            if (response.data.status === 'success') {
+                setLevel(tmpLevel)
+                setCompletionStatusDialog({
+                    open: true, 
+                    title: 'Success',
+                    message: "Successfully completed log config change."
+                })
+            } else {
+                setCompletionStatusDialog({
                     open: true, 
                     title: 'Error',
                     message: response.data.message
                 })
             }
         })
-        setLevel(loggerLevel);
-    };
-    
-    return <FormControl variant="outlined" className={classes.formControl}>
-                <InputLabel>Level</InputLabel>
-                    <Select
-                        native
-                        value={level}
-                        onChange={(e) => changeLogLevel(e.target.value)}
-                        label="Level"
-                    >
-                        <option value={'OFF'}>OFF</option>
-                        <option value={'TRACE'}>TRACE</option>
-                        <option value={'DEBUG'}>DEBUG</option>
-                        <option value={'INFO'}>INFO</option>
-                        <option value={'WARN'}>WARN</option>
-                        <option value={'ERROR'}>ERROR</option>
-                        <option value={'FATAL'}>FATAL</option>
-                    </Select>
-                    <Dialog open={dialog.open} onClose={() => handleDialogClose()}
+    }
+
+    const updateSelected = () => {
+        handleConfirmationDialogClose();
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs/nodes/".concat(selectedNode));
+        axios.patch(url, {
+            "name": name,
+            "level": tmpLevel.value
+        }).then(response => {
+            if (response.data.status === 'success') {
+                setLevel(tmpLevel)
+                setCompletionStatusDialog({
+                    open: true, 
+                    title: 'Success',
+                    message: "Successfully completed log config change."
+                })
+            } else {
+                setCompletionStatusDialog({
+                    open: true, 
+                    title: 'Error',
+                    message: response.data.message
+                })
+            }
+        })
+    }
+
+    return <div><ReactSelect
+                value={level}
+                onChange={(e) => changeLogLevel(e)}
+                options={options}
+            />
+            <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
                                     aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title">{dialog.title}</DialogTitle>
-                        <DialogContent dividers>
-                            <DialogContentText id="alert-dialog-description">
-                                {dialog.message}
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={() => handleDialogClose()} variant="contained" autoFocus>
-                                OK
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-            </FormControl>
+                <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {confirmationDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => updateAllNodes()} variant="contained" autoFocus>
+                        UPDATE ALL NODES
+                    </Button>
+
+                    {selectedNode !== 'All' && <Button onClick={() => updateSelected()} variant="contained" autoFocus>
+                        UPDATE ONLY {selectedNode}
+                    </Button>}
+
+                    <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
+                        CANCEL
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={completionStatusDialog.open} onClose={() => handlecompletionStatusDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{completionStatusDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {completionStatusDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => handlecompletionStatusDialogClose()} variant="contained" autoFocus>
+                        OK
+                    </Button>
+                </DialogActions>
+                
+            </Dialog>
+        </div>
 }
 
 const useStyles = makeStyles((theme) => ({

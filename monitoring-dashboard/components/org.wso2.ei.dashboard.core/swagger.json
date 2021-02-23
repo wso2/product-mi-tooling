@@ -1375,6 +1375,107 @@
         }
       }
     },
+    "/groups/{group-id}/log-configs/nodes/{node-id}" : {
+      "get" : {
+        "tags" : [ "logConfigs" ],
+        "summary" : "Get log configs by node id",
+        "operationId" : "getLogConfigsByNodeIds",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "node-id",
+          "in" : "path",
+          "description" : "NodeId",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of log configs in provided node id",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LogConfigs"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "logConfigs" ],
+        "summary" : "Update log level by nodeId",
+        "operationId" : "updateLogLevelByNodeId",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "node-id",
+          "in" : "path",
+          "description" : "NodeId",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/UpdateLogger"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Logger update status",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SuccessStatus"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/groups/{group-id}/log-configs" : {
       "get" : {
         "tags" : [ "logConfigs" ],

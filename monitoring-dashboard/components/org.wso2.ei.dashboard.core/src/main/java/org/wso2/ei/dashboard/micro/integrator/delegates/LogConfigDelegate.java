@@ -55,12 +55,13 @@ public class LogConfigDelegate {
     public LogConfigs fetchLogConfigs(String groupId) {
         log.debug("Fetching log configs via management api.");
         JsonArray logConfigsArray = getLogConfigs(groupId);
-        LogConfigs logConfigs = new LogConfigs();
-        for (JsonElement element : logConfigsArray) {
-            LogConfigsInner logConfigsInner = createLogConfig(element);
-            logConfigs.add(logConfigsInner);
-        }
-        return logConfigs;
+        return createLogConfigsObject(logConfigsArray);
+    }
+
+    public LogConfigs fetchLogConfigsByNodeId(String groupId, String nodeId) {
+        log.info("Fetching log configs in node " + nodeId + " in group " + groupId);
+        JsonArray logConfigsArray = getLogConfigByNodeId(groupId, nodeId);
+        return createLogConfigsObject(logConfigsArray);
     }
 
     public Ack updateLogLevel(String groupId, LogConfigUpdateRequest request) {
@@ -71,11 +72,8 @@ public class LogConfigDelegate {
         NodeList nodeList = databaseManager.fetchNodes(groupId);
         for (NodeListInner node : nodeList) {
             String nodeId = node.getNodeId();
-            String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-            String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
-            String updateLoggerUrl = mgtApiUrl.concat("logging");
-            log.debug("Updating logger on node " + nodeId);
-            CloseableHttpResponse httpResponse = doPatch(updateLoggerUrl, accessToken, payload);
+            CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
+
             if (httpResponse.getStatusLine().getStatusCode() != 200) {
                 log.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
                 String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
@@ -84,6 +82,21 @@ public class LogConfigDelegate {
             }
         }
         ack.setStatus(Constants.SUCCESS_STATUS);
+        return ack;
+    }
+
+    public Ack updateLogLevelByNodeId(String groupId, String nodeId, LogConfigUpdateRequest request) {
+        log.debug("Updating logger " + request.getName() + " in node " + nodeId + " in group " + groupId);
+        Ack ack = new Ack(Constants.FAIL_STATUS);
+        JsonObject payload = createUpdateLoggerPayload(request);
+        CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
+        if (httpResponse.getStatusLine().getStatusCode() != 200) {
+            log.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
+            String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+            ack.setMessage(message);
+        } else {
+            ack.setStatus(Constants.SUCCESS_STATUS);
+        }
         return ack;
     }
 
@@ -112,6 +125,30 @@ public class LogConfigDelegate {
         return ack;
     }
 
+    private JsonArray getLogConfigs(String groupId) {
+        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        // assumption - In a group, log configs of all nodes in the group should be identical
+        String nodeId = nodeList.get(0).getNodeId();
+        return getLogConfigByNodeId(groupId, nodeId);
+    }
+
+    private JsonArray getLogConfigByNodeId(String groupId, String nodeId) {
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String url = mgtApiUrl.concat("logging");
+        CloseableHttpResponse httpResponse = doGet(accessToken, url);
+        return HttpUtils.getJsonArray(httpResponse);
+    }
+
+    private LogConfigs createLogConfigsObject(JsonArray logConfigsArray) {
+        LogConfigs logConfigs = new LogConfigs();
+        for (JsonElement element : logConfigsArray) {
+            LogConfigsInner logConfigsInner = createLogConfig(element);
+            logConfigs.add(logConfigsInner);
+        }
+        return logConfigs;
+    }
+
     private JsonObject createUpdateLoggerPayload(LogConfigUpdateRequest request) {
         JsonObject payload = new JsonObject();
         payload.addProperty("loggerName", request.getName());
@@ -136,15 +173,12 @@ public class LogConfigDelegate {
         return logConfigsInner;
     }
 
-    private JsonArray getLogConfigs(String groupId) {
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
-        // assumption - In a group, log configs of all nodes in the group should be identical
-        String nodeId = nodeList.get(0).getNodeId();
+    private CloseableHttpResponse updateLogLevelByNodeId(String groupId, String nodeId, JsonObject payload) {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
-        String url = mgtApiUrl.concat("logging");
-        CloseableHttpResponse httpResponse = doGet(accessToken, url);
-        return HttpUtils.getJsonArray(httpResponse);
+        String updateLoggerUrl = mgtApiUrl.concat("logging");
+        log.debug("Updating logger on node " + nodeId);
+        return doPatch(updateLoggerUrl, accessToken, payload);
     }
 
     private CloseableHttpResponse doGet(String accessToken, String url) {
