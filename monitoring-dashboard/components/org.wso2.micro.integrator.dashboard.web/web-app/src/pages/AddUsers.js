@@ -34,6 +34,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import {makeStyles} from "@material-ui/core/styles";
+import {Link, useHistory} from "react-router-dom";
 
 export default function AddUsers(props) {
 
@@ -45,6 +46,7 @@ export default function AddUsers(props) {
         passwordRepeat: "",
         isAdmin: "false"
     });
+    const history = useHistory();
 
     const [dialog, setDialog] = React.useState({
         open: false,
@@ -65,6 +67,7 @@ export default function AddUsers(props) {
             title: '',
             message: ''
         })
+        history.push("/users");
     }
 
     const addUser = () => {
@@ -117,29 +120,40 @@ export default function AddUsers(props) {
     return <div className={classes.root}>
         <Grid container spacing={3}>
             <Grid item xs={12}>
-                <Paper className={classes.sideDrawerHeading} square>
-                    <Typography variant="h6" color="inherit" noWrap>Add Users</Typography>
-                </Paper>
                 <Paper className={classes.paper}>
-                    <TextField onChange={(e) => handleUserInput(e)} name="userId" label="User" value={user.userId}/>
-                    <TextField onChange={(e) => handleUserInput(e)} name="password" label="Password" type="password"
-                               value={user.password}/>
-                    <TextField onChange={(e) => handleUserInput(e)} name="passwordRepeat" label="Repeat Password"
-                               type="password" value={user.passwordRepeat}/>
-                    <Select
-                        native
-                        name="isAdmin"
-                        value={user.isAdmin}
-                        onChange={(e) => handleUserInput(e)}
-                        label="Is Admin"
-                    >
-                        <option value={"true"}>True</option>
-                        <option value={"false"}>False</option>
-                    </Select>
-                    <br/> <br/>
-                    <Box textAlign='right'>
-                        <Button onClick={() => addUser()} variant="contained" color="primary">Add User</Button>
-                    </Box>
+                    <form>
+                        <div>
+                            <TextField required label="User Name" onChange={(e) => handleUserInput(e)} name="userId"
+                                       value={user.userId}/>
+                                       <br/>
+                            <TextField onChange={(e) => handleUserInput(e)} name="password" label="Password"
+                                       type="password"
+                                       value={user.password}/>
+                                       <br/>
+                            <TextField onChange={(e) => handleUserInput(e)} name="passwordRepeat"
+                                       label="Repeat Password"
+                                       type="password" value={user.passwordRepeat}/>
+                                       <br/>
+                                       <br/>
+                            <Select
+                                native
+                                name="isAdmin"
+                                value={user.isAdmin}
+                                onChange={(e) => handleUserInput(e)}
+                                label="Is Admin"
+                            >
+                                <option value={"true"}>True</option>
+                                <option value={"false"}>False</option>
+                            </Select>
+                            <br/> <br/> <br/>
+                            <Box textAlign='left'>
+                                <Button onClick={() => addUser()} variant="contained" color="primary">Add User</Button>
+                                <Button component={Link} to="/users" color="danger">
+                                    Cancel
+                                </Button>
+                            </Box>
+                        </div>
+                    </form>
 
                     <Dialog open={dialog.open} onClose={() => handleDialogClose()}
                             aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
@@ -173,7 +187,8 @@ const useStyles = makeStyles((theme) => ({
     sideDrawerHeading: {
         padding: theme.spacing(1),
         height: '64px',
-        backgroundColor: '#3f51b5',
-        color: '#ffffff'
+        'border-radius': '0px',
     }
+
+
 }));
