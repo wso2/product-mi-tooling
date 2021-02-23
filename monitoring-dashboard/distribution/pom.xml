@@ -120,6 +120,9 @@
                         <configuration>
                             <finalName>mi_dashboard_${version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
+                            <filters>
+                                <filter>filter.properties</filter>
+                            </filters>
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>

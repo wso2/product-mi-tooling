@@ -22,6 +22,7 @@ import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
 
 export default function Nodes () {
 
@@ -37,11 +38,10 @@ export default function Nodes () {
     const [nodeList, setNodeList] = React.useState([]);
 
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(()=>{
         if (globalGroupId !== "") {
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/nodes");
+            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
             axios.get(url).then(response => {
                 response.data.map(data => data.details = JSON.parse(data.details))
                 setNodeList(response.data)
