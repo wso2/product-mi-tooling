@@ -36,6 +36,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import AddUserSideDrawer from './sideDrawers/AddUserSideDrawer'
+import { Link } from 'react-router-dom'
 
 export default function AddGlobalConfigsButton(props) {
     const { pageId } = props;
@@ -59,10 +60,9 @@ export default function AddGlobalConfigsButton(props) {
                 </div>
     } else if (pageId === 'users') {
         return <div>
-                    <Button onClick={toggleDrawer(true)} variant="contained" color="primary">Add Users</Button>
-                    <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
-                        <AddUserSideDrawer />
-                    </Drawer>
+            <Button component={Link} to="/users/add" variant="contained" color="primary">
+                Add User
+            </Button>
                 </div>
     } else {
         return <div />
