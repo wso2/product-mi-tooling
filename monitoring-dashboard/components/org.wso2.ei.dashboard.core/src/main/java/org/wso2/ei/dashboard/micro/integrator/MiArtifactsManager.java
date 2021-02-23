@@ -113,6 +113,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private void fetchAllArtifactsAndStore() {
+        logger.info("Fetching artifacts from node " + heartbeat.getNodeId() + " in group " + heartbeat.getGroupId());
         String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
         for (String artifactType : ALL_ARTIFACTS) {
             final String url = heartbeat.getMgtApiUrl().concat(artifactType);

@@ -22,6 +22,7 @@ import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
 
 export default function CarbonApplications() {
     const [pageInfo] = React.useState({
@@ -38,14 +39,13 @@ export default function CarbonApplications() {
 
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
-    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(() => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/capps?nodes=").concat(nodeListQueryParams.slice(0,-7));
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/capps?nodes=").concat(nodeListQueryParams.slice(0,-7));
         axios.get(url).then(response => {
             response.data.map(data => 
                 data.nodes.map(node => node.details = JSON.parse(node.details))

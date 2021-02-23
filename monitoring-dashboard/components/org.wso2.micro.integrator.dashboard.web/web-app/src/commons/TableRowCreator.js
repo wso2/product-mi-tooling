@@ -166,7 +166,6 @@ function SwitchStatusCell(props) {
     const { pageId, artifactName, nodeId, status } = props;
     var isActive = status;
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
 
     const changeState = () => {
         isActive = !isActive
@@ -174,7 +173,7 @@ function SwitchStatusCell(props) {
     };
 
     const updateArtifact = () => {
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/").concat(pageId);
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/").concat(pageId);
         axios.patch(url, {
             "artifactName": artifactName,
             "nodeId": nodeId,

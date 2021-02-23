@@ -8,19 +8,16 @@ import Select from '@material-ui/core/Select';
 import { changeGroup } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthManager from '../auth/AuthManager';
-import { Constants } from '../auth/Constants';
 
 export default function GroupSelector() {
 
     const [groupList, setGroupList] = React.useState([]);
     const dispatch = useDispatch();
-    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(() => {
-        const url = basePath.concat('/groups/');
+        const url = AuthManager.getBasePath().concat('/groups/');
         let groups = [];
-        var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
-        axios.get(url, { headers: { Authorization: authBearer } }).then(response => {
+        axios.get(url).then(response => {
             response.data.filter(groupName => {
                 var group = {
                     label: groupName,
@@ -42,13 +39,21 @@ export default function GroupSelector() {
 
 function SelectComponent(props) {
     const classes = useStyles();
-
     var options = props.groupList;
+
+    const [selectedGroupId, setselectedGroupId] = React.useState('');
+
+    React.useEffect(()=>{
+        if (options.length !== 0) {
+            setselectedGroupId(options[0].value)
+        }
+    },[props.groupList]);
+
     const dispatch = useDispatch();
     return <FormControl style={{ width: 150 }}>
         <Select
             classes={{ root: classes.selectRoot }}
-
+            value={selectedGroupId}
             labelId="group-id-select-label"
             id="group-id-select"
             onChange={(e) => dispatch(changeGroup(e.target.value))}

@@ -23,7 +23,6 @@ import {useSelector} from "react-redux";
 import axios from "axios";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
 import Box from "@material-ui/core/Box";
@@ -33,13 +32,12 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
+import AuthManager from '../auth/AuthManager';
 import {makeStyles} from "@material-ui/core/styles";
 import {Link, useHistory} from "react-router-dom";
 
-export default function AddUsers(props) {
-
+export default function AddUsers() {
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
     const [user, setUser] = React.useState({
         userId: "",
         password: "",
@@ -92,7 +90,7 @@ export default function AddUsers(props) {
                 message: 'Repeat password must match the password  '
             })
         } else {
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/users");
+            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
             axios.post(url, {
                 "userId": userId,
                 "password": password,

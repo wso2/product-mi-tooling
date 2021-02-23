@@ -27,11 +27,11 @@ import Tab from '@material-ui/core/Tab';
 import XMLViewer from 'react-xml-viewer';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
+import AuthManager from '../../../auth/AuthManager';
 
 export default function SourceViewSection(props) {
     const { artifactType, artifactName, nodeId, designContent } = props;
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
     const [source, setSource] = React.useState("");
     const [selectedTab, setSelectedTab] = React.useState(0);
 
@@ -45,7 +45,7 @@ export default function SourceViewSection(props) {
     const [open] = React.useState(false);
 
     React.useEffect(() => {
-        const url = basePath.concat('/configuration');
+        const url = AuthManager.getBasePath().concat('/configuration');
 
         axios.get(url, { params }).then(response => {
             setSource(response.data.configuration);

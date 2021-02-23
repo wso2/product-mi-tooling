@@ -22,6 +22,7 @@ import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
 
 export default function LogFiles() {
     const [pageInfo] = React.useState({
@@ -37,7 +38,6 @@ export default function LogFiles() {
 
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
-    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(() => {
         if (selectedNodeList.length > 0) {
@@ -45,7 +45,7 @@ export default function LogFiles() {
             selectedNodeList.filter(node => {
                 nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
             })
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/logs?nodes=").concat(nodeListQueryParams.slice(0,-7));
+            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/logs?nodes=").concat(nodeListQueryParams.slice(0,-7));
             axios.get(url).then(response => setlogList(response.data))
         }
     },[globalGroupId, selectedNodeList])

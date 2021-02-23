@@ -28,8 +28,6 @@ import Typography from '@material-ui/core/Typography';
 import Navigator from './layout/Navigator';
 import Content from './layout/Content';
 import Header from './layout/Header';
-import { useDispatch } from 'react-redux';
-import { setBasePath } from '../redux/Actions';
 import ProxyService from '../pages/ProxyService';
 import Endpoints from '../pages/Endpoints';
 import Nodes from '../pages/Nodes';
@@ -87,9 +85,6 @@ function Layout(props) {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-    const windowLocation = window.location.href;
-    const dispatch = useDispatch();
-    dispatch(setBasePath(windowLocation));
     // if the user is not logged in Redirect to login
     if (!AuthManager.isLoggedIn()) {
         return (
