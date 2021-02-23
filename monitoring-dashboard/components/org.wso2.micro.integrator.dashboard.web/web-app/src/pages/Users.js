@@ -21,9 +21,11 @@
 import React from 'react';
 import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import AuthManager from "../auth/AuthManager";
-import {Redirect} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
+import {Button} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 
 export default function Users() {
     const [pageInfo] = React.useState({
@@ -36,7 +38,7 @@ export default function Users() {
     });
 
     const [users, setUsers] = React.useState([]);
-
+    const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
 
     React.useEffect(() => {
@@ -45,13 +47,28 @@ export default function Users() {
             response.data.map(data => data.details = JSON.parse(data.details))
             setUsers(response.data)
         })
-    },[globalGroupId])
+    }, [globalGroupId])
 
     if (AuthManager.getUser().scope !== "admin") {
         return (
-            <Redirect to={{ pathname: '/' }} />
+            <Redirect to={{pathname: '/'}}/>
         );
     }
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={users} />
+    return <>
+        <div style={{height: "30px"}}>
+        <Button classes={{root: classes.buttonRight}} component={Link} to="/users/add" variant="contained"
+                color="primary">
+            Add New User
+        </Button>
+        </div>
+        <br/>
+        <EnhancedTable pageInfo={pageInfo} dataSet={users}/>
+    </>
 }
+
+const useStyles = makeStyles((theme) => ({
+    buttonRight: {
+        float: "right"
+    }
+}));

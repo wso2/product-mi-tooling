@@ -20,20 +20,17 @@
 
 import React from 'react';
 import axios from 'axios';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import MenuItem from '@material-ui/core/MenuItem';
 import EnhancedTable from '../commons/EnhancedTable';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import AddLogConfigs from '../commons/AddLogConfigs';
 import AuthManager from '../auth/AuthManager';
-import { Constants } from '../auth/Constants';
-import { useSelector } from 'react-redux';
-import {Redirect} from "react-router-dom";
+import {Constants} from '../auth/Constants';
+import {useSelector} from 'react-redux';
+import {Link, Redirect} from "react-router-dom";
+import {Button} from "@material-ui/core";
 
 export default function LogConfigs() {
     const [pageInfo, setPageInfo] = React.useState({
@@ -44,8 +41,8 @@ export default function LogConfigs() {
             {id: 'componentName', label: 'Component Name'},
             {id: 'level', label: 'Level'}],
         tableOrderBy: 'name',
-        additionalParams : {
-            selectedNodeId : 'All'
+        additionalParams: {
+            selectedNodeId: 'All'
         }
     });
 
@@ -53,14 +50,10 @@ export default function LogConfigs() {
     const [selectedNodeId, setSelectedNodeId] = React.useState('All');
     const [logConfigs, setLogConfigs] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
-    const [selectedTab, setSelectedTab] = React.useState(0);
-    const changeTab = (e, tab) => {
-        setSelectedTab(tab);
-    }
 
     const classes = useStyles();
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         let allNodes = [{
             label: 'All',
             value: 'All'
@@ -68,7 +61,7 @@ export default function LogConfigs() {
         if (globalGroupId !== '') {
             var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
             const getNodeUrl = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(getNodeUrl, { headers: { Authorization: authBearer }}).then(response => {
+            axios.get(getNodeUrl, {headers: {Authorization: authBearer}}).then(response => {
                 response.data.filter(node => {
                     var node = {
                         label: node.nodeId,
@@ -84,11 +77,11 @@ export default function LogConfigs() {
                 setLogConfigs(response.data)
             })
         }
-    },[globalGroupId])
+    }, [globalGroupId])
 
     if (AuthManager.getUser().scope !== "admin") {
         return (
-            <Redirect to={{ pathname: '/' }} />
+            <Redirect to={{pathname: '/'}}/>
         );
     }
 
@@ -101,39 +94,33 @@ export default function LogConfigs() {
             })
         }
         let param = {
-            selectedNodeId : nodeId
+            selectedNodeId: nodeId
         }
         setPageInfo({...pageInfo, additionalParams: param})
     }
 
-    const viewLogs = <><FormControl style={{ width: 150 }}>
-                            <Select
-                                classes={{ root: classes.selectRoot }}
-                                value={selectedNodeId}
-                                labelId="node-id-select-label"
-                                id="node-id-select"
-                                onChange={(e) => getLogConfigs(e.target.value)}
-                            >
-                                {nodeList.map((option) => (
-                                    <MenuItem value={option.value}>{option.label}</MenuItem>
-                                ))}
+    return <>
 
-                            </Select>
-                            <FormHelperText>Node ID</FormHelperText>
-                        </FormControl>
-                        <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs} /></>;
+        <FormControl style={{width: 150}}>
+            <Select
+                classes={{root: classes.selectRoot}}
+                value={selectedNodeId}
+                labelId="node-id-select-label"
+                id="node-id-select"
+                onChange={(e) => getLogConfigs(e.target.value)}
+            >
+                {nodeList.map((option) => (
+                    <MenuItem value={option.value}>{option.label}</MenuItem>
+                ))}
 
-    return (<><AppBar position="static" classes={{root: classes.tabsAppBar}}>
-                    <Tabs value={selectedTab} onChange={changeTab} aria-label="view add selection">
-                        <Tab label="View Log Configs" />
-                        <Tab label="Add Log Configs" />
-                    </Tabs>
-                </AppBar>
-                {selectedTab === 0 && (<>{viewLogs}</>)}
-                {selectedTab === 1 && (<AddLogConfigs pageId={pageInfo.pageId}/>)}
-            </>)
+            </Select>
+            <FormHelperText>Node ID</FormHelperText>
+        </FormControl>
+        <Button classes={{root: classes.buttonRight}} component={Link} to="/log-configs/add" variant="contained" color="primary">
+            Add Log Config
+        </Button>
+        <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs}/></>;
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs} />
 
 }
 
@@ -144,5 +131,8 @@ const useStyles = makeStyles((theme) => ({
     },
     tabsAppBar: {
         backgroundColor: '#18202c'
+    },
+    buttonRight: {
+        float: "right"
     }
 }));
