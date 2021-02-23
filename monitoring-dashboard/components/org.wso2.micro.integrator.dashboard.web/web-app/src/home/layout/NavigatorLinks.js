@@ -43,7 +43,7 @@ export const categories = [
     },
   ];
 
- const nonDisplayItems = [ {id: 'Add Users', to: '/users/add' }]
+ const nonDisplayItems = [ {id: 'Add Users', to: '/users/add' }, {id: 'Add Log Config', to: '/log-configs/add'}]
 
   export const getIdFromRoute = (route) => {
       let allChildren = [];
