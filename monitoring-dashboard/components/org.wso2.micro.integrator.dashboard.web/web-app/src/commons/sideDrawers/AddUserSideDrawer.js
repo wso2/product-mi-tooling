@@ -34,10 +34,10 @@ import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import { Button } from '@material-ui/core';
 import { useSelector } from 'react-redux';
+import AuthManager from '../../auth/AuthManager';
 
 export default function AddUserSideDrawer() {
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
     const [user, setUser] = React.useState({
         userId: "",
         password: "",
@@ -88,7 +88,7 @@ export default function AddUserSideDrawer() {
                 message: 'Repeat password must match the password  '
             })
         } else {
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/users");
+            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
             axios.post(url, {
                 "userId": userId,
                 "password": password,

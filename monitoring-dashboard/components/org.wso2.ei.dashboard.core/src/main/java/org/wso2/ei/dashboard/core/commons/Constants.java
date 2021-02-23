@@ -50,8 +50,6 @@ public final class Constants {
 
     public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
 
-    // todo change this structure
-
     public static final String DASHBOARD_HOME = System.getenv("DASHBOARD_HOME");
     public static final String HEARTBEAT_POOL_SIZE = System.getProperty("heartbeat_pool_size");
     public static final String DATABASE_URL = "jdbc:h2:mem:ei-dashboard-db;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM '"

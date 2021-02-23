@@ -38,12 +38,11 @@ export default function NodeFilter () {
 
     const [nodeList, setNodeList] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
     var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
 
     React.useEffect(()=>{
         if (globalGroupId !== '') {
-            const url = basePath.concat('/groups/').concat(globalGroupId).concat("/nodes");
+            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
             axios.get(url, { headers: { Authorization: authBearer }}).then(response => {
                 var list = [];
                 response.data.map(data => list.push(data.nodeId))

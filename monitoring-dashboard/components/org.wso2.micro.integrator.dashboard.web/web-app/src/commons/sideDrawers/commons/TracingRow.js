@@ -23,10 +23,10 @@ import axios from 'axios';
 import { TableCell, TableRow } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import Switch from "react-switch";
+import AuthManager from '../../../auth/AuthManager';
 
 export default function TracingRow(props) {
     const {pageId, artifactName, nodeId, tracing} = props;
-    const basePath = useSelector(state => state.basePath);
     var isTracingEnabled = false;
 
     if(tracing === 'enabled') {
@@ -41,7 +41,7 @@ export default function TracingRow(props) {
     };
 
     const updateArtifact = () => {
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/").concat(pageId);
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/").concat(pageId);
         axios.patch(url, {
             "artifactName": artifactName,
             "nodeId": nodeId,

@@ -38,10 +38,9 @@ export default function Users() {
     const [users, setUsers] = React.useState([]);
 
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
 
     React.useEffect(() => {
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/users");
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
         axios.get(url).then(response => {
             response.data.map(data => data.details = JSON.parse(data.details))
             setUsers(response.data)

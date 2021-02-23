@@ -34,7 +34,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import AuthManager from '../auth/AuthManager';
-import { Constants } from '../auth/Constants';
 
 export default function AddLogConfigs(props) {
     const { pageId } = props;
@@ -43,9 +42,8 @@ export default function AddLogConfigs(props) {
     React.useEffect(()=>{
         let allNodes = [{label:'All', value:'All'}]
         if (globalGroupId !== '') {
-            var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
             const getNodeUrl = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(getNodeUrl, { headers: { Authorization: authBearer }}).then(response => {
+            axios.get(getNodeUrl).then(response => {
                 response.data.filter(node => {
                     var node = {
                         label: node.nodeId,
@@ -66,7 +64,6 @@ export default function AddLogConfigs(props) {
 function AddLogConfigsSection() {
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
     const [logConfig, setLogConfig] = React.useState({
         loggerName: "",
         loggerClass: "",
@@ -135,7 +132,7 @@ function AddLogConfigsSection() {
     const addLogger = () => {
         handleConfirmationDialogClose();
         const {loggerName, loggerClass, loggerLevel} = logConfig;
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/log-configs");
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs");
         axios.post(url, {
             "name": loggerName,
             "loggerClass": loggerClass,

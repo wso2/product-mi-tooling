@@ -7,16 +7,16 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { useSelector } from 'react-redux';
+import AuthManager from '../auth/AuthManager';
 
 export default function LogsNodeCell(props) {
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
     const { nodeId, fileName } = props;
     const [open, setOpen] = React.useState(false);
     const [logContent, setLogContent] = React.useState("");
 
     function getLogContent() {
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat('/nodes/').concat(nodeId).concat('/logs/').concat(fileName);
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat('/nodes/').concat(nodeId).concat('/logs/').concat(fileName);
         axios.get(url).then(response => {
             setLogContent(response.data)
         })
