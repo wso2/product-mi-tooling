@@ -17,6 +17,7 @@
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "react-select": "^4.1.0",
     "react-switch": "^5.0.1",
     "react-xml-viewer": "^1.1.0",
     "redux": "^4.0.5",

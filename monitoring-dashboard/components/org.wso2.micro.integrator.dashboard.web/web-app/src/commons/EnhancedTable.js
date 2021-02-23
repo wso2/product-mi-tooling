@@ -20,7 +20,6 @@
 
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -73,7 +72,7 @@ export default function EnhancedTable(props) {
                         />
                         <TableBody>
 
-                            {stableSort(dataSet, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => <TableRowCreator pageId={pageInfo.pageId} data={row} headers={headCells}/>
+                            {stableSort(dataSet, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => <TableRowCreator pageInfo={pageInfo} data={row} headers={headCells}/>
                             )}
                         </TableBody>
                     </Table>

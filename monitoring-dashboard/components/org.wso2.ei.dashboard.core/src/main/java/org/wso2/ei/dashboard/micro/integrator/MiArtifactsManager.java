@@ -279,7 +279,6 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private JsonObject removeConfigurationFromResponse(JsonObject artifact) {
-        logger.debug("Removing config from artifact " + artifact.get("name").getAsString());
         artifact.remove("configuration");
         return artifact;
     }
