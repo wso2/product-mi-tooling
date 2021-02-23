@@ -49,7 +49,7 @@
 
     <modules>
         <module>monitoring-dashboard</module>
-        <module>encryption-client</module>
+<!--        <module>encryption-client</module>-->
     </modules>
 
     <profiles>
