@@ -43,11 +43,16 @@ export const categories = [
     },
   ];
 
+ const nonDisplayItems = [ {id: 'Add Users', to: '/users/add' }]
+
   export const getIdFromRoute = (route) => {
       let allChildren = [];
       categories.map((cat) => {
           allChildren = [...allChildren, ...cat.children];
       })
-      const selected = allChildren.find(child => child.to === route);
+      let selected = allChildren.find(child => child.to === route);
+      if (selected === undefined) {
+          selected = nonDisplayItems.find(item => item.to === route);
+      }
       return selected ? selected : allChildren[0] ;
   }

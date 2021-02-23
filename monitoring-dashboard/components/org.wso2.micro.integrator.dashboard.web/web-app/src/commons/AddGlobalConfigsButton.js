@@ -19,29 +19,18 @@
  */
 
 import React from 'react';
-import Drawer from '@material-ui/core/Drawer';
 import { Button } from '@material-ui/core';
-import AddUserSideDrawer from './sideDrawers/AddUserSideDrawer'
+import { Link } from 'react-router-dom'
 
 export default function AddGlobalConfigsButton(props) {
     const { pageId } = props;
-    const [state, setState] = React.useState({
-        openSideDrawer: false
-    });
 
-    const toggleDrawer = (open) => (event) => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
-        setState({ ...state, openSideDrawer: open });
-    };
 
     if (pageId === 'users') {
         return <div>
-                    <Button onClick={toggleDrawer(true)} variant="contained" color="primary">Add Users</Button>
-                    <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} >
-                        <AddUserSideDrawer />
-                    </Drawer>
+            <Button component={Link} to="/users/add" variant="contained" color="primary">
+                Add User
+            </Button>
                 </div>
     } else {
         return <div />
