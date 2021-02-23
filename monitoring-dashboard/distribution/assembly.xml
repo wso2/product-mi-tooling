@@ -47,14 +47,6 @@
             <fileMode>755</fileMode>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/resources/updates/</directory>
-            <outputDirectory>updates</outputDirectory>
-            <includes>
-                <include>product.txt</include>
-            </includes>
-            <fileMode>755</fileMode>
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}/target/classes</directory>
             <outputDirectory>bin</outputDirectory>
             <includes>
@@ -91,6 +83,15 @@
             </includes>
         </fileSet>
     </fileSets>
+
+    <files>
+        <file>
+            <source>${project.basedir}/src/main/resources/updates/product.txt</source>
+            <outputDirectory>updates</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+    </files>
 
     <!-- package dependencies -->
     <dependencySets>
