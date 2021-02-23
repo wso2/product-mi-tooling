@@ -57,8 +57,8 @@ public final class Constants {
     public static final String DATABASE_URL = "jdbc:h2:mem:ei-dashboard-db;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM '"
                                               + Constants.DASHBOARD_HOME + File.separator + "dbscripts" + File.separator
                                               + "h2.sql'";
-    public static final String DATABASE_USERNAME = System.getProperty("db_username");
-    public static final String DATABASE_PASSWORD = System.getProperty("db_password");
+    public static final String DATABASE_USERNAME = "wso2carbon";
+    public static final String DATABASE_PASSWORD = "wso2carbon";
 
     public static final int TOKEN_CACHE_TIMEOUT = 60;
 

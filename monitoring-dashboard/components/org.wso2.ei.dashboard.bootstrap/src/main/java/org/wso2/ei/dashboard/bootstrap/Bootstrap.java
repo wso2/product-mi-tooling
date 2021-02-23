@@ -51,14 +51,8 @@ public class Bootstrap {
     private static final String CONF_DIR = "conf";
     private static final String DEPLOYMENT_TOML = "deployment.toml";
     private static final String TOML_CONF_PORT = "server_config.port";
-    private static final String TOML_DB_CONF_URL = "database_config.url";
-    private static final String TOML_DB_CONF_USERNAME = "database_config.username";
-    private static final String TOML_DB_CONF_PASSWORD = "database_config.password";
     private static final String TOML_MI_USERNAME = "mi_user_store.password";
     private static final String TOML_MI_PASSWORD = "mi_user_store.password";
-    private static final String DATABASE_URL = "db_url";
-    private static final String DATABASE_USERNAME = "db_username";
-    private static final String DATABASE_PASSWORD = "db_password";
     private static final String MI_USERNAME = "mi_username";
     private static final String MI_PASSWORD = "mi_password";
     private static final String TOML_CONF_HEARTBEAT_POOL_SIZE = "heartbeat_config.pool_size";
@@ -159,9 +153,6 @@ public class Bootstrap {
     }
 
     private static void loadConfigurations(TomlParseResult parseResult) {
-        String url = parseResult.getString(TOML_DB_CONF_URL);
-        String username = parseResult.getString(TOML_DB_CONF_USERNAME);
-        String password = parseResult.getString(TOML_DB_CONF_PASSWORD);
         String heartbeatPoolSize = String.valueOf(5);
         if (parseResult.contains(TOML_CONF_HEARTBEAT_POOL_SIZE)) {
             heartbeatPoolSize = parseResult.getLong(TOML_CONF_HEARTBEAT_POOL_SIZE).toString();
@@ -170,9 +161,6 @@ public class Bootstrap {
         String miPassword = parseResult.getString(TOML_MI_PASSWORD);
         Properties properties = System.getProperties();
         properties.put(HEARTBEAT_POOL_SIZE, heartbeatPoolSize);
-        properties.put(DATABASE_URL , url);
-        properties.put(DATABASE_USERNAME , username);
-        properties.put(DATABASE_PASSWORD , password);
         properties.put(MI_USERNAME , miUsername);
         properties.put(MI_PASSWORD, miPassword);
         System.setProperties(properties);
