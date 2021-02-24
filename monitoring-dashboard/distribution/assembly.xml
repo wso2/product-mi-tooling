@@ -30,6 +30,13 @@
     <id>pack</id>
     <fileSets>
         <fileSet>
+            <directory>${project.basedir}/src/main/resources</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/src/main/resources/conf</directory>
             <outputDirectory>conf</outputDirectory>
             <includes>

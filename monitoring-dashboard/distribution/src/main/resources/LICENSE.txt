@@ -1,0 +1,45 @@
+
+This product is licensed by WSO2 Inc. under Apache License 2.0. The license
+can be downloaded from the following locations:
+	http://www.apache.org/licenses/LICENSE-2.0.html
+	http://www.apache.org/licenses/LICENSE-2.0.txt
+
+This product also contains software under different licenses. This table below
+all the contained libraries (jar files) and the license under which they are 
+provided to you.
+
+At the bottom of this file is a table that shows what each license indicated
+below is and where the actual text of the license can be found.
+
+
+Name                                                                                                Type        License             
+_________________________________________________________________________________________________________________________________________________
+jetty-webapp-9.4.34.v20201102.jar                                                                   bundle         apache2             
+jetty-io-9.4.34.v20201102.jar                                                                       bundle         apache2             
+jetty-util-9.4.34.v20201102.jar                                                                     bundle         apache2             
+jetty-server-9.4.34.v20201102.jar                                                                   bundle         apache2             
+org.wso2.ei.dashboard.bootstrap-4.0.0-alpha.jar                                                     bundle         apache2             
+jetty-servlet-9.4.34.v20201102.jar                                                                  bundle         apache2             
+guava-27.0-jre.jar                                                                                  bundle         apache2             
+javax.servlet-api-3.1.0.jar                                                                         bundle         cddl1               
+log4j-api-2.12.0.jar                                                                                bundle         apache2             
+slf4j-api-1.7.5.jar                                                                                 bundle         mit                 
+jetty-xml-9.4.34.v20201102.jar                                                                      bundle         apache2             
+jetty-http-9.4.34.v20201102.jar                                                                     bundle         apache2             
+cava-toml-0.5.0.jar                                                                                 jar            apache2             
+antlr4-runtime-4.7.1.jar                                                                            bundle         bsd                 
+log4j-slf4j-impl-2.12.0.jar                                                                         bundle         apache2             
+jetty-security-9.4.34.v20201102.jar                                                                 bundle         apache2             
+log4j-core-2.12.0.jar                                                                               bundle         apache2             
+
+
+The license types used by the above libraries and their information is given below:
+
+apache2        Apache License Version 2.0
+               http://www.apache.org/licenses/LICENSE-2.0.html
+cddl1          Common Development and Distribution License
+               http://www.opensource.org/licenses/cddl1.php
+mit            MIT License
+               http://www.opensource.org/licenses/mit-license.php
+bsd            Berkeley License
+               http://www.opensource.org/licenses/bsd-license.php
