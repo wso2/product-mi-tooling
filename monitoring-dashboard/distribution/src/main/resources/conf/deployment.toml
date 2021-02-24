@@ -1,0 +1,9 @@
+[server_config]
+port = 9743
+
+[heartbeat_config]
+pool_size = 15
+
+[mi_user_store]
+username = "admin"
+password = "admin"

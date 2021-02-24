@@ -1,0 +1,122 @@
+<!--
+  ~ Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  ~
+  ~
+  -->
+
+<assembly
+        xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+    http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2
+      http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <formats>
+        <format>zip</format>
+    </formats>
+    <id>pack</id>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <includes>
+                <include>deployment.toml</include>
+                <include>log4j2.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>dashboard.sh</include>
+                <include>dashboard.bat</include>
+            </includes>
+            <fileMode>755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/target/classes</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>version.txt</include>
+            </includes>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources/dbscripts</directory>
+            <outputDirectory>dbscripts</outputDirectory>
+            <includes>
+                <include>h2.sql</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/target/database</directory>
+            <outputDirectory>repository/database</outputDirectory>
+            <includes>
+                <include>WSO2_EI_DASHBOARD_DB.mv.db</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/</directory>
+            <outputDirectory>server/www</outputDirectory>
+            <includes>
+                <include>org.wso2.micro.integrator.dashboard.web.war</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../components/org.wso2.ei.dashboard.core/target</directory>
+            <outputDirectory>server/webapps</outputDirectory>
+            <includes>
+                <include>org.wso2.ei.dashboard.core.war</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+    <files>
+        <file>
+            <source>${project.basedir}/src/main/resources/updates/product.txt</source>
+            <outputDirectory>updates</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+    </files>
+
+    <!-- package dependencies -->
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>org.wso2.ei:org.wso2.ei.dashboard.bootstrap:jar</include>
+                <include>org.eclipse.jetty:jetty-server:jar</include>
+                <include>org.eclipse.jetty:jetty-servlet:jar</include>
+                <include>org.eclipse.jetty:jetty-webapp:jar</include>
+                <include>org.eclipse.jetty:jetty-util:jar</include>
+                <include>org.eclipse.jetty:jetty-http:jar</include>
+                <include>org.eclipse.jetty:jetty-io:jar</include>
+                <include>org.eclipse.jetty:jetty-security:jar</include>
+                <include>org.eclipse.jetty:jetty-xml:jar</include>
+                <include>javax.servlet:javax.servlet-api:jar</include>
+                <include>net.consensys.cava:cava-toml:jar</include>
+                <include>org.antlr:antlr4-runtime:jar</include>
+                <include>org.apache.logging.log4j:log4j-core:jar</include>
+                <include>org.apache.logging.log4j:log4j-api:jar</include>
+                <include>org.slf4j:slf4j-api:jar</include>
+                <include>org.apache.logging.log4j:log4j-slf4j-impl:jar</include>
+                <include>com.google.guava:guava:jar</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+</assembly>

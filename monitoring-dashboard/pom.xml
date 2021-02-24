@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
   ~ http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  ~
   ~
   -->
 
@@ -20,20 +23,18 @@
     <parent>
         <artifactId>wso2-micro-integrator-tooling</artifactId>
         <groupId>org.wso2.ei</groupId>
-        <version>1.2.1-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>monitoring-dashboard-parent</artifactId>
     <packaging>pom</packaging>
     <name>MI Monitoring Dashboard - Parent</name>
+    <version>4.0.0-SNAPSHOT</version>
 
     <modules>
         <module>components</module>
-        <module>features</module>
         <module>distribution</module>
-        <module>integration</module>
     </modules>
 
     <dependencyManagement>
@@ -155,14 +156,24 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${version.log4j.core}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.log4j.wso2</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${wso2.log4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${version.log4j.core}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${version.log4j.core}</version>
             </dependency>
 
             <!-- Metrics -->
@@ -225,6 +236,83 @@
                 <version>${carbon.uis.version}</version>
                 <type>zip</type>
             </dependency>
+
+            <!-- Rest Api-->
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet-core</artifactId>
+                <version>${glassfish.jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.inject</groupId>
+                <artifactId>jersey-hk2</artifactId>
+                <version>${glassfish.jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-json-binding</artifactId>
+                <version>${glassfish.jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${javax.xml.bind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>${javax.activation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${io.swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${io.swagger.core.v3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.database.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikari.cp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${code.gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${google.guava.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -273,7 +361,7 @@
 
         <!-- Logging/SLF4J -->
         <slf4j.version>1.7.5</slf4j.version>
-        <wso2.log4j.version>1.2.17.wso2v1</wso2.log4j.version>
+        <version.log4j.core>2.12.0</version.log4j.core>
 
         <!-- Databridge -->
         <carbon.analytics-common.version>6.1.26</carbon.analytics-common.version>
@@ -291,5 +379,20 @@
 
         <!-- Carbon kernel4 version that is used in Micro Integrator -->
         <carbon.kernel4.version>4.5.3</carbon.kernel4.version>
+
+        <!-- Rest api -->
+        <glassfish.jersey.version>2.26</glassfish.jersey.version>
+        <javax.xml.bind.version>2.3.0</javax.xml.bind.version>
+        <javax.activation.version>1.1</javax.activation.version>
+        <io.swagger.version>1.6.2</io.swagger.version>
+        <io.swagger.core.v3.version>2.1.5</io.swagger.core.v3.version>
+        <jackson.core.version>2.11.3</jackson.core.version>
+        <commons-logging.version>1.2</commons-logging.version>
+        <h2.database.version>1.4.200</h2.database.version>
+        <commons.lang3.version>3.1</commons.lang3.version>
+        <hikari.cp.version>3.4.5</hikari.cp.version>
+        <httpcomponents.version>4.5.8</httpcomponents.version>
+        <code.gson.version>2.8.6</code.gson.version>
+        <google.guava.version>27.0-jre</google.guava.version>
     </properties>
 </project>
