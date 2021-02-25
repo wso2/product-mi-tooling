@@ -118,7 +118,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>mi_dashboard_${version}</finalName>
+                            <finalName>wso2mi-dashboard-${version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <filters>
                                 <filter>filter.properties</filter>
