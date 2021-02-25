@@ -157,12 +157,20 @@ public class Bootstrap {
         if (parseResult.contains(TOML_CONF_HEARTBEAT_POOL_SIZE)) {
             heartbeatPoolSize = parseResult.getLong(TOML_CONF_HEARTBEAT_POOL_SIZE).toString();
         }
-        String miUsername = parseResult.getString(TOML_MI_USERNAME);
-        String miPassword = parseResult.getString(TOML_MI_PASSWORD);
         Properties properties = System.getProperties();
         properties.put(HEARTBEAT_POOL_SIZE, heartbeatPoolSize);
-        properties.put(MI_USERNAME , miUsername);
-        properties.put(MI_PASSWORD, miPassword);
+
+        String miUsername = System.getProperty(MI_USERNAME);
+        if (StringUtils.isEmpty(miUsername)) {
+            miUsername = parseResult.getString(TOML_MI_USERNAME);
+            properties.put(MI_USERNAME , miUsername);
+        }
+
+        String miPassword = System.getProperty(MI_PASSWORD);
+        if (StringUtils.isEmpty(miPassword)) {
+            miPassword = parseResult.getString(TOML_MI_PASSWORD);
+            properties.put(MI_PASSWORD, miPassword);
+        }
         System.setProperties(properties);
     }
 
