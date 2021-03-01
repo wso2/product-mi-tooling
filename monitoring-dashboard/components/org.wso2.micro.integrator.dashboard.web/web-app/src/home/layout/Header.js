@@ -94,13 +94,13 @@ function Header(props) {
                 Go to docs
               </Link>
             </Grid>
-            <Grid item>
+           {/* <Grid item>
               <Tooltip title="Alerts • No alerts">
                 <IconButton color="inherit">
                   <NotificationsIcon />
                 </IconButton>
               </Tooltip>
-            </Grid>
+            </Grid>*/}
             <Grid item>
               <IconButton color="inherit" className={classes.iconButtonAvatar} onClick={handlePopOverClick}>
                 <Avatar src="/static/images/avatar/1.jpg" alt="My Avatar" />
