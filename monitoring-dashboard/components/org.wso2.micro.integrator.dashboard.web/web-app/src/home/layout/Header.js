@@ -66,6 +66,10 @@ function Header(props) {
     setAnchorEl(null);
   };
 
+  const showNodeSelector = () => {
+    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users"));
+  }
+
   return (
     <>
       <Helmet>
@@ -87,7 +91,8 @@ function Header(props) {
               </Grid>
             </Hidden>
             <GroupSelector />
-            <NodeFilter />
+            {showNodeSelector() && <NodeFilter /> }
+            {!showNodeSelector() && <div style={{height:"74px"}}></div> }
             <Grid item xs />
             <Grid item>
               <Link className={classes.link} href="#" variant="body2">
