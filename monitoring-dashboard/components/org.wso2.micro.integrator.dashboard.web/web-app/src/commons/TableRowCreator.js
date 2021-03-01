@@ -135,8 +135,12 @@ export default function TableRowCreator(props) {
                 return <TableCell>Active</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
+
+            // Log Files Page
             case 'nodes_logs':
-                return <TableCell><table>{data.nodes.map(node=><LogsNodeCell nodeId={node} fileName={data.name} />)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><LogsNodeCell nodeId={node.nodeId} fileName={data.name} />)}</table></TableCell>
+            case 'log_size':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.logSize} />)}</table></TableCell>
             default:
                 <TableCell>Table data not available</TableCell>
         }})}

@@ -2,6 +2,7 @@ package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.ei.dashboard.core.rest.model.LogDetail;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 
@@ -13,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LogListInner   {
   private @Valid String name = null;
-  private @Valid List<Object> nodes = new ArrayList<Object>();
+  private @Valid List<LogDetail> nodes = new ArrayList<LogDetail>();
 
   /**
    **/
@@ -35,7 +36,7 @@ public class LogListInner   {
 
   /**
    **/
-  public LogListInner nodes(List<Object> nodes) {
+  public LogListInner nodes(List<LogDetail> nodes) {
     this.nodes = nodes;
     return this;
   }
@@ -44,10 +45,10 @@ public class LogListInner   {
   @ApiModelProperty(value = "")
   @JsonProperty("nodes")
 
-  public List<Object> getNodes() {
+  public List<LogDetail> getNodes() {
     return nodes;
   }
-  public void setNodes(List<Object> nodes) {
+  public void setNodes(List<LogDetail> nodes) {
     this.nodes = nodes;
   }
 
