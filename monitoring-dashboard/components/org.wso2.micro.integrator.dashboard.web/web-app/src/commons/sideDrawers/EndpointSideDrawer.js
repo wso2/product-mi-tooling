@@ -21,7 +21,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
@@ -120,6 +119,42 @@ function EndpointsDetailTable(props) {
                 <TableRow>
                     <TableCell>Port</TableCell>
                     <TableCell>{nodeData.details.portName}</TableCell>
+                </TableRow>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+            </Table>
+        case 'Template Endpoint':
+            return <Table>
+                <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>{artifactName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{artifactType}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Template</TableCell>
+                    <CopyToClipboardCell text={nodeData.details.template} />
+                </TableRow>
+                <TableRow>
+                    <TableCell>URI</TableCell>
+                    <TableCell>{nodeData.details.parameters.uri}</TableCell>
+                </TableRow>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+            </Table>
+        case 'Indirect Endpoint':
+            return <Table>
+                <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>{artifactName}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Type</TableCell>
+                    <TableCell>{artifactType}</TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>Key</TableCell>
+                    <CopyToClipboardCell text={nodeData.details.key} />
                 </TableRow>
                 <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
             </Table>
