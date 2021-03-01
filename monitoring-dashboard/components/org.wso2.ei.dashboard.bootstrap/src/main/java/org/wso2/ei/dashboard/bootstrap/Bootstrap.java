@@ -37,6 +37,8 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,12 +100,11 @@ public class Bootstrap {
         try {
             server.start();
             writePID(dashboardHome);
-            logger.info("Server started in port " + serverPort);
+            printServerStartupLog(serverPort);
             server.join();
         } catch (Exception ex) {
             logger.error("Error while starting up the server", ex);
         }
-
         logger.info("Stopping the server");
     }
 
@@ -150,6 +151,19 @@ public class Bootstrap {
         wwwApp.setParentLoaderPriority(true);
         handlers.addHandler(wwwApp);
         server.setHandler(handlers);
+    }
+
+    private static void printServerStartupLog(int serverPort) {
+        InetAddress localHost;
+        String hostName;
+        try {
+            localHost = InetAddress.getLocalHost();
+            hostName = localHost.getHostName();
+        } catch (UnknownHostException e) {
+            hostName = "127.0.0.1";
+        }
+        String loginUrl = "https://" + hostName + ":" + serverPort + "/login";
+        logger.info("Login to Micro Integrator Dashboard : '" + loginUrl + "'");
     }
 
     private static void loadConfigurations(TomlParseResult parseResult) {
