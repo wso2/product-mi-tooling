@@ -67,7 +67,7 @@ function Header(props) {
   };
 
   const showNodeSelector = () => {
-    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users"));
+    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname === "/");
   }
 
   return (
