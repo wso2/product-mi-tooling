@@ -31,12 +31,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
+import org.wso2.ei.dashboard.core.rest.model.LogDetail;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.LogListInner;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -54,17 +54,25 @@ public class LogsDelegate {
             for (JsonElement jsonElement : logsArray) {
                 JsonObject logObject = jsonElement.getAsJsonObject();
                 String fileName = logObject.get("FileName").getAsString();
+                String fileSize = logObject.get("Size").getAsString();
                 AtomicBoolean isRecordExist = new AtomicBoolean(false);
                 logList.stream().filter(o -> o.getName().equals(fileName)).forEach(
                         o -> {
-                           o.getNodes().add(nodeId);
-                           isRecordExist.set(true);
+                            LogDetail logDetail = new LogDetail();
+                            logDetail.setNodeId(nodeId);
+                            logDetail.setLogSize(fileSize);
+                            o.getNodes().add(logDetail);
+                            isRecordExist.set(true);
                         });
                 if (!isRecordExist.get()) {
                     LogListInner logListInner = new LogListInner();
                     logListInner.setName(fileName);
-                    ArrayList<Object> nodes = new ArrayList<>(Collections.singletonList(nodeId));
-                    logListInner.setNodes(nodes);
+                    List<LogDetail> logDetailList = new ArrayList<>();
+                    LogDetail logDetail = new LogDetail();
+                    logDetail.setNodeId(nodeId);
+                    logDetail.setLogSize(fileSize);
+                    logDetailList.add(logDetail);
+                    logListInner.setNodes(logDetailList);
                     logList.add(logListInner);
                 }
             }

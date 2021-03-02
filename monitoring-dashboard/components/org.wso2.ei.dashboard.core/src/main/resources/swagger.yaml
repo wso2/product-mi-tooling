@@ -1297,12 +1297,15 @@ components:
           nodes:
             type: array
             items:
-              type: object
-              properties:
-                nodeId:
-                  type: string
-                size:
-                  type: boolean
+              $ref: '#/components/schemas/LogDetail'
+    LogDetail:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        logSize:
+          type: string
+
     LogConfigs:
       type: array
       items:

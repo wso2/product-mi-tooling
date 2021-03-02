@@ -37,6 +37,8 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,12 +100,11 @@ public class Bootstrap {
         try {
             server.start();
             writePID(dashboardHome);
-            logger.info("Server started in port " + serverPort);
+            printServerStartupLog(serverPort);
             server.join();
         } catch (Exception ex) {
             logger.error("Error while starting up the server", ex);
         }
-
         logger.info("Stopping the server");
     }
 
@@ -152,17 +153,38 @@ public class Bootstrap {
         server.setHandler(handlers);
     }
 
+    private static void printServerStartupLog(int serverPort) {
+        InetAddress localHost;
+        String hostName;
+        try {
+            localHost = InetAddress.getLocalHost();
+            hostName = localHost.getHostName();
+        } catch (UnknownHostException e) {
+            hostName = "127.0.0.1";
+        }
+        String loginUrl = "https://" + hostName + ":" + serverPort + "/login";
+        logger.info("Login to Micro Integrator Dashboard : '" + loginUrl + "'");
+    }
+
     private static void loadConfigurations(TomlParseResult parseResult) {
         String heartbeatPoolSize = String.valueOf(5);
         if (parseResult.contains(TOML_CONF_HEARTBEAT_POOL_SIZE)) {
             heartbeatPoolSize = parseResult.getLong(TOML_CONF_HEARTBEAT_POOL_SIZE).toString();
         }
-        String miUsername = parseResult.getString(TOML_MI_USERNAME);
-        String miPassword = parseResult.getString(TOML_MI_PASSWORD);
         Properties properties = System.getProperties();
         properties.put(HEARTBEAT_POOL_SIZE, heartbeatPoolSize);
-        properties.put(MI_USERNAME , miUsername);
-        properties.put(MI_PASSWORD, miPassword);
+
+        String miUsername = System.getProperty(MI_USERNAME);
+        if (StringUtils.isEmpty(miUsername)) {
+            miUsername = parseResult.getString(TOML_MI_USERNAME);
+            properties.put(MI_USERNAME , miUsername);
+        }
+
+        String miPassword = System.getProperty(MI_PASSWORD);
+        if (StringUtils.isEmpty(miPassword)) {
+            miPassword = parseResult.getString(TOML_MI_PASSWORD);
+            properties.put(MI_PASSWORD, miPassword);
+        }
         System.setProperties(properties);
     }
 

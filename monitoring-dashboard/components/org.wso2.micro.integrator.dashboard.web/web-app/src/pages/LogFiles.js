@@ -30,7 +30,8 @@ export default function LogFiles() {
         title: "Log Files",
         headCells: [
             {id: 'name', label: 'Log File Name'},
-            {id: 'nodes_logs', label: 'Nodes'}],
+            {id: 'nodes_logs', label: 'Nodes'},
+            {id: 'log_size', label: 'Size'}],
         tableOrderBy: 'name'
     });
 

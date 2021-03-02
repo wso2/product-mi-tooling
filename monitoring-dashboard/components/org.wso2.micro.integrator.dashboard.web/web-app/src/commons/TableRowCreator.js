@@ -28,6 +28,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
 import EnabledIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import DisabledIcon from '@material-ui/icons/BlockOutlined';
+import AdminIcon from '@material-ui/icons/CheckRounded';
+import NonAdminIcon from '@material-ui/icons/ClearRounded';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -126,7 +128,7 @@ export default function TableRowCreator(props) {
             case 'userId':
                 return <TableCell>{data.userId}</TableCell>
             case 'isAdmin':
-                return <TableCell>{data.details.isAdmin ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}</TableCell>
+                return <TableCell>{data.details.isAdmin ? <AdminIcon style={{color:"green"}}/> : <NonAdminIcon style={{color:"red"}}/>}</TableCell>
             
             // Node page
             case 'nodeId':
@@ -135,8 +137,12 @@ export default function TableRowCreator(props) {
                 return <TableCell>Active</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
+
+            // Log Files Page
             case 'nodes_logs':
-                return <TableCell><table>{data.nodes.map(node=><LogsNodeCell nodeId={node} fileName={data.name} />)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><LogsNodeCell nodeId={node.nodeId} fileName={data.name} />)}</table></TableCell>
+            case 'log_size':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.logSize} />)}</table></TableCell>
             default:
                 <TableCell>Table data not available</TableCell>
         }})}
