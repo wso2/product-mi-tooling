@@ -25,7 +25,9 @@ import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -93,7 +95,15 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     }
 
     private void abortWithUnauthorized(ContainerRequestContext requestContext) {
-        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", "Unauthorized");
+
+        Response unauthorizedResponse = Response.status(Response.Status.UNAUTHORIZED)
+                .entity(responseBody)
+                .header("content" +
+                "-type", "application/json").build();
+        requestContext.abortWith(unauthorizedResponse);
     }
 
     private boolean inValidToken(String token) {

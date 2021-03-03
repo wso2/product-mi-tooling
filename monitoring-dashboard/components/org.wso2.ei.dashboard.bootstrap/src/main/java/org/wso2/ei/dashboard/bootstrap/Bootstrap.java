@@ -30,6 +30,7 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -136,10 +137,12 @@ public class Bootstrap {
         String[] pathnames = webAppFilePath.list();
         for (String pathname : pathnames) {
             WebAppContext webApp = new WebAppContext();
-            webApp.setContextPath("/dashboard/");
+            webApp.setContextPath("/dashboard/*");
             File warFile = new File(webAppsPath + File.separator + pathname);
             webApp.setExtractWAR(true);
             webApp.setWar(warFile.getAbsolutePath());
+            ErrorHandler errorHandler = new JsonErrorHandler();
+            webApp.setErrorHandler(errorHandler);
             handlers.addHandler(webApp);
         }
         
