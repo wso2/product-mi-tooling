@@ -55,11 +55,15 @@ public class LoginDelegate {
     private String getTokenFromMI(String username, String password) {
         GroupDelegate groupDelegate = new GroupDelegate();
         GroupList groupList = groupDelegate.getGroupList();
-        NodesDelegate nodesDelegate = new NodesDelegate();
-        NodeList nodes = nodesDelegate.getNodes(groupList.get(0));
-        return ManagementApiUtils.getToken(ManagementApiUtils.getMgtApiUrl(groupList.get(0), nodes.get(0).getNodeId()),
-                username,
-                password);
+        if (groupList.isEmpty()) {
+            logger.error("No running micro integrator instances found. Please start a server and login.");
+            return "";
+        } else {
+            NodesDelegate nodesDelegate = new NodesDelegate();
+            NodeList nodes = nodesDelegate.getNodes(groupList.get(0));
+            return ManagementApiUtils.getToken(ManagementApiUtils.getMgtApiUrl(
+                    groupList.get(0), nodes.get(0).getNodeId()), username, password);
+        }
     }
 
     private void storeTokenInCache(String accessToken) {
