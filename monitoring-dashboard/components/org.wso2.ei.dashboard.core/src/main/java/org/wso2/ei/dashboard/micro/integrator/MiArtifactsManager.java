@@ -209,9 +209,30 @@ public class MiArtifactsManager implements ArtifactsManager {
     private void fetchAndStoreArtifact(UpdatedArtifact info) {
         String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
         String artifactType = info.getType();
+        if (artifactType.equals(TEMPLATES)) {
+            updateTemplates(info);
+        } else {
+            String artifactName = info.getName();
+            JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+            databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(), artifactType, artifactName,
+                                           artifactDetails.toString());
+        }
+    }
+
+    private void updateTemplates(UpdatedArtifact info) {
         String artifactName = info.getName();
-        JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
-        databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(), artifactType, artifactName,
+        String[] splitArray = artifactName.split("_", 2);
+        String templateType = splitArray[0];
+        artifactName = splitArray[1];
+        if (templateType.equals("endpoint")) {
+            templateType = "Endpoint Template";
+        } else if (templateType.equals("sequence")) {
+            templateType = "Sequence Template";
+        }
+        JsonObject artifactDetails = new JsonObject();
+        artifactDetails.addProperty("name", artifactName);
+        artifactDetails.addProperty("type", templateType);
+        databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(), TEMPLATES, artifactName,
                                        artifactDetails.toString());
     }
 
@@ -243,9 +264,6 @@ public class MiArtifactsManager implements ArtifactsManager {
                 break;
             case APIS:
                 getArtifactDetailsUrl = mgtApiUrl.concat(APIS).concat("?apiName=").concat(artifactName);
-                break;
-            case TEMPLATES:
-                getArtifactDetailsUrl = mgtApiUrl.concat(TEMPLATES).concat("?templateName=").concat(artifactName);
                 break;
             case SEQUENCES:
                 getArtifactDetailsUrl = mgtApiUrl.concat(SEQUENCES).concat("?sequenceName=").concat(artifactName);
