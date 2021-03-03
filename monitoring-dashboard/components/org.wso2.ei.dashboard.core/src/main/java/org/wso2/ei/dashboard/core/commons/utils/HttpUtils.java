@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
@@ -77,6 +78,15 @@ public class HttpUtils {
             return httpClient.execute(httpPatch);
         } catch (IOException e) {
             throw new DashboardServerException("Error occurred while sending http patch request.", e);
+        }
+    }
+
+    public static CloseableHttpResponse doDelete(HttpDelete httpDelete) {
+        CloseableHttpClient httpClient = getHttpClient();
+        try {
+            return httpClient.execute(httpDelete);
+        } catch (IOException e) {
+            throw new DashboardServerException("Error occurred while sending delete http request.", e);
         }
     }
 
