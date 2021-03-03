@@ -131,6 +131,23 @@ public class GroupsApi {
         return Response.ok().entity(ack).build();
     }
 
+    @DELETE
+    @Path("/{group-id}/users/{user-id}")
+    @Produces({ "application/json" })
+    @Operation(summary = "Delete user", description = "", tags={ "Users" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User deletion status",
+                         content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error", content =
+            @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response deleteUser(
+            @PathParam("group-id") @Parameter(description = "Group ID") String groupId,
+            @PathParam("user-id") @Parameter(description = "User ID") String userId) {
+        UsersDelegate usersDelegate = new UsersDelegate();
+        Ack ack = usersDelegate.deleteUser(groupId, userId);
+        return Response.ok().entity(ack).build();
+    }
+
     @GET
     @Path("/{group-id}/nodes/{node-id}/logs/{file-name}")
     @Produces({ "text/plain" })

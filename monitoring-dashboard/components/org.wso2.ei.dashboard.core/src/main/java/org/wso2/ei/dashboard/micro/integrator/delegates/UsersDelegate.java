@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -38,7 +39,6 @@ import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
-import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
 import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.core.rest.model.UsersInner;
 
@@ -57,24 +57,42 @@ public class UsersDelegate {
     }
 
     public Ack addUser(String groupId, AddUserRequest request) {
-        log.debug("Adding user " + request.getUserId());
+        log.debug("Adding user " + request.getUserId() + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddUserPayload(request);
 
         NodeList nodeList = databaseManager.fetchNodes(groupId);
-        for (NodeListInner node : nodeList) {
-            String nodeId = node.getNodeId();
-            String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-            String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
-            String url = mgtApiUrl.concat("users");
-            log.debug("Adding new user on node " + nodeId);
-            CloseableHttpResponse httpResponse = doPost(accessToken, url, payload);
-            if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                log.error("Error occurred while adding user on node " + nodeId + " in group " + groupId);
-                String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
-                ack.setMessage(message);
-                return ack;
-            }
+        // assumption - In a group, all nodes use a shared user-store
+        String nodeId = nodeList.get(0).getNodeId();
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String url = mgtApiUrl.concat("users");
+        CloseableHttpResponse httpResponse = doPost(accessToken, url, payload);
+        if (httpResponse.getStatusLine().getStatusCode() != 200) {
+            log.error("Error occurred while adding user in group " + groupId);
+            String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+            ack.setMessage(message);
+            return ack;
+        }
+        ack.setStatus(Constants.SUCCESS_STATUS);
+        return ack;
+    }
+
+    public Ack deleteUser(String groupId, String userId) {
+        log.debug("Deleting user " + userId + " in group " + groupId);
+        Ack ack = new Ack(Constants.FAIL_STATUS);
+        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        // assumption - In a group, all nodes use a shared user-store
+        String nodeId = nodeList.get(0).getNodeId();
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String url = mgtApiUrl.concat("users/").concat(userId);
+        CloseableHttpResponse httpResponse = doDelete(accessToken, url);
+        if (httpResponse.getStatusLine().getStatusCode() != 200) {
+            log.error("Error occurred while deleting user " + userId + " in group " + groupId);
+            String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+            ack.setMessage(message);
+            return ack;
         }
         ack.setStatus(Constants.SUCCESS_STATUS);
         return ack;
@@ -140,5 +158,15 @@ public class UsersDelegate {
         } catch (UnsupportedEncodingException e) {
             throw new DashboardServerException("Error occurred while creating http post request.", e);
         }
+    }
+
+    private CloseableHttpResponse doDelete(String accessToken, String url) {
+        String authHeader = "Bearer " + accessToken;
+        final HttpDelete httpDelete = new HttpDelete(url);
+
+        httpDelete.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
+        httpDelete.setHeader("Authorization", authHeader);
+
+        return HttpUtils.doDelete(httpDelete);
     }
 }

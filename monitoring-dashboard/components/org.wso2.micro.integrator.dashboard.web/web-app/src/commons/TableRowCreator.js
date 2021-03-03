@@ -25,11 +25,12 @@ import TableCell from '@material-ui/core/TableCell';
 import Switch from "react-switch";
 import ReactSelect from 'react-select';
 import { makeStyles } from '@material-ui/core/styles';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import EnabledIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import DisabledIcon from '@material-ui/icons/BlockOutlined';
 import AdminIcon from '@material-ui/icons/CheckRounded';
 import NonAdminIcon from '@material-ui/icons/ClearRounded';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -40,6 +41,7 @@ import NodesCell from './NodesCell';
 import LogsNodeCell from './LogsNodeCell';
 import StatusCell from '../commons/StatusCell';
 import AuthManager from '../auth/AuthManager';
+import { changeData } from '../redux/Actions';
 
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers } = props;
@@ -129,6 +131,8 @@ export default function TableRowCreator(props) {
                 return <TableCell>{data.userId}</TableCell>
             case 'isAdmin':
                 return <TableCell>{data.details.isAdmin ? <AdminIcon style={{color:"green"}}/> : <NonAdminIcon style={{color:"red"}}/>}</TableCell>
+            case 'action':
+                return <TableCell><UserDeleteAction userId={data.userId}/></TableCell>
             
             // Node page
             case 'nodeId':
@@ -371,6 +375,118 @@ function LogConfigLevelDropDown(props) {
                 
             </Dialog>
         </div>
+}
+
+function UserDeleteAction(props) {
+    const userId = props.userId;
+    console.log(userId)
+    const globalGroupId = useSelector(state => state.groupId);
+    const dispatch = useDispatch();
+
+    const [confirmationDialog, setConfirmationDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+
+    const [completionStatusDialog, setCompletionStatusDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+
+    const handleConfirmationDialogClose = () => {
+        setConfirmationDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+    }
+
+    const handlecompletionStatusDialogClose = () => {
+        setCompletionStatusDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
+        axios.get(url).then(response => {
+            response.data.map(data => data.details = JSON.parse(data.details))
+            dispatch(changeData(response.data))
+        })
+    }
+
+    const confirmDelete = () => {
+        var message = 'Are you sure you want to delete user '.concat(userId).concat('?')
+        setConfirmationDialog({
+            open: true,
+            title: 'Confirmation',
+            message: message
+        })
+    }
+
+    const deleteUser = () => {
+        console.log("deleting user", userId)
+        handleConfirmationDialogClose();
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users/").concat(userId);
+        axios.delete(url).then(response => {
+            if (response.data.status === 'success') {
+                setCompletionStatusDialog({
+                    open: true, 
+                    title: 'Success',
+                    message: "Successfully deleted user."
+                })
+            } else {
+                setCompletionStatusDialog({
+                    open: true, 
+                    title: 'Error',
+                    message: response.data.message
+                })
+            }
+        })
+
+    }
+
+    return <div><tr><td><DeleteIcon onClick={() => confirmDelete()}/> Delete</td></tr>
+            <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {confirmationDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => deleteUser()} variant="contained" autoFocus>
+                        CONFIRM
+                    </Button>
+
+                    <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
+                        CANCEL
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={completionStatusDialog.open} onClose={() => handlecompletionStatusDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{completionStatusDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {completionStatusDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => handlecompletionStatusDialogClose()} variant="contained" autoFocus>
+                        OK
+                    </Button>
+                </DialogActions>
+                
+            </Dialog>
+            </div>
 }
 
 const useStyles = makeStyles((theme) => ({
