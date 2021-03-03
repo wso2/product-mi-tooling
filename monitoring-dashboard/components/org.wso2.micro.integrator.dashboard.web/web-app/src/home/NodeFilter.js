@@ -18,7 +18,7 @@
  *
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -33,17 +33,17 @@ import { filterNodes } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthManager from '../auth/AuthManager';
 import {Constants} from '../auth/Constants';
+import Divider from "@material-ui/core/Divider";
 
 export default function NodeFilter () {
 
-    const [nodeList, setNodeList] = React.useState([]);
+    const [nodeList, setNodeList] = useState([]);
     const globalGroupId = useSelector(state => state.groupId);
-    var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
 
     React.useEffect(()=>{
         if (globalGroupId !== '') {
             const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(url, { headers: { Authorization: authBearer }}).then(response => {
+            axios.get(url, { }).then(response => {
                 var list = [];
                 response.data.map(data => list.push(data.nodeId))
                 setNodeList(list)
@@ -58,12 +58,23 @@ function MultipleSelect(props) {
 
     var NodeList = props.nodeList;
     const classes = useStyles();
-    const [nodeList, setNodeList] = React.useState([]);
+    const [nodeList, setNodeList] = useState([]);
+    const [selectedAll, setSelectedAll] = useState(false);
     const dispatch = useDispatch();
 
     const handleChange = (event) => {
+        setSelectedAll(false);
         setNodeList(event.target.value);
     };
+
+    const handleSelectAllChange = (event) => {
+        if (selectedAll) {
+            setNodeList([]);
+        }else{
+            setNodeList([...NodeList])
+        }
+        setSelectedAll(!selectedAll);
+    }
 
     return (
         <div>
@@ -82,6 +93,11 @@ function MultipleSelect(props) {
                         </div>
                     )}
                 >
+                    <MenuItem key={"select-all"} value={"select all"}>
+                        <Checkbox checked={selectedAll} onChange={handleSelectAllChange}/>
+                        <ListItemText primary={"Select All"}  classes={{ primary: classes.selectAllText }}/>
+                    </MenuItem>
+                    <Divider />
                     {NodeList.map((name) => (
                         <MenuItem key={name} value={name}>
                             <Checkbox checked={nodeList.indexOf(name) > -1} />
@@ -114,5 +130,8 @@ const useStyles = makeStyles((theme) => ({
     },
     noLabel: {
         marginTop: theme.spacing(3),
+    },
+    selectAllText: {
+        "font-weight": "bold"
     },
 }));
