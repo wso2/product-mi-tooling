@@ -20,13 +20,12 @@
 
 import React from 'react';
 import Badge from '@material-ui/core/Badge';
-import { makeStyles } from '@material-ui/core/styles';
-import { withStyles } from "@material-ui/core/styles";
+import {withStyles} from '@material-ui/core/styles';
 import PropTypes from "prop-types";
 
 const styles = theme => ({
     margin: {
-        margin: theme.spacing.unit * 2
+        margin: theme.spacing(2)
     },
     greenBadge: {
         backgroundColor: "#00ff00",
@@ -39,19 +38,21 @@ const styles = theme => ({
 });
 
 function StatusCell(props) {
-    const { classes } = props;
-    var nodeData = props.data;
-    var proxyName = props.proxyName;
+    const {classes} = props;
+    const nodeData = props.data;
     var stateClass;
-    if(nodeData=="Active") {
+    if (nodeData === "Active") {
         stateClass = classes.greenBadge;
     } else {
         stateClass = classes.redBadge;
     }
-    return <tr><td><Badge classes={{ badge: stateClass }}
-                          className={classes.margin}
-                          badgeContent={10} color="secondary" variant="dot"></Badge>{nodeData}</td></tr>;
+    return <tr>
+        <td><Badge classes={{badge: stateClass}}
+                   className={classes.margin}
+                   badgeContent={10} color="secondary" variant="dot"/>{nodeData}</td>
+    </tr>;
 }
+
 export default withStyles(styles)(StatusCell);
 StatusCell.propTypes = {
     classes: PropTypes.object.isRequired

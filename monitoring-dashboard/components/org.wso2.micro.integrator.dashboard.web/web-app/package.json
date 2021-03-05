@@ -26,8 +26,17 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-react",
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-react-jsx"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -46,5 +55,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-test-renderer": "^17.0.1"
   }
 }
