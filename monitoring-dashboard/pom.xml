@@ -35,6 +35,7 @@
     <modules>
         <module>components</module>
         <module>distribution</module>
+        <module>integration</module>
     </modules>
 
     <dependencyManagement>
