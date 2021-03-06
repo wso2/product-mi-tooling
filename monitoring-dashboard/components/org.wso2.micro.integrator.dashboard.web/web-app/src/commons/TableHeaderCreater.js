@@ -18,6 +18,7 @@
  *
  */
 
+import React from 'react';
 import TableHead from '@material-ui/core/TableHead';
 import { makeStyles } from '@material-ui/core/styles';
 import TableRow from '@material-ui/core/TableRow';

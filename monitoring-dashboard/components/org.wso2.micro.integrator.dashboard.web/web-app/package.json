@@ -57,6 +57,14 @@
     ]
   },
   "devDependencies": {
-    "react-test-renderer": "^17.0.1"
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.6",
+    "react-test-renderer": "^17.0.1",
+    "regenerator-runtime": "^0.13.7"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./src/setupTests.js"
+    ]
   }
 }
