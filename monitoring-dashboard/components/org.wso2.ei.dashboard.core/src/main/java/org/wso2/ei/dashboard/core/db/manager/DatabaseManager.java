@@ -47,9 +47,11 @@ public interface DatabaseManager {
 
     String getMgtApiUrl(String groupId, String nodeId);
 
+    String getHeartbeatInterval(String groupId, String nodeId);
+
     boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp);
 
-    String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat);
+    String retrieveTimestampOfLastHeartbeat(String groupId, String nodeId);
 
     boolean updateHeartbeat(HeartbeatObject heartbeat);
 

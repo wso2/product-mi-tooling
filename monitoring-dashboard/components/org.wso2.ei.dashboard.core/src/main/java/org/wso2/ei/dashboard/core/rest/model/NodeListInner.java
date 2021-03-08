@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class NodeListInner   {
   private @Valid String nodeId = null;
+  private @Valid String status = null;
   private @Valid String details = null;
 
   /**
@@ -30,6 +31,24 @@ public class NodeListInner   {
   }
   public void setNodeId(String nodeId) {
     this.nodeId = nodeId;
+  }
+
+  /**
+   **/
+  public NodeListInner status(String status) {
+    this.status = status;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("status")
+
+  public String getStatus() {
+    return status;
+  }
+  public void setStatus(String status) {
+    this.status = status;
   }
 
   /**
@@ -62,12 +81,13 @@ public class NodeListInner   {
     }
     NodeListInner nodeListInner = (NodeListInner) o;
     return Objects.equals(nodeId, nodeListInner.nodeId) &&
+        Objects.equals(status, nodeListInner.status) &&
         Objects.equals(details, nodeListInner.details);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(nodeId, details);
+    return Objects.hash(nodeId, status, details);
   }
 
   @Override
@@ -76,6 +96,7 @@ public class NodeListInner   {
     sb.append("class NodeListInner {\n");
     
     sb.append("    nodeId: ").append(toIndentedString(nodeId)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    details: ").append(toIndentedString(details)).append("\n");
     sb.append("}");
     return sb.toString();

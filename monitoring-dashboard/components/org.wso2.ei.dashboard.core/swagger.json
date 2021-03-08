@@ -2130,6 +2130,9 @@
             "type" : "string",
             "description" : "node id."
           },
+          "status" : {
+            "type" : "string"
+          },
           "details" : {
             "type" : "string",
             "description" : "String contains role, upTime, serverName, serverVersion, miHome, javaHome, javaVersion, javaVendor, osName"
