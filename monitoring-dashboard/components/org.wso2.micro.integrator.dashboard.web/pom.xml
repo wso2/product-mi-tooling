@@ -63,6 +63,20 @@
                     </goals>
                 </execution>
                 <execution>
+                    <id>exec-npm-test</id>
+                    <phase>generate-sources</phase>
+                    <configuration>
+                        <workingDirectory>${project.basedir}/web-app</workingDirectory>
+                        <executable>npm</executable>
+                        <arguments>
+                            <argument>test</argument>
+                        </arguments>
+                    </configuration>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>
+                <execution>
                     <id>exec-npm-build</id>
                     <phase>generate-sources</phase>
                     <configuration>
