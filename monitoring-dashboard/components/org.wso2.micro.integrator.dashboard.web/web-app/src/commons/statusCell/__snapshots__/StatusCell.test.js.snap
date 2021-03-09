@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test on green batch 1`] = `
+<tr>
+  <td>
+    <span
+      className="MuiBadge-root StatusCell-margin-1"
+    >
+      <span
+        className="MuiBadge-badge StatusCell-greenBadge-2 MuiBadge-anchorOriginTopRightRectangle MuiBadge-colorSecondary MuiBadge-dot"
+      >
+        
+      </span>
+    </span>
+    Active
+  </td>
+</tr>
+`;
+
+exports[`Test on red batch 1`] = `
+<tr>
+  <td>
+    <span
+      className="MuiBadge-root StatusCell-margin-1"
+    >
+      <span
+        className="MuiBadge-badge StatusCell-redBadge-3 MuiBadge-anchorOriginTopRightRectangle MuiBadge-colorSecondary MuiBadge-dot"
+      >
+        
+      </span>
+    </span>
+    Inactive
+  </td>
+</tr>
+`;

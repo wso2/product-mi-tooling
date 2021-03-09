@@ -39,7 +39,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core';
 import NodesCell from './NodesCell';
 import LogsNodeCell from './LogsNodeCell';
-import StatusCell from '../commons/StatusCell';
+import StatusCell from './statusCell/StatusCell';
 import AuthManager from '../auth/AuthManager';
 import { changeData } from '../redux/Actions';
 

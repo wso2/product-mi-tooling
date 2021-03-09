@@ -30,7 +30,7 @@ import Content from './layout/Content';
 import Header from './layout/Header';
 import ProxyService from '../pages/ProxyService';
 import Endpoints from '../pages/Endpoints';
-import Nodes from '../pages/Nodes';
+import Nodes from '../pages/nodes/Nodes';
 import InboundEndpoints from '../pages/InboundEndpoints';
 import MessageProcessors from '../pages/MessageProcessors'
 import MessageStores from '../pages/MessageStores'
