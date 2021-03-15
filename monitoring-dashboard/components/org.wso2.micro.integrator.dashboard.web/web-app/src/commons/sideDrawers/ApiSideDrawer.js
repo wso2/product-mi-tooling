@@ -53,7 +53,7 @@ export default function ApiSideDrawer(props) {
                             <Paper className={classes.paper} elevation={0} square>
                                 <ApiDetailTable nodeData={nodeData} />
                             </Paper>
-                            <Box pl={4}>
+                            <Box pl={2}>
                                 <Typography variant="h6" color="inherit" noWrap>
                                     Resources
                                 </Typography>
