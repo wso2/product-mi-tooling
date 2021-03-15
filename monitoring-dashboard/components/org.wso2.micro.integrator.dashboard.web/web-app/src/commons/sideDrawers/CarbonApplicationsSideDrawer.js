@@ -19,11 +19,11 @@
  */
 
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import { Table, TableHead, TableCell, TableRow } from '@material-ui/core';
+import {Table, TableHead, TableCell, TableRow} from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import Typography from '@material-ui/core/Typography';
 
@@ -37,12 +37,12 @@ export default function CarbonApplicationsSideDrawer(props) {
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId} />
+                    <HeadingSection name={artifactName} nodeId={nodeId}/>
                     <Paper className={classes.paper} elevation={0} square>
-                        <CarbonAppsDetailTable nodeData={nodeData.details} />
+                        <CarbonAppsDetailTable nodeData={nodeData.details}/>
                     </Paper>
-                    <Box pl={4}>
-                        <ArtifactsSection artifacts={nodeData.details.artifacts} />
+                    <Box pl={2}>
+                        <ArtifactsSection artifacts={nodeData.details.artifacts}/>
                     </Box>
                 </Grid>
             </Grid>
@@ -67,9 +67,11 @@ function CarbonAppsDetailTable(props) {
 function ArtifactsSection(props) {
     const artifacts = props.artifacts;
     return <>
-        <Typography variant="h6" color="inherit" noWrap>
-            Artifacts
-                    </Typography>
+        <Box pl={2}>
+            <Typography variant="h6" color="inherit" noWrap>
+                Artifacts
+            </Typography>
+        </Box>
         <Box>
             <Table>
                 <TableHead>
