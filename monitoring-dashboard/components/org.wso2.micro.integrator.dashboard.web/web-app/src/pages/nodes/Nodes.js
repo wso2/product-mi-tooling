@@ -26,7 +26,7 @@ import AuthManager from '../../auth/AuthManager';
 
 export default function Nodes () {
 
-    const [pageInfo, setpageInfo] = React.useState({
+    const [pageInfo] = React.useState({
         pageId: "nodesPage",
         title: "Nodes",
         headCells: [
