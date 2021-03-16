@@ -24,13 +24,14 @@ import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import XMLViewer from 'react-xml-viewer';
-import { makeStyles } from '@material-ui/core/styles';
-import { useSelector } from 'react-redux';
+import {makeStyles} from '@material-ui/core/styles';
+import {useSelector} from 'react-redux';
 import AuthManager from '../../../auth/AuthManager';
+import Editor from "@monaco-editor/react";
+const format = require('xml-formatter');
 
 export default function SourceViewSection(props) {
-    const { artifactType, artifactName, nodeId, designContent } = props;
+    const {artifactType, artifactName, nodeId, designContent} = props;
     const globalGroupId = useSelector(state => state.groupId);
     const [source, setSource] = React.useState("");
     const [selectedTab, setSelectedTab] = React.useState(0);
@@ -47,7 +48,7 @@ export default function SourceViewSection(props) {
     React.useEffect(() => {
         const url = AuthManager.getBasePath().concat('/configuration');
 
-        axios.get(url, { params }).then(response => {
+        axios.get(url, {params}).then(response => {
             setSource(response.data.configuration);
         })
     }, [])
@@ -55,7 +56,7 @@ export default function SourceViewSection(props) {
     const descriptionElementRef = React.useRef(null);
     React.useEffect(() => {
         if (open) {
-            const { current: descriptionElement } = descriptionElementRef;
+            const {current: descriptionElement} = descriptionElementRef;
             if (descriptionElement !== null) {
                 descriptionElement.focus();
             }
@@ -69,12 +70,21 @@ export default function SourceViewSection(props) {
     if (designContent) {
         return (<><AppBar position="static" classes={{root: classes.tabsAppBar}}>
             <Tabs value={selectedTab} onChange={changeTab} aria-label="design source selection">
-                <Tab label="Design" />
-                <Tab label="Source" />
+                <Tab label="Design"/>
+                <Tab label="Source"/>
             </Tabs>
         </AppBar>
             {selectedTab === 0 && (<>{designContent}</>)}
-            {selectedTab === 1 && (<Box p={5} overflow='auto'><XMLViewer xml={source} /></Box>)}
+            {selectedTab === 1 && (<Box p={5} overflow='auto'>
+                <Editor
+                    height="70vh"
+                    defaultLanguage="xml"
+                    defaultValue={format(source)}
+                    options={{
+                        readOnly: true
+                    }}
+                />
+            </Box>)}
         </>)
     }
 }
