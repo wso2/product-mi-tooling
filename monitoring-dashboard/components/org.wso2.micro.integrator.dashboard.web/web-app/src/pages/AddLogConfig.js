@@ -37,7 +37,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import {makeStyles} from "@material-ui/core/styles";
 import {Link, useHistory} from "react-router-dom";
 
-export default function AddLogConfig(props) {
+export default function AddLogConfig() {
     const globalGroupId = useSelector(state => state.groupId);
     const [nodeList, setNodeList] = React.useState([]);
     React.useEffect(() => {
@@ -65,7 +65,6 @@ function AddLogConfigsSection() {
     const classes = useStyles();
     const history = useHistory();
     const globalGroupId = useSelector(state => state.groupId);
-    const basePath = useSelector(state => state.basePath);
     const [logConfig, setLogConfig] = React.useState({
         loggerName: "",
         loggerClass: "",
@@ -136,7 +135,7 @@ function AddLogConfigsSection() {
     const addLogger = () => {
         handleConfirmationDialogClose();
         const {loggerName, loggerClass, loggerLevel} = logConfig;
-        const url = basePath.concat('/groups/').concat(globalGroupId).concat("/log-configs");
+        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs");
         axios.post(url, {
             "name": loggerName,
             "loggerClass": loggerClass,
