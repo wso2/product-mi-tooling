@@ -32,7 +32,6 @@ import Chip from '@material-ui/core/Chip';
 import { filterNodes } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthManager from '../auth/AuthManager';
-import {Constants} from '../auth/Constants';
 import Divider from "@material-ui/core/Divider";
 
 export default function NodeFilter () {

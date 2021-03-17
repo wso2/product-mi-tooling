@@ -6,7 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { changeGroup } from '../redux/Actions';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AuthManager from '../auth/AuthManager';
 
 export default function GroupSelector() {
@@ -43,11 +43,18 @@ function SelectComponent(props) {
 
     const [selectedGroupId, setselectedGroupId] = React.useState('');
 
+    const globalGroupId = useSelector(state => state.groupId);
+
     React.useEffect(()=>{
-        if (options.length !== 0) {
+        if (globalGroupId === '' && options.length !== 0) {
             setselectedGroupId(options[0].value)
         }
     },[props.groupList]);
+
+    const changeSelectedGroupId = (groupId) => {
+        dispatch(changeGroup(groupId))
+        setselectedGroupId(groupId)
+    }
 
     const dispatch = useDispatch();
     return <FormControl style={{ width: 150 }}>
@@ -56,7 +63,7 @@ function SelectComponent(props) {
             value={selectedGroupId}
             labelId="group-id-select-label"
             id="group-id-select"
-            onChange={(e) => dispatch(changeGroup(e.target.value))}
+            onChange={(e) => changeSelectedGroupId(e.target.value)}
         >
             {options.map((option) => (
                 <MenuItem value={option.value}>{option.label}</MenuItem>
