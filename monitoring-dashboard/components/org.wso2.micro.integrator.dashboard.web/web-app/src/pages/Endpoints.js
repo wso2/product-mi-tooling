@@ -41,7 +41,7 @@ export default function Endpoints() {
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
 
-    React.useEffect(() => {
+    const retrieveEndpoints = () => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
@@ -53,7 +53,15 @@ export default function Endpoints() {
             )
             setEndpointList(response.data)
         })
+    }
+
+    React.useEffect(() => {
+        retrieveEndpoints();
     },[globalGroupId, selectedNodeList])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={endpointList}/>
+    const retrieveData = () => {
+        retrieveEndpoints();
+    }
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={endpointList} retrieveData={retrieveData}/>
 }
