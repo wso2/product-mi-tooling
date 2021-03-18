@@ -379,7 +379,6 @@ function LogConfigLevelDropDown(props) {
 
 function UserDeleteAction(props) {
     const userId = props.userId;
-    console.log(userId)
     const globalGroupId = useSelector(state => state.groupId);
     const dispatch = useDispatch();
 
@@ -426,7 +425,6 @@ function UserDeleteAction(props) {
     }
 
     const deleteUser = () => {
-        console.log("deleting user", userId)
         handleConfirmationDialogClose();
         const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users/").concat(userId);
         axios.delete(url).then(response => {

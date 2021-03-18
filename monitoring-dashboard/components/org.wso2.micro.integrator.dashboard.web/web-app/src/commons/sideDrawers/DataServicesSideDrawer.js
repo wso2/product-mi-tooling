@@ -51,10 +51,10 @@ export default function DataServicesSideDrawer(props) {
                             <Paper className={classes.paper} elevation={0} square>
                                 <DataServicesDetailTable nodeData={nodeData.details} />
                             </Paper>
-                            <Box pl={4}>
-                                <DataSourcesSection dataSources={nodeData.details.dataSources} />
-                                <QueriesSection queries={nodeData.details.queries} />
-                                <ResourcesSection resources={nodeData.details.resources} />
+                            <Box pl={2}>
+                                <DataSourcesSection dataSources={nodeData.details.dataSources} /><br/>
+                                <QueriesSection queries={nodeData.details.queries} /><br/>
+                                <ResourcesSection resources={nodeData.details.resources} /><br/>
                                 <OperationsSection operations={nodeData.details.operations} />
                             </Box>
                         </>}
@@ -69,6 +69,7 @@ function DataServicesDetailTable(props) {
     const nodeData = props.nodeData;
     const wsdl1_1 = nodeData.wsdl1_1;
     const swagger_url = nodeData.swagger_url;
+    const classes = useStyles();
     return <Table>
         <TableBody>
             <TableRow>
@@ -77,27 +78,25 @@ function DataServicesDetailTable(props) {
             </TableRow>
             <TableRow>
                 <TableCell>WSDL 1.1</TableCell>
-                <TableCell><a href={wsdl1_1}>{wsdl1_1}</a></TableCell>
+                <TableCell><a className={classes.url} href={wsdl1_1}>{wsdl1_1}</a></TableCell>
             </TableRow>
             <TableRow>
                 <TableCell>Swagger URL</TableCell>
-                <TableCell><a href={swagger_url}>{swagger_url}</a></TableCell>
+                <TableCell><a className={classes.url} href={swagger_url}>{swagger_url}</a></TableCell>
             </TableRow>
         </TableBody>
     </Table>
 }
 
 function DataSourcesSection(props) {
-    const classes = useStyles();
-    return <Grid item xs={12}>
-        <Paper className={classes.paper} square>
-            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                Data Sources
-                    </Typography>
-            <hr className={classes.horizontalLine}></hr>
-        </Paper>
-        <DataSourcesDetailTable dataSources={props.dataSources} />
-    </Grid>
+    return <Box pl={2}>
+                <Typography variant="h6" color="inherit" noWrap>
+                    Data Sources
+                </Typography>
+                <Box pr={2}>
+                    <DataSourcesDetailTable dataSources={props.dataSources} />
+                </Box>
+            </Box>
 }
 
 function DataSourcesDetailTable(props) {
@@ -130,14 +129,14 @@ function DataSourcesDetailTable(props) {
 }
 
 function QueriesSection(props) {
-    return <>
-        <Typography variant="h6" color="inherit" noWrap>
-            Queries
-            </Typography>
-        <Box pr={2}>
-            <QueriesDetailTable queries={props.queries} />
-        </Box>
-    </>
+    return <Box pl={2}>
+                <Typography variant="h6" color="inherit" noWrap>
+                    Queries
+                </Typography>
+                <Box pr={2}>
+                    <QueriesDetailTable queries={props.queries} />
+                </Box>
+            </Box>
 }
 
 function QueriesDetailTable(props) {
@@ -176,14 +175,14 @@ function QueriesDetailTable(props) {
 }
 
 function ResourcesSection(props) {
-    return <>
-        <Typography variant="h6" color="inherit" noWrap>
-            Resources
-            </Typography>
-        <Box pr={2}>
-            <ResourcesDetailTable resources={props.resources} />
-        </Box>
-    </>
+    return <Box pl={2}>
+                <Typography variant="h6" color="inherit" noWrap>
+                    Resources
+                </Typography>
+                <Box pr={2}>
+                    <ResourcesDetailTable resources={props.resources} />
+                </Box>
+            </Box>
 }
 
 function ResourcesDetailTable(props) {
@@ -222,16 +221,14 @@ function ResourcesDetailTable(props) {
 }
 
 function OperationsSection(props) {
-    const classes = useStyles();
-    return <Grid item xs={12}>
-        <Paper className={classes.paper} square>
-            <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-                Operations
-                    </Typography>
-            <hr className={classes.horizontalLine}></hr>
-        </Paper>
-        <OperationsDetailTable operations={props.operations} />
-    </Grid>
+    return <Box pl={2}>
+                <Typography variant="h6" color="inherit" noWrap>
+                    Operations
+                </Typography>
+                <Box pr={2}>
+                    <OperationsDetailTable operations={props.operations} />
+                </Box>
+            </Box>
 }
 
 function OperationsDetailTable(props) {
@@ -274,4 +271,7 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(2),
     },
+    url: {
+        color: '#3f51b5'
+    }
 }));
