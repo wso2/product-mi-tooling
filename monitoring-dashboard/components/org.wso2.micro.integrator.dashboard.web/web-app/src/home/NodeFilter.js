@@ -55,22 +55,35 @@ export default function NodeFilter () {
 
 function MultipleSelect(props) {
 
-    var NodeList = props.nodeList;
+    var nodeList = props.nodeList;
     const classes = useStyles();
-    const [nodeList, setNodeList] = useState([]);
+    const [selectedNodeList, setSelectedNodeList] = useState([]);
+    const globalGroupId = useSelector(state => state.groupId);
     const [selectedAll, setSelectedAll] = useState(false);
     const dispatch = useDispatch();
 
+    React.useEffect(()=>{
+        setSelectedNodeList([])
+    },[globalGroupId]);
+
+    React.useEffect(()=>{
+        if (nodeList.length !== 0 && selectedNodeList.length == 0) {
+            setSelectedAll(true)
+            setSelectedNodeList(nodeList);
+            dispatch(filterNodes(nodeList))
+        }
+    },[nodeList]);
+
     const handleChange = (event) => {
         setSelectedAll(false);
-        setNodeList(event.target.value);
+        setSelectedNodeList(event.target.value);
     };
 
     const handleSelectAllChange = (event) => {
         if (selectedAll) {
-            setNodeList([]);
+            setSelectedNodeList([]);
         }else{
-            setNodeList([...NodeList])
+            setSelectedNodeList([...nodeList])
         }
         setSelectedAll(!selectedAll);
     }
@@ -81,9 +94,9 @@ function MultipleSelect(props) {
                 <Select
                     classes={{root: classes.selectRoot}}
                     multiple
-                    value={nodeList}
+                    value={selectedNodeList}
                     onChange={handleChange}
-                    onClick={() => dispatch(filterNodes(nodeList))}
+                    onClick={() => dispatch(filterNodes(selectedNodeList))}
                     renderValue={(selected) => (
                         <div className={classes.chips}>
                             {selected.map((value) => (
@@ -97,9 +110,9 @@ function MultipleSelect(props) {
                         <ListItemText primary={"Select All"}  classes={{ primary: classes.selectAllText }}/>
                     </MenuItem>
                     <Divider />
-                    {NodeList.map((name) => (
+                    {nodeList.map((name) => (
                         <MenuItem key={name} value={name}>
-                            <Checkbox checked={nodeList.indexOf(name) > -1} />
+                            <Checkbox checked={selectedNodeList.indexOf(name) > -1} />
                             <ListItemText primary={name} />
                         </MenuItem>
                     ))}
