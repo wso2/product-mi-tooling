@@ -38,6 +38,8 @@ public final class Constants {
     public static final String MESSAGE_PROCESSORS = "message-processors";
     public static final String APIS = "apis";
     public static final String TEMPLATES = "templates";
+    public static final String ENDPOINT_TEMPLATE = "templates_endpoint";
+    public static final String SEQUENCE_TEMPLATE = "templates_sequence";
     public static final String SEQUENCES = "sequences";
     public static final String TASKS = "tasks";
     public static final String LOCAL_ENTRIES = "local-entries";

@@ -27,6 +27,7 @@ import ProxySideDrawer from './sideDrawers/ProxySideDrawer';
 import EndpointSideDrawer from './sideDrawers/EndpointSideDrawer';
 import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
 import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
+import TemplatesSideDrawer from './sideDrawers/TemplatesSideDrawer';
 import SequenceSideDrawer from './sideDrawers/SequenceSideDrawer';
 import InboundEpSideDrawer from './sideDrawers/InboundEpSideDrawer';
 import MessageStoreSideDrawer from './sideDrawers/MessageStoreSideDrawer';
@@ -67,6 +68,8 @@ function SideDrawer(props) {
             return <EndpointSideDrawer nodeData={props.nodeData} />
         case 'apis':
             return <ApiSideDrawer nodeData={props.nodeData} />
+        case 'templates':
+            return <TemplatesSideDrawer nodeData={props.nodeData} />
         case 'sequences':
             return <SequenceSideDrawer nodeData={props.nodeData} />
         case 'inbound-endpoints':

@@ -51,10 +51,11 @@ public class ConfigurationDelegate {
 
     public ModelConfiguration getConfiguration() {
         logger.debug("Fetching configuration of " + artifactName + " in node " + nodeId + " of group " + groupId);
+        String type = artifactType.split("_")[0];
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
         String queryParamName = getQueryParam(artifactType);
-        String url = mgtApiUrl.concat(artifactType).concat("?").concat(queryParamName).concat("=").concat(artifactName);
+        String url = mgtApiUrl.concat(type).concat("?").concat(queryParamName).concat("=").concat(artifactName);
         CloseableHttpResponse httpResponse = doGet(accessToken, url);
         JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
         String configuration = jsonResponse.get("configuration").getAsString();
@@ -76,6 +77,10 @@ public class ConfigurationDelegate {
                 return "name";
             case Constants.APIS:
                 return "apiName";
+            case Constants.ENDPOINT_TEMPLATE:
+                return "type=endpoint&name";
+            case Constants.SEQUENCE_TEMPLATE:
+                return "type=sequence&name";
             case Constants.SEQUENCES:
                 return "sequenceName";
             case Constants.TASKS:

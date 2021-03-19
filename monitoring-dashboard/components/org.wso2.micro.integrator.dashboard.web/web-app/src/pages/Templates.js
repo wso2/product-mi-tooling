@@ -10,7 +10,7 @@ export default function Templates() {
         title: "Templates",
         headCells: [
             {id: 'name', label: 'Template Name'},
-            {id: 'template_nodes', label: 'Nodes'},
+            {id: 'nodes', label: 'Nodes'},
             {id: 'type', label: 'Type'}],
         tableOrderBy: 'name'
     });
