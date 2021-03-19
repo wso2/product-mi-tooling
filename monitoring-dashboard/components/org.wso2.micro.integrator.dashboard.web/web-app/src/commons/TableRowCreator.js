@@ -44,7 +44,7 @@ import AuthManager from '../auth/AuthManager';
 import { changeData } from '../redux/Actions';
 
 export default function TableRowCreator(props) {
-    const { pageInfo, data, headers } = props;
+    const { pageInfo, data, headers, retrieveData } = props;
     const pageId = pageInfo.pageId
     return <TableRow>
         {headers.map(header => {switch(header.id) {
@@ -63,11 +63,11 @@ export default function TableRowCreator(props) {
             // Proxy Services
             case 'isRunning':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
-                        nodeId={node.nodeId} status={node.details.isRunning}/>)}</TableCell>
+                        nodeId={node.nodeId} status={node.details.isRunning} retrieveData={retrieveData} />)}</TableCell>
             // Endpoints
             case 'state':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
-                        nodeId={node.nodeId} status={node.details.isActive}/>)}</TableCell>
+                        nodeId={node.nodeId} status={node.details.isActive} retrieveData={retrieveData} />)}</TableCell>
 
             // Inbound Endpoints
             case 'protocol':
@@ -80,7 +80,7 @@ export default function TableRowCreator(props) {
             // Message Processors
             case 'status':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
-                        nodeId={node.nodeId} status={node.details.status === 'active' ? true : false}/>)}</TableCell>
+                        nodeId={node.nodeId} status={node.details.status === 'active' ? true : false} retrieveData={retrieveData}/>)}</TableCell>
 
             // Apis
             case 'url':
@@ -173,7 +173,7 @@ function ConnectorStatus(props) {
 }
 
 function SwitchStatusCell(props) {
-    const { pageId, artifactName, nodeId, status } = props;
+    const { pageId, artifactName, nodeId, status, retrieveData} = props;
     var isActive = status;
     const globalGroupId = useSelector(state => state.groupId);
 
@@ -189,6 +189,10 @@ function SwitchStatusCell(props) {
             "nodeId": nodeId,
             "type": "status",
             "value": isActive
+        }).then(response => {
+            if (response.data.status === 'success') {
+                retrieveData();
+            }
         });
     }
 

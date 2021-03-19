@@ -29,7 +29,7 @@ import EnhancedTableHead from './TableHeaderCreater';
 import TableRowCreator from './TableRowCreator';
 
 export default function EnhancedTable(props) {
-    const { pageInfo, dataSet } = props;
+    const { pageInfo, dataSet, retrieveData } = props;
     var headCells = pageInfo.headCells;
     var rowCount = dataSet.length;
 
@@ -70,7 +70,7 @@ export default function EnhancedTable(props) {
                         />
                         <TableBody>
 
-                            {stableSort(dataSet, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => <TableRowCreator pageInfo={pageInfo} data={row} headers={headCells}/>
+                            {stableSort(dataSet, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => <TableRowCreator pageInfo={pageInfo} data={row} headers={headCells} retrieveData={retrieveData}/>
                             )}
                         </TableBody>
                     </Table>

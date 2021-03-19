@@ -41,7 +41,7 @@ export default function MessageProcessors() {
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
 
-    React.useEffect(() => {
+    const retrieveMessageProcessors = () => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
@@ -53,7 +53,15 @@ export default function MessageProcessors() {
             )
             setMessageProcessorList(response.data)
         })
+    }
+
+    React.useEffect(() => {
+        retrieveMessageProcessors();
     },[globalGroupId, selectedNodeList])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={messageProcessorList}/>
+    const retrieveData = () => {
+        retrieveMessageProcessors();
+    }
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={messageProcessorList} retrieveData={retrieveData}/>
 }

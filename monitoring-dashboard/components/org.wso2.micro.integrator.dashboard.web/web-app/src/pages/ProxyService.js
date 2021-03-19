@@ -40,8 +40,8 @@ export default function ProxyService() {
 
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
-    
-    React.useEffect(() => {
+
+    const retrieveProxyList = () => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
@@ -53,8 +53,15 @@ export default function ProxyService() {
             )
             setProxyList(response.data)
         })
-        // Need to handle 401 errors
+    }
+
+    React.useEffect(() => {
+        retrieveProxyList();
     },[globalGroupId, selectedNodeList])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={proxyList}/>
+    const retrieveData = () => {
+        retrieveProxyList();
+    }
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={proxyList} retrieveData={retrieveData}/>
 }
