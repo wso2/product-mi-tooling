@@ -17,21 +17,37 @@
  *
  *
  */
-
+import React from 'react';
 import { Button, TableCell } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import { makeStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export default function CopyToClipboardCell(props) {
+    const [copyMessage, setCopyMessage] = React.useState('Copy to Clipboard');
+
+    const onCopy = () => {
+        setCopyMessage('Copied');
+        const caller = function () {
+            setCopyMessage('Copy to Clipboard');
+        };
+        setTimeout(caller, 2000);
+    }
     const text = props.text;
     const classes = useStyles();
 
     return <TableCell>{text}
-                <CopyToClipboard text={text} className={classes.clipboard}>
-                    <Button><FileCopyIcon/></Button>
-                </CopyToClipboard>
-            </TableCell>
+        <CopyToClipboard
+            text={text}
+            className={classes.clipboard}
+            onCopy={onCopy}
+        >
+            <Tooltip title={copyMessage}>
+                <Button><FileCopyIcon /></Button>
+            </Tooltip>
+        </CopyToClipboard>
+    </TableCell>
 }
 
 const useStyles = makeStyles((theme) => ({

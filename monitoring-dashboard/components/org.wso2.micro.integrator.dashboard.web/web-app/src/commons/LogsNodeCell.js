@@ -36,6 +36,7 @@ const useStyles = makeStyles(() => ({
     },
     tableCell : {
         padding: '1px',
-        borderBottom: 'none'
+        borderBottom: 'none',
+        display: 'flex',
     }
 }));

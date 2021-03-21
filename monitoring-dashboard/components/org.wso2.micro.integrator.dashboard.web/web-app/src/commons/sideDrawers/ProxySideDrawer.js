@@ -27,6 +27,7 @@ import Box from '@material-ui/core/Box';
 import { Button, Table, TableCell, TableRow } from '@material-ui/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import Tooltip from '@material-ui/core/Tooltip';
 import HeadingSection from './commons/HeadingSection'
 import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
@@ -36,7 +37,6 @@ export default function ProxySideDrawer(props) {
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
-
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
@@ -76,6 +76,16 @@ function ProxyServiceDetailPage(props) {
 }
 
 function EndpointsSection(props) {
+    const [copyMessage, setCopyMessage] = React.useState('Copy to Clipboard');
+
+    const onCopy = () => {
+        setCopyMessage('Copied');
+        const caller = function () {
+            setCopyMessage('Copy to Clipboard');
+        };
+        setTimeout(caller, 2000);
+    }
+
     const endpoints = props.endpoints;
     const classes = useStyles();
     return <>
@@ -86,8 +96,14 @@ function EndpointsSection(props) {
             <Table>
                 {endpoints.map(ep =>
                     <TableRow>{ep}
-                        <CopyToClipboard text={ep} className={classes.clipboard}>
-                            <Button><FileCopyIcon /></Button>
+                        <CopyToClipboard
+                            text={ep}
+                            className={classes.clipboard}
+                            onCopy={onCopy}
+                        >
+                            <Tooltip title={copyMessage}>
+                                <Button><FileCopyIcon /></Button>
+                            </Tooltip>
                         </CopyToClipboard>
                     </TableRow>)}
             </Table>
