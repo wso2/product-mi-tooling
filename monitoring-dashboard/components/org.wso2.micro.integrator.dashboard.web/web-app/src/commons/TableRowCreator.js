@@ -37,6 +37,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 import NodesCell from './NodesCell';
 import LogsNodeCell from './LogsNodeCell';
 import StatusCell from './statusCell/StatusCell';
@@ -447,7 +448,13 @@ function UserDeleteAction(props) {
 
     }
 
-    return <div><tr><td><DeleteIcon onClick={() => confirmDelete()}/> Delete</td></tr>
+    return <div><tr><td>
+        <Box display='flex' alignItems='center'>
+            <DeleteIcon onClick={() => confirmDelete()}/> 
+            Delete
+        </Box>
+        
+    </td></tr>
             <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
                                     aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
                 <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>

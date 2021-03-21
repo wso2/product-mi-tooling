@@ -19,22 +19,22 @@
  */
 
 import React from 'react';
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
 import Box from "@material-ui/core/Box";
-import {Button} from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import AuthManager from '../auth/AuthManager';
-import {makeStyles} from "@material-ui/core/styles";
-import {Link, useHistory} from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
+import { Link, useHistory } from "react-router-dom";
 
 export default function AddUsers() {
     const globalGroupId = useSelector(state => state.groupId);
@@ -56,7 +56,7 @@ export default function AddUsers() {
         const target = event.target;
         const name = target.name;
         const value = target.value;
-        setUser({...user, [name]: value});
+        setUser({ ...user, [name]: value });
     }
 
     const handleDialogClose = () => {
@@ -69,7 +69,7 @@ export default function AddUsers() {
     }
 
     const addUser = () => {
-        const {userId, password, passwordRepeat, isAdmin} = user
+        const { userId, password, passwordRepeat, isAdmin } = user
 
         if (userId === '') {
             setDialog({
@@ -116,24 +116,53 @@ export default function AddUsers() {
     const classes = useStyles();
 
     return <div className={classes.root}>
-        <Grid container spacing={3}>
-            <Grid item xs={12}>
-                <Paper className={classes.paper}>
+        <Paper className={classes.paper}>
+            <Grid container spacing={3}>
+                <Grid item xl={6} lg={6} md={6} sm={12} xs={12}>
                     <form>
-                        <div>
-                            <TextField required label="User Name" onChange={(e) => handleUserInput(e)} name="userId"
-                                       value={user.userId}/>
-                                       <br/>
-                            <TextField onChange={(e) => handleUserInput(e)} name="password" label="Password"
-                                       type="password"
-                                       value={user.password}/>
-                                       <br/>
-                            <TextField onChange={(e) => handleUserInput(e)} name="passwordRepeat"
-                                       label="Repeat Password"
-                                       type="password" value={user.passwordRepeat}/>
-                                       <br/>
-                                       <br/>
+                        <Box mb={2}>
+                            <TextField
+                                autoFocus
+                                margin='dense'
+                                variant='outlined'
+                                fullWidth
+                                helperText='Enter User Name'
+                                required
+                                label="User Name"
+                                onChange={(e) => handleUserInput(e)}
+                                name="userId"
+                                value={user.userId}
+                            />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField
+                                margin='dense'
+                                variant='outlined'
+                                fullWidth
+                                helperText='Enter Password'
+                                onChange={(e) => handleUserInput(e)}
+                                name="password" l
+                                abel="Password"
+                                type="password"
+                                value={user.password} />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField
+                                margin='dense'
+                                variant='outlined'
+                                fullWidth
+                                helperText='Re Enter The Same Password'
+                                onChange={(e) => handleUserInput(e)}
+                                name="passwordRepeat"
+                                label="Repeat Password"
+                                type="password" value={user.passwordRepeat} />
+                        </Box>
+                        <Box mb={4}>
                             <Select
+                                margin='dense'
+                                variant='outlined'
+                                fullWidth
+                                helperText='Select Role'
                                 native
                                 name="isAdmin"
                                 value={user.isAdmin}
@@ -143,18 +172,17 @@ export default function AddUsers() {
                                 <option value={"true"}>True</option>
                                 <option value={"false"}>False</option>
                             </Select>
-                            <br/> <br/> <br/>
-                            <Box textAlign='left'>
-                                <Button onClick={() => addUser()} variant="contained" color="primary">Add User</Button>
-                                <Button component={Link} to="/users" color="danger">
-                                    Cancel
+                        </Box>
+                        <Box mb={2} textAlign='left'>
+                            <Button onClick={() => addUser()} variant="contained" color="primary">Add User</Button>
+                            <Button component={Link} to="/users" color="danger">
+                                Cancel
                                 </Button>
-                            </Box>
-                        </div>
+                        </Box>
                     </form>
 
                     <Dialog open={dialog.open} onClose={() => handleDialogClose()}
-                            aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                        aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
                         <DialogTitle id="alert-dialog-title">{dialog.title}</DialogTitle>
                         <DialogContent dividers>
                             <DialogContentText id="alert-dialog-description">
@@ -167,10 +195,11 @@ export default function AddUsers() {
                             </Button>
                         </DialogActions>
                     </Dialog>
-                </Paper>
+                </Grid>
             </Grid>
-        </Grid>
-    </div>
+        </Paper>
+
+    </div >
 
 }
 
