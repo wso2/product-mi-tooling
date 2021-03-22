@@ -7,3 +7,6 @@ pool_size = 15
 [mi_user_store]
 username = "admin"
 password = "admin"
+
+[keystore]
+password = "wso2carbon"
