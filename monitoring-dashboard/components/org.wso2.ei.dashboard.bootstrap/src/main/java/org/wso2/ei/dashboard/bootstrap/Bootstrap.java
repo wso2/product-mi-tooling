@@ -53,6 +53,8 @@ import java.util.Properties;
 public class Bootstrap {
     private static final String CONF_DIR = "conf";
     private static final String DEPLOYMENT_TOML = "deployment.toml";
+    private static final String SECURITY_DIR = "security";
+    private static final String KEYSTORE_FILE = "dashboard.jks";
     private static final String TOML_CONF_PORT = "server_config.port";
     private static final String TOML_MI_USERNAME = "mi_user_store.password";
     private static final String TOML_MI_PASSWORD = "mi_user_store.password";
@@ -65,6 +67,10 @@ public class Bootstrap {
     private static final String WWW_DIR = "www";
     private static final String WEBAPP_UI = "org.wso2.micro.integrator.dashboard.web.war";
     private static final String DASHBOARD_HOME = "DASHBOARD_HOME";
+    private static final String KEYSTORE_PASSWORD = "KEYSTORE_PASSWORD";
+    private static final String TOML_KEYSTORE_PASSWORD = "keystore.password";
+    private static String keyStorePassword;
+    
 
     private static final Logger logger = LogManager.getLogger(Bootstrap.class);
 
@@ -95,7 +101,7 @@ public class Bootstrap {
         }
         
         Server server = new Server();
-        setServerConnectors(serverPort, server);
+        setServerConnectors(serverPort, server, dashboardHome);
         setServerHandlers(dashboardHome, server);
         
         try {
@@ -109,16 +115,17 @@ public class Bootstrap {
         logger.info("Stopping the server");
     }
 
-    private static void setServerConnectors(int serverPort, Server server) {
+    private static void setServerConnectors(int serverPort, Server server, String dashboardHome) {
 
         HttpConfiguration https = new HttpConfiguration();
         https.addCustomizer(new SecureRequestCustomizer());
 
         SslContextFactory sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStorePath(Bootstrap.class.getResource(
-                "/dashboard.jks").toExternalForm());
-        sslContextFactory.setKeyStorePassword("wso2carbon");
-        sslContextFactory.setKeyManagerPassword("wso2carbon");
+        String jksPath =
+                dashboardHome + File.separator + CONF_DIR + File.separator + SECURITY_DIR + File.separator + KEYSTORE_FILE;
+        sslContextFactory.setKeyStorePath(jksPath);
+        sslContextFactory.setKeyStorePassword(keyStorePassword);
+        sslContextFactory.setKeyManagerPassword(keyStorePassword);
 
         ServerConnector sslConnector = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory, "http/1.1"),
@@ -189,6 +196,12 @@ public class Bootstrap {
             miPassword = parseResult.getString(TOML_MI_PASSWORD);
             properties.put(MI_PASSWORD, miPassword);
         }
+
+        keyStorePassword = System.getProperty(KEYSTORE_PASSWORD);
+        if (StringUtils.isEmpty(keyStorePassword)) {
+            keyStorePassword = parseResult.getString(TOML_KEYSTORE_PASSWORD);
+        }
+        
         System.setProperties(properties);
     }
 
