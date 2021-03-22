@@ -9,4 +9,6 @@ username = "admin"
 password = "admin"
 
 [keystore]
+file_name = "conf/security/dashboard.jks"
 password = "wso2carbon"
+key_password = "wso2carbon"

@@ -68,8 +68,14 @@ public class Bootstrap {
     private static final String WEBAPP_UI = "org.wso2.micro.integrator.dashboard.web.war";
     private static final String DASHBOARD_HOME = "DASHBOARD_HOME";
     private static final String KEYSTORE_PASSWORD = "KEYSTORE_PASSWORD";
-    private static final String TOML_KEYSTORE_PASSWORD = "keystore.password";
+    private static final String TOML_KEYSTORE_PASSWORD = "keystore.password";    
+    private static final String KEY_MANAGER_PASSWORD = "KEY_MANAGER_PASSWORD";
+    private static final String TOML_KEY_MANAGER_PASSWORD = "keystore.key_password";
+    private static final String JKS_FILE_LOCATION = "JKS_FILE_LOCATION";
+    private static final String TOML_JKS_FILE_LOCATION = "keystore.file_name";
     private static String keyStorePassword;
+    private static String keyManagerPassword;
+    private static String jksFileLocation;
     
 
     private static final Logger logger = LogManager.getLogger(Bootstrap.class);
@@ -122,10 +128,10 @@ public class Bootstrap {
 
         SslContextFactory sslContextFactory = new SslContextFactory.Server();
         String jksPath =
-                dashboardHome + File.separator + CONF_DIR + File.separator + SECURITY_DIR + File.separator + KEYSTORE_FILE;
+                dashboardHome + File.separator + jksFileLocation;
         sslContextFactory.setKeyStorePath(jksPath);
         sslContextFactory.setKeyStorePassword(keyStorePassword);
-        sslContextFactory.setKeyManagerPassword(keyStorePassword);
+        sslContextFactory.setKeyManagerPassword(keyManagerPassword);
 
         ServerConnector sslConnector = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory, "http/1.1"),
@@ -200,6 +206,16 @@ public class Bootstrap {
         keyStorePassword = System.getProperty(KEYSTORE_PASSWORD);
         if (StringUtils.isEmpty(keyStorePassword)) {
             keyStorePassword = parseResult.getString(TOML_KEYSTORE_PASSWORD);
+        }        
+        
+        keyManagerPassword = System.getProperty(KEY_MANAGER_PASSWORD);
+        if (StringUtils.isEmpty(keyManagerPassword)) {
+            keyManagerPassword = parseResult.getString(TOML_KEY_MANAGER_PASSWORD);
+        }
+
+        jksFileLocation = System.getProperty(JKS_FILE_LOCATION);
+        if (StringUtils.isEmpty(jksFileLocation)) {
+            jksFileLocation = parseResult.getString(TOML_JKS_FILE_LOCATION);
         }
         
         System.setProperties(properties);
