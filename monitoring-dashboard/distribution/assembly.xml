@@ -123,6 +123,8 @@
                 <include>org.eclipse.jetty:jetty-security:jar</include>
                 <include>org.eclipse.jetty:jetty-xml:jar</include>
                 <include>javax.servlet:javax.servlet-api:jar</include>
+                <include>javax.xml.bind:jaxb-api:jar</include>
+                <include>javax.activation:activation:jar</include>
                 <include>net.consensys.cava:cava-toml:jar</include>
                 <include>org.antlr:antlr4-runtime:jar</include>
                 <include>org.apache.logging.log4j:log4j-core:jar</include>
