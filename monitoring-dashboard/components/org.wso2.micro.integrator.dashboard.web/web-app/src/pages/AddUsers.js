@@ -24,6 +24,7 @@ import axios from "axios";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from "@material-ui/core/Select";
 import Box from "@material-ui/core/Box";
 import { Button } from "@material-ui/core";
@@ -172,6 +173,7 @@ export default function AddUsers() {
                                 <option value={"true"}>True</option>
                                 <option value={"false"}>False</option>
                             </Select>
+                            <FormHelperText className={classes.selectHelperText}>Is Admin</FormHelperText>
                         </Box>
                         <Box mb={2} textAlign='left'>
                             <Button onClick={() => addUser()} variant="contained" color="primary">Add User</Button>
@@ -198,9 +200,7 @@ export default function AddUsers() {
                 </Grid>
             </Grid>
         </Paper>
-
     </div >
-
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -215,7 +215,8 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1),
         height: '64px',
         'border-radius': '0px',
+    },
+    selectHelperText: {
+        paddingLeft: '15px'
     }
-
-
 }));
