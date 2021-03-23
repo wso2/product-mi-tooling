@@ -47,6 +47,7 @@ import { changeData } from '../redux/Actions';
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers, retrieveData } = props;
     const pageId = pageInfo.pageId
+    const classes = useStyles();
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             // common
@@ -138,7 +139,7 @@ export default function TableRowCreator(props) {
             case 'nodeId':
                 return <TableCell><table><NodesCell pageId={pageId} nodeData={data}/></table></TableCell>
             case 'node_status':
-                return <TableCell>Active</TableCell>
+                return <TableCell>{data.status == "healthy" ? <table>Healthy</table> : <table className={classes.unhealthyNodeCell}>Unhealthy</table>}</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
 
@@ -505,5 +506,8 @@ const useStyles = makeStyles((theme) => ({
     formControl: {
         minWidth: 10,
         minHeight: 10
+    },
+    unhealthyNodeCell: {
+        color: '#ee0707'
     }
 }));

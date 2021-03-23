@@ -68,7 +68,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean insertHeartbeat(HeartbeatObject heartbeat) {
-        String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,?,CURRENT_TIMESTAMP());";
+        String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,?,?);";
         Connection con = null;
         PreparedStatement statement = null;
         try {
@@ -78,6 +78,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             statement.setString(2, heartbeat.getNodeId());
             statement.setInt(3, heartbeat.getInterval());
             statement.setString(4, heartbeat.getMgtApiUrl());
+            statement.setString(5, String.valueOf(heartbeat.getTimestamp()));
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
@@ -257,6 +258,30 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public String getHeartbeatInterval(String groupId, String nodeId) {
+        String query = "SELECT HERTBEAT_INTERVAL FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getString(1);
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while fetching heartbeat interval of group " + groupId
+                                               + " node " + nodeId, e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+
+    @Override
     public boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp) {
         String query = "SELECT COUNT(*) FROM HEARTBEAT WHERE TIMESTAMP>? AND GROUP_ID=? AND NODE_ID=?;";
         boolean isExists = false;
@@ -282,15 +307,15 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         return isExists;
     }
 
-    public String retrieveTimestampOfHeartBeat(HeartbeatObject heartbeat) {
+    public String retrieveTimestampOfLastHeartbeat(String groupId, String nodeId) {
         String query = "SELECT TIMESTAMP FROM HEARTBEAT WHERE GROUP_ID = ? AND NODE_ID = ? ;";
         Connection con = null;
         PreparedStatement statement = null;
         try {
             con = getConnection();
             statement = con.prepareStatement(query);
-            statement.setString(1, heartbeat.getGroupId());
-            statement.setString(2, heartbeat.getNodeId());
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getString(1);
@@ -307,14 +332,15 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean updateHeartbeat(HeartbeatObject heartbeat) {
-        String query = "UPDATE HEARTBEAT SET TIMESTAMP=CURRENT_TIMESTAMP() WHERE GROUP_ID=? AND NODE_ID=?;";
+        String query = "UPDATE HEARTBEAT SET TIMESTAMP=? WHERE GROUP_ID=? AND NODE_ID=?;";
         Connection con = null;
         PreparedStatement statement = null;
         try {
             con = getConnection();
             statement = con.prepareStatement(query);
-            statement.setString(1, heartbeat.getGroupId());
-            statement.setString(2, heartbeat.getNodeId());
+            statement.setString(1, String.valueOf(heartbeat.getTimestamp()));
+            statement.setString(2, heartbeat.getGroupId());
+            statement.setString(3, heartbeat.getNodeId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while updating heartbeat information.", e);

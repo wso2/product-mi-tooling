@@ -49,10 +49,11 @@ public class HeartBeatDelegate {
             Executors.newScheduledThreadPool(heartbeatPoolSize);
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) {
+        long currentTimestamp = System.currentTimeMillis();
         Ack ack = new Ack(Constants.FAIL_STATUS);
         HeartbeatObject heartbeat = new HeartbeatObject(
                 heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
-                heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(),
+                heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp,
                 heartbeatRequest.getChangeNotification().getDeployedArtifacts(),
                 heartbeatRequest.getChangeNotification().getUndeployedArtifacts());
         boolean isSuccess;
@@ -77,7 +78,8 @@ public class HeartBeatDelegate {
     }
 
     private boolean isNodeRegistered(HeartbeatObject heartbeat) {
-        String timestamp = databaseManager.retrieveTimestampOfHeartBeat(heartbeat);
+        String timestamp =
+                databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
         return (null != timestamp && !timestamp.isEmpty());
     }
 
@@ -97,7 +99,8 @@ public class HeartBeatDelegate {
 
     private void runHeartbeatExecutorService(String productName, HeartbeatObject heartbeat) {
         long heartbeatInterval = heartbeat.getInterval();
-        String timestampOfRegisteredNode = databaseManager.retrieveTimestampOfHeartBeat(heartbeat);
+        String timestampOfRegisteredNode =
+                databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
         Runnable runnableTask = () -> {
             boolean isNodeDeregistered = isNodeShutDown(heartbeat, timestampOfRegisteredNode);
             if (isNodeDeregistered) {
