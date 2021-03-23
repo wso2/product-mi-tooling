@@ -18,18 +18,19 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
+import Tooltip from '@material-ui/core/Tooltip';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 export default function HomePageSideDrawer(props) {
     var nodeData = props.nodeData;
+    const [copyMessage, setCopyMessage] = useState('Copy to Clipboard');
 
     const [open, setOpen] = React.useState(false);
 
@@ -44,6 +45,13 @@ export default function HomePageSideDrawer(props) {
     }, [open]);
 
     const classes = useStyles();
+    const onCopy = () => {
+        setCopyMessage('Copied');
+        const caller = function () {
+            setCopyMessage('Copy to Clipboard');
+        };
+        setTimeout(caller, 2000);
+    }
 
     return (
         <div className={classes.root}>
@@ -67,16 +75,28 @@ export default function HomePageSideDrawer(props) {
                             <TableRow>
                                 <TableCell>Product Home</TableCell>
                                 <TableCell>{nodeData.details.carbonHome}
-                                    <CopyToClipboard text={nodeData.details.carbonHome} className={classes.clipboard}>
-                                        <Button><FileCopyIcon/></Button>
+                                    <CopyToClipboard
+                                        text={nodeData.details.carbonHome}
+                                        className={classes.clipboard}
+                                        onCopy={onCopy}
+                                    >
+                                        <Tooltip title={copyMessage}>
+                                            <Button><FileCopyIcon /></Button>
+                                        </Tooltip>
                                     </CopyToClipboard>
                                 </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Java Home</TableCell>
                                 <TableCell>{nodeData.details.javaHome}
-                                    <CopyToClipboard text={nodeData.details.javaHome} className={classes.clipboard}>
-                                        <Button><FileCopyIcon/></Button>
+                                    <CopyToClipboard
+                                        text={nodeData.details.javaHome}
+                                        className={classes.clipboard}
+                                        onCopy={onCopy}
+                                    >
+                                        <Tooltip title={copyMessage}>
+                                            <Button><FileCopyIcon /></Button>
+                                        </Tooltip>
                                     </CopyToClipboard>
                                 </TableCell>
                             </TableRow>
