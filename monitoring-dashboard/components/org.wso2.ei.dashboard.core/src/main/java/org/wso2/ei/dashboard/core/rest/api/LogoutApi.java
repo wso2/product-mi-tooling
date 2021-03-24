@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.rest.delegates.auth.LogoutDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.Error;
@@ -54,7 +55,11 @@ public class LogoutApi {
     public Response receiveLogout(@Context HttpHeaders httpHeaders) {
         String authorizationHeader = httpHeaders.getHeaderString("Authorization");
         if (authorizationHeader != null) {
-            String token = authorizationHeader.split(" ")[1];
+            String token = Constants.EMPTY_STRING;
+            String[] splitResult = authorizationHeader.split(" ");
+            if (splitResult.length > 1) {
+                token = splitResult[1];
+            }
             return logoutDelegate.logoutUser(token);
         }
         return Response.status(Response.Status.UNAUTHORIZED).build();

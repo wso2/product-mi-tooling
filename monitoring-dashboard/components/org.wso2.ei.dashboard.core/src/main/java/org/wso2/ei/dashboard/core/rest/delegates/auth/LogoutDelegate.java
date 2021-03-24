@@ -29,7 +29,9 @@ import javax.ws.rs.core.Response;
 public class LogoutDelegate {
 
     public Response logoutUser(String accessToken) {
-        removeTokenFromCache(accessToken);
+        if (accessToken.isEmpty()) {
+            removeTokenFromCache(accessToken);
+        }
         return Response.ok().build();
     }
 
