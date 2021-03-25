@@ -117,7 +117,7 @@ export default function LogConfigs() {
             <FormHelperText>Node ID</FormHelperText>
         </FormControl>
         <Button classes={{root: classes.buttonRight}} component={Link} to="/log-configs/add" variant="contained" color="primary">
-            Add Log Config
+            Add Logging Configuration
         </Button>
         <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs}/></>;
 

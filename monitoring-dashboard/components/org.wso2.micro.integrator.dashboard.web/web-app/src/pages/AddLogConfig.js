@@ -26,6 +26,7 @@ import axios from "axios";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from "@material-ui/core/Select";
 import Box from "@material-ui/core/Box";
 import {Button} from "@material-ui/core";
@@ -157,76 +158,109 @@ function AddLogConfigsSection() {
         });
     }
     return <div className={classes.root}>
-        <Grid container spacing={3}>
-            <Grid item xs={12}>
                 <Paper className={classes.paper}>
-                    <TextField onChange={(e) => handleUserInput(e)} name="loggerName" label="Logger Name"
-                               value={logConfig.loggerName}/> <br/>
-                    <TextField onChange={(e) => handleUserInput(e)} name="loggerClass" label="Logger Class"
-                               value={logConfig.loggerClass}/> <br/><br/>
-                    <Select
-                        native
-                        name="loggerLevel"
-                        value={logConfig.loggerLevel}
-                        onChange={(e) => handleUserInput(e)}
-                        label="Level"
-                    >
-                        <option value={'OFF'}>OFF</option>
-                        <option value={'TRACE'}>TRACE</option>
-                        <option value={'DEBUG'}>DEBUG</option>
-                        <option value={'INFO'}>INFO</option>
-                        <option value={'WARN'}>WARN</option>
-                        <option value={'ERROR'}>ERROR</option>
-                        <option value={'FATAL'}>FATAL</option>
-                    </Select>
-                    <br/> <br/>
-                    <Box textAlign='left'>
-                        <Button onClick={() => checkAndOpenConfirmationDialog()} variant="contained" color="primary">Add
-                            Logger</Button>
-                        <Button component={Link} to="/log-configs" color="danger">
-                            Cancel
-                        </Button>
-                    </Box>
+                    <Grid container spacing={3}>
+                        <Grid item xl={6} lg={6} md={6} sm={12} xs={12}>
+                            <form>
+                                <Box mb={2}>
+                                    <TextField
+                                        autoFocus
+                                        margin='dense'
+                                        variant='outlined'
+                                        fullWidth
+                                        helperText='Logger Name'
+                                        required
+                                        label="Logger Name"
+                                        onChange={(e) => handleUserInput(e)}
+                                        name="loggerName"
+                                        value={logConfig.loggerName}
+                                    />
+                                </Box>
+                                <Box mb={2}>
+                                    <TextField
+                                        autoFocus
+                                        margin='dense'
+                                        variant='outlined'
+                                        fullWidth
+                                        helperText='Logger Class'
+                                        required
+                                        label="Logger Class"
+                                        onChange={(e) => handleUserInput(e)}
+                                        name="loggerClass"
+                                        value={logConfig.loggerClass}
+                                    />
+                                </Box>
 
-                    <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
-                            aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
-                        <DialogContent dividers>
-                            <DialogContentText id="alert-dialog-description">
-                                {confirmationDialog.message}
-                            </DialogContentText>
-                        </DialogContent>
+                                <Box mb={4}>
+                                    <Select
+                                        margin='dense'
+                                        variant='outlined'
+                                        fullWidth
+                                        helperText='Logger level'
+                                        native
+                                        name="loggerLevel"
+                                        value={logConfig.loggerLevel}
+                                        onChange={(e) => handleUserInput(e)}
+                                        label="Level"
+                                    >
+                                        <option value={'OFF'}>OFF</option>
+                                        <option value={'TRACE'}>TRACE</option>
+                                        <option value={'DEBUG'}>DEBUG</option>
+                                        <option value={'INFO'}>INFO</option>
+                                        <option value={'WARN'}>WARN</option>
+                                        <option value={'ERROR'}>ERROR</option>
+                                        <option value={'FATAL'}>FATAL</option>
+                                    </Select>
+                                    <FormHelperText className={classes.selectHelperText}>Logger Level</FormHelperText>
+                                </Box>
+                                <Box mb={2} textAlign='left'>
+                                    <Button onClick={() => checkAndOpenConfirmationDialog()} variant="contained" color="primary">Add
+                                        Logger</Button>
+                                    <Button component={Link} to="/log-configs" color="danger">
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            </form>
 
-                        <DialogActions>
-                            <Button onClick={() => addLogger()} variant="contained" autoFocus>
-                                CONTINUE
-                            </Button>
+                            <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
+                                <DialogContent dividers>
+                                    <DialogContentText id="alert-dialog-description">
+                                        {confirmationDialog.message}
+                                    </DialogContentText>
+                                </DialogContent>
 
-                            <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
-                                CANCEL
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                                <DialogActions>
+                                    <Button onClick={() => addLogger()} variant="contained" autoFocus>
+                                        Continue
+                                    </Button>
 
-                    <Dialog open={completionStatusDialog.open} onClose={() => handlecompletionStatusDialogClose()}
-                            aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title">{completionStatusDialog.title}</DialogTitle>
-                        <DialogContent dividers>
-                            <DialogContentText id="alert-dialog-description">
-                                {completionStatusDialog.message}
-                            </DialogContentText>
-                        </DialogContent>
+                                    <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
+                                        Cancel
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
 
-                        <DialogActions>
-                            <Button onClick={() => handlecompletionStatusDialogClose()} variant="contained" autoFocus>
-                                OK
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                            <Dialog open={completionStatusDialog.open} onClose={() => handlecompletionStatusDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">{completionStatusDialog.title}</DialogTitle>
+                                <DialogContent dividers>
+                                    <DialogContentText id="alert-dialog-description">
+                                        {completionStatusDialog.message}
+                                    </DialogContentText>
+                                </DialogContent>
+
+                                <DialogActions>
+                                    <Button onClick={() => handlecompletionStatusDialogClose()} variant="contained" autoFocus>
+                                        OK
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                        </Grid>
+                    </Grid>
                 </Paper>
-            </Grid>
-        </Grid>
-    </div>
+            </div>
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -251,4 +285,7 @@ const useStyles = makeStyles((theme) => ({
         minWidth: 120,
         maxWidth: 300,
     },
+    selectHelperText: {
+        paddingLeft: '15px'
+    }
 }));
