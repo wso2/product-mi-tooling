@@ -30,6 +30,7 @@ import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
+import org.wso2.ei.dashboard.core.rest.model.LocalEntryValue;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
@@ -304,6 +305,26 @@ public class GroupsApi {
         Artifacts localEntriesList = localEntriesDelegate.getArtifactsList(groupId, nodes);
         return Response.ok().entity(localEntriesList).build();
     }
+
+    @GET
+    @Path("/{group-id}/nodes/{node-id}/local-entries/{local-entry}/value")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get value of local entry", description = "", tags={ "localEntries" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Value of the local entry",
+                         content = @Content(schema = @Schema(implementation = LocalEntryValue.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response getLocalEntryValue(
+            @PathParam("group-id") @Parameter(description = "Group id of the node") String groupId,
+            @PathParam("node-id") @Parameter(description = "Node id") String nodeId,
+            @PathParam("local-entry") @Parameter(description = "Local entry name") String localEntry) {
+
+        LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
+        LocalEntryValue localEntryValue = localEntriesDelegate.getValue(groupId, nodeId, localEntry);
+        return Response.ok().entity(localEntryValue).build();
+    }
+
     @GET
     @Path("/{group-id}/log-configs")
     @Produces({ "application/json" })

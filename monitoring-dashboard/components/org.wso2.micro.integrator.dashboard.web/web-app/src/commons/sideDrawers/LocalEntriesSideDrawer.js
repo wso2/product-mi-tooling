@@ -21,11 +21,10 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
+import LocalEntryValueSection from './commons/LocalEntryValueSection'
 
 export default function LocalEntriesSideDrawer(props) {
     var nodeData = props.nodeData;
@@ -38,12 +37,16 @@ export default function LocalEntriesSideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId} />
-                    <Paper className={classes.paper} elevation={0} square>
-                        <LocalEntriesDetailTable nodeData={nodeData} />
-                    </Paper>
-                    <Box pl={4}>
-                        <ValueSection value={nodeData.details.value} />
-                    </Box>
+                    <LocalEntryValueSection
+                        name={artifactName}
+                        type={nodeData.details.type}
+                        nodeId={nodeId}
+                        designContent={<>
+                            <Paper className={classes.paper} elevation={0} square>
+                                <LocalEntriesDetailTable nodeData={nodeData} />
+                            </Paper>
+                        </>}
+                    />
                 </Grid>
             </Grid>
         </div>
@@ -63,16 +66,6 @@ function LocalEntriesDetailTable(props) {
             <TableCell>{nodeData.details.type}</TableCell>
         </TableRow>
     </Table>
-}
-
-function ValueSection(props) {
-    const classes = useStyles();
-    return <>
-        <Typography variant="h6" color="inherit" noWrap className={classes.subTopic}>
-            Value
-        </Typography>
-        <Box pr={2}>{props.value}</Box>
-    </>
 }
 
 const useStyles = makeStyles((theme) => ({

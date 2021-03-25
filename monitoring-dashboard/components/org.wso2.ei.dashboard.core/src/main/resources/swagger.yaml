@@ -697,6 +697,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /groups/{group-id}/nodes/{node-id}/local-entries/{local-entry}/value:
+    get:
+      tags:
+        - "localEntries"
+      summary: "Get value of local entry"
+      operationId: "getLocalEntryValue"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "node-id"
+          in: path
+          description: "Node id"
+          required: true
+          schema:
+            type: string
+        - name: "local-entry"
+          in: path
+          description: "Local entry name"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Value of the local entry"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalEntryValue'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /groups/{group-id}/data-services:
     get:
       tags:
@@ -1186,7 +1224,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-
 components:
   schemas:
     LoginRequest:
@@ -1401,19 +1438,15 @@ components:
           type: array
           items:
             type: string
-    KeyValueAsArrayOfObject:
-      type: object
-      properties:
-        key:
-          type: string
-        value:
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyValue'
     Configuration:
       type: object
       properties:
         configuration:
+          type: string
+    LocalEntryValue:
+      type: object
+      properties:
+        value:
           type: string
     SuccessStatus:
       type: object
