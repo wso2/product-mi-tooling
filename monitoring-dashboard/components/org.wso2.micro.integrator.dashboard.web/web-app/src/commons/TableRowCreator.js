@@ -349,15 +349,15 @@ function LogConfigLevelDropDown(props) {
 
                 <DialogActions>
                     <Button onClick={() => updateAllNodes()} variant="contained" autoFocus>
-                        UPDATE ALL NODES
+                        Update All Nodes
                     </Button>
 
                     {selectedNode !== 'All' && <Button onClick={() => updateSelected()} variant="contained" autoFocus>
-                        UPDATE ONLY {selectedNode}
+                        Update Only {selectedNode}
                     </Button>}
 
                     <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
-                        CANCEL
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -469,11 +469,11 @@ function UserDeleteAction(props) {
 
                 <DialogActions>
                     <Button onClick={() => deleteUser()} variant="contained" autoFocus>
-                        CONFIRM
+                        Confirm
                     </Button>
 
                     <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
-                        CANCEL
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>

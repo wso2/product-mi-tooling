@@ -292,6 +292,8 @@ public class MiArtifactsManager implements ArtifactsManager {
         JsonObject jsonResponse = HttpUtils.getJsonResponse(artifactDetails);
         if (artifactType.equals(CONNECTORS) || artifactType.equals(CARBON_APPLICATIONS)) {
             return jsonResponse;
+        } else if (artifactType.equals(LOCAL_ENTRIES)) {
+            return removeValueFromResponse(jsonResponse);
         } else {
             return removeConfigurationFromResponse(jsonResponse);
         }
@@ -299,6 +301,11 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     private JsonObject removeConfigurationFromResponse(JsonObject artifact) {
         artifact.remove("configuration");
+        return artifact;
+    }
+
+    private JsonObject removeValueFromResponse(JsonObject artifact) {
+        artifact.remove("value");
         return artifact;
     }
 
