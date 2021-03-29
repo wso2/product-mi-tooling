@@ -83,7 +83,7 @@ function MultipleSelect(props) {
         const selectAllValueArray = event.target.value.filter(nodeName => nodeName === selectAllLabel)
         if (selectAllValueArray.length !== 0) {
            handleSelectAllChange();
-        }else {
+        } else {
             setSelectedAll(false);
             setSelectedNodeList(event.target.value.filter(nodeName => nodeName !== selectAllLabel));
         }
