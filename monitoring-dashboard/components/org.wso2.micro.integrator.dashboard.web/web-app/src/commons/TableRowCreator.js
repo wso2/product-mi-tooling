@@ -54,7 +54,7 @@ export default function TableRowCreator(props) {
             case 'name':
                 return <TableCell>{data.name}</TableCell>
             case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} />)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} retrieveData={retrieveData}/>)}</table></TableCell>
             case 'type':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
 

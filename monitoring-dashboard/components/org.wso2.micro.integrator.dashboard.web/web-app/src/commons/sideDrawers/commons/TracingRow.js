@@ -26,7 +26,7 @@ import Switch from "react-switch";
 import AuthManager from '../../../auth/AuthManager';
 
 export default function TracingRow(props) {
-    const {pageId, artifactName, nodeId, tracing} = props;
+    const {pageId, artifactName, nodeId, tracing, retrieveData} = props;
     var isTracingEnabled = false;
 
     if(tracing === 'enabled') {
@@ -47,6 +47,10 @@ export default function TracingRow(props) {
             "nodeId": nodeId,
             "type": "tracing",
             "value": isTracingEnabled
+        }).then(response => {
+            if (response.data.status === 'success') {
+                retrieveData();
+            }
         });
     }
 

@@ -35,7 +35,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 export default function ApiSideDrawer(props) {
-    var nodeData = props.nodeData;
+    const { nodeData, retrieveData } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -51,7 +51,7 @@ export default function ApiSideDrawer(props) {
                         nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <ApiDetailTable nodeData={nodeData} />
+                                <ApiDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
                             </Paper>
                             <Box pl={2}>
                                 <Typography variant="h6" color="inherit" noWrap>
@@ -71,7 +71,7 @@ export default function ApiSideDrawer(props) {
 }
 
 function ApiDetailTable(props) {
-    const nodeData = props.nodeData;
+    const { nodeData, retrieveData } = props;
     const artifactName = nodeData.details.name
     const pageId = "apis";
 
@@ -92,7 +92,7 @@ function ApiDetailTable(props) {
             <TableCell>Statistics</TableCell>
             <TableCell>{nodeData.details.stats}</TableCell>
         </TableRow>
-        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
     </Table>
 }
 

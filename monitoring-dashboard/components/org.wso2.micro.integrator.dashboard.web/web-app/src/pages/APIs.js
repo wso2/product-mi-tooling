@@ -40,7 +40,7 @@ export default function APIs() {
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
 
-    React.useEffect(() => {
+    const retrieveApis = () => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
@@ -52,7 +52,15 @@ export default function APIs() {
             )
             setApiList(response.data)
         })
+    }
+
+    React.useEffect(() => {
+        retrieveApis();
     },[globalGroupId, selectedNodeList])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={apiList} />
+    const retrieveData = () => {
+        retrieveApis();
+    }
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={apiList} retrieveData={retrieveData}/>
 }

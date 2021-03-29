@@ -39,7 +39,7 @@ import DataServicesSideDrawer from './sideDrawers/DataServicesSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
-    const { pageId, nodeData } = props;
+    const { pageId, nodeData, retrieveData } = props;
     const [state, setState] = React.useState({
         openSideDrawer: false,
     });
@@ -55,39 +55,40 @@ export default function NodesCell(props) {
     return <TableRow hover role="presentation">
         <TableCell onClick={toggleDrawer(true)} className={classes.tableCell}>{nodeData.nodeId}</TableCell>
         <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} classes={{paper: classes.drawerPaper}}>
-            <SideDrawer pageId={pageId} nodeData={nodeData} />
+            <SideDrawer pageId={pageId} nodeData={nodeData} retrieveData={retrieveData}/>
         </Drawer>
     </TableRow>;
 }
 
 function SideDrawer(props) {
+    const { nodeData, retrieveData } = props
     switch(props.pageId) {
         case 'proxy-services':
-            return <ProxySideDrawer nodeData={props.nodeData} />
+            return <ProxySideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
         case 'endpoints':
-            return <EndpointSideDrawer nodeData={props.nodeData} />
+            return <EndpointSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
         case 'apis':
-            return <ApiSideDrawer nodeData={props.nodeData} />
+            return <ApiSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
         case 'templates':
-            return <TemplatesSideDrawer nodeData={props.nodeData} />
+            return <TemplatesSideDrawer nodeData={nodeData} />
         case 'sequences':
-            return <SequenceSideDrawer nodeData={props.nodeData} />
+            return <SequenceSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
         case 'inbound-endpoints':
-            return <InboundEpSideDrawer nodeData={props.nodeData} />
+            return <InboundEpSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
         case 'message-stores':
-            return <MessageStoreSideDrawer nodeData={props.nodeData} />
+            return <MessageStoreSideDrawer nodeData={nodeData} />
         case 'message-processors':
-            return <MessageProcessorSideDrawer nodeData={props.nodeData} />
+            return <MessageProcessorSideDrawer nodeData={nodeData} />
         case 'tasks':
-            return <TasksSideDrawer nodeData={props.nodeData} />
+            return <TasksSideDrawer nodeData={nodeData} />
         case 'local-entries':
-            return <LocalEntriesSideDrawer nodeData={props.nodeData} />
+            return <LocalEntriesSideDrawer nodeData={nodeData} />
         case 'carbonapps':
-            return <CarbonApplicationsSideDrawer nodeData={props.nodeData} />
+            return <CarbonApplicationsSideDrawer nodeData={nodeData} />
         case 'data-services':
-            return <DataServicesSideDrawer nodeData={props.nodeData} />
+            return <DataServicesSideDrawer nodeData={nodeData} />
         default :
-            return <HomePageSideDrawer nodeData={props.nodeData} />
+            return <HomePageSideDrawer nodeData={nodeData} />
     }
 }
 
