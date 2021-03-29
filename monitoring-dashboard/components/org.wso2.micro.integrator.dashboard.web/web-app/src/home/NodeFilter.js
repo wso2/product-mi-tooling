@@ -18,7 +18,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -62,11 +62,11 @@ function MultipleSelect(props) {
     const [selectedAll, setSelectedAll] = useState(false);
     const dispatch = useDispatch();
 
-    React.useEffect(()=>{
+    useEffect(()=>{
         setSelectedNodeList([])
     },[globalGroupId]);
 
-    React.useEffect(()=>{
+    useEffect(()=>{
         if (nodeList.length !== 0 && selectedNodeList.length == 0) {
             setSelectedAll(true)
             setSelectedNodeList(nodeList);
@@ -74,12 +74,22 @@ function MultipleSelect(props) {
         }
     },[nodeList]);
 
+    useEffect(()=> {
+        dispatch(filterNodes(selectedNodeList));
+    },[selectedNodeList])
+
     const handleChange = (event) => {
-        setSelectedAll(false);
-        setSelectedNodeList(event.target.value);
+        const selectAllLabel = "select all";
+        const selectAllValueArray = event.target.value.filter(nodeName => nodeName === selectAllLabel)
+        if (selectAllValueArray.length !== 0) {
+           handleSelectAllChange();
+        } else {
+            setSelectedAll(false);
+            setSelectedNodeList(event.target.value.filter(nodeName => nodeName !== selectAllLabel));
+        }
     };
 
-    const handleSelectAllChange = (event) => {
+    const handleSelectAllChange = () => {
         if (selectedAll) {
             setSelectedNodeList([]);
         }else{
@@ -96,7 +106,6 @@ function MultipleSelect(props) {
                     multiple
                     value={selectedNodeList}
                     onChange={handleChange}
-                    onClick={() => dispatch(filterNodes(selectedNodeList))}
                     renderValue={(selected) => (
                         <div className={classes.chips}>
                             {selected.map((value) => (
@@ -106,7 +115,7 @@ function MultipleSelect(props) {
                     )}
                 >
                     <MenuItem key={"select-all"} value={"select all"}>
-                        <Checkbox checked={selectedAll} onChange={handleSelectAllChange}/>
+                        <Checkbox checked={selectedAll} />
                         <ListItemText primary={"Select All"}  classes={{ primary: classes.selectAllText }}/>
                     </MenuItem>
                     <Divider />
