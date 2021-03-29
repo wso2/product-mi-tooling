@@ -40,7 +40,7 @@ export default function Sequences() {
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
 
-    React.useEffect(() => {
+    const retrieveSequences = () => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
@@ -52,7 +52,15 @@ export default function Sequences() {
             )
             setSequenceList(response.data)
         })
+    }
+
+    React.useEffect(() => {
+        retrieveSequences();
     },[globalGroupId, selectedNodeList])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={sequenceList}/>
+    const retrieveData = () => {
+        retrieveSequences();
+    }
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={sequenceList} retrieveData={retrieveData}/>
 }

@@ -29,7 +29,7 @@ import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 
 export default function SequenceSideDrawer(props) {
-    var nodeData = props.nodeData;
+    const { nodeData, retrieveData } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -42,7 +42,7 @@ export default function SequenceSideDrawer(props) {
                     <SourceViewSection
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <SequenceDetailTable nodeData={nodeData} />
+                                <SequenceDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
                             </Paper>
                         </>}
                         artifactType="sequences" artifactName={artifactName} nodeId={nodeId} />
@@ -53,7 +53,7 @@ export default function SequenceSideDrawer(props) {
 }
 
 function SequenceDetailTable(props) {
-    const nodeData = props.nodeData;
+    const { nodeData, retrieveData } = props;
     const artifactName = nodeData.details.name
     const pageId = "sequences";
 
@@ -66,7 +66,7 @@ function SequenceDetailTable(props) {
             <TableCell>Statistics</TableCell>
             <TableCell>{nodeData.details.stats}</TableCell>
         </TableRow>
-        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
     </Table>
 }
 

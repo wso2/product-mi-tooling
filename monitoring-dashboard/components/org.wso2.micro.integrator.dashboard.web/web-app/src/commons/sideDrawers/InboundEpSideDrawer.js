@@ -28,13 +28,9 @@ import HeadingSection from './commons/HeadingSection'
 import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 import Typography from '@material-ui/core/Typography';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 export default function InboundEpSideDrawer(props) {
-    var nodeData = props.nodeData;
+    const { nodeData, retrieveData } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -48,7 +44,7 @@ export default function InboundEpSideDrawer(props) {
                         artifactType="inbound-endpoints" artifactName={artifactName} nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <InboundEpDetailTable nodeData={nodeData} />
+                                <InboundEpDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
                             </Paper>
                             <Box pl={4}>
                                 <Typography variant="h6" color="inherit" noWrap>
@@ -67,7 +63,7 @@ export default function InboundEpSideDrawer(props) {
 }
 
 function InboundEpDetailTable(props) {
-    const nodeData = props.nodeData;
+    const { nodeData, retrieveData } = props;
     const artifactName = nodeData.details.name
     const pageId = "inbound-endpoints";
 
@@ -80,7 +76,7 @@ function InboundEpDetailTable(props) {
             <TableCell>Protocol</TableCell>
             <TableCell>{nodeData.details.protocol}</TableCell>
         </TableRow>
-        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} />
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
         <TableRow>
             <TableCell>Statistics</TableCell>
             <TableCell>{nodeData.details.stats}</TableCell>

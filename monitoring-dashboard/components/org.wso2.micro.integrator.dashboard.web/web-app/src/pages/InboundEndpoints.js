@@ -40,7 +40,7 @@ export default function InboundEndpoints() {
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
 
-    React.useEffect(() => {
+    const retrieveInboundEps = () => {
         var nodeListQueryParams="";
         selectedNodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
@@ -52,7 +52,15 @@ export default function InboundEndpoints() {
             )
             setInboundEpList(response.data)
         })
+    }
+
+    React.useEffect(() => {
+        retrieveInboundEps();
     },[globalGroupId, selectedNodeList])
 
-    return <EnhancedTable pageInfo={pageInfo} dataSet={inboundEpList}/>
+    const retrieveData = () => {
+        retrieveInboundEps();
+    }
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={inboundEpList} retrieveData={retrieveData}/>
 }
