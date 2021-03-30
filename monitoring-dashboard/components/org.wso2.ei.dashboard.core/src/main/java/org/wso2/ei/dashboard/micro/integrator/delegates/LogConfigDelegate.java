@@ -23,13 +23,13 @@ package org.wso2.ei.dashboard.micro.integrator.delegates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
@@ -49,23 +49,23 @@ import java.nio.charset.StandardCharsets;
  * Delegate class to handle requests from log-configs page.
  */
 public class LogConfigDelegate {
-    private static final Log log = LogFactory.getLog(LogConfigDelegate.class);
+    private static final Logger logger = LogManager.getLogger(LogConfigDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     public LogConfigs fetchLogConfigs(String groupId) {
-        log.debug("Fetching log configs via management api.");
+        logger.debug("Fetching log configs via management api.");
         JsonArray logConfigsArray = getLogConfigs(groupId);
         return createLogConfigsObject(logConfigsArray);
     }
 
     public LogConfigs fetchLogConfigsByNodeId(String groupId, String nodeId) {
-        log.info("Fetching log configs in node " + nodeId + " in group " + groupId);
+        logger.debug("Fetching log configs in node " + nodeId + " in group " + groupId);
         JsonArray logConfigsArray = getLogConfigByNodeId(groupId, nodeId);
         return createLogConfigsObject(logConfigsArray);
     }
 
     public Ack updateLogLevel(String groupId, LogConfigUpdateRequest request) {
-        log.debug("Updating logger " + request.getName() + " for all nodes in group " + groupId);
+        logger.debug("Updating logger " + request.getName() + " for all nodes in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
 
@@ -75,7 +75,7 @@ public class LogConfigDelegate {
             CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
 
             if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                log.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
+                logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
                 String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
                 ack.setMessage(message);
                 return ack;
@@ -86,12 +86,12 @@ public class LogConfigDelegate {
     }
 
     public Ack updateLogLevelByNodeId(String groupId, String nodeId, LogConfigUpdateRequest request) {
-        log.debug("Updating logger " + request.getName() + " in node " + nodeId + " in group " + groupId);
+        logger.debug("Updating logger " + request.getName() + " in node " + nodeId + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
         CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
-            log.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
+            logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
             String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
             ack.setMessage(message);
         } else {
@@ -101,7 +101,7 @@ public class LogConfigDelegate {
     }
 
     public Ack addLogger(String groupId, LogConfigAddRequest request) {
-        log.debug("Adding new Logger " + request.getName() + " for all nodes in group " + groupId);
+        logger.debug("Adding new Logger " + request.getName() + " for all nodes in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddLoggerPayload(request);
 
@@ -112,10 +112,10 @@ public class LogConfigDelegate {
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
             String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
             String addLoggerUrl = mgtApiUrl.concat("logging");
-            log.debug("Adding new logger on node " + nodeId);
+            logger.debug("Adding new logger on node " + nodeId);
             CloseableHttpResponse httpResponse = doPatch(addLoggerUrl, accessToken, payload);
             if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                log.error("Error occurred while adding logger on node " + nodeId + " in group " + groupId);
+                logger.error("Error occurred while adding logger on node " + nodeId + " in group " + groupId);
                 String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
                 ack.setMessage(message);
                 return ack;
@@ -177,7 +177,7 @@ public class LogConfigDelegate {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
         String updateLoggerUrl = mgtApiUrl.concat("logging");
-        log.debug("Updating logger on node " + nodeId);
+        logger.debug("Updating logger on node " + nodeId);
         return doPatch(updateLoggerUrl, accessToken, payload);
     }
 

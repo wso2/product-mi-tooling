@@ -125,7 +125,7 @@ export default function TableRowCreator(props) {
                 return <TableCell><StringCell data={data.componentName}/></TableCell>
             
             case 'level':
-                return <TableCell><LogConfigLevelDropDown selectedNode={pageInfo.additionalParams.selectedNodeId} name={data.name} level={data.level}/></TableCell>
+                return <TableCell><LogConfigLevelDropDown selectedNode={pageInfo.additionalParams.selectedNodeId} name={data.name} level={data.level} retrieveData={retrieveData}/></TableCell>
 
             // users page
             case 'userId':
@@ -201,7 +201,7 @@ function SwitchStatusCell(props) {
 }
 
 function LogConfigLevelDropDown(props) {
-    const { selectedNode, name } = props;
+    const { selectedNode, name, retrieveData } = props;
     const globalGroupId = useSelector(state => state.groupId);
 
     var [ level, setLevel ] = React.useState(
@@ -292,6 +292,7 @@ function LogConfigLevelDropDown(props) {
             "level": tmpLevel.value
         }).then(response => {
             if (response.data.status === 'success') {
+                retrieveData();
                 setLevel(tmpLevel)
                 setCompletionStatusDialog({
                     open: true, 
@@ -316,6 +317,7 @@ function LogConfigLevelDropDown(props) {
             "level": tmpLevel.value
         }).then(response => {
             if (response.data.status === 'success') {
+                retrieveData(selectedNode);
                 setLevel(tmpLevel)
                 setCompletionStatusDialog({
                     open: true, 
