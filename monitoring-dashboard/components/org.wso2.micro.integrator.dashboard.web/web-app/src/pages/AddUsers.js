@@ -50,7 +50,8 @@ export default function AddUsers() {
     const [dialog, setDialog] = React.useState({
         open: false,
         title: '',
-        message: ''
+        message: '',
+        isError: false
     });
 
     const handleUserInput = (event) => {
@@ -61,12 +62,16 @@ export default function AddUsers() {
     }
 
     const handleDialogClose = () => {
+        const isError = dialog.isError;
         setDialog({
             open: false,
             title: '',
-            message: ''
+            message: '',
+            isError: false
         })
-        history.push("/users");
+        if (!isError) {
+            history.push("/users");
+        }
     }
 
     const addUser = () => {
@@ -76,19 +81,22 @@ export default function AddUsers() {
             setDialog({
                 open: true,
                 title: 'Error',
-                message: 'User id is missing.'
+                message: 'User id is missing.',
+                isError: true
             })
         } else if (password === '') {
             setDialog({
                 open: true,
                 title: 'Error',
-                message: 'Password is missing.'
+                message: 'Password is missing.',
+                isError: true
             })
         } else if (password !== passwordRepeat) {
             setDialog({
                 open: true,
                 title: 'Error',
-                message: 'Repeat password must match the password  '
+                message: 'Repeat password must match the password  ',
+                isError: true
             })
         } else {
             const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
@@ -101,13 +109,15 @@ export default function AddUsers() {
                     setDialog({
                         open: true,
                         title: 'Error',
-                        message: response.data.message
+                        message: response.data.message,
+                        isError: true
                     })
                 } else {
                     setDialog({
                         open: true,
                         title: 'Success',
-                        message: 'Successfully added user'
+                        message: 'Successfully added user',
+                        isError: false
                     })
                 }
             })

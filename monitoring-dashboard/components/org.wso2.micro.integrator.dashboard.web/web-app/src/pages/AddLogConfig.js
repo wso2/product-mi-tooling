@@ -84,13 +84,15 @@ function AddLogConfigsSection() {
             setCompletionStatusDialog({
                 open: true,
                 title: 'Error',
-                message: 'Logger name is missing.'
+                message: 'Logger name is missing.',
+                isError: true
             })
         } else if (loggerClass === '') {
             setCompletionStatusDialog({
                 open: true,
                 title: 'Error',
-                message: 'Logger class is missing.'
+                message: 'Logger class is missing.',
+                isError: true
             })
         } else {
             var message = 'This would add logger to all nodes of group '.concat(globalGroupId).concat('. Do you want to continue?');
@@ -114,16 +116,22 @@ function AddLogConfigsSection() {
     const [completionStatusDialog, setCompletionStatusDialog] = React.useState({
         open: false,
         title: '',
-        message: ''
+        message: '',
+        isError: false
     });
 
     const handlecompletionStatusDialogClose = () => {
+        const isError = completionStatusDialog.isError;
         setCompletionStatusDialog({
             open: false,
             title: '',
-            message: ''
+            message: '',
+            isError: false
         })
-        history.push("/log-configs");
+
+        if (!isError) {
+            history.push("/log-configs");
+        }
     }
 
     const handleUserInput = (event) => {
@@ -146,13 +154,15 @@ function AddLogConfigsSection() {
                 setCompletionStatusDialog({
                     open: true,
                     title: 'Error',
-                    message: response.data.message
+                    message: response.data.message,
+                    isError: true
                 })
             } else {
                 setCompletionStatusDialog({
                     open: true,
                     title: 'Success',
-                    message: 'Successfully added logger'
+                    message: 'Successfully added logger',
+                    isError: false
                 })
             }
         });
