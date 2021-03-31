@@ -53,7 +53,7 @@ export default function LogConfigs() {
 
     const classes = useStyles();
 
-    React.useEffect(() => {
+    const getDefaultLogConfigs = () => {
         let allNodes = [{
             label: 'All',
             value: 'All'
@@ -77,6 +77,10 @@ export default function LogConfigs() {
                 setLogConfigs(response.data)
             })
         }
+    }
+
+    React.useEffect(() => {
+        getDefaultLogConfigs();
     }, [globalGroupId])
 
     if (AuthManager.getUser().scope !== "admin") {
@@ -85,9 +89,9 @@ export default function LogConfigs() {
         );
     }
 
-    const getLogConfigs = (nodeId) => {
+    const getLogConfigByNodeId = (nodeId) => {
         setSelectedNodeId(nodeId);
-        if (selectedNodeId !== 'All') {
+        if (nodeId !== 'All') {
             const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs/nodes/").concat(nodeId);
             axios.get(url).then(response => {
                 setLogConfigs(response.data)
@@ -99,6 +103,15 @@ export default function LogConfigs() {
         setPageInfo({...pageInfo, additionalParams: param})
     }
 
+    const retrieveLogConfig = (nodeId) => {
+        if (nodeId == undefined) {
+            getDefaultLogConfigs();
+        } else {
+            getLogConfigByNodeId(nodeId)
+        }
+        
+    }
+
     return <>
 
         <FormControl style={{width: 150}}>
@@ -107,7 +120,7 @@ export default function LogConfigs() {
                 value={selectedNodeId}
                 labelId="node-id-select-label"
                 id="node-id-select"
-                onChange={(e) => getLogConfigs(e.target.value)}
+                onChange={(e) => getLogConfigByNodeId(e.target.value)}
             >
                 {nodeList.map((option) => (
                     <MenuItem value={option.value}>{option.label}</MenuItem>
@@ -119,9 +132,7 @@ export default function LogConfigs() {
         <Button classes={{root: classes.buttonRight}} component={Link} to="/log-configs/add" variant="contained" color="primary">
             Add Logging Configuration
         </Button>
-        <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs}/></>;
-
-
+        <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs} retrieveData={retrieveLogConfig}/></>;
 }
 
 const useStyles = makeStyles((theme) => ({
