@@ -26,7 +26,6 @@ package org.wso2.ei.dashboard.bootstrap;
 public class StringUtils {
     /**
      * <p>Checks if a String is empty ("") or null.</p>
-     * <p/>
      * <pre>
      * StringUtils.isEmpty(null)      = true
      * StringUtils.isEmpty("")        = true
@@ -34,7 +33,6 @@ public class StringUtils {
      * StringUtils.isEmpty("bob")     = false
      * StringUtils.isEmpty("  bob  ") = false
      * </pre>
-     * <p/>
      * <p>NOTE: This method changed in Lang version 2.0.
      * It no longer trims the String.
      * That functionality is available in isBlank().</p>
