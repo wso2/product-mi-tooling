@@ -58,7 +58,7 @@
 
     <properties>
         <automation.version>4.4.4</automation.version>
-        <mi.automation.version>4.0.0-SNAPSHOT</mi.automation.version>
+        <mi.automation.version>4.0.0-alpha</mi.automation.version>
     </properties>
 
 </project>
