@@ -125,6 +125,7 @@ public class Bootstrap {
 
         HttpConfiguration https = new HttpConfiguration();
         https.addCustomizer(new SecureRequestCustomizer());
+        https.setSendServerVersion(false);
 
         SslContextFactory sslContextFactory = new SslContextFactory.Server();
         String jksPath =
