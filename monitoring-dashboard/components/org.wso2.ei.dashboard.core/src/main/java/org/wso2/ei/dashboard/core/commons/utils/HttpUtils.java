@@ -45,6 +45,7 @@ import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
 import java.io.IOException;
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.core.Response;
 
 /**
  * Utilities to execute http requests.
@@ -130,6 +131,16 @@ public class HttpUtils {
         } catch (Exception e) {
             throw new DashboardServerException("Error occurred while creating http client.", e);
         }
+    }
+
+    public static void setHeaders(Response.ResponseBuilder responseBuilder) {
+        responseBuilder
+                .header("Content-Security-Policy",
+                        "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';"
+                                + " frame-ancestors 'none'; form-action 'self';")
+                .header("X-Frame-Options", "DENY")
+                .header("X-Content-Type-Options", "nosniff")
+                .header("Referrer-Policy", "same-origin");
     }
 
 }
