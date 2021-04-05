@@ -140,6 +140,7 @@ export default function AddUsers() {
                                 helperText='Enter User Name'
                                 required
                                 label="User Name"
+                                autoComplete="off"
                                 onChange={(e) => handleUserInput(e)}
                                 name="userId"
                                 value={user.userId}
@@ -154,6 +155,7 @@ export default function AddUsers() {
                                 onChange={(e) => handleUserInput(e)}
                                 name="password" l
                                 abel="Password"
+                                autoComplete="off"
                                 type="password"
                                 value={user.password} />
                         </Box>
@@ -166,6 +168,7 @@ export default function AddUsers() {
                                 onChange={(e) => handleUserInput(e)}
                                 name="passwordRepeat"
                                 label="Repeat Password"
+                                autoComplete="off"
                                 type="password" value={user.passwordRepeat} />
                         </Box>
                         <Box mb={4}>
