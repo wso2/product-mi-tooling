@@ -126,6 +126,7 @@ public class Bootstrap {
         HttpConfiguration https = new HttpConfiguration();
         https.addCustomizer(new SecureRequestCustomizer());
         https.setSendServerVersion(false);
+        server.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", 2000);
 
         SslContextFactory sslContextFactory = new SslContextFactory.Server();
         String jksPath =
