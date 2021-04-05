@@ -81,7 +81,7 @@ function Login(props){
 
         e.preventDefault();
 
-        AuthManager.authenticate(userName, password, false)
+        AuthManager.authenticate(userName, password, true)
             .then(() => { setAuthenticated(true)})
             .catch((error) => {
                 console.log("Authentication failed with error :: " + error);
