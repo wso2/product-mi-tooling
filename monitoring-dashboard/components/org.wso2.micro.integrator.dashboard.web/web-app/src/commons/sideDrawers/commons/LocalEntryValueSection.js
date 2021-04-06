@@ -62,7 +62,7 @@ export default function LocalEntryValueSection(props) {
     if (designContent) {
         return (<><AppBar position="static" classes={{root: classes.tabsAppBar}}>
             <Tabs value={selectedTab} onChange={changeTab} aria-label="design source selection">
-                <Tab label="Design"/>
+                <Tab label="Overview"/>
                 <Tab label="Value"/>
             </Tabs>
         </AppBar>

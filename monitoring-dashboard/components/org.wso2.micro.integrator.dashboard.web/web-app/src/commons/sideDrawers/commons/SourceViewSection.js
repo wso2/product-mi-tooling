@@ -70,7 +70,7 @@ export default function SourceViewSection(props) {
     if (designContent) {
         return (<><AppBar position="static" classes={{root: classes.tabsAppBar}}>
             <Tabs value={selectedTab} onChange={changeTab} aria-label="design source selection">
-                <Tab label="Design"/>
+                <Tab label="Overview"/>
                 <Tab label="Source"/>
             </Tabs>
         </AppBar>
