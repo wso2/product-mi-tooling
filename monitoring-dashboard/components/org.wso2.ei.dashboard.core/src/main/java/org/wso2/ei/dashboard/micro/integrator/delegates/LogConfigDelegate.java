@@ -23,11 +23,7 @@ package org.wso2.ei.dashboard.micro.integrator.delegates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
@@ -42,8 +38,7 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigsInner;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
-
-import java.nio.charset.StandardCharsets;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 /**
  * Delegate class to handle requests from log-configs page.
@@ -110,10 +105,10 @@ public class LogConfigDelegate {
         for (NodeListInner node : nodeList) {
             String nodeId = node.getNodeId();
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-            String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
             String addLoggerUrl = mgtApiUrl.concat("logging");
             logger.debug("Adding new logger on node " + nodeId);
-            CloseableHttpResponse httpResponse = doPatch(addLoggerUrl, accessToken, payload);
+            CloseableHttpResponse httpResponse = Utils.doPatch(groupId, nodeId, accessToken, addLoggerUrl, payload);
             if (httpResponse.getStatusLine().getStatusCode() != 200) {
                 logger.error("Error occurred while adding logger on node " + nodeId + " in group " + groupId);
                 String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
@@ -134,9 +129,9 @@ public class LogConfigDelegate {
 
     private JsonArray getLogConfigByNodeId(String groupId, String nodeId) {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("logging");
-        CloseableHttpResponse httpResponse = doGet(accessToken, url);
+        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         return HttpUtils.getJsonArray(httpResponse);
     }
 
@@ -175,33 +170,10 @@ public class LogConfigDelegate {
 
     private CloseableHttpResponse updateLogLevelByNodeId(String groupId, String nodeId, JsonObject payload) {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String updateLoggerUrl = mgtApiUrl.concat("logging");
         logger.debug("Updating logger on node " + nodeId);
-        return doPatch(updateLoggerUrl, accessToken, payload);
-    }
-
-    private CloseableHttpResponse doGet(String accessToken, String url) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpGet httpGet = new HttpGet(url);
-
-        httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpGet.setHeader("Authorization", authHeader);
-
-        return HttpUtils.doGet(httpGet);
-    }
-
-    private CloseableHttpResponse doPatch(String url, String accessToken, JsonObject payload) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpPatch httpPatch = new HttpPatch(url);
-
-        httpPatch.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpPatch.setHeader("Content-Type", Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpPatch.setHeader("Authorization", authHeader);
-
-        HttpEntity httpEntity = new ByteArrayEntity(payload.toString().getBytes(StandardCharsets.UTF_8));
-        httpPatch.setEntity(httpEntity);
-        return HttpUtils.doPatch(httpPatch);
+        return Utils.doPatch(groupId, nodeId, accessToken, updateLoggerUrl, payload);
     }
 }
 

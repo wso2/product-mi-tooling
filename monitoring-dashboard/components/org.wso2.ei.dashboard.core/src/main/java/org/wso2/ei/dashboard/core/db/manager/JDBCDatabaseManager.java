@@ -67,8 +67,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public boolean insertHeartbeat(HeartbeatObject heartbeat) {
-        String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,?,?);";
+    public boolean insertHeartbeat(HeartbeatObject heartbeat, String accessToken) {
+        String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,?,?,?);";
         Connection con = null;
         PreparedStatement statement = null;
         try {
@@ -79,6 +79,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             statement.setInt(3, heartbeat.getInterval());
             statement.setString(4, heartbeat.getMgtApiUrl());
             statement.setString(5, String.valueOf(heartbeat.getTimestamp()));
+            statement.setString(6, accessToken);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
@@ -258,6 +259,31 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public String getAccessToken(String groupId, String nodeId) {
+        String query = "SELECT ACCESS_TOKEN FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        String accessToken = "";
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, groupId);
+            statement.setString(2, nodeId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                accessToken = resultSet.getString(1);
+            }
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while retrieving access token of node: " + nodeId
+                                               + " in group " + groupId, e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+        return accessToken;
+    }
+
+    @Override
     public String getHeartbeatInterval(String groupId, String nodeId) {
         String query = "SELECT HERTBEAT_INTERVAL FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
         Connection con = null;
@@ -344,6 +370,26 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
+        } finally {
+            closeStatement(statement);
+            closeConnection(con);
+        }
+    }
+
+    @Override
+    public boolean updateAccessToken(String groupId, String nodeId, String accessToken) {
+        String query = "UPDATE HEARTBEAT SET ACCESS_TOKEN=? WHERE GROUP_ID=? AND NODE_ID=?;";
+        Connection con = null;
+        PreparedStatement statement = null;
+        try {
+            con = getConnection();
+            statement = con.prepareStatement(query);
+            statement.setString(1, accessToken);
+            statement.setString(2, groupId);
+            statement.setString(3, nodeId);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DashboardServerException("Error occurred while updating access token.", e);
         } finally {
             closeStatement(statement);
             closeConnection(con);

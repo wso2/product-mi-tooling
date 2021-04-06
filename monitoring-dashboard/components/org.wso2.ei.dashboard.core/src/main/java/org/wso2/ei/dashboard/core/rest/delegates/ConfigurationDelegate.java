@@ -22,14 +22,16 @@ package org.wso2.ei.dashboard.core.rest.delegates;
 
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
+import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
+import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.model.ModelConfiguration;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 /**
  * Delegate class to manage fetch configuration using management api.
@@ -41,6 +43,7 @@ public class ConfigurationDelegate {
     private String artifactName;
 
     private static final Logger logger = LogManager.getLogger(ConfigurationDelegate.class);
+    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     public ConfigurationDelegate(String groupId, String nodeId, String artifactType, String artifactName) {
         this.groupId = groupId;
@@ -53,10 +56,12 @@ public class ConfigurationDelegate {
         logger.debug("Fetching configuration of " + artifactName + " in node " + nodeId + " of group " + groupId);
         String type = artifactType.split("_")[0];
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
         String queryParamName = getQueryParam(artifactType);
         String url = mgtApiUrl.concat(type).concat("?").concat(queryParamName).concat("=").concat(artifactName);
-        CloseableHttpResponse httpResponse = doGet(accessToken, url);
+
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
+
         JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
         String configuration = jsonResponse.get("configuration").getAsString();
         ModelConfiguration modelConfiguration = new ModelConfiguration();
@@ -89,15 +94,5 @@ public class ConfigurationDelegate {
                 return "dataServiceName";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");        }
-    }
-
-    private CloseableHttpResponse doGet(String accessToken, String url) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpGet httpGet = new HttpGet(url);
-
-        httpGet.setHeader("Accept", "application/json");
-        httpGet.setHeader("Authorization", authHeader);
-
-        return HttpUtils.doGet(httpGet);
     }
 }

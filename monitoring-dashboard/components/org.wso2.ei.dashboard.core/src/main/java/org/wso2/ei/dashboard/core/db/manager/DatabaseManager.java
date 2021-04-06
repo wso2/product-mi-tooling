@@ -32,7 +32,7 @@ import java.util.List;
  */
 public interface DatabaseManager {
 
-    boolean insertHeartbeat(HeartbeatObject heartbeat);
+    boolean insertHeartbeat(HeartbeatObject heartbeat, String accessToken);
 
     boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo);
 
@@ -47,6 +47,8 @@ public interface DatabaseManager {
 
     String getMgtApiUrl(String groupId, String nodeId);
 
+    String getAccessToken(String groupId, String nodeId);
+
     String getHeartbeatInterval(String groupId, String nodeId);
 
     boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp);
@@ -54,6 +56,8 @@ public interface DatabaseManager {
     String retrieveTimestampOfLastHeartbeat(String groupId, String nodeId);
 
     boolean updateHeartbeat(HeartbeatObject heartbeat);
+
+    boolean updateAccessToken(String groupId, String nodeId, String accessToken);
 
     boolean updateDetails(String artifactType, String artifactName, String groupId, String nodeId, String details);
 
