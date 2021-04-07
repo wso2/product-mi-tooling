@@ -69,11 +69,10 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     @Override
     public boolean insertHeartbeat(HeartbeatObject heartbeat, String accessToken) {
         String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,?,?,?);";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, heartbeat.getGroupId());
             statement.setString(2, heartbeat.getNodeId());
             statement.setInt(3, heartbeat.getInterval());
@@ -83,20 +82,16 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
     @Override
     public boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo) {
         String query = "INSERT INTO SERVERS VALUES (?,?,?);";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, heartbeat.getGroupId());
             statement.setString(2, heartbeat.getNodeId());
             statement.setString(3, serverInfo);
@@ -104,9 +99,6 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while inserting server information of node : "
                                                + heartbeat.getNodeId() + " in group: " + heartbeat.getGroupId(), e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -114,34 +106,27 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     public boolean insertArtifact(String groupId, String nodeId, String artifactType, String artifactName,
                                   String artifactDetails) {
         String query = "INSERT INTO " + getTableName(artifactType) + " VALUES (?,?,?,?);";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             statement.setString(3, artifactName);
             statement.setString(4, artifactDetails);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while inserting " + artifactName + " information.",
-                                               e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
+            throw new DashboardServerException("Error occurred while inserting " + artifactName + " information.", e);
         }
     }
 
     @Override
     public GroupList fetchGroups() {
         String query = "SELECT DISTINCT GROUP_ID FROM HEARTBEAT;";
-        Connection con = null;
-        PreparedStatement statement = null;
-
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             GroupList groupList = new GroupList();
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -150,21 +135,16 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return groupList;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred fetching groups.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
     @Override
     public NodeList fetchNodes(String groupId) {
         String query = "SELECT * FROM SERVERS WHERE GROUP_ID=?";
-        Connection con = null;
-        PreparedStatement statement = null;
-
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             NodeList nodeList = new NodeList();
             ResultSet resultSet = statement.executeQuery();
@@ -179,9 +159,6 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return nodeList;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred fetching servers.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -205,12 +182,12 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                                        + "AND (" + nodeSearch + ");";
         String getDetailsQuery = "SELECT NODE_ID, DETAILS FROM " + tableName + " WHERE NAME=? AND GROUP_ID=? AND " +
                                   "(" + nodeSearch + ");";
-        Connection con = null;
-        PreparedStatement statement = null;
 
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(getDistinctNamesQuery);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(getDistinctNamesQuery);
+
+        ) {
             statement.setString(1, groupId);
             for (int i = 0, j = 2; i < nodeList.size(); i++, j++) {
                 statement.setString(j, nodeList.get(i));
@@ -228,21 +205,18 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return artifacts;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred fetching " + artifactType, e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
     @Override
     public String getMgtApiUrl(String groupId, String nodeId) {
         String query = "SELECT MGT_API_URL FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
         String mgtApiUrl = "";
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             ResultSet resultSet = statement.executeQuery();
@@ -251,9 +225,6 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             }
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while retrieveTimestampOfRegisteredNode results.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
         return mgtApiUrl;
     }
@@ -261,12 +232,11 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     @Override
     public String getAccessToken(String groupId, String nodeId) {
         String query = "SELECT ACCESS_TOKEN FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
         String accessToken = "";
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             ResultSet resultSet = statement.executeQuery();
@@ -276,9 +246,6 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while retrieving access token of node: " + nodeId
                                                + " in group " + groupId, e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
         return accessToken;
     }
@@ -286,12 +253,10 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     @Override
     public String getHeartbeatInterval(String groupId, String nodeId) {
         String query = "SELECT HERTBEAT_INTERVAL FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             ResultSet resultSet = statement.executeQuery();
@@ -300,9 +265,6 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while fetching heartbeat interval of group " + groupId
                                                + " node " + nodeId, e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -311,11 +273,10 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     public boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp) {
         String query = "SELECT COUNT(*) FROM HEARTBEAT WHERE TIMESTAMP>? AND GROUP_ID=? AND NODE_ID=?;";
         boolean isExists = false;
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, initialTimestamp);
             statement.setString(2, heartbeat.getGroupId());
             statement.setString(3, heartbeat.getNodeId());
@@ -326,20 +287,16 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             }
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while retrieving next row.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
         return isExists;
     }
 
     public String retrieveTimestampOfLastHeartbeat(String groupId, String nodeId) {
         String query = "SELECT TIMESTAMP FROM HEARTBEAT WHERE GROUP_ID = ? AND NODE_ID = ? ;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             ResultSet resultSet = statement.executeQuery();
@@ -350,49 +307,40 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             }
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while retrieveTimestampOfRegisteredNode results.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
     @Override
     public boolean updateHeartbeat(HeartbeatObject heartbeat) {
         String query = "UPDATE HEARTBEAT SET TIMESTAMP=? WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, String.valueOf(heartbeat.getTimestamp()));
             statement.setString(2, heartbeat.getGroupId());
             statement.setString(3, heartbeat.getNodeId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
     @Override
     public boolean updateAccessToken(String groupId, String nodeId, String accessToken) {
         String query = "UPDATE HEARTBEAT SET ACCESS_TOKEN=? WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, accessToken);
             statement.setString(2, groupId);
             statement.setString(3, nodeId);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while updating access token.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -401,11 +349,11 @@ public final class JDBCDatabaseManager implements DatabaseManager {
                                  String details) {
         String tableName = getTableName(artifactType);
         String query = "UPDATE " + tableName + " SET DETAILS=? WHERE GROUP_ID=? AND NODE_ID=? AND NAME=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, details);
             statement.setString(2, groupId);
             statement.setString(3, nodeId);
@@ -413,28 +361,22 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
     @Override
     public int deleteHeartbeat(HeartbeatObject heartbeat) {
         String query = "DELETE FROM HEARTBEAT WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, heartbeat.getGroupId());
             statement.setString(2, heartbeat.getNodeId());
             return statement.executeUpdate();
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while deleting heartbeat information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -442,19 +384,16 @@ public final class JDBCDatabaseManager implements DatabaseManager {
     public boolean deleteServerInformation(String groupId, String nodeId) {
         logger.debug("Deleting server information of node: " + nodeId + " in group : " + groupId);
         String query = "DELETE FROM SERVERS WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             return (statement.executeUpdate() > 0);
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while deleting server information.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -463,20 +402,17 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         logger.debug("Deleting all " + artifactType + " in node: " + nodeId + " in group : " + groupId);
         String tableName = getTableName(artifactType);
         String query = "DELETE FROM " + tableName + " WHERE GROUP_ID=? AND NODE_ID=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             return (statement.executeUpdate() > 0);
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while deleting all " + artifactType +  " in node: "
                                                + nodeId + " in group : " + groupId, e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -489,31 +425,27 @@ public final class JDBCDatabaseManager implements DatabaseManager {
         String tableName = getTableName(artifactType);
 
         String query = "DELETE FROM " + tableName + " WHERE GROUP_ID=? AND NODE_ID=? AND NAME=?;";
-        Connection con = null;
-        PreparedStatement statement = null;
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(query);
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(query);
+        ) {
             statement.setString(1, groupId);
             statement.setString(2, nodeId);
             statement.setString(3, artifactName);
             return (statement.executeUpdate() > 0);
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while deleting " + artifactName, e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
     private List<ArtifactDetails> getArtifactDetails(String getServicesQuery, String artifactName, String groupId,
                                                      List<String> nodeList) {
-        Connection con = null;
-        PreparedStatement statement = null;
 
-        try {
-            con = getConnection();
-            statement = con.prepareStatement(getServicesQuery);
+        try (
+                Connection con = getConnection();
+                PreparedStatement statement = con.prepareStatement(getServicesQuery);
+        ) {
             statement.setString(1, artifactName);
             statement.setString(2, groupId);
             for (int i = 0, j = 3; i < nodeList.size(); i++, j++) {
@@ -533,9 +465,6 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             return artifactDetailsList;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred while retrieving next row.", e);
-        } finally {
-            closeStatement(statement);
-            closeConnection(con);
         }
     }
 
@@ -574,25 +503,5 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     private Connection getConnection() throws SQLException {
         return dataSource.getConnection();
-    }
-
-    private void closeStatement(PreparedStatement statement) {
-        try {
-            if (statement != null) {
-                statement.close();
-            }
-        } catch (SQLException e) {
-            logger.error("Error occurred while closing the statement.", e);
-        }
-    }
-
-    private void closeConnection(Connection con) {
-        try {
-            if (con != null) {
-                con.close();
-            }
-        } catch (SQLException e) {
-            logger.error("Error occurred while closing the connection.", e);
-        }
     }
 }
