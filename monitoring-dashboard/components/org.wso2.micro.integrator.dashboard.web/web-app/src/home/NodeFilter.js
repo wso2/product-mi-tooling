@@ -126,7 +126,7 @@ function MultipleSelect(props) {
                         </MenuItem>
                     ))}
                 </Select>
-                <FormHelperText>Select Nodes</FormHelperText>
+                <FormHelperText>Node IDs</FormHelperText>
             </FormControl>
         </div>
     );

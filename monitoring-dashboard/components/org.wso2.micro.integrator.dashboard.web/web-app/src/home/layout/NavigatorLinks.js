@@ -23,7 +23,7 @@ export const categories = [
         { id: 'Inbound Endpoints', to: '/inbound-endpoints', icon: <InbountEpIcon /> },
         { id: 'Message Processors', to: '/message-processors', icon: <MessageProcessorIcon /> },
         { id: 'Message Stores', to: '/message-stores', icon: <MessageStoreIcon /> },
-        { id: 'API', to: '/apis', icon: <ApiIcon /> },
+        { id: 'APIs', to: '/apis', icon: <ApiIcon /> },
         { id: 'Templates', to: '/templates', icon: <TemplateIcon /> },
         { id: 'Sequences', to: '/sequences', icon: <SequenceIcon /> },
         { id: 'Tasks', to: '/tasks', icon: <Event /> },
