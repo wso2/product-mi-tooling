@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
@@ -35,6 +34,7 @@ import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.LocalEntryValue;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 import java.util.List;
 
@@ -60,23 +60,13 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
     public LocalEntryValue getValue(String groupId, String nodeId, String localEntry) {
         log.debug("Fetching value of local entry " + localEntry + " in node " + nodeId + " of group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("local-entries?name=").concat(localEntry);
-        CloseableHttpResponse httpResponse = doGet(accessToken, url);
+        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
         String value = jsonResponse.get("value").getAsString();
         LocalEntryValue localEntryValue = new LocalEntryValue();
         localEntryValue.setValue(value);
         return localEntryValue;
-    }
-
-    private CloseableHttpResponse doGet(String accessToken, String url) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpGet httpGet = new HttpGet(url);
-
-        httpGet.setHeader("Accept", "application/json");
-        httpGet.setHeader("Authorization", authHeader);
-
-        return HttpUtils.doGet(httpGet);
     }
 }

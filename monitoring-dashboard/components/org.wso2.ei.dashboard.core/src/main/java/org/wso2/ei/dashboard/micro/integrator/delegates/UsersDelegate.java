@@ -26,23 +26,17 @@ import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.core.rest.model.UsersInner;
-
-import java.io.UnsupportedEncodingException;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 /**
  * Delegate class to handle requests from users page.
@@ -65,9 +59,9 @@ public class UsersDelegate {
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users");
-        CloseableHttpResponse httpResponse = doPost(accessToken, url, payload);
+        CloseableHttpResponse httpResponse = Utils.doPost(groupId, nodeId, accessToken, url, payload);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
             log.error("Error occurred while adding user in group " + groupId);
             String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
@@ -85,9 +79,9 @@ public class UsersDelegate {
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users/").concat(userId);
-        CloseableHttpResponse httpResponse = doDelete(accessToken, url);
+        CloseableHttpResponse httpResponse = Utils.doDelete(groupId, nodeId, accessToken, url);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
             log.error("Error occurred while deleting user " + userId + " in group " + groupId);
             String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
@@ -112,61 +106,25 @@ public class UsersDelegate {
         // assumption - In a group, users of all nodes in the group should be identical
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users/");
-        CloseableHttpResponse httpResponse = doGet(accessToken, url);
+        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonArray userList = HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();
         for (JsonElement user : userList) {
-            UsersInner usersInner = getUserDetails(accessToken, url, user);
+            UsersInner usersInner = getUserDetails(groupId, nodeId, accessToken, url, user);
             users.add(usersInner);
         }
         return users;
     }
 
-    private UsersInner getUserDetails(String accessToken, String url, JsonElement user) {
+    private UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url, JsonElement user) {
         String userId = user.getAsJsonObject().get("userId").getAsString();
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);
-        String getUsersDetails = url.concat(userId);
-        CloseableHttpResponse userDetailResponse = doGet(accessToken, getUsersDetails);
+        String getUsersDetailsUrl = url.concat(userId);
+        CloseableHttpResponse userDetailResponse = Utils.doGet(groupId, nodeId, accessToken, getUsersDetailsUrl);
         String userDetail = HttpUtils.getStringResponse(userDetailResponse);
         usersInner.setDetails(userDetail);
         return usersInner;
-    }
-
-    private CloseableHttpResponse doGet(String accessToken, String url) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpGet httpGet = new HttpGet(url);
-
-        httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpGet.setHeader("Authorization", authHeader);
-
-        return HttpUtils.doGet(httpGet);
-    }
-
-    private CloseableHttpResponse doPost(String accessToken, String url, JsonObject payload) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpPost httpPost = new HttpPost(url);
-
-        httpPost.setHeader("Authorization", authHeader);
-        httpPost.setHeader("content-type", Constants.HEADER_VALUE_APPLICATION_JSON);
-
-        try {
-            StringEntity entity = new StringEntity(payload.toString());
-            httpPost.setEntity(entity);
-            return HttpUtils.doPost(httpPost);
-        } catch (UnsupportedEncodingException e) {
-            throw new DashboardServerException("Error occurred while creating http post request.", e);
-        }
-    }
-
-    private CloseableHttpResponse doDelete(String accessToken, String url) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpDelete httpDelete = new HttpDelete(url);
-
-        httpDelete.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpDelete.setHeader("Authorization", authHeader);
-
-        return HttpUtils.doDelete(httpDelete);
     }
 }

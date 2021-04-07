@@ -24,11 +24,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
-import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
@@ -36,6 +34,7 @@ import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.core.rest.model.UpdatedArtifact;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -113,11 +112,13 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private void fetchAllArtifactsAndStore() {
-        logger.info("Fetching artifacts from node " + heartbeat.getNodeId() + " in group " + heartbeat.getGroupId());
-        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
+        String nodeId = heartbeat.getNodeId();
+        String groupId = heartbeat.getGroupId();
+        logger.info("Fetching artifacts from node " + nodeId + " in group " + groupId);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         for (String artifactType : ALL_ARTIFACTS) {
             final String url = heartbeat.getMgtApiUrl().concat(artifactType);
-            CloseableHttpResponse response = doGet(accessToken, url);
+            CloseableHttpResponse response = Utils.doGet(groupId, nodeId, accessToken, url);
             JsonObject artifacts = HttpUtils.getJsonResponse(response);
             switch (artifactType) {
                 case TEMPLATES:
@@ -177,7 +178,7 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     private void fetchAndStoreServers(String accessToken) {
         String url = heartbeat.getMgtApiUrl() + SERVER;
-        CloseableHttpResponse response = doGet(accessToken, url);
+        CloseableHttpResponse response = Utils.doGet(heartbeat.getGroupId(), heartbeat.getNodeId(), accessToken, url);
         String stringResponse = HttpUtils.getStringResponse(response);
         storeServerInfo(stringResponse, heartbeat);
     }
@@ -193,28 +194,31 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     public boolean updateArtifactDetails() {
         if (updateArtifactObject != null) {
+            String groupId = updateArtifactObject.getGroupId();
+            String nodeId = updateArtifactObject.getNodeId();
             String mgtApiUrl = updateArtifactObject.getMgtApiUrl();
-            String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
             String artifactType = updateArtifactObject.getType();
             String artifactName = updateArtifactObject.getName();
-            JsonObject details = getArtifactDetails(mgtApiUrl, artifactType, artifactName,
+            JsonObject details = getArtifactDetails(groupId, nodeId, mgtApiUrl, artifactType, artifactName,
                                                     accessToken);
-            return databaseManager.updateDetails(artifactType, artifactName, updateArtifactObject.getGroupId(),
-                                          updateArtifactObject.getNodeId(), details.toString());
+            return databaseManager.updateDetails(artifactType, artifactName, groupId, nodeId, details.toString());
         } else {
             throw new DashboardServerException("Artifact details are invalid");
         }
     }
 
     private void fetchAndStoreArtifact(UpdatedArtifact info) {
-        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
         String artifactType = info.getType();
         if (artifactType.equals(TEMPLATES)) {
             updateTemplates(info);
         } else {
             String artifactName = info.getName();
+            String groupId = heartbeat.getGroupId();
+            String nodeId = heartbeat.getNodeId();
+            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
             JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
-            databaseManager.insertArtifact(heartbeat.getGroupId(), heartbeat.getNodeId(), artifactType, artifactName,
+            databaseManager.insertArtifact(groupId, nodeId, artifactType, artifactName,
                                            artifactDetails.toString());
         }
     }
@@ -237,49 +241,62 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken) {
-        final String mgtApiUrl = heartbeat.getMgtApiUrl();
-        return getArtifactDetails(mgtApiUrl, artifactType, artifactName, accessToken);
+        return getArtifactDetails(heartbeat.getGroupId(), heartbeat.getNodeId(), heartbeat.getMgtApiUrl(), artifactType,
+                                  artifactName, accessToken);
     }
 
-    private JsonObject getArtifactDetails(String mgtApiUrl, String artifactType, String artifactName,
-                                          String accessToken) {
+    private JsonObject getArtifactDetails(String groupId, String nodeId, String mgtApiUrl, String artifactType,
+                                          String artifactName, String accessToken) {
+        String getArtifactDetailsUrl = getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
+        CloseableHttpResponse artifactDetails = Utils.doGet(groupId, nodeId, accessToken,
+                                                            getArtifactDetailsUrl);
+        JsonObject jsonResponse = HttpUtils.getJsonResponse(artifactDetails);
+        return removeValueAndConfiguration(artifactType, jsonResponse);
+    }
+
+    private JsonObject removeValueAndConfiguration(String artifactType, JsonObject jsonResponse) {
+        if (artifactType.equals(CONNECTORS) || artifactType.equals(CARBON_APPLICATIONS)) {
+            return jsonResponse;
+        } else if (artifactType.equals(LOCAL_ENTRIES)) {
+            return removeValueFromResponse(jsonResponse);
+        } else {
+            return removeConfigurationFromResponse(jsonResponse);
+        }
+    }
+
+    private String getArtifactDetailsUrl(String mgtApiUrl, String artifactType, String artifactName) {
+
         String getArtifactDetailsUrl;
+        String getArtifactsUrl = mgtApiUrl.concat(artifactType);
         switch (artifactType) {
             case PROXY_SERVICES:
-                getArtifactDetailsUrl = mgtApiUrl.concat(PROXY_SERVICES).concat("?proxyServiceName=")
-                                                 .concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?proxyServiceName=").concat(artifactName);
                 break;
             case ENDPOINTS:
-                getArtifactDetailsUrl = mgtApiUrl.concat(ENDPOINTS).concat("?endpointName=").concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?endpointName=").concat(artifactName);
                 break;
             case INBOUND_ENDPOINTS:
-                getArtifactDetailsUrl = mgtApiUrl.concat(INBOUND_ENDPOINTS).concat("?inboundEndpointName=")
-                                                 .concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?inboundEndpointName=").concat(artifactName);
                 break;
             case MESSAGE_STORES:
-                getArtifactDetailsUrl = mgtApiUrl.concat(MESSAGE_STORES).concat("?name=").concat(artifactName);
-                break;
             case MESSAGE_PROCESSORS:
-                getArtifactDetailsUrl = mgtApiUrl.concat(MESSAGE_PROCESSORS).concat("?name=").concat(artifactName);
+            case LOCAL_ENTRIES:
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?name=").concat(artifactName);
                 break;
             case APIS:
-                getArtifactDetailsUrl = mgtApiUrl.concat(APIS).concat("?apiName=").concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?apiName=").concat(artifactName);
                 break;
             case SEQUENCES:
-                getArtifactDetailsUrl = mgtApiUrl.concat(SEQUENCES).concat("?sequenceName=").concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?sequenceName=").concat(artifactName);
                 break;
             case TASKS:
-                getArtifactDetailsUrl = mgtApiUrl.concat(TASKS).concat("?taskName=").concat(artifactName);
-                break;
-            case LOCAL_ENTRIES:
-                getArtifactDetailsUrl = mgtApiUrl.concat(LOCAL_ENTRIES).concat("?name=").concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?taskName=").concat(artifactName);
                 break;
             case CONNECTORS:
-                getArtifactDetailsUrl = mgtApiUrl.concat(CONNECTORS).concat("?connectorName=").concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?connectorName=").concat(artifactName);
                 break;
             case CARBON_APPLICATIONS:
-                getArtifactDetailsUrl = mgtApiUrl.concat(CARBON_APPLICATIONS).concat("?carbonAppName=")
-                                                 .concat(artifactName);
+                getArtifactDetailsUrl = getArtifactsUrl.concat("?carbonAppName=").concat(artifactName);
                 break;
             case DATA_SERVICES:
                 getArtifactDetailsUrl = mgtApiUrl.concat(DATA_SERVICES).concat("?dataServiceName=")
@@ -288,15 +305,7 @@ public class MiArtifactsManager implements ArtifactsManager {
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }
-        CloseableHttpResponse artifactDetails = doGet(accessToken, getArtifactDetailsUrl);
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(artifactDetails);
-        if (artifactType.equals(CONNECTORS) || artifactType.equals(CARBON_APPLICATIONS)) {
-            return jsonResponse;
-        } else if (artifactType.equals(LOCAL_ENTRIES)) {
-            return removeValueFromResponse(jsonResponse);
-        } else {
-            return removeConfigurationFromResponse(jsonResponse);
-        }
+        return getArtifactDetailsUrl;
     }
 
     private JsonObject removeConfigurationFromResponse(JsonObject artifact) {
@@ -323,16 +332,6 @@ public class MiArtifactsManager implements ArtifactsManager {
         for (String artifact : ALL_ARTIFACTS) {
             databaseManager.deleteAllArtifacts(artifact, groupId, nodeId);
         }
-    }
-
-    private CloseableHttpResponse doGet(String accessToken, String url) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpGet httpGet = new HttpGet(url);
-
-        httpGet.setHeader("Accept", "application/json");
-        httpGet.setHeader("Authorization", authHeader);
-
-        return HttpUtils.doGet(httpGet);
     }
 
     private void addToDelayedQueue() {

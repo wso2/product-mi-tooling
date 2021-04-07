@@ -30,7 +30,7 @@ import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
-import org.wso2.ei.dashboard.micro.integrator.DelegatesUtil;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 
 import java.util.List;
 

@@ -27,13 +27,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
+import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
+import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.rest.model.LogDetail;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.LogListInner;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class LogsDelegate {
     private static final Log log = LogFactory.getLog(LogsDelegate.class);
+    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     public LogList getLogsList(String groupId, List<String> nodeList) {
         log.debug("Fetching logs via management api.");
@@ -82,17 +85,17 @@ public class LogsDelegate {
 
     private JsonArray getLogsArray(String groupId, String nodeId) {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("logs");
-        CloseableHttpResponse httpResponse = doGet(accessToken, url);
+        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         return HttpUtils.getJsonResponse(httpResponse).getAsJsonArray("list");
     }
 
     public String getLogByName(String groupId, String nodeId, String fileName) {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String url = mgtApiUrl.concat("logs?file=").concat(fileName);
-        String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
-        CloseableHttpResponse httpResponse = doGet(accessToken, url);
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         HttpEntity responseEntity = httpResponse.getEntity();
         String response = "";
         if (responseEntity != null) {
@@ -104,15 +107,5 @@ public class LogsDelegate {
 
         }
         return response;
-    }
-
-    private CloseableHttpResponse doGet(String accessToken, String url) {
-        String authHeader = "Bearer " + accessToken;
-        final HttpGet httpGet = new HttpGet(url);
-
-        httpGet.setHeader("Accept", "application/json");
-        httpGet.setHeader("Authorization", authHeader);
-
-        return HttpUtils.doGet(httpGet);
     }
 }

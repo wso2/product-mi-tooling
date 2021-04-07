@@ -23,6 +23,7 @@ package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
@@ -94,7 +95,8 @@ public class HeartBeatDelegate {
     private boolean registerNode(HeartbeatObject heartbeat) {
         logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
-        return databaseManager.insertHeartbeat(heartbeat);
+        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
+        return databaseManager.insertHeartbeat(heartbeat, accessToken);
     }
 
     private void runHeartbeatExecutorService(String productName, HeartbeatObject heartbeat) {
