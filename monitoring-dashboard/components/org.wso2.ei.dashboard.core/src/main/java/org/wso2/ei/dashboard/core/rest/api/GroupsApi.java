@@ -20,6 +20,7 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
@@ -94,7 +95,9 @@ public class GroupsApi {
             @Valid LogConfigAddRequest request) {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         Ack ack = logConfigDelegate.addLogger(groupId, request);
-        return Response.ok().entity(ack).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @PATCH
@@ -112,7 +115,9 @@ public class GroupsApi {
             @Valid LogConfigUpdateRequest request) {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         Ack ack = logConfigDelegate.updateLogLevel(groupId, request);
-        return Response.ok().entity(ack).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @POST
@@ -129,7 +134,9 @@ public class GroupsApi {
             @Valid AddUserRequest request) {
         UsersDelegate usersDelegate = new UsersDelegate();
         Ack ack = usersDelegate.addUser(groupId, request);
-        return Response.ok().entity(ack).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @DELETE
@@ -146,7 +153,9 @@ public class GroupsApi {
             @PathParam("user-id") @Parameter(description = "User ID") String userId) {
         UsersDelegate usersDelegate = new UsersDelegate();
         Ack ack = usersDelegate.deleteUser(groupId, userId);
-        return Response.ok().entity(ack).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @GET
@@ -164,7 +173,9 @@ public class GroupsApi {
             @PathParam("file-name") @Parameter(description = "Log file name") String fileName) {
         LogsDelegate logsDelegate = new LogsDelegate();
         String logContent = logsDelegate.getLogByName(groupId, nodeId, fileName);
-        return Response.ok().entity(logContent).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logContent);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/apis")
@@ -180,7 +191,9 @@ public class GroupsApi {
 
         ApisDelegate apisDelegate = new ApisDelegate();
         Artifacts apiList = apisDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(apiList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(apiList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/capps")
@@ -198,7 +211,9 @@ public class GroupsApi {
 
         CarbonAppsDelegate cappsDelegate = new CarbonAppsDelegate();
         Artifacts cappList = cappsDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(cappList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(cappList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/connectors")
@@ -216,7 +231,9 @@ public class GroupsApi {
 
         ConnectorsDelegate connectorsDelegate = new ConnectorsDelegate();
         Artifacts connectorList = connectorsDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(connectorList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(connectorList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/data-services")
@@ -233,7 +250,9 @@ public class GroupsApi {
 
         DataServicesDelegate dataServicesDelegate = new DataServicesDelegate();
         Artifacts dataServicesList = dataServicesDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(dataServicesList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(dataServicesList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/datasources")
@@ -243,14 +262,12 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "List of datsources deployed in provided nodes", content = @Content(schema = @Schema(implementation = DatasourceList.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response getDatasourcesByNodeIds( @PathParam("group-id")
-
- @Parameter(description = "Group ID of the node") String groupId
-, @NotNull  @QueryParam("nodes") 
-
- @Parameter(description = "ID/IDs of the nodes")  List<String> nodes
-) {
-        return Response.ok().entity("magic!").build();
+    public Response getDatasourcesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+        Response.ResponseBuilder responseBuilder = Response.ok().entity("magic!");
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/endpoints")
@@ -268,7 +285,9 @@ public class GroupsApi {
 
         EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
         Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(endpointList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(endpointList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/inbound-endpoints")
@@ -286,7 +305,9 @@ public class GroupsApi {
 
         InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
         Artifacts inboundEndpointList = inboundEndpointDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(inboundEndpointList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(inboundEndpointList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/local-entries")
@@ -303,7 +324,9 @@ public class GroupsApi {
 
         LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
         Artifacts localEntriesList = localEntriesDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(localEntriesList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(localEntriesList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @GET
@@ -322,7 +345,9 @@ public class GroupsApi {
 
         LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
         LocalEntryValue localEntryValue = localEntriesDelegate.getValue(groupId, nodeId, localEntry);
-        return Response.ok().entity(localEntryValue).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(localEntryValue);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @GET
@@ -338,7 +363,9 @@ public class GroupsApi {
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         LogConfigs logConfigs = logConfigDelegate.fetchLogConfigs(groupId);
-        return Response.ok().entity(logConfigs).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logConfigs);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @GET
@@ -355,7 +382,9 @@ public class GroupsApi {
             @PathParam("node-id") @Parameter(description = "NodeId") String nodeId) {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         LogConfigs logConfigs = logConfigDelegate.fetchLogConfigsByNodeId(groupId, nodeId);
-        return Response.ok().entity(logConfigs).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logConfigs);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @PATCH
@@ -392,7 +421,9 @@ public class GroupsApi {
 
         LogsDelegate logsDelegate = new LogsDelegate();
         LogList logList = logsDelegate.getLogsList(groupId, nodes);
-        return Response.ok().entity(logList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/message-processors")
@@ -409,7 +440,9 @@ public class GroupsApi {
 
         MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
         Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(messageProcessorList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(messageProcessorList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/message-stores")
@@ -427,7 +460,9 @@ public class GroupsApi {
 
         MessageStoresDelegate messageStoresDelegate = new MessageStoresDelegate();
         Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(messageStoresList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(messageStoresList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @GET
@@ -445,7 +480,9 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes) {
         ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
         Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(proxyList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(proxyList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @GET
@@ -462,7 +499,9 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
         SequencesDelegate sequencesDelegate = new SequencesDelegate();
         Artifacts sequenceList = sequencesDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(sequenceList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(sequenceList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/tasks")
@@ -479,7 +518,9 @@ public class GroupsApi {
 
         TasksDelegate tasksDelegate = new TasksDelegate();
         Artifacts tasksList = tasksDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(tasksList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(tasksList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/templates")
@@ -496,7 +537,9 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
         TemplatesDelegate templatesDelegate = new TemplatesDelegate();
         Artifacts templateList =templatesDelegate.getArtifactsList(groupId, nodes);
-        return Response.ok().entity(templateList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(templateList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Path("/{group-id}/users")
@@ -512,7 +555,9 @@ public class GroupsApi {
 
         UsersDelegate usersDelegate = new UsersDelegate();
         Users users = usersDelegate.fetchUsers(groupId);
-        return Response.ok().entity(users).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(users);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
     @GET
     @Produces({ "application/json" })
@@ -524,7 +569,9 @@ public class GroupsApi {
     public Response retrieveGroups() {
         GroupDelegate groupDelegate = new GroupDelegate();
         GroupList groupList = groupDelegate.getGroupList();
-        return Response.ok().entity(groupList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(groupList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @GET
@@ -542,7 +589,9 @@ public class GroupsApi {
 
         NodesDelegate nodesDeligate = new NodesDelegate();
         NodeList nodeList = nodesDeligate.getNodes(groupId);
-        return Response.ok().entity(nodeList).build();
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(nodeList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
     }
 
     @PATCH
