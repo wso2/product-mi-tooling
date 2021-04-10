@@ -3,24 +3,20 @@ import { Helmet } from "react-helmet";
 import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
-import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
-import HelpIcon from '@material-ui/icons/Help';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
 import Toolbar from '@material-ui/core/Toolbar';
-import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { Menu, MenuItem, Popover } from '@material-ui/core';
 import NodeFilter from '../NodeFilter';
 import GroupSelector from '../GroupSelector';
 import { categories, getIdFromRoute } from './NavigatorLinks';
+import AuthManager from '../../auth/AuthManager';
+import Chip from '@material-ui/core/Chip';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -50,7 +46,11 @@ function Header(props) {
   const { classes, onDrawerToggle } = props;
   const location = useLocation();
   const [selected, setSelected] = useState(null);
+  const [user, setUser] = useState(null);
   useEffect(() => {
+    if (!user) {
+        setUser(AuthManager.getUser());
+    }
     if (location.pathname !== '/') {
       setSelected(getIdFromRoute(location.pathname));
     } else {
@@ -68,7 +68,7 @@ function Header(props) {
 
   const showNodeSelector = () => {
     return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname === "/");
-  }
+  };
 
   return (
     <>
@@ -95,24 +95,14 @@ function Header(props) {
             {!showNodeSelector() && <div style={{height:"74px"}}></div> }
             <Grid item xs />
             <Grid item>
-              <Link className={classes.link} href="#" variant="body2">
-                Go to docs
-              </Link>
-            </Grid>
-           {/* <Grid item>
-              <Tooltip title="Alerts • No alerts">
-                <IconButton color="inherit">
-                  <NotificationsIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>*/}
-            <Grid item>
-              <IconButton color="inherit" className={classes.iconButtonAvatar} onClick={handlePopOverClick}>
-                <Avatar src="/static/images/avatar/1.jpg" alt="My Avatar" />
-              </IconButton>
+                <Chip
+                    icon={<AccountCircle />}
+                    label={user ? user.username.toUpperCase() : 'Anonymous'}
+                    onClick={handlePopOverClick}
+                    variant="outlined"
+                />
 
-
-              <Popover
+                <Popover
                 open={anchorEl}
                 anchorEl={anchorEl}
                 onClose={handlePopOverClose}
