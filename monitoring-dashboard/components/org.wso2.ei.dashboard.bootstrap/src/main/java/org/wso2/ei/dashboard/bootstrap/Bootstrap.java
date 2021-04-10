@@ -56,7 +56,7 @@ public class Bootstrap {
     private static final String SECURITY_DIR = "security";
     private static final String KEYSTORE_FILE = "dashboard.jks";
     private static final String TOML_CONF_PORT = "server_config.port";
-    private static final String TOML_MI_USERNAME = "mi_user_store.password";
+    private static final String TOML_MI_USERNAME = "mi_user_store.username";
     private static final String TOML_MI_PASSWORD = "mi_user_store.password";
     private static final String MI_USERNAME = "mi_username";
     private static final String MI_PASSWORD = "mi_password";
