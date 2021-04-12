@@ -27,6 +27,7 @@ import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.HeartbeatRequest;
@@ -95,8 +96,14 @@ public class HeartBeatDelegate {
     private boolean registerNode(HeartbeatObject heartbeat) {
         logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
-        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
-        return databaseManager.insertHeartbeat(heartbeat, accessToken);
+        String accessToken = null;
+        try {
+            accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
+            return databaseManager.insertHeartbeat(heartbeat, accessToken);
+        } catch (UnAuthorizedException e) {
+            logger.error("Unable to register node information due to {}", e.getMessage());
+            return false;
+        }
     }
 
     private void runHeartbeatExecutorService(String productName, HeartbeatObject heartbeat) {

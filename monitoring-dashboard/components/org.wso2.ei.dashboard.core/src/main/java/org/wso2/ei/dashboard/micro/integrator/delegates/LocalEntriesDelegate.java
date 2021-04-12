@@ -29,6 +29,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
@@ -57,7 +58,7 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
         return null;
     }
 
-    public LocalEntryValue getValue(String groupId, String nodeId, String localEntry) {
+    public LocalEntryValue getValue(String groupId, String nodeId, String localEntry) throws UnAuthorizedException {
         log.debug("Fetching value of local entry " + localEntry + " in node " + nodeId + " of group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);

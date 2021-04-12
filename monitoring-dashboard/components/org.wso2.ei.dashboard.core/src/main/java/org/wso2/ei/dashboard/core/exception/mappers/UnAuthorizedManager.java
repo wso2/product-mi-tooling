@@ -19,7 +19,10 @@
  */
 package org.wso2.ei.dashboard.core.exception.mappers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartBeatDelegate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +37,12 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class UnAuthorizedManager implements ExceptionMapper<UnAuthorizedException> {
 
+    private static final Logger logger = LogManager.getLogger(UnAuthorizedManager.class);
+
     @Override
     public Response toResponse(UnAuthorizedException e) {
 
+        logger.debug("Error: ", e);
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", "Unauthorized");
 
