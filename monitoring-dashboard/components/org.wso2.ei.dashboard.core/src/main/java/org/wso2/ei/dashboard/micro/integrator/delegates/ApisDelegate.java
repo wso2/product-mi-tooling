@@ -49,7 +49,7 @@ public class ApisDelegate implements ArtifactDelegate {
     }
 
     @Override
-    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) {
+    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException {
         logger.debug("Updating API " + request.getArtifactName() + " in node " + request.getNodeId() + " in group "
                   + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);

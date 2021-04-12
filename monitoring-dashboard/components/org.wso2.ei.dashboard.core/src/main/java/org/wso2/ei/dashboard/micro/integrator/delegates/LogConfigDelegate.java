@@ -81,7 +81,8 @@ public class LogConfigDelegate {
         return ack;
     }
 
-    public Ack updateLogLevelByNodeId(String groupId, String nodeId, LogConfigUpdateRequest request) throws UnAuthorizedException {
+    public Ack updateLogLevelByNodeId(String groupId, String nodeId, LogConfigUpdateRequest request)
+            throws UnAuthorizedException {
         logger.debug("Updating logger " + request.getName() + " in node " + nodeId + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
@@ -169,7 +170,8 @@ public class LogConfigDelegate {
         return logConfigsInner;
     }
 
-    private CloseableHttpResponse updateLogLevelByNodeId(String groupId, String nodeId, JsonObject payload) throws UnAuthorizedException {
+    private CloseableHttpResponse updateLogLevelByNodeId(String groupId, String nodeId, JsonObject payload)
+            throws UnAuthorizedException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String updateLoggerUrl = mgtApiUrl.concat("logging");

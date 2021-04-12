@@ -11,7 +11,6 @@ import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
 import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
-import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
 
 /**
  * Util class to update artifacts deployed in micro integrator and update the database of the dashboard server.
@@ -26,20 +25,16 @@ public class DelegatesUtil {
     }
 
     public static boolean updateArtifact(String artifactType, String groupId, ArtifactUpdateRequest request,
-                                         JsonObject payload)  {
+                                         JsonObject payload) throws UnAuthorizedException {
         String nodeId = request.getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
 
         if (null != mgtApiUrl && !mgtApiUrl.isEmpty()) {
             String accessToken = databaseManager.getAccessToken(groupId, nodeId);
             String url = mgtApiUrl.concat(artifactType);
-            try {
-                CloseableHttpResponse response = Utils.doPost(groupId, nodeId, accessToken, url, payload);
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    return updateDatabase(artifactType, mgtApiUrl, groupId, request);
-                }
-            } catch (UnAuthorizedException e) {
-                logger.error("Error while updating artifact", e);
+            CloseableHttpResponse response = Utils.doPost(groupId, nodeId, accessToken, url, payload);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                return updateDatabase(artifactType, mgtApiUrl, groupId, request);
             }
         }
         return false;

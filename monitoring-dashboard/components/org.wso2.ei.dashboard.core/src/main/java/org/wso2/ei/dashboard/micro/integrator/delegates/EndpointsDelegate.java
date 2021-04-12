@@ -49,7 +49,7 @@ public class EndpointsDelegate implements ArtifactDelegate {
     }
 
     @Override
-    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) {
+    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException {
         logger.debug("Updating Endpoint " + request.getArtifactName() + " in node " + request.getNodeId() + " in group "
                   + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
@@ -60,7 +60,7 @@ public class EndpointsDelegate implements ArtifactDelegate {
         return ack;
     }
 
-    private boolean updateEndpoint(String groupId, ArtifactUpdateRequest request) {
+    private boolean updateEndpoint(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException {
         JsonObject payload = new JsonObject();
         payload.addProperty("name", request.getArtifactName());
         if (request.getType().equals("status")) {

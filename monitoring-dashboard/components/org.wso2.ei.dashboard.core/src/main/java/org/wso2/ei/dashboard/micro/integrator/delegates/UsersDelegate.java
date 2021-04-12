@@ -118,7 +118,8 @@ public class UsersDelegate {
         return users;
     }
 
-    private UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url, JsonElement user) throws UnAuthorizedException {
+    private UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url, JsonElement user)
+            throws UnAuthorizedException {
         String userId = user.getAsJsonObject().get("userId").getAsString();
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);

@@ -143,7 +143,8 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts) throws UnAuthorizedException {
+    private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts)
+            throws UnAuthorizedException {
         JsonArray list = artifacts.get("list").getAsJsonArray();
         for (JsonElement element : list) {
             final String artifactName = element.getAsJsonObject().get("name").getAsString();
@@ -251,7 +252,8 @@ public class MiArtifactsManager implements ArtifactsManager {
                                        artifactDetails.toString());
     }
 
-    private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken) throws UnAuthorizedException {
+    private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken)
+            throws UnAuthorizedException {
         return getArtifactDetails(heartbeat.getGroupId(), heartbeat.getNodeId(), heartbeat.getMgtApiUrl(), artifactType,
                                   artifactName, accessToken);
     }

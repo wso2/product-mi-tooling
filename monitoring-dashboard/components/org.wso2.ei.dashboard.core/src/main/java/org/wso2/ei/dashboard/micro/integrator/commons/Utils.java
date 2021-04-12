@@ -38,7 +38,8 @@ public class Utils {
     private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private static final int HTTP_SC_UNAUTHORIZED = 401;
 
-    public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, String url) throws UnAuthorizedException {
+    public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, String url)
+            throws UnAuthorizedException {
         CloseableHttpResponse response = HttpUtils.doGet(accessToken, url);
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
             accessToken = retrieveNewAccessToken(groupId, nodeId);
@@ -67,7 +68,8 @@ public class Utils {
         return response;
     }
 
-    public static CloseableHttpResponse doDelete(String groupId, String nodeId, String accessToken, String url) throws UnAuthorizedException {
+    public static CloseableHttpResponse doDelete(String groupId, String nodeId, String accessToken, String url)
+            throws UnAuthorizedException {
         CloseableHttpResponse response = HttpUtils.doDelete(accessToken, url);
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
             accessToken = retrieveNewAccessToken(groupId, nodeId);

@@ -117,15 +117,10 @@ public class GroupsApi {
                          content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response updateLogLevel(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid LogConfigUpdateRequest request) {
+            @Valid LogConfigUpdateRequest request) throws UnAuthorizedException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            Ack ack = logConfigDelegate.updateLogLevel(groupId, request);
-            responseBuilder = Response.ok().entity(ack);
-        } catch (UnAuthorizedException e) {
-            responseBuilder = Util.logAndBuildUnAuthorizedResponse("Error while updateing log level", e);
-        }
+        Ack ack = logConfigDelegate.updateLogLevel(groupId, request);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -141,16 +136,10 @@ public class GroupsApi {
     })
     public Response addUser(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid AddUserRequest request) {
+            @Valid AddUserRequest request) throws UnAuthorizedException {
         UsersDelegate usersDelegate = new UsersDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            Ack ack = usersDelegate.addUser(groupId, request);
-            responseBuilder = Response.ok().entity(ack);
-        } catch (UnAuthorizedException e) {
-            responseBuilder = Util.logAndBuildUnAuthorizedResponse("Error while creating user to the group: " + groupId,
-                                                                   e);
-        }
+        Ack ack = usersDelegate.addUser(groupId, request);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -166,16 +155,10 @@ public class GroupsApi {
             @Content(schema = @Schema(implementation = Error.class)))
     }) public Response deleteUser(
             @PathParam("group-id") @Parameter(description = "Group ID") String groupId,
-            @PathParam("user-id") @Parameter(description = "User ID") String userId) {
+            @PathParam("user-id") @Parameter(description = "User ID") String userId) throws UnAuthorizedException {
         UsersDelegate usersDelegate = new UsersDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            Ack ack = usersDelegate.deleteUser(groupId, userId);
-            responseBuilder = Response.ok().entity(ack);
-        } catch (UnAuthorizedException e) {
-            responseBuilder = Util.logAndBuildUnAuthorizedResponse("Error while deleting user from group: " + groupId,
-                                                                   e);
-        }
+        Ack ack = usersDelegate.deleteUser(groupId, userId);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -192,16 +175,10 @@ public class GroupsApi {
     }) public Response getLogContent(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @PathParam("node-id") @Parameter(description = "Node id of the file") String nodeId,
-            @PathParam("file-name") @Parameter(description = "Log file name") String fileName) {
+            @PathParam("file-name") @Parameter(description = "Log file name") String fileName) throws UnAuthorizedException {
         LogsDelegate logsDelegate = new LogsDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            String logContent = logsDelegate.getLogByName(groupId, nodeId, fileName);
-            responseBuilder = Response.ok().entity(logContent);
-        } catch (UnAuthorizedException e) {
-            responseBuilder =
-                    Util.logAndBuildUnAuthorizedResponse("Error while retrieving log files from node: " + nodeId, e);
-        }
+        String logContent = logsDelegate.getLogByName(groupId, nodeId, fileName);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logContent);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -369,19 +346,11 @@ public class GroupsApi {
     public Response getLocalEntryValue(
             @PathParam("group-id") @Parameter(description = "Group id of the node") String groupId,
             @PathParam("node-id") @Parameter(description = "Node id") String nodeId,
-            @PathParam("local-entry") @Parameter(description = "Local entry name") String localEntry) {
+            @PathParam("local-entry") @Parameter(description = "Local entry name") String localEntry) throws UnAuthorizedException {
 
         LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
-        LocalEntryValue localEntryValue = null;
-        Response.ResponseBuilder responseBuilder;
-        try {
-            localEntryValue = localEntriesDelegate.getValue(groupId, nodeId, localEntry);
-            responseBuilder = Response.ok().entity(localEntryValue);
-        } catch (UnAuthorizedException e) {
-            responseBuilder =
-                    Util.logAndBuildUnAuthorizedResponse("Error while retrieving local entries from node: " + nodeId,
-                                                         e);
-        }
+        LocalEntryValue localEntryValue = localEntriesDelegate.getValue(groupId, nodeId, localEntry);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(localEntryValue);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -396,16 +365,10 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "Unexpected error",
                      content = @Content(schema = @Schema(implementation = Error.class)))
     }) public Response getLogConfigs(
-            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) {
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) throws UnAuthorizedException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            LogConfigs logConfigs = logConfigDelegate.fetchLogConfigs(groupId);
-            responseBuilder = Response.ok().entity(logConfigs);
-        } catch (UnAuthorizedException e) {
-            log.error("Error while retrieving logging configurations from group: " + groupId, e);
-            responseBuilder = Response.status(Response.Status.UNAUTHORIZED);
-        }
+        LogConfigs logConfigs = logConfigDelegate.fetchLogConfigs(groupId);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logConfigs);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -421,17 +384,10 @@ public class GroupsApi {
                          content = @Content(schema = @Schema(implementation = Error.class)))
     }) public Response getLogConfigsByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @PathParam("node-id") @Parameter(description = "NodeId") String nodeId) {
+            @PathParam("node-id") @Parameter(description = "NodeId") String nodeId) throws UnAuthorizedException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
-        LogConfigs logConfigs = null;
-        Response.ResponseBuilder responseBuilder;
-        try {
-            logConfigs = logConfigDelegate.fetchLogConfigsByNodeId(groupId, nodeId);
-            responseBuilder = Response.ok().entity(logConfigs);
-        } catch (UnAuthorizedException e) {
-            log.error("Error while retrieving logging configurations from node: " + nodeId, e);
-            responseBuilder = Response.status(Response.Status.UNAUTHORIZED);
-        }
+        LogConfigs logConfigs = logConfigDelegate.fetchLogConfigsByNodeId(groupId, nodeId);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logConfigs);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -449,17 +405,10 @@ public class GroupsApi {
     }) public Response updateLogLevelByNodeId(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @PathParam("node-id") @Parameter(description = "NodeId") String nodeId,
-            @Valid LogConfigUpdateRequest request) {
+            @Valid LogConfigUpdateRequest request) throws UnAuthorizedException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            Ack ack = logConfigDelegate.updateLogLevelByNodeId(groupId, nodeId, request);
-            responseBuilder = Response.ok().entity(ack);
-        } catch (UnAuthorizedException e) {
-            responseBuilder = Util.logAndBuildUnAuthorizedResponse("Error while retrieving log files from nodes", e);
-        }
-        HttpUtils.setHeaders(responseBuilder);
-        return responseBuilder.build();
+        Ack ack = logConfigDelegate.updateLogLevelByNodeId(groupId, nodeId, request);
+        return Response.ok().entity(ack).build();
     }
 
     @GET
@@ -473,16 +422,11 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response getLogFilesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws UnAuthorizedException {
 
         LogsDelegate logsDelegate = new LogsDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            LogList logList = logsDelegate.getLogsList(groupId, nodes);
-            responseBuilder = Response.ok().entity(logList);
-        } catch (UnAuthorizedException e) {
-            responseBuilder = Util.logAndBuildUnAuthorizedResponse("Error while retrieving log files from nodes", e);
-        }
+        LogList logList = logsDelegate.getLogsList(groupId, nodes);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(logList);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -612,17 +556,11 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "Unexpected error",
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response getUsers(
-            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) {
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) throws UnAuthorizedException {
 
         UsersDelegate usersDelegate = new UsersDelegate();
-        Response.ResponseBuilder responseBuilder = null;
-        try {
-            Users users = usersDelegate.fetchUsers(groupId);
-            responseBuilder = Response.ok().entity(users);
-        } catch (UnAuthorizedException e) {
-            responseBuilder = Util.logAndBuildUnAuthorizedResponse("Error while retrieving users from group: " + groupId,
-                                                                   e);
-        }
+        Users users = usersDelegate.fetchUsers(groupId);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(users);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -673,7 +611,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateApi(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) {
+            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
         ApisDelegate apisDelegate = new ApisDelegate();
         return apisDelegate.updateArtifact(groupId, request);
     }
@@ -690,7 +628,7 @@ public class GroupsApi {
     })
     public Ack updateEndpoint(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) {
+            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
         EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
         return endpointsDelegate.updateArtifact(groupId, request);
     }
@@ -706,7 +644,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateInboundEp(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) {
+            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
         InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
         return inboundEndpointDelegate.updateArtifact(groupId, request);
     }
@@ -722,7 +660,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateMessageProcessor(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) {
+            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
 
         MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
         return messageProcessorsDelegate.updateArtifact(groupId, request);
@@ -740,7 +678,7 @@ public class GroupsApi {
     })
     public Ack updateProxyService(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) {
+            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
         ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
         return proxyServiceDelegate.updateArtifact(groupId, request);
     }
@@ -756,7 +694,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateSequence(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) {
+            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
 
         SequencesDelegate sequencesDelegate = new SequencesDelegate();
         return sequencesDelegate.updateArtifact(groupId, request);

@@ -50,7 +50,7 @@ public class HeartBeatDelegate {
     private final ScheduledExecutorService heartbeatScheduledExecutorService =
             Executors.newScheduledThreadPool(heartbeatPoolSize);
 
-    public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) {
+    public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws UnAuthorizedException {
         long currentTimestamp = System.currentTimeMillis();
         Ack ack = new Ack(Constants.FAIL_STATUS);
         HeartbeatObject heartbeat = new HeartbeatObject(
@@ -93,17 +93,11 @@ public class HeartBeatDelegate {
         return databaseManager.updateHeartbeat(heartbeat);
     }
 
-    private boolean registerNode(HeartbeatObject heartbeat) {
+    private boolean registerNode(HeartbeatObject heartbeat) throws UnAuthorizedException {
         logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
-        String accessToken = null;
-        try {
-            accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
-            return databaseManager.insertHeartbeat(heartbeat, accessToken);
-        } catch (UnAuthorizedException e) {
-            logger.error("Unable to register node information due to {}", e.getMessage());
-            return false;
-        }
+        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
+        return databaseManager.insertHeartbeat(heartbeat, accessToken);
     }
 
     private void runHeartbeatExecutorService(String productName, HeartbeatObject heartbeat) {

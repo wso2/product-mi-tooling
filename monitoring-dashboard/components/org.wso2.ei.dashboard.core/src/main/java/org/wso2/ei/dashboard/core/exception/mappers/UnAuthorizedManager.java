@@ -22,7 +22,6 @@ package org.wso2.ei.dashboard.core.exception.mappers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
-import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartBeatDelegate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class UnAuthorizedManager implements ExceptionMapper<UnAuthorizedExceptio
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", "Unauthorized");
 
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+        return Response.status(Response.Status.UNAUTHORIZED)
                 .entity(responseBody)
                 .header("content" +
                         "-type", "application/json").build();
