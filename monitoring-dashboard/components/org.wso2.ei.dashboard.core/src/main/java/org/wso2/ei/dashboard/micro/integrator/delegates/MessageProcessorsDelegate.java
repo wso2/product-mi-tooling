@@ -60,7 +60,8 @@ public class MessageProcessorsDelegate implements ArtifactDelegate {
         return ack;
     }
 
-    private boolean updateMessageProcessor(String groupId, ArtifactUpdateRequest request) throws ManagementApiException {
+    private boolean updateMessageProcessor(String groupId, ArtifactUpdateRequest request)
+            throws ManagementApiException {
         JsonObject payload = new JsonObject();
         payload.addProperty("name", request.getArtifactName());
         if (request.getType().equals("status")) {
