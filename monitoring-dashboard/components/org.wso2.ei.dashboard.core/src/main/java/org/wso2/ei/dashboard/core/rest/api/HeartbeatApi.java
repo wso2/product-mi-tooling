@@ -20,7 +20,7 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartBeatDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.Error;
@@ -50,6 +50,6 @@ public class HeartbeatApi {
         @ApiResponse(responseCode = "200", description = "Receive node heartbeats", content = @Content(schema = @Schema(implementation = Ack.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Ack receiveNodeHeartbeat(@Valid HeartbeatRequest body) throws UnAuthorizedException {
+    public Ack receiveNodeHeartbeat(@Valid HeartbeatRequest body) throws ManagementApiException {
         return heartBeatDelegate.processHeartbeat(body);
     }}

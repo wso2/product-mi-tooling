@@ -27,7 +27,7 @@ import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.HeartbeatRequest;
@@ -50,7 +50,7 @@ public class HeartBeatDelegate {
     private final ScheduledExecutorService heartbeatScheduledExecutorService =
             Executors.newScheduledThreadPool(heartbeatPoolSize);
 
-    public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws UnAuthorizedException {
+    public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws ManagementApiException {
         long currentTimestamp = System.currentTimeMillis();
         Ack ack = new Ack(Constants.FAIL_STATUS);
         HeartbeatObject heartbeat = new HeartbeatObject(
@@ -93,7 +93,7 @@ public class HeartBeatDelegate {
         return databaseManager.updateHeartbeat(heartbeat);
     }
 
-    private boolean registerNode(HeartbeatObject heartbeat) throws UnAuthorizedException {
+    private boolean registerNode(HeartbeatObject heartbeat) throws ManagementApiException {
         logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
         String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());

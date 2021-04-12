@@ -20,7 +20,7 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates;
 
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
@@ -33,5 +33,5 @@ import java.util.List;
 public interface ArtifactDelegate {
     Artifacts getArtifactsList(String groupId, List<String> nodeList);
 
-    Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException;
+    Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws ManagementApiException;
 }

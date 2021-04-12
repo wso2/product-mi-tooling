@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
@@ -25,7 +25,7 @@ public class DelegatesUtil {
     }
 
     public static boolean updateArtifact(String artifactType, String groupId, ArtifactUpdateRequest request,
-                                         JsonObject payload) throws UnAuthorizedException {
+                                         JsonObject payload) throws ManagementApiException {
         String nodeId = request.getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
 
@@ -41,7 +41,7 @@ public class DelegatesUtil {
     }
 
     private static boolean updateDatabase(String artifactType, String mgtApiUrl, String groupId,
-                                          ArtifactUpdateRequest request) throws UnAuthorizedException {
+                                          ArtifactUpdateRequest request) throws ManagementApiException {
 
         UpdateArtifactObject updateArtifactObject = new UpdateArtifactObject(mgtApiUrl, artifactType,
                                                                              request.getArtifactName(), groupId,

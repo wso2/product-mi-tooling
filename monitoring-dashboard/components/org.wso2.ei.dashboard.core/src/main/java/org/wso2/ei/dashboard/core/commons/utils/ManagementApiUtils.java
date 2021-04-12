@@ -25,8 +25,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.DashboardServerException;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
 import java.util.Base64;
 
@@ -45,13 +44,13 @@ public class ManagementApiUtils {
         return databaseManager.getMgtApiUrl(groupId, nodeId);
     }
 
-    public static String getAccessToken(String mgtApiUrl) throws UnAuthorizedException {
+    public static String getAccessToken(String mgtApiUrl) throws ManagementApiException {
         String username = System.getProperty("mi_username");
         String password = System.getProperty("mi_password");
         return getToken(mgtApiUrl, username, password);
     }
 
-    public static String getToken(String mgtApiUrl, String username, String password) throws UnAuthorizedException {
+    public static String getToken(String mgtApiUrl, String username, String password) throws ManagementApiException {
         String usernamePassword = username + ":" + password;
         String encodedUsernamePassword = Base64.getEncoder().encodeToString(usernamePassword.getBytes());
         String loginUrl = mgtApiUrl + "login";
@@ -61,8 +60,9 @@ public class ManagementApiUtils {
         httpGet.setHeader("Authorization", "Basic " + encodedUsernamePassword);
         CloseableHttpResponse response = HttpUtils.doGet(httpGet);
 
-        if (response.getStatusLine().getStatusCode() == 401) {
-            throw new UnAuthorizedException("Invalid Credentials");
+        int responseCode = response.getStatusLine().getStatusCode();
+        if (responseCode / 100 != 2) {
+            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), responseCode);
         }
 
         JsonObject jsonResponse = HttpUtils.getJsonResponse(response);
@@ -70,7 +70,7 @@ public class ManagementApiUtils {
         if (jsonResponse.has("AccessToken")) {
             return jsonResponse.get("AccessToken").getAsString();
         } else {
-            throw new DashboardServerException("Error occurred while retrieving access token from management api.");
+            throw new ManagementApiException("Error occurred while retrieving access token from management api.", 500);
         }
     }
 }

@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
@@ -49,7 +49,7 @@ public class MessageProcessorsDelegate implements ArtifactDelegate {
     }
 
     @Override
-    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException {
+    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws ManagementApiException {
         log.debug("Updating message processor " + request.getArtifactName() + " in node " + request.getNodeId()
                   + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
@@ -60,7 +60,7 @@ public class MessageProcessorsDelegate implements ArtifactDelegate {
         return ack;
     }
 
-    private boolean updateMessageProcessor(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException {
+    private boolean updateMessageProcessor(String groupId, ArtifactUpdateRequest request) throws ManagementApiException {
         JsonObject payload = new JsonObject();
         payload.addProperty("name", request.getArtifactName());
         if (request.getType().equals("status")) {
