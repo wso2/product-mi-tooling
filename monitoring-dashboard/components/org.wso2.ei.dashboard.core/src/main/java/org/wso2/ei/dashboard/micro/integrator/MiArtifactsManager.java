@@ -30,7 +30,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
@@ -102,7 +102,7 @@ public class MiArtifactsManager implements ArtifactsManager {
                 for (UpdatedArtifact info : deployedArtifacts) {
                     fetchAndStoreArtifact(info);
                 }
-            } catch (UnAuthorizedException e) {
+            } catch (ManagementApiException e) {
                 logger.error("Error while fetching updated artifacts", e);
             }
         };
@@ -137,14 +137,14 @@ public class MiArtifactsManager implements ArtifactsManager {
             }
         }
         fetchAndStoreServers(accessToken);
-        } catch (UnAuthorizedException e) {
+        } catch (ManagementApiException e) {
             logger.error("Unable to fetch artifacts/details from node: {} of group: {} due to {} ", nodeId,
                          groupId, e.getMessage());
         }
     }
 
     private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts)
-            throws UnAuthorizedException {
+            throws ManagementApiException {
         JsonArray list = artifacts.get("list").getAsJsonArray();
         for (JsonElement element : list) {
             final String artifactName = element.getAsJsonObject().get("name").getAsString();
@@ -188,7 +188,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    private void fetchAndStoreServers(String accessToken) throws UnAuthorizedException {
+    private void fetchAndStoreServers(String accessToken) throws ManagementApiException {
         String url = heartbeat.getMgtApiUrl() + SERVER;
         CloseableHttpResponse response = Utils.doGet(heartbeat.getGroupId(), heartbeat.getNodeId(), accessToken, url);
         String stringResponse = HttpUtils.getStringResponse(response);
@@ -204,7 +204,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    public boolean updateArtifactDetails() throws UnAuthorizedException {
+    public boolean updateArtifactDetails() throws ManagementApiException {
         if (updateArtifactObject != null) {
             String groupId = updateArtifactObject.getGroupId();
             String nodeId = updateArtifactObject.getNodeId();
@@ -220,7 +220,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    private void fetchAndStoreArtifact(UpdatedArtifact info) throws UnAuthorizedException {
+    private void fetchAndStoreArtifact(UpdatedArtifact info) throws ManagementApiException {
         String artifactType = info.getType();
         if (artifactType.equals(TEMPLATES)) {
             updateTemplates(info);
@@ -253,13 +253,13 @@ public class MiArtifactsManager implements ArtifactsManager {
     }
 
     private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken)
-            throws UnAuthorizedException {
+            throws ManagementApiException {
         return getArtifactDetails(heartbeat.getGroupId(), heartbeat.getNodeId(), heartbeat.getMgtApiUrl(), artifactType,
                                   artifactName, accessToken);
     }
 
     private JsonObject getArtifactDetails(String groupId, String nodeId, String mgtApiUrl, String artifactType,
-                                          String artifactName, String accessToken) throws UnAuthorizedException {
+                                          String artifactName, String accessToken) throws ManagementApiException {
         String getArtifactDetailsUrl = getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
         CloseableHttpResponse artifactDetails = Utils.doGet(groupId, nodeId, accessToken,
                                                             getArtifactDetailsUrl);

@@ -31,7 +31,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
@@ -46,12 +46,12 @@ public class UsersDelegate {
     private static final Log log = LogFactory.getLog(UsersDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
-    public Users fetchUsers(String groupId) throws UnAuthorizedException {
+    public Users fetchUsers(String groupId) throws ManagementApiException {
         log.debug("Fetching users via management api.");
         return getUsers(groupId);
     }
 
-    public Ack addUser(String groupId, AddUserRequest request) throws UnAuthorizedException {
+    public Ack addUser(String groupId, AddUserRequest request) throws ManagementApiException {
         log.debug("Adding user " + request.getUserId() + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddUserPayload(request);
@@ -73,7 +73,7 @@ public class UsersDelegate {
         return ack;
     }
 
-    public Ack deleteUser(String groupId, String userId) throws UnAuthorizedException {
+    public Ack deleteUser(String groupId, String userId) throws ManagementApiException {
         log.debug("Deleting user " + userId + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         NodeList nodeList = databaseManager.fetchNodes(groupId);
@@ -101,7 +101,7 @@ public class UsersDelegate {
         return payload;
     }
 
-    private Users getUsers(String groupId) throws UnAuthorizedException {
+    private Users getUsers(String groupId) throws ManagementApiException {
         Users users = new Users();
         NodeList nodeList = databaseManager.fetchNodes(groupId);
         // assumption - In a group, users of all nodes in the group should be identical
@@ -119,7 +119,7 @@ public class UsersDelegate {
     }
 
     private UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url, JsonElement user)
-            throws UnAuthorizedException {
+            throws ManagementApiException {
         String userId = user.getAsJsonObject().get("userId").getAsString();
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);

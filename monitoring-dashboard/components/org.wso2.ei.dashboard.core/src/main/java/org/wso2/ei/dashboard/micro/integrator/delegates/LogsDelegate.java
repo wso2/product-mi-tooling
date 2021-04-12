@@ -32,7 +32,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.LogDetail;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
 import org.wso2.ei.dashboard.core.rest.model.LogListInner;
@@ -50,7 +50,7 @@ public class LogsDelegate {
     private static final Log log = LogFactory.getLog(LogsDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
-    public LogList getLogsList(String groupId, List<String> nodeList) throws UnAuthorizedException {
+    public LogList getLogsList(String groupId, List<String> nodeList) throws ManagementApiException {
         log.debug("Fetching logs via management api.");
         LogList logList = new LogList();
         for (String nodeId : nodeList) {
@@ -84,7 +84,7 @@ public class LogsDelegate {
         return logList;
     }
 
-    private JsonArray getLogsArray(String groupId, String nodeId) throws UnAuthorizedException {
+    private JsonArray getLogsArray(String groupId, String nodeId) throws ManagementApiException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("logs");
@@ -92,7 +92,7 @@ public class LogsDelegate {
         return HttpUtils.getJsonResponse(httpResponse).getAsJsonArray("list");
     }
 
-    public String getLogByName(String groupId, String nodeId, String fileName) throws UnAuthorizedException {
+    public String getLogByName(String groupId, String nodeId, String fileName) throws ManagementApiException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String url = mgtApiUrl.concat("logs?file=").concat(fileName);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);

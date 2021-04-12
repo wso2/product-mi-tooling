@@ -23,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.auth.TokenCache;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
@@ -43,7 +43,7 @@ public class LoginDelegate {
             String accessToken = getTokenFromMI(username, password);
             storeTokenInCache(accessToken);
             return Response.ok(accessToken).build();
-        } catch (UnAuthorizedException e) {
+        } catch (ManagementApiException e) {
             logger.error("Error logging into dashboard server due to {} ", e.getMessage());
             return Response.status(Response.Status.UNAUTHORIZED).build();
         } catch (Exception e) {
@@ -52,7 +52,7 @@ public class LoginDelegate {
         }
     }
 
-    private String getTokenFromMI(String username, String password) throws UnAuthorizedException {
+    private String getTokenFromMI(String username, String password) throws ManagementApiException {
         GroupDelegate groupDelegate = new GroupDelegate();
         GroupList groupList = groupDelegate.getGroupList();
         if (groupList.isEmpty()) {

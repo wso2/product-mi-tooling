@@ -1,6 +1,6 @@
 package org.wso2.ei.dashboard.core.rest.api;
 
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ConfigurationDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.ModelConfiguration;
@@ -34,7 +34,7 @@ public class ConfigurationApi {
             @NotNull  @QueryParam("groupId") @Parameter(description = "Group id of the node")  String groupId,
             @NotNull  @QueryParam("nodeId") @Parameter(description = "Node id of the node")  String nodeId,
             @NotNull  @QueryParam("artifactType") @Parameter(description = "Type of the artifact")  String artifactType,
-            @NotNull  @QueryParam("artifactName") @Parameter(description = "Name of the artifact")  String artifactName) throws UnAuthorizedException {
+            @NotNull  @QueryParam("artifactName") @Parameter(description = "Name of the artifact")  String artifactName) throws ManagementApiException {
         ConfigurationDelegate configurationDelegate = new ConfigurationDelegate(groupId, nodeId, artifactType, artifactName);
         return configurationDelegate.getConfiguration();
     }}

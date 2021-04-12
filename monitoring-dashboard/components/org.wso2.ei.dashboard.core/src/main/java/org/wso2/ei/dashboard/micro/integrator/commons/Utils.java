@@ -28,7 +28,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
 /**
  * Util class for micro integrator dashboard.
@@ -39,50 +39,66 @@ public class Utils {
     private static final int HTTP_SC_UNAUTHORIZED = 401;
 
     public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, String url)
-            throws UnAuthorizedException {
+            throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doGet(accessToken, url);
+        int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doGet(accessToken, url);
+        } else if (isNotSuccessCode(httpSc)) {
+            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
         }
         return response;
     }
 
     public static CloseableHttpResponse doPost(String groupId, String nodeId, String accessToken, String url,
-                                               JsonObject payload) throws UnAuthorizedException {
+                                               JsonObject payload) throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doPost(accessToken, url, payload);
+        int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doPost(accessToken, url, payload);
+        } else if (isNotSuccessCode(httpSc)) {
+            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
         }
         return response;
     }
 
     public static CloseableHttpResponse doPatch(String groupId, String nodeId, String accessToken, String url,
-                                                JsonObject payload) throws UnAuthorizedException {
+                                                JsonObject payload) throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doPatch(accessToken, url, payload);
+        int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doPatch(accessToken, url, payload);
+        } else if (isNotSuccessCode(httpSc)) {
+            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
         }
         return response;
     }
 
     public static CloseableHttpResponse doDelete(String groupId, String nodeId, String accessToken, String url)
-            throws UnAuthorizedException {
+            throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doDelete(accessToken, url);
+        int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doDelete(accessToken, url);
+        } else if (isNotSuccessCode(httpSc)) {
+            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
         }
         return response;
     }
 
-    private static String retrieveNewAccessToken(String groupId, String nodeId) throws UnAuthorizedException {
+    private static String retrieveNewAccessToken(String groupId, String nodeId) throws ManagementApiException {
         logger.debug("Retrieving new access-token from node " + nodeId + " in group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
         databaseManager.updateAccessToken(groupId, nodeId, accessToken);
         return accessToken;
+    }
+
+    private static boolean isNotSuccessCode(int httpStatusCode) {
+        return httpStatusCode / 100 != 2;
     }
 }

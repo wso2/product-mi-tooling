@@ -31,7 +31,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
@@ -48,19 +48,19 @@ public class LogConfigDelegate {
     private static final Logger logger = LogManager.getLogger(LogConfigDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
-    public LogConfigs fetchLogConfigs(String groupId) throws UnAuthorizedException {
+    public LogConfigs fetchLogConfigs(String groupId) throws ManagementApiException {
         logger.debug("Fetching log configs via management api.");
         JsonArray logConfigsArray = getLogConfigs(groupId);
         return createLogConfigsObject(logConfigsArray);
     }
 
-    public LogConfigs fetchLogConfigsByNodeId(String groupId, String nodeId) throws UnAuthorizedException {
+    public LogConfigs fetchLogConfigsByNodeId(String groupId, String nodeId) throws ManagementApiException {
         logger.debug("Fetching log configs in node " + nodeId + " in group " + groupId);
         JsonArray logConfigsArray = getLogConfigByNodeId(groupId, nodeId);
         return createLogConfigsObject(logConfigsArray);
     }
 
-    public Ack updateLogLevel(String groupId, LogConfigUpdateRequest request) throws UnAuthorizedException {
+    public Ack updateLogLevel(String groupId, LogConfigUpdateRequest request) throws ManagementApiException {
         logger.debug("Updating logger " + request.getName() + " for all nodes in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
@@ -82,7 +82,7 @@ public class LogConfigDelegate {
     }
 
     public Ack updateLogLevelByNodeId(String groupId, String nodeId, LogConfigUpdateRequest request)
-            throws UnAuthorizedException {
+            throws ManagementApiException {
         logger.debug("Updating logger " + request.getName() + " in node " + nodeId + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
@@ -97,7 +97,7 @@ public class LogConfigDelegate {
         return ack;
     }
 
-    public Ack addLogger(String groupId, LogConfigAddRequest request) throws UnAuthorizedException {
+    public Ack addLogger(String groupId, LogConfigAddRequest request) throws ManagementApiException {
         logger.debug("Adding new Logger " + request.getName() + " for all nodes in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddLoggerPayload(request);
@@ -122,14 +122,14 @@ public class LogConfigDelegate {
         return ack;
     }
 
-    private JsonArray getLogConfigs(String groupId) throws UnAuthorizedException {
+    private JsonArray getLogConfigs(String groupId) throws ManagementApiException {
         NodeList nodeList = databaseManager.fetchNodes(groupId);
         // assumption - In a group, log configs of all nodes in the group should be identical
         String nodeId = nodeList.get(0).getNodeId();
         return getLogConfigByNodeId(groupId, nodeId);
     }
 
-    private JsonArray getLogConfigByNodeId(String groupId, String nodeId) throws UnAuthorizedException {
+    private JsonArray getLogConfigByNodeId(String groupId, String nodeId) throws ManagementApiException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("logging");
@@ -171,7 +171,7 @@ public class LogConfigDelegate {
     }
 
     private CloseableHttpResponse updateLogLevelByNodeId(String groupId, String nodeId, JsonObject payload)
-            throws UnAuthorizedException {
+            throws ManagementApiException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String updateLoggerUrl = mgtApiUrl.concat("logging");

@@ -30,7 +30,7 @@ import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.ModelConfiguration;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
@@ -53,7 +53,7 @@ public class ConfigurationDelegate {
         this.artifactName = artifactName;
     }
 
-    public ModelConfiguration getConfiguration() throws UnAuthorizedException {
+    public ModelConfiguration getConfiguration() throws ManagementApiException {
         logger.debug("Fetching configuration of " + artifactName + " in node " + nodeId + " of group " + groupId);
         String type = artifactType.split("_")[0];
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);

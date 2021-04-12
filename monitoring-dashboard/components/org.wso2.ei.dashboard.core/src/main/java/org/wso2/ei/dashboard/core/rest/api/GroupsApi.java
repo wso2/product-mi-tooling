@@ -23,7 +23,7 @@ package org.wso2.ei.dashboard.core.rest.api;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
-import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
@@ -97,7 +97,7 @@ public class GroupsApi {
     })
     public Response addLogger(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid LogConfigAddRequest request) throws UnAuthorizedException {
+            @Valid LogConfigAddRequest request) throws ManagementApiException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         Ack ack = logConfigDelegate.addLogger(groupId, request);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
@@ -117,7 +117,7 @@ public class GroupsApi {
                          content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response updateLogLevel(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid LogConfigUpdateRequest request) throws UnAuthorizedException {
+            @Valid LogConfigUpdateRequest request) throws ManagementApiException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         Ack ack = logConfigDelegate.updateLogLevel(groupId, request);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
@@ -136,7 +136,7 @@ public class GroupsApi {
     })
     public Response addUser(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid AddUserRequest request) throws UnAuthorizedException {
+            @Valid AddUserRequest request) throws ManagementApiException {
         UsersDelegate usersDelegate = new UsersDelegate();
         Ack ack = usersDelegate.addUser(groupId, request);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
@@ -155,7 +155,7 @@ public class GroupsApi {
             @Content(schema = @Schema(implementation = Error.class)))
     }) public Response deleteUser(
             @PathParam("group-id") @Parameter(description = "Group ID") String groupId,
-            @PathParam("user-id") @Parameter(description = "User ID") String userId) throws UnAuthorizedException {
+            @PathParam("user-id") @Parameter(description = "User ID") String userId) throws ManagementApiException {
         UsersDelegate usersDelegate = new UsersDelegate();
         Ack ack = usersDelegate.deleteUser(groupId, userId);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
@@ -175,7 +175,7 @@ public class GroupsApi {
     }) public Response getLogContent(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @PathParam("node-id") @Parameter(description = "Node id of the file") String nodeId,
-            @PathParam("file-name") @Parameter(description = "Log file name") String fileName) throws UnAuthorizedException {
+            @PathParam("file-name") @Parameter(description = "Log file name") String fileName) throws ManagementApiException {
         LogsDelegate logsDelegate = new LogsDelegate();
         String logContent = logsDelegate.getLogByName(groupId, nodeId, fileName);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(logContent);
@@ -346,7 +346,7 @@ public class GroupsApi {
     public Response getLocalEntryValue(
             @PathParam("group-id") @Parameter(description = "Group id of the node") String groupId,
             @PathParam("node-id") @Parameter(description = "Node id") String nodeId,
-            @PathParam("local-entry") @Parameter(description = "Local entry name") String localEntry) throws UnAuthorizedException {
+            @PathParam("local-entry") @Parameter(description = "Local entry name") String localEntry) throws ManagementApiException {
 
         LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
         LocalEntryValue localEntryValue = localEntriesDelegate.getValue(groupId, nodeId, localEntry);
@@ -365,7 +365,7 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "Unexpected error",
                      content = @Content(schema = @Schema(implementation = Error.class)))
     }) public Response getLogConfigs(
-            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) throws UnAuthorizedException {
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) throws ManagementApiException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         LogConfigs logConfigs = logConfigDelegate.fetchLogConfigs(groupId);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(logConfigs);
@@ -384,7 +384,7 @@ public class GroupsApi {
                          content = @Content(schema = @Schema(implementation = Error.class)))
     }) public Response getLogConfigsByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @PathParam("node-id") @Parameter(description = "NodeId") String nodeId) throws UnAuthorizedException {
+            @PathParam("node-id") @Parameter(description = "NodeId") String nodeId) throws ManagementApiException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         LogConfigs logConfigs = logConfigDelegate.fetchLogConfigsByNodeId(groupId, nodeId);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(logConfigs);
@@ -405,7 +405,7 @@ public class GroupsApi {
     }) public Response updateLogLevelByNodeId(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @PathParam("node-id") @Parameter(description = "NodeId") String nodeId,
-            @Valid LogConfigUpdateRequest request) throws UnAuthorizedException {
+            @Valid LogConfigUpdateRequest request) throws ManagementApiException {
         LogConfigDelegate logConfigDelegate = new LogConfigDelegate();
         Ack ack = logConfigDelegate.updateLogLevelByNodeId(groupId, nodeId, request);
         return Response.ok().entity(ack).build();
@@ -422,7 +422,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response getLogFilesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws UnAuthorizedException {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         LogsDelegate logsDelegate = new LogsDelegate();
         LogList logList = logsDelegate.getLogsList(groupId, nodes);
@@ -556,7 +556,7 @@ public class GroupsApi {
         @ApiResponse(responseCode = "200", description = "Unexpected error",
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response getUsers(
-            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) throws UnAuthorizedException {
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId) throws ManagementApiException {
 
         UsersDelegate usersDelegate = new UsersDelegate();
         Users users = usersDelegate.fetchUsers(groupId);
@@ -611,7 +611,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateApi(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
+            @Valid ArtifactUpdateRequest request) throws ManagementApiException {
         ApisDelegate apisDelegate = new ApisDelegate();
         return apisDelegate.updateArtifact(groupId, request);
     }
@@ -628,7 +628,7 @@ public class GroupsApi {
     })
     public Ack updateEndpoint(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
+            @Valid ArtifactUpdateRequest request) throws ManagementApiException {
         EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
         return endpointsDelegate.updateArtifact(groupId, request);
     }
@@ -644,7 +644,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateInboundEp(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
+            @Valid ArtifactUpdateRequest request) throws ManagementApiException {
         InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
         return inboundEndpointDelegate.updateArtifact(groupId, request);
     }
@@ -660,7 +660,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateMessageProcessor(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
+            @Valid ArtifactUpdateRequest request) throws ManagementApiException {
 
         MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
         return messageProcessorsDelegate.updateArtifact(groupId, request);
@@ -678,7 +678,7 @@ public class GroupsApi {
     })
     public Ack updateProxyService(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
+            @Valid ArtifactUpdateRequest request) throws ManagementApiException {
         ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
         return proxyServiceDelegate.updateArtifact(groupId, request);
     }
@@ -694,7 +694,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Ack updateSequence(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @Valid ArtifactUpdateRequest request) throws UnAuthorizedException {
+            @Valid ArtifactUpdateRequest request) throws ManagementApiException {
 
         SequencesDelegate sequencesDelegate = new SequencesDelegate();
         return sequencesDelegate.updateArtifact(groupId, request);
