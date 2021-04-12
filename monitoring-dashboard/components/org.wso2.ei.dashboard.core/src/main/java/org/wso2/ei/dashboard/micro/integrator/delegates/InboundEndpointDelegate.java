@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
@@ -48,7 +49,7 @@ public class InboundEndpointDelegate implements ArtifactDelegate {
     }
 
     @Override
-    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) {
+    public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException {
         logger.debug("Updating inbound endpoint " + request.getArtifactName() + " in node " + request.getNodeId()
                   + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
@@ -59,7 +60,7 @@ public class InboundEndpointDelegate implements ArtifactDelegate {
         return ack;
     }
 
-    private boolean updateInboundEndpoint(String groupId, ArtifactUpdateRequest request) {
+    private boolean updateInboundEndpoint(String groupId, ArtifactUpdateRequest request) throws UnAuthorizedException {
         JsonObject payload = new JsonObject();
         payload.addProperty("name", request.getArtifactName());
         if (request.getType().equals("tracing")) {

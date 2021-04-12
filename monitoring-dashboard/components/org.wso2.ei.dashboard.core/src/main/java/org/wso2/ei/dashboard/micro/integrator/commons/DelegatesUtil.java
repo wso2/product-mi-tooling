@@ -2,9 +2,12 @@ package org.wso2.ei.dashboard.micro.integrator.commons;
 
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
 import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
@@ -15,12 +18,14 @@ import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
 public class DelegatesUtil {
     private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
+    private static final Logger logger = LogManager.getLogger(DelegatesUtil.class);
+
     private DelegatesUtil() {
 
     }
 
     public static boolean updateArtifact(String artifactType, String groupId, ArtifactUpdateRequest request,
-                                         JsonObject payload) {
+                                         JsonObject payload) throws UnAuthorizedException {
         String nodeId = request.getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
 
@@ -36,7 +41,7 @@ public class DelegatesUtil {
     }
 
     private static boolean updateDatabase(String artifactType, String mgtApiUrl, String groupId,
-                                          ArtifactUpdateRequest request) {
+                                          ArtifactUpdateRequest request) throws UnAuthorizedException {
 
         UpdateArtifactObject updateArtifactObject = new UpdateArtifactObject(mgtApiUrl, artifactType,
                                                                              request.getArtifactName(), groupId,

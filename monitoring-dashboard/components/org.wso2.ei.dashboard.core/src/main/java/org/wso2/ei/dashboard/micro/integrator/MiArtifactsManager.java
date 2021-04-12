@@ -30,6 +30,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.exception.UnAuthorizedException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
@@ -97,9 +98,13 @@ public class MiArtifactsManager implements ArtifactsManager {
            }
 
            List<UpdatedArtifact> deployedArtifacts = heartbeat.getDeployedArtifacts();
-           for (UpdatedArtifact info : deployedArtifacts) {
-               fetchAndStoreArtifact(info);
-           }
+            try {
+                for (UpdatedArtifact info : deployedArtifacts) {
+                    fetchAndStoreArtifact(info);
+                }
+            } catch (UnAuthorizedException e) {
+                logger.error("Error while fetching updated artifacts", e);
+            }
         };
         updateExecutor.execute(runnable);
     }
@@ -116,9 +121,11 @@ public class MiArtifactsManager implements ArtifactsManager {
         String groupId = heartbeat.getGroupId();
         logger.info("Fetching artifacts from node " + nodeId + " in group " + groupId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        CloseableHttpResponse response = null;
+        try {
         for (String artifactType : ALL_ARTIFACTS) {
             final String url = heartbeat.getMgtApiUrl().concat(artifactType);
-            CloseableHttpResponse response = Utils.doGet(groupId, nodeId, accessToken, url);
+            response = Utils.doGet(groupId, nodeId, accessToken, url);
             JsonObject artifacts = HttpUtils.getJsonResponse(response);
             switch (artifactType) {
                 case TEMPLATES:
@@ -130,9 +137,14 @@ public class MiArtifactsManager implements ArtifactsManager {
             }
         }
         fetchAndStoreServers(accessToken);
+        } catch (UnAuthorizedException e) {
+            logger.error("Unable to fetch artifacts/details from node: {} of group: {} due to {} ", nodeId,
+                         groupId, e.getMessage());
+        }
     }
 
-    private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts) {
+    private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts)
+            throws UnAuthorizedException {
         JsonArray list = artifacts.get("list").getAsJsonArray();
         for (JsonElement element : list) {
             final String artifactName = element.getAsJsonObject().get("name").getAsString();
@@ -176,7 +188,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    private void fetchAndStoreServers(String accessToken) {
+    private void fetchAndStoreServers(String accessToken) throws UnAuthorizedException {
         String url = heartbeat.getMgtApiUrl() + SERVER;
         CloseableHttpResponse response = Utils.doGet(heartbeat.getGroupId(), heartbeat.getNodeId(), accessToken, url);
         String stringResponse = HttpUtils.getStringResponse(response);
@@ -192,7 +204,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    public boolean updateArtifactDetails() {
+    public boolean updateArtifactDetails() throws UnAuthorizedException {
         if (updateArtifactObject != null) {
             String groupId = updateArtifactObject.getGroupId();
             String nodeId = updateArtifactObject.getNodeId();
@@ -208,7 +220,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    private void fetchAndStoreArtifact(UpdatedArtifact info) {
+    private void fetchAndStoreArtifact(UpdatedArtifact info) throws UnAuthorizedException {
         String artifactType = info.getType();
         if (artifactType.equals(TEMPLATES)) {
             updateTemplates(info);
@@ -240,13 +252,14 @@ public class MiArtifactsManager implements ArtifactsManager {
                                        artifactDetails.toString());
     }
 
-    private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken) {
+    private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken)
+            throws UnAuthorizedException {
         return getArtifactDetails(heartbeat.getGroupId(), heartbeat.getNodeId(), heartbeat.getMgtApiUrl(), artifactType,
                                   artifactName, accessToken);
     }
 
     private JsonObject getArtifactDetails(String groupId, String nodeId, String mgtApiUrl, String artifactType,
-                                          String artifactName, String accessToken) {
+                                          String artifactName, String accessToken) throws UnAuthorizedException {
         String getArtifactDetailsUrl = getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
         CloseableHttpResponse artifactDetails = Utils.doGet(groupId, nodeId, accessToken,
                                                             getArtifactDetailsUrl);

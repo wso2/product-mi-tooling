@@ -22,7 +22,7 @@ package org.wso2.ei.dashboard.core.exception;
 /**
  * Exception to throw when invalid credentials are used to login to the dashboard server.
  */
-public class UnAuthorizedException extends RuntimeException {
+public class UnAuthorizedException extends Exception {
 
     public UnAuthorizedException() {
         super();

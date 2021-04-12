@@ -44,7 +44,7 @@ public class LoginDelegate {
             storeTokenInCache(accessToken);
             return Response.ok(accessToken).build();
         } catch (UnAuthorizedException e) {
-            logger.error("Error logging into dashboard server", e);
+            logger.error("Error logging into dashboard server due to {} ", e.getMessage());
             return Response.status(Response.Status.UNAUTHORIZED).build();
         } catch (Exception e) {
             logger.error("Error logging into dashboard server", e);
@@ -52,7 +52,7 @@ public class LoginDelegate {
         }
     }
 
-    private String getTokenFromMI(String username, String password) {
+    private String getTokenFromMI(String username, String password) throws UnAuthorizedException {
         GroupDelegate groupDelegate = new GroupDelegate();
         GroupList groupList = groupDelegate.getGroupList();
         if (groupList.isEmpty()) {

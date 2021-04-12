@@ -45,13 +45,13 @@ public class ManagementApiUtils {
         return databaseManager.getMgtApiUrl(groupId, nodeId);
     }
 
-    public static String getAccessToken(String mgtApiUrl) {
+    public static String getAccessToken(String mgtApiUrl) throws UnAuthorizedException {
         String username = System.getProperty("mi_username");
         String password = System.getProperty("mi_password");
         return getToken(mgtApiUrl, username, password);
     }
 
-    public static String getToken(String mgtApiUrl, String username, String password) {
+    public static String getToken(String mgtApiUrl, String username, String password) throws UnAuthorizedException {
         String usernamePassword = username + ":" + password;
         String encodedUsernamePassword = Base64.getEncoder().encodeToString(usernamePassword.getBytes());
         String loginUrl = mgtApiUrl + "login";
