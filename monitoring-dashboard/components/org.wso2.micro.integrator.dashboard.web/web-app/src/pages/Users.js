@@ -27,6 +27,7 @@ import {Link, Redirect} from "react-router-dom";
 import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import { changeData } from '../redux/Actions';
+import Progress from '../commons/Progress';
 
 export default function Users() {
     const [pageInfo] = React.useState({
@@ -39,7 +40,7 @@ export default function Users() {
         tableOrderBy: 'name'
     });
 
-    const [users, setUsers] = React.useState([]);
+    const [users, setUsers] = React.useState(null);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
@@ -47,15 +48,19 @@ export default function Users() {
     React.useEffect(() => {
         const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
         axios.get(url).then(response => {
-            response.data.map(data => data.details = JSON.parse(data.details))
+            response.data.map(data => data.details = JSON.parse(data.details));
             setUsers(response.data)
         })
-    }, [globalGroupId, dataSet])
+    }, [globalGroupId, dataSet]);
 
     if (AuthManager.getUser().scope !== "admin") {
         return (
             <Redirect to={{pathname: '/'}}/>
         );
+    }
+
+    if (!users) {
+        return(<Progress/>);
     }
 
     return <>
