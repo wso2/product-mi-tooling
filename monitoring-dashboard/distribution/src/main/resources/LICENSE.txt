@@ -12,13 +12,14 @@ At the bottom of this file is a table that shows what each license indicated
 below is and where the actual text of the license can be found.
 
 
-Name                                                                                                Type        License             
+Name                                                                                                Type.          License             
 _________________________________________________________________________________________________________________________________________________
 jetty-webapp-9.4.34.v20201102.jar                                                                   bundle         apache2             
 jetty-io-9.4.34.v20201102.jar                                                                       bundle         apache2             
 jetty-util-9.4.34.v20201102.jar                                                                     bundle         apache2             
 jetty-server-9.4.34.v20201102.jar                                                                   bundle         apache2             
-org.wso2.ei.dashboard.bootstrap-4.0.0-alpha.jar                                                     bundle         apache2             
+jaxb-api-2.3.0.jar                                                                                  bundle         cddl1               
+org.wso2.ei.dashboard.bootstrap-4.0.0.jar                                                           bundle         apache2             
 jetty-servlet-9.4.34.v20201102.jar                                                                  bundle         apache2             
 guava-27.0-jre.jar                                                                                  bundle         apache2             
 javax.servlet-api-3.1.0.jar                                                                         bundle         cddl1               
@@ -28,6 +29,7 @@ jetty-xml-9.4.34.v20201102.jar                                                  
 jetty-http-9.4.34.v20201102.jar                                                                     bundle         apache2             
 cava-toml-0.5.0.jar                                                                                 jar            apache2             
 antlr4-runtime-4.7.1.jar                                                                            bundle         bsd                 
+activation-1.1.jar                                                                                  jar            cddl1               
 log4j-slf4j-impl-2.12.0.jar                                                                         bundle         apache2             
 jetty-security-9.4.34.v20201102.jar                                                                 bundle         apache2             
 log4j-core-2.12.0.jar                                                                               bundle         apache2             
