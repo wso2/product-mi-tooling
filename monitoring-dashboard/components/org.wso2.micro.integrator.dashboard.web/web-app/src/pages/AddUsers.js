@@ -105,21 +105,19 @@ export default function AddUsers() {
                 "password": password,
                 "isAdmin": isAdmin
             }).then(response => {
-                if (response.data.status === 'fail') {
-                    setDialog({
-                        open: true,
-                        title: 'Error',
-                        message: response.data.message,
-                        isError: true
-                    })
-                } else {
                     setDialog({
                         open: true,
                         title: 'Success',
                         message: 'Successfully added user',
                         isError: false
                     })
-                }
+            }).catch(error => {
+                setDialog({
+                    open: true,
+                    title: 'Error',
+                    message: error.response.data.message,
+                    isError: true
+                })
             })
         }
     }
