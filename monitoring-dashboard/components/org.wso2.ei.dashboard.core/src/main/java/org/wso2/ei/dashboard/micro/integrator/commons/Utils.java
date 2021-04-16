@@ -20,6 +20,7 @@
 
 package org.wso2.ei.dashboard.micro.integrator.commons;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
@@ -59,7 +60,15 @@ public class Utils {
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doPost(accessToken, url, payload);
         } else if (isNotSuccessCode(httpSc)) {
-            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+            JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
+            String errorMessage = "Error occurred. Please check server logs.";
+            if (error != null) {
+                String message = error.getAsString();
+                if (null != message && !message.isEmpty()) {
+                    errorMessage = message;
+                }
+            }
+            throw new ManagementApiException(errorMessage, httpSc);
         }
         return response;
     }

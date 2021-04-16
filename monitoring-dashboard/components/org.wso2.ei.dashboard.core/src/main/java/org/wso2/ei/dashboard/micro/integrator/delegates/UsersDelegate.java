@@ -62,13 +62,7 @@ public class UsersDelegate {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users");
-        CloseableHttpResponse httpResponse = Utils.doPost(groupId, nodeId, accessToken, url, payload);
-        if (httpResponse.getStatusLine().getStatusCode() != 200) {
-            log.error("Error occurred while adding user in group " + groupId);
-            String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
-            ack.setMessage(message);
-            return ack;
-        }
+        Utils.doPost(groupId, nodeId, accessToken, url, payload);
         ack.setStatus(Constants.SUCCESS_STATUS);
         return ack;
     }

@@ -41,16 +41,23 @@ public class DashboardServerExceptionMapper implements ExceptionMapper<Managemen
     public Response toResponse(ManagementApiException error) {
 
         logger.debug("Error: ", error);
-
+        String errorMessage = error.getMessage();
         switch (error.getErrorCode()) {
+            case 400: {
+                return populateResponse(getErrorMessage(errorMessage, "Bad request"),
+                                        Response.Status.BAD_REQUEST);
+            }
             case 401: {
-                return populateResponse("Autorization failure", Response.Status.UNAUTHORIZED);
+                return populateResponse(getErrorMessage(errorMessage, "Authorization failure"),
+                                        Response.Status.UNAUTHORIZED);
             }
             case 404: {
-                return populateResponse("Resource not found", Response.Status.NOT_FOUND);
+                return populateResponse(getErrorMessage(errorMessage, "Resource not found"),
+                                        Response.Status.NOT_FOUND);
             }
             default: {
-                return populateResponse("Error processing request. Please check server logs",
+                return populateResponse(getErrorMessage(
+                        errorMessage, "Error processing request. Please check server logs"),
                                         Response.Status.INTERNAL_SERVER_ERROR);
             }
 
@@ -61,5 +68,12 @@ public class DashboardServerExceptionMapper implements ExceptionMapper<Managemen
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", message);
         return Response.status(httpStatusCode).entity(responseBody).header("content-type", "application/json").build();
+    }
+
+    private String getErrorMessage(String errorMessage, String defaultMessage) {
+        if (null == errorMessage || errorMessage.isEmpty()) {
+            return defaultMessage;
+        }
+        return errorMessage;
     }
 }
