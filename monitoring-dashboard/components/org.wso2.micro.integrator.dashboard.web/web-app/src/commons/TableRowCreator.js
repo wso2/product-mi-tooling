@@ -19,7 +19,6 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Switch from "react-switch";
@@ -43,6 +42,7 @@ import LogsNodeCell from './LogsNodeCell';
 import StatusCell from './statusCell/StatusCell';
 import AuthManager from '../auth/AuthManager';
 import { changeData } from '../redux/Actions';
+import HTTPClient from '../utils/HTTPClient';
 
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers, retrieveData } = props;
@@ -184,13 +184,13 @@ function SwitchStatusCell(props) {
     };
 
     const updateArtifact = () => {
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/").concat(pageId);
-        axios.patch(url, {
+        var payload = {
             "artifactName": artifactName,
             "nodeId": nodeId,
             "type": "status",
             "value": isActive
-        }).then(response => {
+        }
+        HTTPClient.updateArtifact(globalGroupId, pageId, payload).then(response => {
             if (response.data.status === 'success') {
                 retrieveData();
             }
@@ -286,11 +286,11 @@ function LogConfigLevelDropDown(props) {
 
     const updateAllNodes = () => {
         handleConfirmationDialogClose();
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs");
-        axios.patch(url, {
+        var payload = {
             "name": name,
             "level": tmpLevel.value
-        }).then(response => {
+        }
+        HTTPClient.updateAllLogConfig(globalGroupId, payload).then(response => {
             if (response.data.status === 'success') {
                 retrieveData();
                 setLevel(tmpLevel)
@@ -311,11 +311,11 @@ function LogConfigLevelDropDown(props) {
 
     const updateSelected = () => {
         handleConfirmationDialogClose();
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs/nodes/".concat(selectedNode));
-        axios.patch(url, {
+        var payload = {
             "name": name,
             "level": tmpLevel.value
-        }).then(response => {
+        }
+        HTTPClient.updateLogConfig(globalGroupId, selectedNode, payload).then(response => {
             if (response.data.status === 'success') {
                 retrieveData(selectedNode);
                 setLevel(tmpLevel)
@@ -417,8 +417,7 @@ function UserDeleteAction(props) {
             title: '',
             message: ''
         })
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
-        axios.get(url).then(response => {
+        HTTPClient.getUsers(globalGroupId).then(response => {
             response.data.map(data => data.details = JSON.parse(data.details))
             dispatch(changeData(response.data))
         })
@@ -435,8 +434,7 @@ function UserDeleteAction(props) {
 
     const deleteUser = () => {
         handleConfirmationDialogClose();
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users/").concat(userId);
-        axios.delete(url).then(response => {
+        HTTPClient.deleteUser(globalGroupId, userId).then(response => {
             if (response.data.status === 'success') {
                 setCompletionStatusDialog({
                     open: true, 

@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -7,7 +6,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { changeGroup } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
-import AuthManager from '../auth/AuthManager';
+import HTTPClient from '../utils/HTTPClient';
 
 export default function GroupSelector() {
 
@@ -15,9 +14,8 @@ export default function GroupSelector() {
     const dispatch = useDispatch();
 
     React.useEffect(() => {
-        const url = AuthManager.getBasePath().concat('/groups/');
         let groups = [];
-        axios.get(url).then(response => {
+        HTTPClient.getGroups().then(response => {
             response.data.filter(groupName => {
                 var group = {
                     label: groupName,

@@ -19,7 +19,6 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -31,8 +30,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 import { filterNodes } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
-import AuthManager from '../auth/AuthManager';
 import Divider from "@material-ui/core/Divider";
+import HTTPClient from '../utils/HTTPClient';
 
 export default function NodeFilter () {
 
@@ -41,8 +40,7 @@ export default function NodeFilter () {
 
     React.useEffect(()=>{
         if (globalGroupId !== '') {
-            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(url, { }).then(response => {
+            HTTPClient.getNodes(globalGroupId).then(response => {
                 var list = [];
                 response.data.map(data => list.push(data.nodeId))
                 setNodeList(list)

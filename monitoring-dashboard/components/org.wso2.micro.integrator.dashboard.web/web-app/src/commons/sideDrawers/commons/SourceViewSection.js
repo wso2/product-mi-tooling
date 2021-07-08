@@ -19,15 +19,14 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import {makeStyles} from '@material-ui/core/styles';
 import {useSelector} from 'react-redux';
-import AuthManager from '../../../auth/AuthManager';
 import Editor from "@monaco-editor/react";
+import HTTPClient from '../../../utils/HTTPClient';
 const format = require('xml-formatter');
 
 export default function SourceViewSection(props) {
@@ -46,9 +45,7 @@ export default function SourceViewSection(props) {
     const [open] = React.useState(false);
 
     React.useEffect(() => {
-        const url = AuthManager.getBasePath().concat('/configuration');
-
-        axios.get(url, {params}).then(response => {
+        HTTPClient.getConfiguration(params).then(response => {
             setSource(response.data.configuration);
         })
     }, [])
