@@ -83,10 +83,17 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/</directory>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/www</directory>
             <outputDirectory>server/www</outputDirectory>
             <includes>
-                <include>org.wso2.micro.integrator.dashboard.web.war</include>
+                <include>**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/WEB-INF</directory>
+            <outputDirectory>server/www/WEB-INF</outputDirectory>
+            <includes>
+                <include>web.xml</include>
             </includes>
         </fileSet>
         <fileSet>

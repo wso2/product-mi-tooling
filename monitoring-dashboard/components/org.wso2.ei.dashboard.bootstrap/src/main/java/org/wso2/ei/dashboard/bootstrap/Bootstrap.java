@@ -65,7 +65,6 @@ public class Bootstrap {
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
-    private static final String WEBAPP_UI = "org.wso2.micro.integrator.dashboard.web.war";
     private static final String DASHBOARD_HOME = "DASHBOARD_HOME";
     private static final String KEYSTORE_PASSWORD = "KEYSTORE_PASSWORD";
     private static final String TOML_KEYSTORE_PASSWORD = "keystore.password";    
@@ -163,9 +162,7 @@ public class Bootstrap {
         
         WebAppContext wwwApp = new WebAppContext();
         wwwApp.setContextPath("/");
-        wwwApp.setExtractWAR(true);
-        wwwApp.setWar(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR + File.separator
-                + WEBAPP_UI);
+        wwwApp.setResourceBase(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR);
         wwwApp.setParentLoaderPriority(true);
         handlers.addHandler(wwwApp);
         server.setHandler(handlers);
