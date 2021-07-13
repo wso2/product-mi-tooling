@@ -48,7 +48,7 @@
                         <goal>exec</goal>
                     </goals>
                 </execution>
-                <execution>
+                <!-- <execution>
                     <id>exec-npm-test</id>
                     <phase>generate-sources</phase>
                     <configuration>
@@ -61,7 +61,7 @@
                     <goals>
                         <goal>exec</goal>
                     </goals>
-                </execution>
+                </execution> -->
                 <execution>
                     <id>exec-npm-build</id>
                     <phase>generate-sources</phase>

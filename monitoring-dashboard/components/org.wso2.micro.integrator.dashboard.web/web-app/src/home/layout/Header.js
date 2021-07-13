@@ -17,6 +17,7 @@ import { categories, getIdFromRoute } from './NavigatorLinks';
 import AuthManager from '../../auth/AuthManager';
 import Chip from '@material-ui/core/Chip';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -47,6 +48,8 @@ function Header(props) {
   const location = useLocation();
   const [selected, setSelected] = useState(null);
   const [user, setUser] = useState(null);
+  const { signOut } = useAuthContext();
+
   useEffect(() => {
     if (!user) {
         setUser(AuthManager.getUser());
@@ -69,6 +72,15 @@ function Header(props) {
   const showNodeSelector = () => {
     return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname === "/");
   };
+
+  const handleLogout = () => {
+    if (AuthManager.getUser().sso) {
+      signOut();
+      AuthManager.discardSession();
+    } else {
+      window.location.href = "/logout";
+    }
+  }
 
   return (
     <>
@@ -114,7 +126,7 @@ function Header(props) {
                   keepMounted
                   open={Boolean(anchorEl)}
                   onClose={handlePopOverClose}>
-                  <MenuItem component="a" href="/logout">Logout</MenuItem>
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </Popover>
             </Grid>

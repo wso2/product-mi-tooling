@@ -51,7 +51,7 @@ export default class AuthManager {
                 if (decodedToken !== undefined) {
                     scope = decodedToken.scope;
                 }
-                AuthManager.setUser({username: username, scope: scope}, isSecure);
+                AuthManager.setUser({username: username, scope: scope, sso: false}, isSecure);
                 AuthManager.setCookie(Constants.JWT_TOKEN_COOKIE, accessToken, 3600, window.contextPath, isSecure);
                 resolve();
             })

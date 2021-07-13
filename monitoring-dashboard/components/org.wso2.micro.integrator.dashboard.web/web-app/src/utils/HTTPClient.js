@@ -18,6 +18,7 @@
  */
 
 import axios from 'axios';
+import { AuthClient } from "@asgardeo/auth-react";
 import AuthManager from '../auth/AuthManager';
 import {Constants} from './Constants';
 
@@ -33,7 +34,12 @@ export default class HTTPClient {
             params: params,
             data: body
         };
-        return axios.request(requestConfig)
+
+        if (AuthManager.getUser().sso) {
+            return AuthClient.httpRequest(requestConfig);
+        } else {
+            return axios.request(requestConfig)
+        }
     }
 
     static get(path, params={}) {
@@ -119,7 +125,7 @@ export default class HTTPClient {
     }
 
     static getArtifacts(artifactType, groupId, nodeList) {
-        const resourcePath = `${groupId}/${artifactType}${this.getNodeListAsQueryParams(nodeList)}`
+        const resourcePath = `${groupId}/${artifactType}?nodes=${this.getNodeListAsQueryParams(nodeList)}`
         return new Promise((resolve, reject) => {
             this.getResource(resourcePath).then(response => {
                 response.data.map(data => 
@@ -138,7 +144,7 @@ export default class HTTPClient {
     }
 
     static getNodeListAsQueryParams(nodeList) {
-        var nodeListQueryParams = "?nodes="
+        var nodeListQueryParams = ""
         nodeList.filter(node => {
             nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
         })
