@@ -34,6 +34,8 @@ import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.wso2.config.mapper.ConfigParser;
+import org.wso2.config.mapper.ConfigParserException;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +53,7 @@ import java.util.Properties;
  * React application serve in root context and all the war files serve in "/api" context.
  */
 public class Bootstrap {
+    private static final String CONFIG_PARSER_DIR = "config-parser";
     private static final String CONF_DIR = "conf";
     private static final String DEPLOYMENT_TOML = "deployment.toml";
     private static final String SECURITY_DIR = "security";
@@ -110,6 +113,7 @@ public class Bootstrap {
         setServerHandlers(dashboardHome, server);
         
         try {
+            generateSSOConfigJS(tomlFile);
             server.start();
             writePID(dashboardHome);
             printServerStartupLog(serverPort);
@@ -241,5 +245,22 @@ public class Bootstrap {
         } catch (IOException e) {
             logger.warn("Cannot write process ID '" + pid + "' to '" + runtimePidFile.toString() + "' file.", e);
         }
+    }
+
+    private static void generateSSOConfigJS(String tomlPath) throws ConfigParserException {
+
+        String resourcesDir =
+                System.getenv(DASHBOARD_HOME) + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
+
+        String outputDir =
+                System.getenv(DASHBOARD_HOME) + File.separator + SERVER_DIR + File.separator + WWW_DIR +
+                        File.separator + CONF_DIR;
+
+        File directory = new File(outputDir);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+
+        ConfigParser.parse(tomlPath, resourcesDir, outputDir);
     }
 }
