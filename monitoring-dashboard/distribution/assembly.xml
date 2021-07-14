@@ -162,6 +162,12 @@
                 <include>commons-lang.wso2:commons-lang:jar</include>
                 <include>commons-logging:commons-logging:jar</include>
                 <include>org.apache.logging.log4j:log4j-jcl:jar</include>
+                <include>io.asgardeo.java.oidc.sdk:io.asgardeo.java.oidc.sdk:jar</include>
+                <include>com.nimbusds:oauth2-oidc-sdk:jar</include>
+                <include>com.nimbusds:nimbus-jose-jwt:jar</include>
+                <include>net.minidev:json-smart:jar</include>
+                <include>net.minidev:asm:jar</include>
+                <include>org.wso2.ei:org.wso2.micro.integrator.dashboard.utils:jar</include>
             </includes>
         </dependencySet>
     </dependencySets>

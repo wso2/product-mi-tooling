@@ -324,6 +324,16 @@
                 <artifactId>config-mapper</artifactId>
                 <version>${config.mapper.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.asgardeo.java.oidc.sdk</groupId>
+                <artifactId>io.asgardeo.java.oidc.sdk</artifactId>
+                <version>${asgardeo.java.oidc.sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>asm</artifactId>
+                <version>${net.minidev.asm.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -407,5 +417,7 @@
         <google.guava.version>27.0-jre</google.guava.version>
         <jetty.version>9.4.14.v20181114</jetty.version>
         <config.mapper.version>1.0.2</config.mapper.version>
+        <asgardeo.java.oidc.sdk.version>0.1.13</asgardeo.java.oidc.sdk.version>
+        <net.minidev.asm.version>1.0.2</net.minidev.asm.version>
     </properties>
 </project>
