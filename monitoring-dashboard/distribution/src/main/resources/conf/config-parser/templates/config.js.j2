@@ -1,0 +1,59 @@
+window.sso = {
+    enable: {{sso.enable}},
+    config: {
+    	clientID: "{{sso.client_id}}",
+    	clientSecret: "{{sso.client_secret}}",
+    	serverOrigin: "{{sso.idp_url}}",
+    	resourceServerURLs: [{% for url in sso.resource_server_URLs %}"{{url}}"{% if loop.index < sso.resource_server_URLs|length %},{% endif %}{% endfor %}],
+    	signInRedirectURL: "{{sso.sign_in_redirect_URL}}",
+    	{% if sso.sign_out_redirect_URL is defined %}
+        signOutRedirectURL: "{{sso.sign_out_redirect_URL}}",
+        {% endif %}
+    	storage: "{{sso.storage}}",
+    	{% if sso.well_known_endpoint is defined %}
+        wellKnownEndpoint: "{{sso.well_known_endpoint}}",
+        {% endif %}
+        {% if sso.override_well_known_endpoint is defined %}
+        overrideWellEndpointConfig: {{sso.override_well_known_endpoint}},
+        {% endif %}
+        {% if sso.override_well_known_endpoint is defined %}
+        endpoints: {
+            {% if sso.authorization_endpoint is defined %}
+            authorizationEndpoint: "{{sso.authorization_endpoint}}",
+            {% endif %}
+            {% if sso.token_endpoint is defined %}
+            tokenEndpoint: "{{sso.token_endpoint}}",
+            {% endif %}
+            {% if sso.user_info_endpoint is defined %}
+            userinfoEndpoint: "{{sso.user_info_endpoint}}",
+            {% endif %}
+            {% if sso.jwks_endpoint is defined %}
+            jwksUri: "{{sso.jwks_endpoint}}",
+            {% endif %}
+            {% if sso.registration_endpoint is defined %}
+            registrationEndpoint: "{{sso.registration_endpoint}}",
+            {% endif %}
+            {% if sso.revocation_endpoint is defined %}
+            revocationEndpoint: "{{sso.revocation_endpoint}}",
+            {% endif %}
+            {% if sso.introspection_endpoint is defined %}
+            introspectionEndpoint: "{{sso.introspection_endpoint}}",
+            {% endif %}
+            {% if sso.check_session_Iframe_endpoint is defined %}
+            checkSessionIframe: "{{sso.check_session_Iframe_endpoint}}",
+            {% endif %}
+            {% if sso.end_session_endpoint is defined %}
+            endSessionEndpoint: "{{sso.end_session_endpoint}}",
+            {% endif %}
+        },
+        {% endif %}
+    	{% if sso.enable_PKCE is defined %}
+        enablePKCE: {{sso.enable_PKCE}},
+        {% endif %}
+        {% if sso.scope is defined %}
+        scope: [{% for value in sso.scope %}"{{value}}"{% if loop.index < sso.scope|length %},{% endif %}{% endfor %}],
+        {% endif %}
+    },
+    adminGroupAttribute: "{{sso.admin_group_attribute}}",
+    allowedAdminGroups: [{% for group in sso.admin_groups %}"{{group}}"{% if loop.index < sso.admin_groups|length %},{% endif %}{% endfor %}]
+};

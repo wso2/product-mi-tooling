@@ -20,7 +20,6 @@
 
 import React from 'react';
 import { useSelector } from "react-redux";
-import axios from "axios";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
@@ -33,9 +32,9 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
-import AuthManager from '../auth/AuthManager';
 import { makeStyles } from "@material-ui/core/styles";
 import { Link, useHistory } from "react-router-dom";
+import HTTPClient from '../utils/HTTPClient';
 
 export default function AddUsers() {
     const globalGroupId = useSelector(state => state.groupId);
@@ -99,12 +98,12 @@ export default function AddUsers() {
                 isError: true
             })
         } else {
-            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
-            axios.post(url, {
+            var payload = {
                 "userId": userId,
                 "password": password,
                 "isAdmin": isAdmin
-            }).then(response => {
+            }
+            HTTPClient.addUser(globalGroupId, payload).then(response => {
                     setDialog({
                         open: true,
                         title: 'Success',

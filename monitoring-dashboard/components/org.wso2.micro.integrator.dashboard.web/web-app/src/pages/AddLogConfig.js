@@ -20,9 +20,6 @@
 
 import React from 'react';
 import {useSelector} from "react-redux";
-import AuthManager from "../auth/AuthManager";
-import {Constants} from "../auth/Constants";
-import axios from "axios";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
@@ -37,6 +34,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import {makeStyles} from "@material-ui/core/styles";
 import {Link, useHistory} from "react-router-dom";
+import HTTPClient from '../utils/HTTPClient';
 
 export default function AddLogConfig() {
     const globalGroupId = useSelector(state => state.groupId);
@@ -44,9 +42,7 @@ export default function AddLogConfig() {
     React.useEffect(() => {
         let allNodes = [{label: 'All', value: 'All'}]
         if (globalGroupId !== '') {
-            var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
-            const getNodeUrl = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(getNodeUrl, {headers: {Authorization: authBearer}}).then(response => {
+            HTTPClient.getNodes().then(response => {
                 response.data.filter(node => {
                     var node = {
                         label: node.nodeId,
@@ -144,12 +140,12 @@ function AddLogConfigsSection() {
     const addLogger = () => {
         handleConfirmationDialogClose();
         const {loggerName, loggerClass, loggerLevel} = logConfig;
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs");
-        axios.post(url, {
+        var payload = {
             "name": loggerName,
             "loggerClass": loggerClass,
             "level": loggerLevel
-        }).then(response => {
+        }
+        HTTPClient.addLogConfig(globalGroupId, payload).then(response => {
             if (response.data.status === 'fail') {
                 setCompletionStatusDialog({
                     open: true,

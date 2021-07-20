@@ -1,0 +1,4 @@
+{
+	"sso.enable": false,
+	"sso.storage": "webWorker"
+}

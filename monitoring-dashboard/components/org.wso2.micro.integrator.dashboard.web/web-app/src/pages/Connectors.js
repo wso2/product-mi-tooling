@@ -19,10 +19,9 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
-import AuthManager from '../auth/AuthManager';
+import HTTPClient from '../utils/HTTPClient';
 
 export default function Connectors() {
     const [pageInfo] = React.useState({
@@ -43,15 +42,7 @@ export default function Connectors() {
     const selectedNodeList = useSelector(state => state.nodeList);
 
     React.useEffect(() => {
-        var nodeListQueryParams="";
-        selectedNodeList.filter(node => {
-            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
-        })
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/connectors?nodes=").concat(nodeListQueryParams.slice(0,-7));
-        axios.get(url).then(response => {
-            response.data.map(data => 
-                data.nodes.map(node => node.details = JSON.parse(node.details))
-            )
+        HTTPClient.getArtifacts("connectors", globalGroupId, selectedNodeList).then(response => {
             setConnectorList(response.data)
         })
     },[globalGroupId, selectedNodeList])

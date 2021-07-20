@@ -19,15 +19,14 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import {makeStyles} from '@material-ui/core/styles';
 import {useSelector} from 'react-redux';
-import AuthManager from '../../../auth/AuthManager';
 import Editor from "@monaco-editor/react";
+import HTTPClient from '../../../utils/HTTPClient';
 const format = require('xml-formatter');
 
 export default function LocalEntryValueSection(props) {
@@ -39,8 +38,7 @@ export default function LocalEntryValueSection(props) {
     const [open] = React.useState(false);
 
     React.useEffect(() => {
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat('/nodes/').concat(nodeId).concat('/local-entries/').concat(name).concat('/value');
-        axios.get(url).then(response => {
+        HTTPClient.getLocalEntryValue(globalGroupId, nodeId, name).then(response => {
             setValue(response.data.value);
         })
     }, [])

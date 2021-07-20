@@ -51,7 +51,7 @@ it("renders user data", async () => {
         ]
     };
 
-    axios.get.mockImplementation(() => Promise.resolve(nodesPayload))
+    axios.request.mockImplementation(() => Promise.resolve(nodesPayload))
 
     await act(async () => {
         render(<Nodes/>, container);

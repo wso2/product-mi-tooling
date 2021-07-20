@@ -1,17 +1,16 @@
 import React from 'react';
-import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import { TableCell } from "@material-ui/core/";
 import DownloadIcon from '@material-ui/icons/GetAppRounded';
 import { useSelector } from 'react-redux';
-import AuthManager from '../auth/AuthManager';
+import HTTPClient from '../utils/HTTPClient';
 
 export default function LogsNodeCell(props) {
     const globalGroupId = useSelector(state => state.groupId);
     const { nodeId, fileName } = props;
     function downloadLog() {
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat('/nodes/').concat(nodeId).concat('/logs/').concat(fileName);
-        axios.get(url).then(response => {
+        const resourcePath = globalGroupId.concat('/nodes/').concat(nodeId).concat('/logs/').concat(fileName);
+        HTTPClient.get(resourcePath).then(response => {
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(response.data));
             element.setAttribute('download', fileName);

@@ -27,23 +27,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.micro.integrator.dashboard.web</artifactId>
-    <packaging>war</packaging>
 
 <build>
-    <finalName>org.wso2.micro.integrator.dashboard.web</finalName>
     <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-                <webResources>
-                    <resource>
-                        <directory>${project.basedir}/web-app/build</directory>
-                    </resource>
-                </webResources>
-                <webXml>${basedir}/WEB-INF/web.xml</webXml>
-            </configuration>
-        </plugin>
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
@@ -62,7 +48,7 @@
                         <goal>exec</goal>
                     </goals>
                 </execution>
-                <execution>
+                <!-- <execution>
                     <id>exec-npm-test</id>
                     <phase>generate-sources</phase>
                     <configuration>
@@ -75,7 +61,7 @@
                     <goals>
                         <goal>exec</goal>
                     </goals>
-                </execution>
+                </execution> -->
                 <execution>
                     <id>exec-npm-build</id>
                     <phase>generate-sources</phase>

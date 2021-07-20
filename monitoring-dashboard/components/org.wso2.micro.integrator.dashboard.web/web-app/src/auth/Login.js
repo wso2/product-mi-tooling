@@ -32,6 +32,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {Redirect} from 'react-router';
+import { useAuthContext } from "@asgardeo/auth-react";
 import AuthManager from './AuthManager'
 
 const styles = theme => ({
@@ -61,6 +62,7 @@ function Login(props){
     const [authenticated, setAuthenticated] = useState(false);
     const [loginErrorMessage, setLoginErrorMessage] = useState('')
     const [loginError, setLoginError] = useState(false)
+    const { signIn } = useAuthContext();
 
     useEffect(() => {
         initAuthenticationFlow();
@@ -166,7 +168,19 @@ function Login(props){
                             onClick={authenticate}
                         >
                             Sign In
-                </Button>
+                        </Button>
+                        {window.sso.enable &&
+                        <Button
+                            type="button"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            onClick={ () => {
+                                signIn();
+                            } }>
+                            Sign In with SSO
+                        </Button>
+                        }
 {/*                        <Grid container>
                             <Grid item xs>
                                 <Link href="#" variant="body2">
