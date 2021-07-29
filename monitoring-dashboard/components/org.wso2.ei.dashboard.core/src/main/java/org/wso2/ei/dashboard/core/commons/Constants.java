@@ -64,4 +64,5 @@ public final class Constants {
 
     public static final int TOKEN_CACHE_TIMEOUT = 60;
 
+    public static final String JWKS_URI = "jwks_uri";
 }

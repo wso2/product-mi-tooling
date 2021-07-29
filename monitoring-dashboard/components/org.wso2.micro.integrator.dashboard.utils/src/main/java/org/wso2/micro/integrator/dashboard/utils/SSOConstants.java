@@ -28,10 +28,14 @@ public class SSOConstants {
     public static final String TOML_SSO_ADMIN_GROUP_ATTRIBUTE = "sso.admin_group_attribute";
     public static final String TOML_SSO_ADMIN_GROUPS = "sso.admin_groups";
     public static final String TOML_SSO_JWT_ISSUER = "sso.jwt_issuer";
+    public static final String TOML_SSO_IDP_URL = "sso.idp_url";
     public static final String TOML_SSO_JWKS_ENDPOINT = "sso.jwks_endpoint";
+    public static final String TOML_SSO_WELL_KNOWN_ENDPOINT = "sso.well_known_endpoint";
     public static final String TOML_SSO_CLIENT_ID = "sso.client_id";
     public static final String TOML_SSO_CLIENT_SECRET = "sso.client_secret";
     public static final String TOML_SSO_JWKS_ALGORITHM = "sso.jwks_algorithm";
     public static final String DEFAULT_SSO_ADMIN_GROUP_ATTRIBUTE = "groups";
+
+    public static final String DEFAULT_WELL_KNOWN_ENDPOINT = "/oauth2/token/.well-known/openid-configuration";
 
 }
