@@ -52,7 +52,7 @@ export default function Users() {
         })
     }, [globalGroupId, dataSet]);
 
-    if (AuthManager.getUser().scope !== "admin") {
+    if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
         return (
             <Redirect to={{pathname: '/'}}/>
         );

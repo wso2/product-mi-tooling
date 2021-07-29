@@ -18,7 +18,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Switch, Route, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -88,8 +88,8 @@ function Layout(props) {
         setMobileOpen(!mobileOpen);
     };
 
-    React.useEffect(() => {
-        if (AuthManager.getUser().sso) {
+    useEffect(() => {
+        if (AuthManager.getUser()?.sso) {
             signIn()
         }
     },[])

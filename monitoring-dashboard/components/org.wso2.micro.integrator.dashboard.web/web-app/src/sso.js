@@ -39,7 +39,7 @@ function SSO() {
                 if (window.sso.adminGroupAttribute && window.sso.allowedAdminGroups) {
                     var group = window.sso.adminGroupAttribute
                     var adminGroups = window.sso.allowedAdminGroups
-                    if (decodedIDToken[group].some(role => adminGroups.includes(role))) {
+                    if (decodedIDToken[group]?.some(role => adminGroups.includes(role))) {
                         scope = "admin"
                     }
                 }

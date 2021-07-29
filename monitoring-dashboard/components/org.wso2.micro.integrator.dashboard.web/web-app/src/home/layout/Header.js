@@ -74,7 +74,7 @@ function Header(props) {
   };
 
   const handleLogout = () => {
-    if (AuthManager.getUser().sso) {
+    if (AuthManager.getUser()?.sso) {
       signOut();
       AuthManager.discardSession();
     } else {
