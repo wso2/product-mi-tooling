@@ -52,6 +52,10 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/src/main/resources/conf/config-parser</directory>
+            <outputDirectory>conf/config-parser</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/src/main/resources/bin</directory>
             <outputDirectory>bin</outputDirectory>
             <includes>
@@ -83,10 +87,17 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/</directory>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/www</directory>
             <outputDirectory>server/www</outputDirectory>
             <includes>
-                <include>org.wso2.micro.integrator.dashboard.web.war</include>
+                <include>**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/WEB-INF</directory>
+            <outputDirectory>server/www/WEB-INF</outputDirectory>
+            <includes>
+                <include>web.xml</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -138,6 +149,25 @@
                 <include>org.slf4j:slf4j-api:jar</include>
                 <include>org.apache.logging.log4j:log4j-slf4j-impl:jar</include>
                 <include>com.google.guava:guava:jar</include>
+                <include>org.wso2.config.mapper:config-mapper:jar</include>
+                <include>com.google.code.gson:gson:jar</include>
+                <include>org.jsoup:jsoup:jar</include>
+                <include>com.google.re2j:re2j:jar</include>
+                <include>com.fasterxml.jackson.core:jackson-core:jar</include>
+                <include>com.fasterxml.jackson.core:jackson-databind:jar</include>
+                <include>com.fasterxml.jackson.core:jackson-annotations:jar</include>
+                <include>commons-codec:commons-codec:jar</include>
+                <include>com.hubspot.jinjava:jinjava:jar</include>
+                <include>org.apache.commons:commons-lang3:jar</include>
+                <include>commons-lang.wso2:commons-lang:jar</include>
+                <include>commons-logging:commons-logging:jar</include>
+                <include>org.apache.logging.log4j:log4j-jcl:jar</include>
+                <include>io.asgardeo.java.oidc.sdk:io.asgardeo.java.oidc.sdk:jar</include>
+                <include>com.nimbusds:oauth2-oidc-sdk:jar</include>
+                <include>com.nimbusds:nimbus-jose-jwt:jar</include>
+                <include>net.minidev:json-smart:jar</include>
+                <include>net.minidev:asm:jar</include>
+                <include>org.wso2.ei:org.wso2.micro.integrator.dashboard.utils:jar</include>
             </includes>
         </dependencySet>
     </dependencySets>

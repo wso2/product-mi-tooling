@@ -31,6 +31,7 @@
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>org.wso2.micro.integrator.dashboard.utils</module>
         <module>org.wso2.ei.dashboard.bootstrap</module>
         <module>org.wso2.ei.dashboard.core</module>
         <module>org.wso2.micro.integrator.dashboard.web</module>

@@ -19,6 +19,11 @@
  */
 package org.wso2.ei.dashboard.bootstrap;
 
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.oauth2.sdk.id.Issuer;
+import io.asgardeo.java.oidc.sdk.config.model.OIDCAgentConfig;
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
 import org.apache.logging.log4j.LogManager;
@@ -34,23 +39,33 @@ import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.wso2.config.mapper.ConfigParser;
+import org.wso2.config.mapper.ConfigParserException;
+import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
+import org.wso2.micro.integrator.dashboard.utils.SSOConfigException;
+import org.wso2.micro.integrator.dashboard.utils.SSOConstants;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * This class starting up the jetty server on the port as defined in deployment.toml file.
  * React application serve in root context and all the war files serve in "/api" context.
  */
 public class Bootstrap {
+    private static final String CONFIG_PARSER_DIR = "config-parser";
     private static final String CONF_DIR = "conf";
     private static final String DEPLOYMENT_TOML = "deployment.toml";
     private static final String SECURITY_DIR = "security";
@@ -65,7 +80,6 @@ public class Bootstrap {
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
-    private static final String WEBAPP_UI = "org.wso2.micro.integrator.dashboard.web.war";
     private static final String DASHBOARD_HOME = "DASHBOARD_HOME";
     private static final String KEYSTORE_PASSWORD = "KEYSTORE_PASSWORD";
     private static final String TOML_KEYSTORE_PASSWORD = "keystore.password";    
@@ -73,10 +87,14 @@ public class Bootstrap {
     private static final String TOML_KEY_MANAGER_PASSWORD = "keystore.key_password";
     private static final String JKS_FILE_LOCATION = "JKS_FILE_LOCATION";
     private static final String TOML_JKS_FILE_LOCATION = "keystore.file_name";
+    private static final String TOML_TRUSTSTORE_PASSWORD = "truststore.password";
+    private static final String TOML_TRUSTSTORE_FILE_LOCATION = "truststore.file_name";
+    private static final String JAVAX_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
+    private static final String JAVAX_SSL_TRUSTSTORE_PASSWORD = "javax.net.ssl.trustStorePassword";
     private static String keyStorePassword;
     private static String keyManagerPassword;
     private static String jksFileLocation;
-    
+    private static SSOConfig ssoConfig;
 
     private static final Logger logger = LogManager.getLogger(Bootstrap.class);
 
@@ -98,8 +116,12 @@ public class Bootstrap {
             if (serverPortConfig != null) {
                 serverPort = serverPortConfig.intValue();
             }
-            
+
             loadConfigurations(parseResult);
+            ssoConfig = generateSSOConfig(parseResult);
+        } catch (SSOConfigException e) {
+            logger.error("Error reading SSO configs from TOML file", e);
+            System.exit(1);
         } catch (IOException e) {
             logger.warn(
                     String.format("Error while reading TOML file in %s. Using default port %d", tomlFile,
@@ -111,6 +133,7 @@ public class Bootstrap {
         setServerHandlers(dashboardHome, server);
         
         try {
+            generateSSOConfigJS(tomlFile);
             server.start();
             writePID(dashboardHome);
             printServerStartupLog(serverPort);
@@ -156,6 +179,7 @@ public class Bootstrap {
             File warFile = new File(webAppsPath + File.separator + pathname);
             webApp.setExtractWAR(true);
             webApp.setWar(warFile.getAbsolutePath());
+            webApp.setAttribute(SSOConstants.CONFIG_BEAN_NAME, ssoConfig);
             ErrorHandler errorHandler = new JsonErrorHandler();
             webApp.setErrorHandler(errorHandler);
             handlers.addHandler(webApp);
@@ -163,9 +187,7 @@ public class Bootstrap {
         
         WebAppContext wwwApp = new WebAppContext();
         wwwApp.setContextPath("/");
-        wwwApp.setExtractWAR(true);
-        wwwApp.setWar(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR + File.separator
-                + WEBAPP_UI);
+        wwwApp.setResourceBase(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR);
         wwwApp.setParentLoaderPriority(true);
         handlers.addHandler(wwwApp);
         server.setHandler(handlers);
@@ -244,5 +266,91 @@ public class Bootstrap {
         } catch (IOException e) {
             logger.warn("Cannot write process ID '" + pid + "' to '" + runtimePidFile.toString() + "' file.", e);
         }
+    }
+
+    private static void generateSSOConfigJS(String tomlPath) throws ConfigParserException {
+
+        String resourcesDir =
+                System.getenv(DASHBOARD_HOME) + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
+
+        String outputDir =
+                System.getenv(DASHBOARD_HOME) + File.separator + SERVER_DIR + File.separator + WWW_DIR +
+                        File.separator + CONF_DIR;
+
+        File directory = new File(outputDir);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+
+        ConfigParser.parse(tomlPath, resourcesDir, outputDir);
+    }
+
+    private static SSOConfig generateSSOConfig(TomlParseResult parseResult) throws SSOConfigException {
+
+        if (parseResult.isBoolean(SSOConstants.TOML_SSO_ENABLE) &&
+                parseResult.getBoolean(SSOConstants.TOML_SSO_ENABLE)) {
+            OIDCAgentConfig oidcAgentConfig = generateOIDCAgentConfig(parseResult);
+            String adminGroupAttribute = SSOConstants.DEFAULT_SSO_ADMIN_GROUP_ATTRIBUTE;
+            if (parseResult.isString(SSOConstants.TOML_SSO_ADMIN_GROUP_ATTRIBUTE)) {
+                adminGroupAttribute = parseResult.getString(SSOConstants.TOML_SSO_ADMIN_GROUP_ATTRIBUTE);
+            }
+            String adminGroups = "";
+            if (parseResult.isArray(SSOConstants.TOML_SSO_ADMIN_GROUPS)) {
+                adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toString();
+            }
+            setJavaxSslTruststore(parseResult);
+            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups);
+        }
+        return null;
+    }
+
+    private static OIDCAgentConfig generateOIDCAgentConfig(TomlParseResult parseResult) throws SSOConfigException {
+
+        OIDCAgentConfig oidcAgentConfig = new OIDCAgentConfig();
+        if (!parseResult.isString(SSOConstants.TOML_SSO_JWT_ISSUER)) {
+            throw new SSOConfigException("Missing value for jwt_issuer in SSO Configs");
+        }
+        Issuer issuer = new Issuer(parseResult.getString(SSOConstants.TOML_SSO_JWT_ISSUER));
+        oidcAgentConfig.setIssuer(issuer);
+        if (!parseResult.isString(SSOConstants.TOML_SSO_JWKS_ENDPOINT)) {
+            throw new SSOConfigException("Missing value for jwks_endpoint in SSO Configs");
+        }
+        URI jwksEndpoint = null;
+        try {
+            jwksEndpoint = new URI(parseResult.getString(SSOConstants.TOML_SSO_JWKS_ENDPOINT));
+        } catch (URISyntaxException e) {
+            throw new SSOConfigException("Invalid url for jwks_endpoint in SSO Configs");
+        }
+        oidcAgentConfig.setJwksEndpoint(jwksEndpoint);
+        if (!parseResult.isString(SSOConstants.TOML_SSO_CLIENT_ID)) {
+            throw new SSOConfigException("Missing value for client_id in SSO Configs");
+        }
+        ClientID consumerKey = new ClientID(parseResult.getString(SSOConstants.TOML_SSO_CLIENT_ID));
+        oidcAgentConfig.setConsumerKey(consumerKey);
+        if (parseResult.isString(SSOConstants.TOML_SSO_CLIENT_SECRET)) {
+            Secret consumerSecret = new Secret(parseResult.getString(SSOConstants.TOML_SSO_CLIENT_SECRET));
+            oidcAgentConfig.setConsumerSecret(consumerSecret);
+        }
+        if (parseResult.isString(SSOConstants.TOML_SSO_JWKS_ALGORITHM)) {
+            JWSAlgorithm jwsAlgorithm = new JWSAlgorithm(parseResult.getString(SSOConstants.TOML_SSO_JWKS_ALGORITHM));
+            oidcAgentConfig.setSignatureAlgorithm(jwsAlgorithm);
+        }
+        Set<String> trustedAudience = new HashSet<>();
+        trustedAudience.add(consumerKey.getValue());
+        oidcAgentConfig.setTrustedAudience(trustedAudience);
+        return oidcAgentConfig;
+    }
+
+    private static void setJavaxSslTruststore(TomlParseResult parseResult) throws SSOConfigException {
+
+        if (!parseResult.isString(TOML_TRUSTSTORE_FILE_LOCATION) || !parseResult.isString(TOML_TRUSTSTORE_PASSWORD)) {
+            throw new SSOConfigException("Truststore information is missing");
+        }
+        String trustStoreLocation = parseResult.getString(TOML_TRUSTSTORE_FILE_LOCATION);
+        trustStoreLocation = System.getenv(DASHBOARD_HOME) + File.separator + trustStoreLocation;
+        System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
+
+        String trustStorePassword = parseResult.getString(TOML_TRUSTSTORE_PASSWORD);
+        System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
     }
 }

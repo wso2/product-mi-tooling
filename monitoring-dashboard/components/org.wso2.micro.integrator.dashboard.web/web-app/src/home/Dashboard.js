@@ -18,13 +18,14 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Switch, Route, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
+import { useAuthContext } from "@asgardeo/auth-react";
 import Navigator from './layout/Navigator';
 import Content from './layout/Content';
 import Header from './layout/Header';
@@ -81,10 +82,18 @@ const styles = (theme) => ({
 function Layout(props) {
     const { classes } = props;
     const [mobileOpen, setMobileOpen] = React.useState(false);
+    const { signIn } = useAuthContext();
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
+
+    useEffect(() => {
+        if (AuthManager.getUser()?.sso) {
+            signIn()
+        }
+    },[])
+
     // if the user is not logged in Redirect to login
     if (!AuthManager.isLoggedIn()) {
         return (

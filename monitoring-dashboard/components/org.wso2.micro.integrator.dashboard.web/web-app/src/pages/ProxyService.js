@@ -19,10 +19,9 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
-import AuthManager from '../auth/AuthManager';
+import HTTPClient from '../utils/HTTPClient';
 
 export default function ProxyService() {
     const [pageInfo] = React.useState({
@@ -42,15 +41,7 @@ export default function ProxyService() {
     const selectedNodeList = useSelector(state => state.nodeList);
 
     const retrieveProxyList = () => {
-        var nodeListQueryParams="";
-        selectedNodeList.filter(node => {
-            nodeListQueryParams = nodeListQueryParams.concat(node, '&nodes=')
-        })
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/proxy-services?nodes=").concat(nodeListQueryParams.slice(0,-7));
-        axios.get(url, {}).then(response => {
-            response.data.map(data => 
-                data.nodes.map(node => node.details = JSON.parse(node.details))
-            )
+        HTTPClient.getArtifacts("proxy-services", globalGroupId, selectedNodeList).then(response => {
             setProxyList(response.data)
         })
     }

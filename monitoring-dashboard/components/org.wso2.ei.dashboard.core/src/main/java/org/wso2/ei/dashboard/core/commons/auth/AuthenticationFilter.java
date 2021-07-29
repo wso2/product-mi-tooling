@@ -18,11 +18,21 @@
 
 package org.wso2.ei.dashboard.core.commons.auth;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
+import io.asgardeo.java.oidc.sdk.exception.SSOAgentServerException;
+import io.asgardeo.java.oidc.sdk.validators.IDTokenValidator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
+import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
+import org.wso2.micro.integrator.dashboard.utils.SSOConstants;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -30,9 +40,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Priority;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -49,33 +61,54 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private static final Base64.Decoder decoder = Base64.getUrlDecoder();
     private static final List<String> adminOnlyPaths = Arrays.asList("groups/mi_test/log-configs",
                                                                      "groups/mi_test/users");
-    
+
+    private static final Logger logger = LogManager.getLogger(AuthenticationFilter.class);
+
+    @Context
+    private HttpServletRequest servletRequest;
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
+
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         if (!isTokenBasedAuthentication(authorizationHeader)) {
             abortWithUnauthorized(requestContext);
             return;
         }
+        boolean isSelfContainedToken = false;
         String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
-        if (inValidToken(token)) {
-            abortWithUnauthorized(requestContext);
+        SSOConfig config = null;
+        if (servletRequest.getServletContext()
+                .getAttribute(SSOConstants.CONFIG_BEAN_NAME) instanceof SSOConfig) {
+            config = (SSOConfig) servletRequest.getServletContext().getAttribute(SSOConstants.CONFIG_BEAN_NAME);
         }
-        
-        if (!isAuthorized(token, requestContext)) {
+
+        if (inValidToken(token)) {
+            if (inValidSelfContainedToken(config, token)) {
+                abortWithUnauthorized(requestContext);
+            } else {
+                isSelfContainedToken = true;
+            }
+        }
+
+        if (!isAuthorized(token, requestContext, isSelfContainedToken, config)) {
             abortWithUnauthorized(requestContext);
         }
     }
 
-    private boolean isAuthorized(String token, ContainerRequestContext requestContext) {
+    private boolean isAuthorized(String token, ContainerRequestContext requestContext, boolean isSelfContainedToken,
+                                 SSOConfig config) {
 
         String path = ((ContainerRequest) requestContext).getPath(false);
-        
+
         if (adminOnlyPaths.contains(path)) {
             String[] parts = token.split("\\.");
             if (parts.length >= 2) {
                 String payloadJson = new String(decoder.decode(parts[1]));
                 JsonElement jsonElementPayload = JsonParser.parseString(payloadJson);
+                if (isSelfContainedToken) {
+                    return isUserInAdminGroup(jsonElementPayload, config);
+                }
                 JsonElement scopeElement = jsonElementPayload.getAsJsonObject().get("scope");
                 if (scopeElement != null) {
                     String scope = scopeElement.getAsString();
@@ -108,5 +141,38 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     private boolean inValidToken(String token) {
         return TokenCache.getInstance().getToken(token) == null;
+    }
+
+    private boolean inValidSelfContainedToken(SSOConfig config, String token) {
+
+        if (config == null) {
+            return true;
+        }
+        JWT idTokenJWT = null;
+        try {
+            idTokenJWT = JWTParser.parse(token);
+            IDTokenValidator validator = new IDTokenValidator(config.getOidcAgentConfig(), idTokenJWT);
+            validator.validate(null);
+            return false;
+        } catch (ParseException | SSOAgentServerException e) {
+            if (logger.isDebugEnabled()) {
+                logger.error("Error validating the access token", e);
+            }
+        }
+        return true;
+    }
+
+    private boolean isUserInAdminGroup(JsonElement tokenPayload, SSOConfig config) {
+
+        if (config == null) {
+            return false;
+        }
+        JsonArray groupElement = tokenPayload.getAsJsonObject().getAsJsonArray(config.getAdminGroupAttribute());
+        for (JsonElement group : groupElement) {
+            if (config.getAllowedAdminGroups().contains(group.getAsString())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

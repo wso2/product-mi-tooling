@@ -19,7 +19,6 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import {makeStyles} from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -27,10 +26,10 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import MenuItem from '@material-ui/core/MenuItem';
 import EnhancedTable from '../commons/EnhancedTable';
 import AuthManager from '../auth/AuthManager';
-import {Constants} from '../auth/Constants';
 import {useSelector} from 'react-redux';
 import {Link, Redirect} from "react-router-dom";
 import {Button} from "@material-ui/core";
+import HTTPClient from '../utils/HTTPClient';
 
 export default function LogConfigs() {
     const [pageInfo, setPageInfo] = React.useState({
@@ -59,9 +58,7 @@ export default function LogConfigs() {
             value: 'All'
         }]
         if (globalGroupId !== '') {
-            var authBearer = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
-            const getNodeUrl = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/nodes");
-            axios.get(getNodeUrl, {headers: {Authorization: authBearer}}).then(response => {
+            HTTPClient.getNodes(globalGroupId).then(response => {
                 response.data.filter(node => {
                     var node = {
                         label: node.nodeId,
@@ -72,8 +69,7 @@ export default function LogConfigs() {
                 setNodeList(allNodes)
             })
 
-            const getLogsUrl = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs");
-            axios.get(getLogsUrl).then(response => {
+            HTTPClient.getLogConfigs(globalGroupId).then(response => {
                 setLogConfigs(response.data)
             })
         }
@@ -92,8 +88,7 @@ export default function LogConfigs() {
     const getLogConfigByNodeId = (nodeId) => {
         setSelectedNodeId(nodeId);
         if (nodeId !== 'All') {
-            const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/log-configs/nodes/").concat(nodeId);
-            axios.get(url).then(response => {
+            HTTPClient.getLogConfigs(globalGroupId, nodeId).then(response => {
                 setLogConfigs(response.data)
             })
         }

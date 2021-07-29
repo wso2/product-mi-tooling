@@ -25,11 +25,13 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux'
 import Reducers from './redux/Reducers';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { AuthProvider } from "@asgardeo/auth-react";
 
 import Login from './auth/Login';
 import Logout from './auth/Logout';
 import Dashboard from './home/Dashboard'
 import interceptor from "./auth/Interceptor";
+import Sso from './sso'
 
 const store = createStore(Reducers)
 
@@ -194,6 +196,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            sso: window.sso,
             loggedOut: false
         }
         interceptor(this.logout);
@@ -209,14 +212,16 @@ class App extends Component {
 
         return (
             <ThemeProvider theme={theme}>
-                <BrowserRouter basename={window.contextPath}>
-                    <Switch>
-                        <Route exact path='/login' component={Login} />
-                        <Route exact path='/logout' component={Logout} />
-                        <Route component={Dashboard} />
-                    )}/>
-                </Switch>
-                </BrowserRouter>
+                <AuthProvider config={ this.state.sso.config }>
+                    <BrowserRouter basename={window.contextPath}>
+                        <Switch>
+                            <Route exact path='/login' component={Login} />
+                            <Route exact path='/logout' component={Logout} />
+                            <Route exact path='/sso' component={ Sso }/>
+                            <Route component={Dashboard} />
+                        </Switch>
+                    </BrowserRouter>
+                </AuthProvider>
             </ThemeProvider>
         );
 

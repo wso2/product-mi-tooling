@@ -75,6 +75,13 @@ function Navigator(props) {
         if(userScope !== "admin"){
             return categories.filter(category => category.id ===  "General");
         }
+        if (AuthManager.getUser()?.sso) {
+            return categories.map(category => ({
+                ...category,
+                children: category.children
+                .filter(child => child.id !== "Users")
+            }))
+        }
         return categories;
     }
 

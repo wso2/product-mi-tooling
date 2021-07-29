@@ -19,7 +19,6 @@
  */
 
 import React from 'react';
-import axios from 'axios';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthManager from "../auth/AuthManager";
@@ -28,6 +27,7 @@ import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import { changeData } from '../redux/Actions';
 import Progress from '../commons/Progress';
+import HTTPClient from '../utils/HTTPClient';
 
 export default function Users() {
     const [pageInfo] = React.useState({
@@ -46,14 +46,13 @@ export default function Users() {
     const dataSet = useSelector(state => state.data);
 
     React.useEffect(() => {
-        const url = AuthManager.getBasePath().concat('/groups/').concat(globalGroupId).concat("/users");
-        axios.get(url).then(response => {
+        HTTPClient.getUsers(globalGroupId).then(response => {
             response.data.map(data => data.details = JSON.parse(data.details));
             setUsers(response.data)
         })
     }, [globalGroupId, dataSet]);
 
-    if (AuthManager.getUser().scope !== "admin") {
+    if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
         return (
             <Redirect to={{pathname: '/'}}/>
         );
