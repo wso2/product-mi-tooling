@@ -28,6 +28,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import { changeData } from '../redux/Actions';
 import Progress from '../commons/Progress';
 import HTTPClient from '../utils/HTTPClient';
+import Alert from '@material-ui/lab/Alert';
 
 export default function Users() {
     const [pageInfo] = React.useState({
@@ -41,6 +42,7 @@ export default function Users() {
     });
 
     const [users, setUsers] = React.useState(null);
+    const [error, setError] = React.useState(null);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
@@ -49,12 +51,24 @@ export default function Users() {
         HTTPClient.getUsers(globalGroupId).then(response => {
             response.data.map(data => data.details = JSON.parse(data.details));
             setUsers(response.data)
+        }).catch(error => {
+            setError(error.response.data.message)
         })
     }, [globalGroupId, dataSet]);
 
     if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
         return (
             <Redirect to={{pathname: '/'}}/>
+        );
+    }
+
+    if (error) {
+        return (
+        <div>
+            <Alert severity="error">
+                {error}
+            </Alert>
+        </div>
         );
     }
 
