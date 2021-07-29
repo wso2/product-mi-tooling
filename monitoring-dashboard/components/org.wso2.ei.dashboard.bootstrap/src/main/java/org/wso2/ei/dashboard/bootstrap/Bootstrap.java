@@ -298,8 +298,16 @@ public class Bootstrap {
             if (parseResult.isArray(SSOConstants.TOML_SSO_ADMIN_GROUPS)) {
                 adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toString();
             }
+            if (!parseResult.isString(SSOConstants.TOML_SSO_IDP_URL)) {
+                throw new SSOConfigException("Missing value for idp_url in SSO Configs");
+            }
+            String idpUrl = parseResult.getString(SSOConstants.TOML_SSO_IDP_URL);
+            String wellKnownEndpointPath = SSOConstants.DEFAULT_WELL_KNOWN_ENDPOINT;
+            if (parseResult.isString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT)) {
+                wellKnownEndpointPath = parseResult.getString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT);
+            }
             setJavaxSslTruststore(parseResult);
-            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups);
+            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, idpUrl + wellKnownEndpointPath);
         }
         return null;
     }
@@ -312,16 +320,15 @@ public class Bootstrap {
         }
         Issuer issuer = new Issuer(parseResult.getString(SSOConstants.TOML_SSO_JWT_ISSUER));
         oidcAgentConfig.setIssuer(issuer);
-        if (!parseResult.isString(SSOConstants.TOML_SSO_JWKS_ENDPOINT)) {
-            throw new SSOConfigException("Missing value for jwks_endpoint in SSO Configs");
+        if (parseResult.isString(SSOConstants.TOML_SSO_JWKS_ENDPOINT)) {
+            URI jwksEndpoint = null;
+            try {
+                jwksEndpoint = new URI(parseResult.getString(SSOConstants.TOML_SSO_JWKS_ENDPOINT));
+                oidcAgentConfig.setJwksEndpoint(jwksEndpoint);
+            } catch (URISyntaxException e) {
+                throw new SSOConfigException("Invalid url for jwks_endpoint in SSO Configs");
+            }
         }
-        URI jwksEndpoint = null;
-        try {
-            jwksEndpoint = new URI(parseResult.getString(SSOConstants.TOML_SSO_JWKS_ENDPOINT));
-        } catch (URISyntaxException e) {
-            throw new SSOConfigException("Invalid url for jwks_endpoint in SSO Configs");
-        }
-        oidcAgentConfig.setJwksEndpoint(jwksEndpoint);
         if (!parseResult.isString(SSOConstants.TOML_SSO_CLIENT_ID)) {
             throw new SSOConfigException("Missing value for client_id in SSO Configs");
         }

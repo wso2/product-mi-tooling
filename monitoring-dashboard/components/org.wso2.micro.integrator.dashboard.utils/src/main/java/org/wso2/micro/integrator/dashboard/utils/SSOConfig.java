@@ -28,13 +28,25 @@ public class SSOConfig {
     private OIDCAgentConfig oidcAgentConfig;
     private String adminGroupAttribute;
     private String allowedAdminGroups;
+    private String wellKnownEndpoint;
 
     public SSOConfig(OIDCAgentConfig oidcAgentConfig, String adminGroupAttribute,
-                     String allowedAdminGroups) {
+                     String allowedAdminGroups, String wellKnownEndpoint) {
 
         this.oidcAgentConfig = oidcAgentConfig;
         this.adminGroupAttribute = adminGroupAttribute;
         this.allowedAdminGroups = allowedAdminGroups;
+        this.wellKnownEndpoint = wellKnownEndpoint;
+    }
+
+    public String getWellKnownEndpoint() {
+
+        return wellKnownEndpoint;
+    }
+
+    public void setWellKnownEndpoint(String wellKnownEndpoint) {
+
+        this.wellKnownEndpoint = wellKnownEndpoint;
     }
 
     public OIDCAgentConfig getOidcAgentConfig() {

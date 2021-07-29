@@ -47,7 +47,15 @@ public class Utils {
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doGet(accessToken, url);
         } else if (isNotSuccessCode(httpSc)) {
-            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+            JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
+            String errorMessage = "Error occurred. Please check server logs.";
+            if (error != null) {
+                String message = error.getAsString();
+                if (null != message && !message.isEmpty()) {
+                    errorMessage = message;
+                }
+            }
+            throw new ManagementApiException(errorMessage, httpSc);
         }
         return response;
     }

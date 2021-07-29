@@ -25,13 +25,21 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import io.asgardeo.java.oidc.sdk.exception.SSOAgentServerException;
 import io.asgardeo.java.oidc.sdk.validators.IDTokenValidator;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.wso2.ei.dashboard.core.commons.Constants;
+import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
+import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 import org.wso2.micro.integrator.dashboard.utils.SSOConstants;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -151,10 +159,14 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         JWT idTokenJWT = null;
         try {
             idTokenJWT = JWTParser.parse(token);
+            if (config.getOidcAgentConfig().getJwksEndpoint() == null) {
+                config.getOidcAgentConfig()
+                        .setJwksEndpoint(getJWKSEndpointFromWellKnownEndpoint(config.getWellKnownEndpoint()));
+            }
             IDTokenValidator validator = new IDTokenValidator(config.getOidcAgentConfig(), idTokenJWT);
             validator.validate(null);
             return false;
-        } catch (ParseException | SSOAgentServerException e) {
+        } catch (DashboardServerException | ParseException | SSOAgentServerException e) {
             if (logger.isDebugEnabled()) {
                 logger.error("Error validating the access token", e);
             }
@@ -174,5 +186,23 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             }
         }
         return false;
+    }
+
+    private static URI getJWKSEndpointFromWellKnownEndpoint(String wellKnownEndpointPath) {
+
+        HttpGet httpGet = new HttpGet(wellKnownEndpointPath);
+        CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet);
+
+        int httpSc = httpResponse.getStatusLine().getStatusCode();
+
+        if (httpSc == HttpStatus.SC_OK) {
+            try {
+                return new URI(HttpUtils.getJsonResponse(httpResponse).get(Constants.JWKS_URI).getAsString());
+            } catch (URISyntaxException e) {
+                throw new DashboardServerException("Invalid url for JWKS Endpoint.", e);
+            }
+        }
+        throw new DashboardServerException("Cannot find jwks_uri in well known endpoint response. " +
+                httpResponse.getStatusLine().getReasonPhrase());
     }
 }
