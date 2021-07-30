@@ -52,7 +52,9 @@ export default function Users() {
             response.data.map(data => data.details = JSON.parse(data.details));
             setUsers(response.data)
         }).catch(error => {
-            setError(error.response.data.message)
+            if (error.response.status === 500) {
+                setError(error.response.data.message)
+            }
         })
     }, [globalGroupId, dataSet]);
 
