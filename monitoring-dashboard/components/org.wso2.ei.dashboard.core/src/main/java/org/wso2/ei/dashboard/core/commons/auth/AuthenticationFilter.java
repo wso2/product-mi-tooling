@@ -18,29 +18,13 @@
 
 package org.wso2.ei.dashboard.core.commons.auth;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTParser;
-import io.asgardeo.java.oidc.sdk.exception.SSOAgentServerException;
-import io.asgardeo.java.oidc.sdk.validators.IDTokenValidator;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
-import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 import org.wso2.micro.integrator.dashboard.utils.SSOConstants;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -83,7 +67,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             abortWithUnauthorized(requestContext);
             return;
         }
-        boolean isSelfContainedToken = false;
         String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
         SSOConfig config = null;
         if (servletRequest.getServletContext()
@@ -91,43 +74,32 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             config = (SSOConfig) servletRequest.getServletContext().getAttribute(SSOConstants.CONFIG_BEAN_NAME);
         }
 
-        if (inValidToken(token)) {
-            if (inValidSelfContainedToken(config, token)) {
-                abortWithUnauthorized(requestContext);
-            } else {
-                isSelfContainedToken = true;
-            }
+        SecurityHandler securityHandler = getSecurityHandler(token);
+
+        if (!securityHandler.isAuthenticated(config, token)) {
+            abortWithUnauthorized(requestContext);
         }
 
-        if (!isAuthorized(token, requestContext, isSelfContainedToken, config)) {
+        if (isAdminResource(requestContext) && !securityHandler.isAuthorized(config, token)) {
             abortWithUnauthorized(requestContext);
         }
     }
 
-    private boolean isAuthorized(String token, ContainerRequestContext requestContext, boolean isSelfContainedToken,
-                                 SSOConfig config) {
+    private static boolean isAdminResource(ContainerRequestContext requestContext) {
 
         String path = ((ContainerRequest) requestContext).getPath(false);
+        return adminOnlyPaths.contains(path);
+    }
 
-        if (adminOnlyPaths.contains(path)) {
-            String[] parts = token.split("\\.");
-            if (parts.length >= 2) {
-                String payloadJson = new String(decoder.decode(parts[1]));
-                JsonElement jsonElementPayload = JsonParser.parseString(payloadJson);
-                if (isSelfContainedToken) {
-                    return isUserInAdminGroup(jsonElementPayload, config);
-                }
-                JsonElement scopeElement = jsonElementPayload.getAsJsonObject().get("scope");
-                if (scopeElement != null) {
-                    String scope = scopeElement.getAsString();
-                    return scope.equals("admin");
-                }
-            }
-        } else {
-            return true;
+    private static SecurityHandler getSecurityHandler(String token) {
+
+        if (TokenCache.getInstance().getToken(token) != null) {
+            return new InMemorySecurityHandler();
         }
-
-        return false;
+        if (isJWTToken(token)) {
+            return new JWTSecurityHandler();
+        }
+        return new OpaqueTokenSecurityHandler();
     }
 
     private boolean isTokenBasedAuthentication(String authorizationHeader) {
@@ -147,62 +119,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         requestContext.abortWith(unauthorizedResponse);
     }
 
-    private boolean inValidToken(String token) {
-        return TokenCache.getInstance().getToken(token) == null;
-    }
+    private static boolean isJWTToken(String token) {
 
-    private boolean inValidSelfContainedToken(SSOConfig config, String token) {
-
-        if (config == null) {
-            return true;
-        }
-        JWT idTokenJWT = null;
-        try {
-            idTokenJWT = JWTParser.parse(token);
-            if (config.getOidcAgentConfig().getJwksEndpoint() == null) {
-                config.getOidcAgentConfig()
-                        .setJwksEndpoint(getJWKSEndpointFromWellKnownEndpoint(config.getWellKnownEndpoint()));
-            }
-            IDTokenValidator validator = new IDTokenValidator(config.getOidcAgentConfig(), idTokenJWT);
-            validator.validate(null);
-            return false;
-        } catch (DashboardServerException | ParseException | SSOAgentServerException e) {
-            if (logger.isDebugEnabled()) {
-                logger.error("Error validating the access token", e);
-            }
-        }
-        return true;
-    }
-
-    private boolean isUserInAdminGroup(JsonElement tokenPayload, SSOConfig config) {
-
-        if (config == null) {
-            return false;
-        }
-        JsonArray groupElement = tokenPayload.getAsJsonObject().getAsJsonArray(config.getAdminGroupAttribute());
-        for (JsonElement group : groupElement) {
-            if (config.getAllowedAdminGroups().contains(group.getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static URI getJWKSEndpointFromWellKnownEndpoint(String wellKnownEndpointPath) {
-
-        HttpGet httpGet = new HttpGet(wellKnownEndpointPath);
-        CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet);
-
-        int httpSc = httpResponse.getStatusLine().getStatusCode();
-
-        if (httpSc == HttpStatus.SC_OK) {
-            try {
-                return new URI(HttpUtils.getJsonResponse(httpResponse).get(Constants.JWKS_URI).getAsString());
-            } catch (URISyntaxException e) {
-                throw new DashboardServerException("Invalid url for JWKS Endpoint.", e);
-            }
-        }
-        throw new DashboardServerException("Cannot find jwks_uri in well known endpoint response. " +
-                httpResponse.getStatusLine().getReasonPhrase());
+        String[] parts = token.split("\\.");
+        return parts.length >= 2;
     }
 }

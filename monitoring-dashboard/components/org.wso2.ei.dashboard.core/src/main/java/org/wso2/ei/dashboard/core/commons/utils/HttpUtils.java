@@ -49,6 +49,8 @@ import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.Response;
 
@@ -86,6 +88,24 @@ public class HttpUtils {
 
         httpPost.setHeader("Authorization", authHeader);
         httpPost.setHeader("content-type", Constants.HEADER_VALUE_APPLICATION_JSON);
+        try {
+            StringEntity entity = new StringEntity(payload.toString());
+            httpPost.setEntity(entity);
+            return doPost(httpPost);
+        } catch (UnsupportedEncodingException e) {
+            throw new DashboardServerException("Error occurred while creating http post request.", e);
+        }
+    }
+
+    public static CloseableHttpResponse doPost(String url, Map<String, String> params) {
+        final HttpPost httpPost = new HttpPost(url);
+
+        StringBuilder payload = new StringBuilder();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            payload.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+
+        httpPost.setHeader("Content-type", Constants.APPLICATION_X_WWW_FORM_URLENCODED);
         try {
             StringEntity entity = new StringEntity(payload.toString());
             httpPost.setEntity(entity);
