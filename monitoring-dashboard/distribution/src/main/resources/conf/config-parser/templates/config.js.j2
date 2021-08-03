@@ -55,5 +55,12 @@ window.sso = {
         {% endif %}
     },
     adminGroupAttribute: "{{sso.admin_group_attribute}}",
-    allowedAdminGroups: [{% for group in sso.admin_groups %}"{{group}}"{% if loop.index < sso.admin_groups|length %},{% endif %}{% endfor %}]
+    allowedAdminGroups: [{% for group in sso.admin_groups %}"{{group}}"{% if loop.index < sso.admin_groups|length %},{% endif %}{% endfor %}],
+    {% if sso.authorization_request.params is defined %}
+     authorizationRequestParams: {
+        {% for param in sso.authorization_request.params %}
+        {{param.key}}:"{{param.value}}"{% if loop.index < sso.authorization_request.params|length %},{% endif %}
+        {% endfor %}
+     }
+    {% endif %}
 };

@@ -28,7 +28,7 @@ function SSO() {
     const history = useHistory();
 
     useEffect(() => {
-        signIn()
+        signIn(window.sso.authorizationRequestParams)
     },[])
 
     useEffect(() => {
