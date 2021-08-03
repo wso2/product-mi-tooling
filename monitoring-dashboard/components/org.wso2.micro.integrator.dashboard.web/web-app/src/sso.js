@@ -43,7 +43,8 @@ function SSO() {
                         scope = "admin"
                     }
                 }
-                AuthManager.setUser({username: decodedIDToken.sub, scope: scope, sso: true}, true);
+                var userNameAttribute = window.sso.usernameAttribute
+                AuthManager.setUser({username: decodedIDToken[userNameAttribute], scope: scope, sso: true}, true);
                 history.push("/");
             };
             getData();

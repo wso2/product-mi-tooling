@@ -54,6 +54,7 @@ window.sso = {
         scope: [{% for value in sso.scope %}"{{value}}"{% if loop.index < sso.scope|length %},{% endif %}{% endfor %}],
         {% endif %}
     },
+    usernameAttribute: "{{sso.user_name_attribute}}",
     adminGroupAttribute: "{{sso.admin_group_attribute}}",
     allowedAdminGroups: [{% for group in sso.admin_groups %}"{{group}}"{% if loop.index < sso.admin_groups|length %},{% endif %}{% endfor %}],
     {% if sso.authorization_request.params is defined %}
