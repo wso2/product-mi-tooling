@@ -12,36 +12,57 @@ At the bottom of this file is a table that shows what each license indicated
 below is and where the actual text of the license can be found.
 
 
-Name                                                                                                Type.          License             
+Name                                                                                                Type           License
 _________________________________________________________________________________________________________________________________________________
-jetty-webapp-9.4.34.v20201102.jar                                                                   bundle         apache2             
-jetty-io-9.4.34.v20201102.jar                                                                       bundle         apache2             
-jetty-util-9.4.34.v20201102.jar                                                                     bundle         apache2             
-jetty-server-9.4.34.v20201102.jar                                                                   bundle         apache2             
-jaxb-api-2.3.0.jar                                                                                  bundle         cddl1               
-org.wso2.ei.dashboard.bootstrap-4.0.0.jar                                                           bundle         apache2             
-jetty-servlet-9.4.34.v20201102.jar                                                                  bundle         apache2             
-guava-27.0-jre.jar                                                                                  bundle         apache2             
-javax.servlet-api-3.1.0.jar                                                                         bundle         cddl1               
-log4j-api-2.12.0.jar                                                                                bundle         apache2             
-slf4j-api-1.7.5.jar                                                                                 bundle         mit                 
-jetty-xml-9.4.34.v20201102.jar                                                                      bundle         apache2             
-jetty-http-9.4.34.v20201102.jar                                                                     bundle         apache2             
-cava-toml-0.5.0.jar                                                                                 jar            apache2             
-antlr4-runtime-4.7.1.jar                                                                            bundle         bsd                 
-activation-1.1.jar                                                                                  jar            cddl1               
-log4j-slf4j-impl-2.12.0.jar                                                                         bundle         apache2             
-jetty-security-9.4.34.v20201102.jar                                                                 bundle         apache2             
-log4j-core-2.12.0.jar                                                                               bundle         apache2             
+jackson-core-2.7.9.jar                                                                              bundle         apache2
+re2j-1.2.jar                                                                                        jar            golang
+jsoup-1.10.3.jar                                                                                    bundle         mit
+jetty-webapp-9.4.34.v20201102.jar                                                                   bundle         apache2
+commons-lang3-3.1.jar                                                                               bundle         apache2
+jackson-annotations-2.11.3.jar                                                                      bundle         apache2
+org.wso2.micro.integrator.dashboard.utils-4.0.1.jar                                                 bundle         apache2
+jetty-io-9.4.34.v20201102.jar                                                                       bundle         apache2
+oauth2-oidc-sdk-8.19.jar                                                                            bundle         apache2
+nimbus-jose-jwt-8.19.jar                                                                            bundle         apache2
+jetty-util-9.4.34.v20201102.jar                                                                     bundle         apache2
+jetty-server-9.4.34.v20201102.jar                                                                   bundle         apache2
+commons-codec-1.12.jar                                                                              bundle         apache2
+config-mapper-1.0.2.jar                                                                             jar            apache2
+jaxb-api-2.3.0.jar                                                                                  bundle         cddl1
+jinjava-2.4.14.jar                                                                                  jar            apache2
+json-smart-2.3.jar                                                                                  bundle         apache2
+asm-1.0.2.jar                                                                                       bundle         bsd
+org.wso2.ei.dashboard.bootstrap-4.0.1.jar                                                           bundle         apache2
+jetty-servlet-9.4.34.v20201102.jar                                                                  bundle         apache2
+jackson-databind-2.7.9.1.jar                                                                        bundle         apache2
+guava-27.0-jre.jar                                                                                  bundle         apache2
+javax.servlet-api-3.1.0.jar                                                                         bundle         cddl1
+log4j-api-2.12.0.jar                                                                                bundle         apache2
+slf4j-api-1.7.5.jar                                                                                 bundle         mit
+jetty-xml-9.4.34.v20201102.jar                                                                      bundle         apache2
+io.asgardeo.java.oidc.sdk-0.1.13.jar                                                                jar            apache2
+jetty-http-9.4.34.v20201102.jar                                                                     bundle         apache2
+cava-toml-0.5.0.jar                                                                                 jar            apache2
+antlr4-runtime-4.7.1.jar                                                                            bundle         bsd
+activation-1.1.jar                                                                                  jar            cddl1
+gson-2.8.6.jar                                                                                      bundle         apache2
+commons-lang-2.6.0.wso2v1.jar                                                                       bundle         apache2
+commons-logging-1.2.jar                                                                             bundle         apache2
+log4j-slf4j-impl-2.12.0.jar                                                                         bundle         apache2
+jetty-security-9.4.34.v20201102.jar                                                                 bundle         apache2
+log4j-core-2.12.0.jar                                                                               bundle         apache2
+log4j-jcl-2.12.0.jar                                                                                bundle         apache2
 
 
 The license types used by the above libraries and their information is given below:
 
 apache2        Apache License Version 2.0
                http://www.apache.org/licenses/LICENSE-2.0.html
-cddl1          Common Development and Distribution License
-               http://www.opensource.org/licenses/cddl1.php
+golang         Go Lang
+               https://golang.org/LICENSE
 mit            MIT License
                http://www.opensource.org/licenses/mit-license.php
+cddl1          Common Development and Distribution License
+               http://www.opensource.org/licenses/cddl1.php
 bsd            Berkeley License
                http://www.opensource.org/licenses/bsd-license.php

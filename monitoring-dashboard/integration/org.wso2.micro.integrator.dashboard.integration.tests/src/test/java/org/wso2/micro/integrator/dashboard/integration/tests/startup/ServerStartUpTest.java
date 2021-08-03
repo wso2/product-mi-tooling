@@ -59,6 +59,5 @@ public class ServerStartUpTest {
         TimeUnit.SECONDS.sleep(TIMEOUT);
         logReader.stop();
         Assert.assertFalse(logReader.getLogs().contains("ERROR"), "Dashboard started with errors.");
-        Assert.assertFalse(logReader.getLogs().contains("WARN"), "Dashboard started with warn messages.");
     }
 }

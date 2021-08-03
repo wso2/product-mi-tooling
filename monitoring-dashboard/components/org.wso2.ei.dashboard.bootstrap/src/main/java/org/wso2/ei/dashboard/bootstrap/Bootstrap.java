@@ -299,7 +299,7 @@ public class Bootstrap {
                 adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toString();
             }
             if (!parseResult.isString(SSOConstants.TOML_SSO_IDP_URL)) {
-                throw new SSOConfigException("Missing value for idp_url in SSO Configs");
+                throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_IDP_URL + " in SSO Configs");
             }
             String idpUrl = parseResult.getString(SSOConstants.TOML_SSO_IDP_URL);
             String wellKnownEndpointPath = SSOConstants.DEFAULT_WELL_KNOWN_ENDPOINT;
@@ -316,7 +316,7 @@ public class Bootstrap {
 
         OIDCAgentConfig oidcAgentConfig = new OIDCAgentConfig();
         if (!parseResult.isString(SSOConstants.TOML_SSO_JWT_ISSUER)) {
-            throw new SSOConfigException("Missing value for jwt_issuer in SSO Configs");
+            throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_JWT_ISSUER + " in SSO Configs");
         }
         Issuer issuer = new Issuer(parseResult.getString(SSOConstants.TOML_SSO_JWT_ISSUER));
         oidcAgentConfig.setIssuer(issuer);
@@ -326,11 +326,12 @@ public class Bootstrap {
                 jwksEndpoint = new URI(parseResult.getString(SSOConstants.TOML_SSO_JWKS_ENDPOINT));
                 oidcAgentConfig.setJwksEndpoint(jwksEndpoint);
             } catch (URISyntaxException e) {
-                throw new SSOConfigException("Invalid url for jwks_endpoint in SSO Configs");
+                throw new SSOConfigException("Invalid url for " + SSOConstants.TOML_SSO_JWKS_ENDPOINT + " in SSO " +
+                        "Configs", e);
             }
         }
         if (!parseResult.isString(SSOConstants.TOML_SSO_CLIENT_ID)) {
-            throw new SSOConfigException("Missing value for client_id in SSO Configs");
+            throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_CLIENT_ID + " in SSO Configs");
         }
         ClientID consumerKey = new ClientID(parseResult.getString(SSOConstants.TOML_SSO_CLIENT_ID));
         oidcAgentConfig.setConsumerKey(consumerKey);

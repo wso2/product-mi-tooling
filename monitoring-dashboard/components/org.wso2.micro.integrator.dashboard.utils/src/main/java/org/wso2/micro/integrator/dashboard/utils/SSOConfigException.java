@@ -28,4 +28,8 @@ public class SSOConfigException extends Exception {
         super(error);
     }
 
+    public SSOConfigException(String error, Throwable cause) {
+
+        super(error, cause);
+    }
 }
