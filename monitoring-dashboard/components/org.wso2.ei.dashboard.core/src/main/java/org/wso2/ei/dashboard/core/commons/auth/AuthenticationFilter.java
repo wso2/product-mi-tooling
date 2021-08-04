@@ -18,15 +18,12 @@
 
 package org.wso2.ei.dashboard.core.commons.auth;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 import org.wso2.micro.integrator.dashboard.utils.SSOConstants;
 
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,11 +47,8 @@ import javax.ws.rs.ext.Provider;
 public class AuthenticationFilter implements ContainerRequestFilter {
 
     private static final String AUTHENTICATION_SCHEME = "Bearer";
-    private static final Base64.Decoder decoder = Base64.getUrlDecoder();
-    private static final List<String> adminOnlyPaths = Arrays.asList("groups/mi_test/log-configs",
-                                                                     "groups/mi_test/users");
-
-    private static final Logger logger = LogManager.getLogger(AuthenticationFilter.class);
+    private static final List<String> adminOnlyPaths = Arrays.asList("/log-configs",
+                                                                     "/users");
 
     @Context
     private HttpServletRequest servletRequest;
@@ -88,7 +82,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private static boolean isAdminResource(ContainerRequestContext requestContext) {
 
         String path = ((ContainerRequest) requestContext).getPath(false);
-        return adminOnlyPaths.contains(path);
+        String resource = path.substring(path.lastIndexOf("/"));
+        return adminOnlyPaths.contains(resource);
     }
 
     private static SecurityHandler getSecurityHandler(String token) {
