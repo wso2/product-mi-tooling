@@ -296,7 +296,7 @@ public class Bootstrap {
             }
             String adminGroups = "";
             if (parseResult.isArray(SSOConstants.TOML_SSO_ADMIN_GROUPS)) {
-                adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toString();
+                adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toJson();
             }
             if (!parseResult.isString(SSOConstants.TOML_SSO_IDP_URL)) {
                 throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_IDP_URL + " in SSO Configs");
@@ -306,8 +306,18 @@ public class Bootstrap {
             if (parseResult.isString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT)) {
                 wellKnownEndpointPath = parseResult.getString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT);
             }
+            String introspectionEndpoint = null;
+            if (parseResult.isString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT)) {
+                introspectionEndpoint =
+                        idpUrl + parseResult.getString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT);
+            }
+            String userInfoEndpoint = null;
+            if (parseResult.isString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT)) {
+                userInfoEndpoint = idpUrl + parseResult.getString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
+            }
             setJavaxSslTruststore(parseResult);
-            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, idpUrl + wellKnownEndpointPath);
+            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, idpUrl + wellKnownEndpointPath,
+                    introspectionEndpoint, userInfoEndpoint);
         }
         return null;
     }

@@ -51,6 +51,7 @@ public final class Constants {
     public static final String FAIL_STATUS = "fail";
 
     public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
+    public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
     public static final String DASHBOARD_HOME = System.getenv("DASHBOARD_HOME");
     public static final String HEARTBEAT_POOL_SIZE = System.getProperty("heartbeat_pool_size");
@@ -65,4 +66,14 @@ public final class Constants {
     public static final int TOKEN_CACHE_TIMEOUT = 60;
 
     public static final String JWKS_URI = "jwks_uri";
+    public static final String INTROSPECTION_URI = "introspection_endpoint";
+    public static final String USERINFO_URI = "userinfo_endpoint";
+
+    public static final String TOKEN = "token";
+    public static final String CLIENT_ID = "client_id";
+    public static final String CLIENT_SECRET = "client_secret";
+    public static final String ACTIVE = "active";
+    public static final String SCOPE = "scope";
+    public static final String ADMIN = "admin";
+
 }

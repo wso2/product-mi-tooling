@@ -176,7 +176,7 @@ function Login(props){
                             variant="contained"
                             color="primary"
                             onClick={ () => {
-                                signIn();
+                                signIn(window.sso.authorizationRequestParams);
                             } }>
                             Sign In with SSO
                         </Button>

@@ -1,4 +1,5 @@
 {
 	"sso.enable": false,
-	"sso.storage": "webWorker"
+	"sso.storage": "webWorker",
+	"sso.user_name_attribute" : "sub"
 }

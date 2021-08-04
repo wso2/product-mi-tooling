@@ -31,6 +31,8 @@ public class SSOConstants {
     public static final String TOML_SSO_IDP_URL = "sso.idp_url";
     public static final String TOML_SSO_JWKS_ENDPOINT = "sso.jwks_endpoint";
     public static final String TOML_SSO_WELL_KNOWN_ENDPOINT = "sso.well_known_endpoint";
+    public static final String TOML_SSO_INTROSPECTION_ENDPOINT = "sso.introspection_endpoint";
+    public static final String TOML_SSO_USER_INFO_ENDPOINT = "sso.user_info_endpoint";
     public static final String TOML_SSO_CLIENT_ID = "sso.client_id";
     public static final String TOML_SSO_CLIENT_SECRET = "sso.client_secret";
     public static final String TOML_SSO_JWKS_ALGORITHM = "sso.jwks_algorithm";
