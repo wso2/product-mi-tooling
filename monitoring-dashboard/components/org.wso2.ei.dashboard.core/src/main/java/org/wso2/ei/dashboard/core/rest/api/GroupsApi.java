@@ -31,6 +31,7 @@ import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.core.rest.model.CAppArtifacts;
 import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
@@ -220,6 +221,31 @@ public class GroupsApi {
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
+
+    @GET
+    @Path("/{group-id}/nodes/{node-id}/capps/{capp-name}/artifacts")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get artifact list of carbon application by node id", description = "",
+               tags={ "carbonApplications" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                         description = "List of artifacts in carbon applications deployed in provided nodes",
+                         content = @Content(schema = @Schema(implementation = CAppArtifacts.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getCarbonApplicationArtifactsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @PathParam("node-id") @Parameter(description = "Node ID") String nodeId,
+            @PathParam("capp-name") @Parameter(description = "Carbon application name") String cappName)
+            throws ManagementApiException {
+        CarbonAppsDelegate cappsDelegate = new CarbonAppsDelegate();
+        CAppArtifacts cAppArtifactList = cappsDelegate.getCAppArtifactList(groupId, nodeId, cappName);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(cAppArtifactList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
     @GET
     @Path("/{group-id}/connectors")
     @Produces({ "application/json" })

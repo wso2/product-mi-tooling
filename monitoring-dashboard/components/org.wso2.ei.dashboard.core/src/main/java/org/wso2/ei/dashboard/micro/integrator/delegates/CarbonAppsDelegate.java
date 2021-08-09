@@ -20,15 +20,25 @@
 
 package org.wso2.ei.dashboard.micro.integrator.delegates;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.commons.Constants;
+import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.core.rest.model.CAppArtifacts;
+import org.wso2.ei.dashboard.core.rest.model.CAppArtifactsInner;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 import java.util.List;
 
@@ -43,6 +53,27 @@ public class CarbonAppsDelegate implements ArtifactDelegate {
     public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
         log.debug("Fetching carbon applications from database.");
         return databaseManager.fetchArtifacts(Constants.CARBON_APPLICATIONS, groupId, nodeList);
+    }
+
+    public CAppArtifacts getCAppArtifactList(String groupId, String nodeId, String cAppName)
+            throws ManagementApiException {
+        log.debug("Fetching artifacts in carbon applications from management console");
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String url = mgtApiUrl.concat("applications").concat("?").concat("carbonAppName").concat("=").concat(cAppName);
+
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
+        JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
+        JsonArray artifacts = jsonResponse.getAsJsonArray("artifacts");
+        CAppArtifacts cAppArtifacts = new CAppArtifacts();
+        for (JsonElement artifact : artifacts) {
+            JsonObject jsonObject = artifact.getAsJsonObject();
+            CAppArtifactsInner cAppArtifact = new CAppArtifactsInner();
+            cAppArtifact.setName(jsonObject.get("name").getAsString());
+            cAppArtifact.setType(jsonObject.get("type").getAsString());
+            cAppArtifacts.add(cAppArtifact);
+        }
+        return cAppArtifacts;
     }
 
     @Override

@@ -149,7 +149,10 @@ public class MiArtifactsManager implements ArtifactsManager {
         for (JsonElement element : list) {
             final String artifactName = element.getAsJsonObject().get("name").getAsString();
             JsonObject artifactDetails = new JsonObject();
-            if (artifactType.equals(MESSAGE_STORES)) {
+            if (artifactType.equals(CARBON_APPLICATIONS)) {
+                artifactDetails.addProperty("name", artifactName);
+                artifactDetails.addProperty("version", element.getAsJsonObject().get("version").getAsString());
+            } else if (artifactType.equals(MESSAGE_STORES)) {
                 artifactDetails.addProperty("name", artifactName);
                 artifactDetails.addProperty("type", element.getAsJsonObject().get("type").getAsString());
                 artifactDetails.addProperty("size", element.getAsJsonObject().get("size").getAsString());

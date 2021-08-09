@@ -1321,6 +1321,66 @@
         }
       }
     },
+    "/groups/{group-id}/nodes/{node-id}/capps/{capp-name}/artifacts" : {
+      "get" : {
+        "tags" : [ "carbonApplications" ],
+        "summary" : "Get artifact list of carbon application by node id",
+        "operationId" : "getCarbonApplicationArtifactsByNodeIds",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "node-id",
+          "in" : "path",
+          "description" : "Node ID",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "capp-name",
+          "in" : "path",
+          "description" : "Carbon application name",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of artifacts in carbon applications deployed in provided nodes",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CAppArtifacts"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/groups/{group-id}/logs" : {
       "get" : {
         "tags" : [ "logFiles" ],
@@ -1974,6 +2034,12 @@
           "$ref" : "#/components/schemas/Artifacts_inner"
         }
       },
+      "CAppArtifacts" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/CAppArtifacts_inner"
+        }
+      },
       "ArtifactUpdateRequest" : {
         "type" : "object",
         "properties" : {
@@ -2204,6 +2270,17 @@
             "items" : {
               "$ref" : "#/components/schemas/ArtifactDetails"
             }
+          }
+        }
+      },
+      "CAppArtifacts_inner" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string"
           }
         }
       },
