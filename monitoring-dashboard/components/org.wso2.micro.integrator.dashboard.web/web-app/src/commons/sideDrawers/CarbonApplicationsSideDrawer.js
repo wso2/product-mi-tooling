@@ -19,6 +19,7 @@
  */
 
 import React from 'react';
+import { useSelector } from 'react-redux';
 import {makeStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
@@ -26,23 +27,32 @@ import Grid from '@material-ui/core/Grid';
 import {Table, TableHead, TableCell, TableRow} from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import Typography from '@material-ui/core/Typography';
+import HTTPClient from '../../utils/HTTPClient';
 
 export default function CarbonApplicationsSideDrawer(props) {
+    const globalGroupId = useSelector(state => state.groupId);
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
-    const artifactName = nodeData.details.name;
+    const cappName = nodeData.details.name;
+    const [artifacts, setArtifacts] = React.useState([]);
     const classes = useStyles();
+
+    React.useEffect(() => {
+        HTTPClient.getCappArtifacts(globalGroupId, nodeId, cappName).then(response => {
+            setArtifacts(response.data);
+        })
+    }, [])
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={artifactName} nodeId={nodeId}/>
+                    <HeadingSection name={cappName} nodeId={nodeId}/>
                     <Paper className={classes.paper} elevation={0} square>
                         <CarbonAppsDetailTable nodeData={nodeData.details}/>
                     </Paper>
                     <Box pl={2}>
-                        <ArtifactsSection artifacts={nodeData.details.artifacts}/>
+                        <ArtifactsSection artifacts={artifacts}/>
                     </Box>
                 </Grid>
             </Grid>

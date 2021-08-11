@@ -138,6 +138,11 @@ export default class HTTPClient {
         });
     }
 
+    static getCappArtifacts(groupId, nodeId, artifactName) {
+        const resourcePath = `${groupId}/${Constants.PREFIX_NODES}/${nodeId}/capps/${artifactName}/artifacts`
+        return this.getResource(resourcePath)
+    }
+
     static updateArtifact(groupId, pageId, payload) {
         const path = `/${Constants.PREFIX_GROUPS}/${groupId}/${pageId}`
         return this.patch(path, payload)
