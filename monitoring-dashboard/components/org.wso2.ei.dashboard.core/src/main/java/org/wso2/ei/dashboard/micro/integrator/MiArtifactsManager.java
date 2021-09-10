@@ -150,8 +150,8 @@ public class MiArtifactsManager implements ArtifactsManager {
             final String artifactName = element.getAsJsonObject().get("name").getAsString();
             JsonObject artifactDetails = new JsonObject();
             if (artifactType.equals(CARBON_APPLICATIONS)) {
-                artifactDetails.addProperty("name", artifactName);
-                artifactDetails.addProperty("version", element.getAsJsonObject().get("version").getAsString());
+                populateCAppDetails(artifactDetails, artifactName,
+                        element.getAsJsonObject().get("version").getAsString());
             } else if (artifactType.equals(MESSAGE_STORES)) {
                 artifactDetails.addProperty("name", artifactName);
                 artifactDetails.addProperty("type", element.getAsJsonObject().get("type").getAsString());
@@ -228,14 +228,25 @@ public class MiArtifactsManager implements ArtifactsManager {
         if (artifactType.equals(TEMPLATES)) {
             updateTemplates(info);
         } else {
+            JsonObject artifactDetails = new JsonObject();
             String artifactName = info.getName();
             String groupId = heartbeat.getGroupId();
             String nodeId = heartbeat.getNodeId();
-            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
-            JsonObject artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+            if (artifactType.equals(CARBON_APPLICATIONS)) {
+                populateCAppDetails(artifactDetails, artifactName, info.getVersion());
+            } else {
+                String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+                artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
+            }
             databaseManager.insertArtifact(groupId, nodeId, artifactType, artifactName,
                                            artifactDetails.toString());
         }
+    }
+
+    private void populateCAppDetails(JsonObject artifactDetails, String artifactName, String artifactVersion) {
+
+        artifactDetails.addProperty("name", artifactName);
+        artifactDetails.addProperty("version", artifactVersion);
     }
 
     private void updateTemplates(UpdatedArtifact info) {
