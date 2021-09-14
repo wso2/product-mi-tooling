@@ -115,7 +115,7 @@ export default class HTTPClient {
     }
 
     static getLogFiles(groupId, nodeList) {
-        const resourcePath = `${groupId}/logs${this.getNodeListAsQueryParams(nodeList)}`
+        const resourcePath = `${groupId}/logs?nodes=${this.getNodeListAsQueryParams(nodeList)}`
         return this.getResource(resourcePath)
     }
 
