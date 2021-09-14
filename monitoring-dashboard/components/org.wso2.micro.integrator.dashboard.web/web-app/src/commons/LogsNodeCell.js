@@ -9,7 +9,7 @@ export default function LogsNodeCell(props) {
     const globalGroupId = useSelector(state => state.groupId);
     const { nodeId, fileName } = props;
     function downloadLog() {
-        const resourcePath = globalGroupId.concat('/nodes/').concat(nodeId).concat('/logs/').concat(fileName);
+        const resourcePath = '/groups/'.concat(globalGroupId).concat('/nodes/').concat(nodeId).concat('/logs/').concat(fileName);
         HTTPClient.get(resourcePath).then(response => {
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(response.data));
