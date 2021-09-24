@@ -53,7 +53,7 @@ public final class Constants {
     public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
-    public static final String DASHBOARD_HOME = System.getenv("DASHBOARD_HOME");
+    public static final String DASHBOARD_HOME = System.getProperty("dashboard.home");
     public static final String HEARTBEAT_POOL_SIZE = System.getProperty("heartbeat_pool_size");
     public static final String DATABASE_URL = "jdbc:h2:mem:ei-dashboard-db;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM '"
                                               + Constants.DASHBOARD_HOME + File.separator + "dbscripts" + File.separator

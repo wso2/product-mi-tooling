@@ -80,7 +80,7 @@ public class Bootstrap {
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
-    private static final String DASHBOARD_HOME = "DASHBOARD_HOME";
+    private static final String DASHBOARD_HOME = "dashboard.home";
     private static final String KEYSTORE_PASSWORD = "KEYSTORE_PASSWORD";
     private static final String TOML_KEYSTORE_PASSWORD = "keystore.password";    
     private static final String KEY_MANAGER_PASSWORD = "KEY_MANAGER_PASSWORD";
@@ -105,7 +105,7 @@ public class Bootstrap {
 
     private static void startServerWithConfigs() {
 
-        String dashboardHome = System.getenv(DASHBOARD_HOME);
+        String dashboardHome = System.getProperty(DASHBOARD_HOME);
         int serverPort = 9743;
         String tomlFile = dashboardHome + File.separator + CONF_DIR + File.separator + DEPLOYMENT_TOML;
         
@@ -271,10 +271,10 @@ public class Bootstrap {
     private static void generateSSOConfigJS(String tomlPath) throws ConfigParserException {
 
         String resourcesDir =
-                System.getenv(DASHBOARD_HOME) + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
+                System.getProperty(DASHBOARD_HOME) + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
 
         String outputDir =
-                System.getenv(DASHBOARD_HOME) + File.separator + SERVER_DIR + File.separator + WWW_DIR +
+                System.getProperty(DASHBOARD_HOME) + File.separator + SERVER_DIR + File.separator + WWW_DIR +
                         File.separator + CONF_DIR;
 
         File directory = new File(outputDir);
@@ -365,7 +365,7 @@ public class Bootstrap {
             throw new SSOConfigException("Truststore information is missing");
         }
         String trustStoreLocation = parseResult.getString(TOML_TRUSTSTORE_FILE_LOCATION);
-        trustStoreLocation = System.getenv(DASHBOARD_HOME) + File.separator + trustStoreLocation;
+        trustStoreLocation = System.getProperty(DASHBOARD_HOME) + File.separator + trustStoreLocation;
         System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
 
         String trustStorePassword = parseResult.getString(TOML_TRUSTSTORE_PASSWORD);
