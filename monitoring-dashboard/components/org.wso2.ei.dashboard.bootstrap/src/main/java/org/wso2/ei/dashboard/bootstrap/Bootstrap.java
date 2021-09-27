@@ -80,7 +80,7 @@ public class Bootstrap {
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
-    private static final String DASHBOARD_HOME = "dashboard.home";
+    private static final String DASHBOARD_HOME = System.getProperty("dashboard.home");
     private static final String KEYSTORE_PASSWORD = "KEYSTORE_PASSWORD";
     private static final String TOML_KEYSTORE_PASSWORD = "keystore.password";    
     private static final String KEY_MANAGER_PASSWORD = "KEY_MANAGER_PASSWORD";
@@ -105,9 +105,8 @@ public class Bootstrap {
 
     private static void startServerWithConfigs() {
 
-        String dashboardHome = System.getProperty(DASHBOARD_HOME);
         int serverPort = 9743;
-        String tomlFile = dashboardHome + File.separator + CONF_DIR + File.separator + DEPLOYMENT_TOML;
+        String tomlFile = DASHBOARD_HOME + File.separator + CONF_DIR + File.separator + DEPLOYMENT_TOML;
         
         try {
             TomlParseResult parseResult = Toml.parse(Paths.get(tomlFile));
@@ -129,13 +128,13 @@ public class Bootstrap {
         }
         
         Server server = new Server();
-        setServerConnectors(serverPort, server, dashboardHome);
-        setServerHandlers(dashboardHome, server);
+        setServerConnectors(serverPort, server, DASHBOARD_HOME);
+        setServerHandlers(DASHBOARD_HOME, server);
         
         try {
             generateSSOConfigJS(tomlFile);
             server.start();
-            writePID(dashboardHome);
+            writePID(DASHBOARD_HOME);
             printServerStartupLog(serverPort);
             server.join();
         } catch (Exception ex) {
@@ -271,10 +270,10 @@ public class Bootstrap {
     private static void generateSSOConfigJS(String tomlPath) throws ConfigParserException {
 
         String resourcesDir =
-                System.getProperty(DASHBOARD_HOME) + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
+                DASHBOARD_HOME + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
 
         String outputDir =
-                System.getProperty(DASHBOARD_HOME) + File.separator + SERVER_DIR + File.separator + WWW_DIR +
+                DASHBOARD_HOME + File.separator + SERVER_DIR + File.separator + WWW_DIR +
                         File.separator + CONF_DIR;
 
         File directory = new File(outputDir);
@@ -365,7 +364,7 @@ public class Bootstrap {
             throw new SSOConfigException("Truststore information is missing");
         }
         String trustStoreLocation = parseResult.getString(TOML_TRUSTSTORE_FILE_LOCATION);
-        trustStoreLocation = System.getProperty(DASHBOARD_HOME) + File.separator + trustStoreLocation;
+        trustStoreLocation = DASHBOARD_HOME + File.separator + trustStoreLocation;
         System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
 
         String trustStorePassword = parseResult.getString(TOML_TRUSTSTORE_PASSWORD);
