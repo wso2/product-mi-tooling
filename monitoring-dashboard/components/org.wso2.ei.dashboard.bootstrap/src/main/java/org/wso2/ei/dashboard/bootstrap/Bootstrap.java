@@ -41,6 +41,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.wso2.config.mapper.ConfigParser;
 import org.wso2.config.mapper.ConfigParserException;
+import org.wso2.micro.integrator.dashboard.utils.Constants;
+import org.wso2.micro.integrator.dashboard.utils.ExecutorServiceHolder;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfigException;
 import org.wso2.micro.integrator.dashboard.utils.SSOConstants;
@@ -59,6 +61,8 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class starting up the jetty server on the port as defined in deployment.toml file.
@@ -76,7 +80,6 @@ public class Bootstrap {
     private static final String MI_USERNAME = "mi_username";
     private static final String MI_PASSWORD = "mi_password";
     private static final String TOML_CONF_HEARTBEAT_POOL_SIZE = "heartbeat_config.pool_size";
-    private static final String HEARTBEAT_POOL_SIZE = "heartbeat_pool_size";
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
     private static final String WWW_DIR = "www";
@@ -91,10 +94,13 @@ public class Bootstrap {
     private static final String TOML_TRUSTSTORE_FILE_LOCATION = "truststore.file_name";
     private static final String JAVAX_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
     private static final String JAVAX_SSL_TRUSTSTORE_PASSWORD = "javax.net.ssl.trustStorePassword";
+    private static final int EXECUTOR_SERVICE_TERMINATION_TIMEOUT = 5000;
+    private static final int DEFAULT_HEARTBEAT_POOL_SIZE = 10;
     private static String keyStorePassword;
     private static String keyManagerPassword;
     private static String jksFileLocation;
     private static SSOConfig ssoConfig;
+    private static Thread shutdownHook;
 
     private static final Logger logger = LogManager.getLogger(Bootstrap.class);
 
@@ -131,7 +137,8 @@ public class Bootstrap {
         Server server = new Server();
         setServerConnectors(serverPort, server, dashboardHome);
         setServerHandlers(dashboardHome, server);
-        
+        addShutdownHook();
+
         try {
             generateSSOConfigJS(tomlFile);
             server.start();
@@ -142,6 +149,32 @@ public class Bootstrap {
             logger.error("Error while starting up the server", ex);
         }
         logger.info("Stopping the server");
+    }
+
+    private static void addShutdownHook() {
+        if (shutdownHook != null) {
+            return;
+        }
+        shutdownHook = new Thread(() -> {
+            logger.debug("Shutdown hook triggered....");
+            shutdownGracefully();
+        });
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
+
+    private static void shutdownGracefully() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Shutting down MI Dashboard Server...");
+        }
+        ExecutorService executorService = ExecutorServiceHolder.getMiArtifactsManagerExecutorService();
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(EXECUTOR_SERVICE_TERMINATION_TIMEOUT, TimeUnit.MILLISECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
     }
 
     private static void setServerConnectors(int serverPort, Server server, String dashboardHome) {
@@ -208,12 +241,12 @@ public class Bootstrap {
     }
 
     private static void loadConfigurations(TomlParseResult parseResult) {
-        String heartbeatPoolSize = String.valueOf(5);
+        String heartbeatPoolSize = String.valueOf(DEFAULT_HEARTBEAT_POOL_SIZE);
         if (parseResult.contains(TOML_CONF_HEARTBEAT_POOL_SIZE)) {
             heartbeatPoolSize = parseResult.getLong(TOML_CONF_HEARTBEAT_POOL_SIZE).toString();
         }
         Properties properties = System.getProperties();
-        properties.put(HEARTBEAT_POOL_SIZE, heartbeatPoolSize);
+        properties.put(Constants.HEARTBEAT_POOL_SIZE, heartbeatPoolSize);
 
         String miUsername = System.getProperty(MI_USERNAME);
         if (StringUtils.isEmpty(miUsername)) {

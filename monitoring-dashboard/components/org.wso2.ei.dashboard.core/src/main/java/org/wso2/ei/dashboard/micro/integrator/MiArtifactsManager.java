@@ -36,14 +36,13 @@ import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.core.rest.model.UpdatedArtifact;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
+import org.wso2.micro.integrator.dashboard.utils.ExecutorServiceHolder;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
 import static org.wso2.ei.dashboard.core.commons.Constants.CARBON_APPLICATIONS;
@@ -83,14 +82,37 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     @Override
     public void runFetchAllExecutorService() {
-        ExecutorService fetchExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        Runnable runnable = this::fetchAllArtifactsAndStore;
-        fetchExecutor.execute(runnable);
+        Runnable runnable = () -> {
+            String nodeId = heartbeat.getNodeId();
+            String groupId = heartbeat.getGroupId();
+            logger.info("Fetching artifacts from node " + nodeId + " in group " + groupId);
+            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+            CloseableHttpResponse response = null;
+            try {
+                for (String artifactType : ALL_ARTIFACTS) {
+                    final String url = heartbeat.getMgtApiUrl().concat(artifactType);
+                    response = Utils.doGet(groupId, nodeId, accessToken, url);
+                    JsonObject artifacts = HttpUtils.getJsonResponse(response);
+                    switch (artifactType) {
+                        case TEMPLATES:
+                            processTemplates(artifactType, artifacts);
+                            break;
+                        default:
+                            processArtifacts(accessToken, artifactType, artifacts);
+                            break;
+                    }
+                }
+                fetchAndStoreServers(accessToken);
+            } catch (ManagementApiException e) {
+                logger.error("Unable to fetch artifacts/details from node: {} of group: {} due to {} ", nodeId,
+                        groupId, e.getMessage(), e);
+            }
+        };
+        ExecutorServiceHolder.getMiArtifactsManagerExecutorService().execute(runnable);
     }
 
     @Override
     public void runUpdateExecutorService() {
-        ExecutorService updateExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Runnable runnable = () -> {
            List<UpdatedArtifact> undeployedArtifacts = heartbeat.getUndeployedArtifacts();
            for (UpdatedArtifact artifact : undeployedArtifacts) {
@@ -106,41 +128,13 @@ public class MiArtifactsManager implements ArtifactsManager {
                 logger.error("Error while fetching updated artifacts", e);
             }
         };
-        updateExecutor.execute(runnable);
+        ExecutorServiceHolder.getMiArtifactsManagerExecutorService().execute(runnable);
     }
 
     @Override
     public void runDeleteAllExecutorService() {
-        ExecutorService deleteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Runnable runnable = this::deleteAllArtifacts;
-        deleteExecutor.execute(runnable);
-    }
-
-    private void fetchAllArtifactsAndStore() {
-        String nodeId = heartbeat.getNodeId();
-        String groupId = heartbeat.getGroupId();
-        logger.info("Fetching artifacts from node " + nodeId + " in group " + groupId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
-        CloseableHttpResponse response = null;
-        try {
-        for (String artifactType : ALL_ARTIFACTS) {
-            final String url = heartbeat.getMgtApiUrl().concat(artifactType);
-            response = Utils.doGet(groupId, nodeId, accessToken, url);
-            JsonObject artifacts = HttpUtils.getJsonResponse(response);
-            switch (artifactType) {
-                case TEMPLATES:
-                    processTemplates(artifactType, artifacts);
-                    break;
-                default:
-                    processArtifacts(accessToken, artifactType, artifacts);
-                    break;
-            }
-        }
-        fetchAndStoreServers(accessToken);
-        } catch (ManagementApiException e) {
-            logger.error("Unable to fetch artifacts/details from node: {} of group: {} due to {} ", nodeId,
-                         groupId, e.getMessage());
-        }
+        ExecutorServiceHolder.getMiArtifactsManagerExecutorService().execute(runnable);
     }
 
     private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts)
