@@ -95,7 +95,7 @@ public class Bootstrap {
     private static final String JAVAX_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
     private static final String JAVAX_SSL_TRUSTSTORE_PASSWORD = "javax.net.ssl.trustStorePassword";
     private static final int EXECUTOR_SERVICE_TERMINATION_TIMEOUT = 5000;
-    private static final int DEFAULT_HEARTBEAT_POOL_SIZE = 5;
+    private static final int DEFAULT_HEARTBEAT_POOL_SIZE = 10;
     private static String keyStorePassword;
     private static String keyManagerPassword;
     private static String jksFileLocation;
