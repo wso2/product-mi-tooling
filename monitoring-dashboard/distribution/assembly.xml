@@ -122,6 +122,18 @@
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>
+        <file>
+            <source>${project.basedir}/src/main/resources/bin/yajsw/wrapper.conf</source>
+            <outputDirectory>bin/yajsw/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>${project.basedir}/src/main/resources/bin/yajsw/README.txt</source>
+            <outputDirectory>bin/yajsw/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
     </files>
 
     <!-- package dependencies -->
