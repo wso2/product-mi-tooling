@@ -50,6 +50,7 @@ import static org.wso2.ei.dashboard.core.commons.Constants.CONNECTORS;
 import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
+import static org.wso2.ei.dashboard.core.commons.Constants.LIST_ATTRIBUTE;
 import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
 import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
 import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
@@ -139,7 +140,12 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     private void processArtifacts(String accessToken, String artifactType, JsonObject artifacts)
             throws ManagementApiException {
-        JsonArray list = artifacts.get("list").getAsJsonArray();
+        JsonArray list;
+        if (artifactType.equals(CARBON_APPLICATIONS)) {
+            list = artifacts.get("activeList").getAsJsonArray();
+        } else {
+            list = artifacts.get(LIST_ATTRIBUTE).getAsJsonArray();
+        }
         for (JsonElement element : list) {
             final String artifactName = element.getAsJsonObject().get("name").getAsString();
             JsonObject artifactDetails = new JsonObject();
