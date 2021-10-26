@@ -62,6 +62,7 @@ public final class Constants {
     public static final String DATABASE_PASSWORD = "wso2carbon";
 
     public static final String EMPTY_STRING = "";
+    public static final String LIST_ATTRIBUTE = "list";
 
     public static final int TOKEN_CACHE_TIMEOUT = 60;
 
