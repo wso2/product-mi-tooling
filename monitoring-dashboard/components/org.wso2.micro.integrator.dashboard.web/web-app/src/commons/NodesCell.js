@@ -36,6 +36,7 @@ import TasksSideDrawer from './sideDrawers/TasksSideDrawer';
 import LocalEntriesSideDrawer from './sideDrawers/LocalEntriesSideDrawer';
 import CarbonApplicationsSideDrawer from './sideDrawers/CarbonApplicationsSideDrawer';
 import DataServicesSideDrawer from './sideDrawers/DataServicesSideDrawer';
+import DataSourcesSideDrawer from './sideDrawers/DataSourcesSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -87,6 +88,8 @@ function SideDrawer(props) {
             return <CarbonApplicationsSideDrawer nodeData={nodeData} />
         case 'data-services':
             return <DataServicesSideDrawer nodeData={nodeData} />
+        case 'data-sources':
+            return <DataSourcesSideDrawer nodeData={nodeData} />
         default :
             return <HomePageSideDrawer nodeData={nodeData} />
     }

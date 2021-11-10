@@ -13,6 +13,7 @@ import CappIcon from '@material-ui/icons/Dashboard';
 import UserIcon from '@material-ui/icons/People';
 import LogFileIcon from '@material-ui/icons/Description';
 import LayersIcon from '@material-ui/icons/Layers';
+import DnsIcon from '@material-ui/icons/Dns';
 
 export const categories = [
     {
@@ -29,6 +30,7 @@ export const categories = [
         { id: 'Tasks', to: '/tasks', icon: <Event /> },
         { id: 'Local Entries', to: '/local-entries', icon: <LocalEntriesIcon /> },
         { id: 'Data Services', to: '/data-services', icon: <LayersIcon /> },
+        { id: 'Data Sources', to: '/data-sources', icon: <DnsIcon /> },
         { id: 'Connectors', to: '/connectors', icon: <ConnectorIcon /> },
         { id: 'Carbon Applications', to: '/carbon-applications', icon: <CappIcon /> },
         { id: 'Log Files', to: '/log-files', icon: <LogFileIcon /> },
