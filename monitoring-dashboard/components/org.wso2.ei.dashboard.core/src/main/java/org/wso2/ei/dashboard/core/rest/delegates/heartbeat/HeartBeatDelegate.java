@@ -58,6 +58,14 @@ public class HeartBeatDelegate {
                 heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp,
                 heartbeatRequest.getChangeNotification().getDeployedArtifacts(),
                 heartbeatRequest.getChangeNotification().getUndeployedArtifacts());
+
+        logger.info("received heartbeat...");
+        logger.info("product id: " + heartbeatRequest.getProduct());
+        logger.info("group id: " + heartbeatRequest.getGroupId());
+        logger.info("node id: " + heartbeatRequest.getNodeId());
+        logger.info("interval: " + heartbeatRequest.getInterval());
+        logger.info("mgt api url: " + heartbeatRequest.getMgtApiUrl());
+
         boolean isSuccess;
         String productName = heartbeat.getProduct();
         ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
@@ -66,9 +74,13 @@ public class HeartBeatDelegate {
             isSuccess = updateHeartbeat(heartbeat);
             artifactsManager.runUpdateExecutorService();
         } else {
-            isSuccess = registerNode(heartbeat);
+            isSuccess = registerNode
+                    (heartbeat);
             if (isSuccess) {
+                logger.info("node registration successful...");
                 artifactsManager.runFetchAllExecutorService();
+            } else {
+                logger.error("node registration failed...");
             }
         }
         runHeartbeatExecutorService(productName, heartbeat);

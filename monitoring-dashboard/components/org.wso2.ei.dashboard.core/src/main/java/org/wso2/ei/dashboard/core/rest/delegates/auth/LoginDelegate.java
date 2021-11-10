@@ -53,6 +53,7 @@ public class LoginDelegate {
     }
 
     private String getTokenFromMI(String username, String password) throws ManagementApiException {
+        logger.info("Request token from MI...");
         GroupDelegate groupDelegate = new GroupDelegate();
         GroupList groupList = groupDelegate.getGroupList();
         if (groupList.isEmpty()) {

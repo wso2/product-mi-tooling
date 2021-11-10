@@ -34,7 +34,7 @@ public class GroupDelegate {
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     public GroupList getGroupList() {
-        logger.debug("Fetching group list registered with the dashboard.");
+        logger.info("Fetching group list registered with the dashboard.");
         return databaseManager.fetchGroups();
     }
 }

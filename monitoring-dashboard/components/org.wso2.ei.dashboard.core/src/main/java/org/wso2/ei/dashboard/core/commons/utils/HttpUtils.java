@@ -43,6 +43,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
@@ -56,6 +58,8 @@ import javax.ws.rs.core.Response;
  * Utilities to execute http requests.
  */
 public class HttpUtils {
+
+    private static final Logger logger = LogManager.getLogger(HttpUtils.class);
 
     private HttpUtils() {
     }
@@ -75,7 +79,8 @@ public class HttpUtils {
         CloseableHttpClient httpClient = getHttpClient();
         try {
             return httpClient.execute(httpGet);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            logger.info("Error occurred while sending get http request : " + e.getMessage(), e.getCause());
             throw new DashboardServerException("Error occurred while sending get http request.", e);
         }
     }

@@ -68,6 +68,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean insertHeartbeat(HeartbeatObject heartbeat, String accessToken) {
+        logger.info("inserting heartbeat into database: groupID: " + heartbeat.getGroupId() + " nodeid: " +
+                    heartbeat.getNodeId());
         String query = "INSERT INTO HEARTBEAT VALUES (?,?,?,?,?,?);";
         try (
                 Connection con = getConnection();
@@ -81,6 +83,8 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             statement.setString(6, accessToken);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
+            logger.error("Error occurred while inserting heartbeat information. " + e.getMessage(),
+                         e.getCause());
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
         }
     }
@@ -132,6 +136,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             while (resultSet.next()) {
                 groupList.add(resultSet.getString("GROUP_ID"));
             }
+            logger.info("Group list size: " + groupList.size());
             return groupList;
         } catch (SQLException e) {
             throw new DashboardServerException("Error occurred fetching groups.", e);
