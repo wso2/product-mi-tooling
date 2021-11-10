@@ -80,6 +80,7 @@ public class ConfigurationDelegate {
                 return "inboundEndpointName";
             case Constants.MESSAGE_STORES:
             case Constants.MESSAGE_PROCESSORS:
+            case Constants.DATA_SOURCES:
                 return "name";
             case Constants.APIS:
                 return "apiName";
