@@ -83,14 +83,41 @@
             <dependency>
                 <groupId>org.wso2.carbon.secvault</groupId>
                 <artifactId>org.wso2.carbon.secvault.feature</artifactId>
-                <version>${carbon.securevault.version}</version>
+                <version>${securevault.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.secvault</groupId>
                 <artifactId>org.wso2.carbon.secvault.tools.feature</artifactId>
-                <version>${carbon.securevault.version}</version>
+                <version>${securevault.version}</version>
                 <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.securevault</groupId>
+                <artifactId>org.wso2.securevault</artifactId>
+                <version>${securevault.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.securevault</artifactId>
+                <version>${carbon.kernel.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.securevault</groupId>
+                <artifactId>org.wso2.securevault</artifactId>
+                <version>${securevault.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.utils</groupId>
@@ -334,6 +361,21 @@
                 <artifactId>asm</artifactId>
                 <version>${net.minidev.asm.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+                <artifactId>axiom</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.ciphertool</groupId>
+                <artifactId>org.wso2.ciphertool</artifactId>
+                <version>${cipher.tool.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -364,7 +406,8 @@
         <carbon.kernel5.version>5.2.8</carbon.kernel5.version>
         <carbon.config.version>2.1.12</carbon.config.version>
         <carbon.config.version.range>[2.1.0, 3.0.0)</carbon.config.version.range>
-        <carbon.securevault.version>5.0.13</carbon.securevault.version>
+        <securevault.version>1.1.2</securevault.version>
+        <carbon.kernel.version>4.5.3</carbon.kernel.version>
         <carbon.utils.version>2.0.8</carbon.utils.version>
         <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
         <carbon.deployment.version>5.2.0</carbon.deployment.version>
@@ -411,6 +454,7 @@
         <commons-logging.version>1.2</commons-logging.version>
         <h2.database.version>1.4.200</h2.database.version>
         <commons.lang3.version>3.1</commons.lang3.version>
+        <commons-codec.orbit.version>1.15</commons-codec.orbit.version>
         <hikari.cp.version>3.4.5</hikari.cp.version>
         <httpcomponents.version>4.5.8</httpcomponents.version>
         <code.gson.version>2.8.6</code.gson.version>
@@ -419,5 +463,7 @@
         <config.mapper.version>1.0.19</config.mapper.version>
         <asgardeo.java.oidc.sdk.version>0.1.13</asgardeo.java.oidc.sdk.version>
         <net.minidev.asm.version>1.0.2</net.minidev.asm.version>
+        <axiom.version>1.2.11-wso2v17</axiom.version>
+        <cipher.tool.version>1.1.15</cipher.tool.version>
     </properties>
 </project>
