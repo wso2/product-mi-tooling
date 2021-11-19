@@ -42,6 +42,7 @@
             <includes>
                 <include>deployment.toml</include>
                 <include>log4j2.properties</include>
+                <include>cipher-standalone-config.properties</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -49,6 +50,8 @@
             <outputDirectory>conf/security</outputDirectory>
             <includes>
                 <include>dashboard.jks</include>
+                <include>cipher-text.properties</include>
+                <include>cipher-tool.properties</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -61,6 +64,8 @@
             <includes>
                 <include>dashboard.sh</include>
                 <include>dashboard.bat</include>
+                <include>ciphertool.bat</include>
+                <include>ciphertool.sh</include>
             </includes>
             <fileMode>755</fileMode>
         </fileSet>
@@ -180,6 +185,10 @@
                 <include>net.minidev:json-smart:jar</include>
                 <include>net.minidev:asm:jar</include>
                 <include>org.wso2.ei:org.wso2.micro.integrator.dashboard.utils:jar</include>
+                <include>org.apache.ws.commons.axiom.wso2:axiom:jar</include>
+                <include>org.wso2.securevault:org.wso2.securevault:jar</include>
+                <include>org.wso2.carbon:org.wso2.carbon.securevault:jar</include>
+                <include>org.wso2.ciphertool:org.wso2.ciphertool:jar</include>
             </includes>
         </dependencySet>
     </dependencySets>

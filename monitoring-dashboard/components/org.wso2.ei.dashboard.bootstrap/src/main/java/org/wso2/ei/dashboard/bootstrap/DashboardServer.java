@@ -38,6 +38,7 @@ import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.wso2.carbon.securevault.SecretManagerInitializer;
 import org.wso2.config.mapper.ConfigParser;
 import org.wso2.config.mapper.ConfigParserException;
 import org.wso2.micro.integrator.dashboard.utils.Constants;
@@ -45,8 +46,13 @@ import org.wso2.micro.integrator.dashboard.utils.ExecutorServiceHolder;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfigException;
 import org.wso2.micro.integrator.dashboard.utils.SSOConstants;
+import org.wso2.securevault.SecretResolver;
+import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
+import org.wso2.securevault.secret.SecretCallbackHandler;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
@@ -57,6 +63,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -94,6 +101,9 @@ public class DashboardServer {
     private static final String TOML_TRUSTSTORE_FILE_LOCATION = "truststore.file_name";
     private static final String JAVAX_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
     private static final String JAVAX_SSL_TRUSTSTORE_PASSWORD = "javax.net.ssl.trustStorePassword";
+    private static final String CARBON_HOME = "carbon.home";
+    private static final String SECRET_CONF = "secret-conf.properties";
+    private static final String CARBON_CONFIG_DIR = "carbon.config.dir.path";
     private static final int EXECUTOR_SERVICE_TERMINATION_TIMEOUT = 5000;
     private static final int DEFAULT_HEARTBEAT_POOL_SIZE = 10;
     private static String keyStorePassword;
@@ -101,6 +111,7 @@ public class DashboardServer {
     private static String jksFileLocation;
     private static SSOConfig ssoConfig;
     private static Thread shutdownHook;
+    private static SecretResolver secretResolver = new SecretResolver();
 
     private static final Logger logger = LogManager.getLogger(DashboardServer.class);
 
@@ -118,6 +129,7 @@ public class DashboardServer {
             }
 
             Map<String, Object> parsedConfigs = generateSSOConfigJS(tomlFile);
+            initSecureVault(parseResult);
             loadConfigurations(parsedConfigs);
             ssoConfig = generateSSOConfig(parseResult);
         } catch (SSOConfigException e) {
@@ -247,28 +259,28 @@ public class DashboardServer {
         String miUsername = System.getProperty(MI_USERNAME);
         if (StringUtils.isEmpty(miUsername)) {
             miUsername = (String) parsedConfigs.get(TOML_MI_USERNAME);
-            properties.put(MI_USERNAME , miUsername);
+            properties.put(MI_USERNAME, resolveSecret(miUsername));
         }
 
         String miPassword = System.getProperty(MI_PASSWORD);
         if (StringUtils.isEmpty(miPassword)) {
             miPassword = (String) parsedConfigs.get(TOML_MI_PASSWORD);
-            properties.put(MI_PASSWORD, miPassword);
+            properties.put(MI_PASSWORD, resolveSecret(miPassword));
         }
 
         keyStorePassword = System.getProperty(KEYSTORE_PASSWORD);
         if (StringUtils.isEmpty(keyStorePassword)) {
-            keyStorePassword = (String) parsedConfigs.get(TOML_KEYSTORE_PASSWORD);
+            keyStorePassword = resolveSecret((String) parsedConfigs.get(TOML_KEYSTORE_PASSWORD));
         }
 
         keyManagerPassword = System.getProperty(KEY_MANAGER_PASSWORD);
         if (StringUtils.isEmpty(keyManagerPassword)) {
-            keyManagerPassword = (String) parsedConfigs.get(TOML_KEY_MANAGER_PASSWORD);
+            keyManagerPassword = resolveSecret((String) parsedConfigs.get(TOML_KEY_MANAGER_PASSWORD));
         }
 
         jksFileLocation = System.getProperty(JKS_FILE_LOCATION);
         if (StringUtils.isEmpty(jksFileLocation)) {
-            jksFileLocation = (String) parsedConfigs.get(TOML_JKS_FILE_LOCATION);
+            jksFileLocation = resolveSecret((String) parsedConfigs.get(TOML_JKS_FILE_LOCATION));
         }
 
         System.setProperties(properties);
@@ -302,9 +314,7 @@ public class DashboardServer {
         String resourcesDir =
                 DASHBOARD_HOME + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
 
-        String outputDir =
-                DASHBOARD_HOME + File.separator + SERVER_DIR + File.separator + WWW_DIR +
-                File.separator + CONF_DIR;
+        String outputDir = DASHBOARD_HOME;
 
         File directory = new File(outputDir);
         if (!directory.exists()) {
@@ -400,5 +410,62 @@ public class DashboardServer {
 
         String trustStorePassword = parseResult.getString(TOML_TRUSTSTORE_PASSWORD);
         System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
+    }
+
+    private void initSecureVault(TomlParseResult parseResult) {
+
+        System.setProperty(CARBON_HOME, DASHBOARD_HOME);
+        System.setProperty(CARBON_CONFIG_DIR, DASHBOARD_HOME + File.separator + CONF_DIR);
+        if (!secretResolver.isInitialized()) {
+            SecretManagerInitializer secretManagerInitializer = new SecretManagerInitializer();
+            SecretCallbackHandler secretCallbackHandler =
+                    secretManagerInitializer.init().getSecretCallbackHandler();
+            secretResolver = SecretResolverFactory.create(loadProperties(parseResult));
+            secretResolver.init(secretCallbackHandler);
+        }
+    }
+
+    private Properties loadProperties(TomlParseResult parseResult) {
+
+        Properties properties = new Properties();
+        String carbonHome = System.getProperty(CARBON_HOME);
+        String filePath = Paths.get(carbonHome, CONF_DIR, SECURITY_DIR, SECRET_CONF).toString();
+
+        File dataSourceFile = new File(filePath);
+        if (!dataSourceFile.exists()) {
+            appendTomlProperties(properties, parseResult);
+            return properties;
+        } else {
+
+            Properties var8;
+            try (FileInputStream in = new FileInputStream(dataSourceFile)) {
+                properties.load(in);
+                appendTomlProperties(properties, parseResult);
+                return properties;
+            } catch (IOException e) {
+                logger.error(MessageFormat.format("Error loading properties from a file at :{0}", filePath), e);
+                var8 = properties;
+            }
+
+            return var8;
+        }
+    }
+
+    private void appendTomlProperties(Properties properties, TomlParseResult parseResult) {
+
+        for (String dottedKey : parseResult.dottedKeySet()) {
+            if (parseResult.isString(dottedKey)) {
+                properties.put(dottedKey, parseResult.getString(dottedKey));
+            }
+        }
+    }
+
+    private String resolveSecret(String text) {
+
+        String alias = org.wso2.securevault.commons.MiscellaneousUtil.getProtectedToken(text);
+        if (!StringUtils.isEmpty(alias)) {
+            return MiscellaneousUtil.resolve(alias, secretResolver);
+        }
+        return text;
     }
 }
