@@ -18,13 +18,13 @@
  *
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
 import HTTPClient from '../utils/HTTPClient';
 
 export default function DataSources() {
-    const [pageInfo] = React.useState({
+    const [pageInfo] = useState({
         pageId: "data-sources",
         title: "Data Sources",
         headCells: [
@@ -34,12 +34,12 @@ export default function DataSources() {
         tableOrderBy: 'name'
     });
 
-    const [dataSourcesList, setDataSourcesList] = React.useState([]);
+    const [dataSourcesList, setDataSourcesList] = useState([]);
 
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
 
-    React.useEffect(() => {
+    useEffect(() => {
         HTTPClient.getArtifacts("datasources", globalGroupId, selectedNodeList).then(response => {
             setDataSourcesList(response.data)
         })

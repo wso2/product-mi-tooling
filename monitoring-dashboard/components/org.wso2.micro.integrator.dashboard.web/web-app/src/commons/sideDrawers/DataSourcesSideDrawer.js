@@ -39,22 +39,7 @@ export default function DataSourcesSideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId} />
-                    <SourceViewSection
-                        artifactType="data-sources" artifactName={artifactName} nodeId={nodeId}
-                        designContent={<>
-                            <Paper className={classes.paper} elevation={0} square>
-                                <DataSourceDetailTable nodeData={nodeData.details} />
-                            </Paper>
-                            <Box pl={4}>
-                                <Typography variant="h6" color="inherit" noWrap>
-                                    Parameters
-                                </Typography>
-                                <Box pr={2}>
-                                    <ParametersSection parameters={nodeData.details.configurationParameters} />
-                                </Box>
-                            </Box>
-                        </>}
-                    />
+                    <SourceViewSectionForDataSources nodeData={nodeData} classes={classes} />
                 </Grid>
             </Grid>
         </div>
@@ -87,11 +72,35 @@ function DataSourceDetailTable(props) {
     </Table>
 }
 
+function SourceViewSectionForDataSources(props) {
+    const nodeData = props.nodeData;
+    const nodeId = nodeData.nodeId;
+    const artifactName = nodeData.details.name;
+    const classes = props.classes;
+    return <SourceViewSection
+        artifactType="data-sources" artifactName={artifactName} nodeId={nodeId}
+        designContent={<>
+            <Paper className={classes.paper} elevation={0} square>
+                <DataSourceDetailTable nodeData={nodeData.details} />
+            </Paper>
+            <Box pl={4}>
+                <Typography variant="h6" color="inherit" noWrap>
+                    Parameters
+                </Typography>
+                <Box pr={2}>
+                    <ParametersSection parameters={nodeData.details.configurationParameters} classes={classes} />
+                </Box>
+            </Box>
+        </>}
+    />
+}
+
 function ParametersSection(props) {
     const parameters = props.parameters;
-    return <Table size="small" style={{width: '100%'}}>
-        {Object.entries(parameters).map(([key, value]) => 
-            <TableRow>
+    const classes = props.classes;
+    return <Table size="small" className={classes.parameterTable}>
+        {Object.entries(parameters).map(([key, value], index) =>
+            <TableRow key={index}>
                 <TableCell>{key}</TableCell>
                 <TableCell>{String(value)}</TableCell>
             </TableRow>
@@ -108,5 +117,8 @@ const useStyles = makeStyles((theme) => ({
     },
     paper: {
         padding: theme.spacing(2),
+    },
+    parameterTable: {
+        width: '100%',
     },
 }));
