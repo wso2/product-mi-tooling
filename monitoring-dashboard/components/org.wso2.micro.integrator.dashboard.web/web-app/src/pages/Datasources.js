@@ -18,40 +18,32 @@
  *
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
+import { useSelector } from 'react-redux';
+import HTTPClient from '../utils/HTTPClient';
 
-export default class Datasources extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = { pageInfo: {
-                pageId: "datasources",
-                title: "Data Sources",
-                headCells: [
-                    {id: 'name', label: 'Inbound Endpoint Name'},
-                    {id: 'nodes', label: 'Nodes'},
-                    {id: 'type', label: 'Type'},
-                    {id: 'data_source_status', label: 'Status'}],
-                tableOrderBy: 'service'
-            },
-            datasourceList: [{
-                name: "Calculator EP",
-                nodes: [
-                    { nodeId: "node_01",
-                        type: "Type",
-                        data_source_status: "Inactive"
+export default function DataSources() {
+    const [pageInfo] = useState({
+        pageId: "data-sources",
+        title: "Data Sources",
+        headCells: [
+            {id: 'name', label: 'Data Source Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'type', label: 'Type'}],
+        tableOrderBy: 'name'
+    });
 
-                    },
-                    { nodeId: "node_02",
-                        protocol: "http",
-                        data_source_status: "Active"
+    const [dataSourcesList, setDataSourcesList] = useState([]);
 
-                    }
-                ]
-            }
-            ]};
-    }
-    render() {
-        return <EnhancedTable pageInfo={this.state.pageInfo} dataSet={this.state.datasourceList}/>;
-    }
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
+
+    useEffect(() => {
+        HTTPClient.getArtifacts("datasources", globalGroupId, selectedNodeList).then(response => {
+            setDataSourcesList(response.data)
+        })
+    },[globalGroupId, selectedNodeList])
+
+    return <EnhancedTable pageInfo={pageInfo} dataSet={dataSourcesList}/>
 }

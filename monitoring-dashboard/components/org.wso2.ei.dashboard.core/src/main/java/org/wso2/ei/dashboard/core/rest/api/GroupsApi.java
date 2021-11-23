@@ -60,6 +60,7 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.DataServicesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.DataSourcesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LocalEntriesDelegate;
@@ -296,7 +297,10 @@ public class GroupsApi {
     public Response getDatasourcesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
-        Response.ResponseBuilder responseBuilder = Response.ok().entity("magic!");
+
+        DataSourcesDelegate dataSourcesDelegate = new DataSourcesDelegate();
+        Artifacts dataSourcesList = dataSourcesDelegate.getArtifactsList(groupId, nodes);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(dataSourcesList);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }

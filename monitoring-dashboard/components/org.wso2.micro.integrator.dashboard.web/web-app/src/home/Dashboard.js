@@ -48,6 +48,7 @@ import LogConfigs from '../pages/LogConfigs'
 import Users from '../pages/Users'
 import AddUsers from '../pages/AddUsers'
 import AddLogConfig from '../pages/AddLogConfig'
+import DataSources from '../pages/Datasources';
 import AuthManager from '../auth/AuthManager';
 
 const drawerWidth = 256;
@@ -136,6 +137,7 @@ function Layout(props) {
                                 <Route exact path='/tasks' component={Tasks}/>
                                 <Route exact path='/local-entries' component={LocalEntries}/>
                                 <Route exact path='/data-services' component={DataServices}/>
+                                <Route exact path='/data-sources' component={DataSources}/>
                                 <Route exact path='/connectors' component={Connectors} />
                                 <Route exact path='/carbon-applications' component={CarbonApplications} />
                                 <Route exact path='/log-files' component={LogFiles} />
