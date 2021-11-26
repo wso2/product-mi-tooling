@@ -12,7 +12,7 @@ At the bottom of this file is a table that shows what each license indicated
 below is and where the actual text of the license can be found.
 
 
-Name                                                                                                Type           License
+Name                                                                                                Type        License
 _________________________________________________________________________________________________________________________________________________
 jackson-core-2.7.9.jar                                                                              bundle         apache2
 re2j-1.2.jar                                                                                        jar            golang
@@ -20,7 +20,6 @@ jsoup-1.10.3.jar                                                                
 jetty-webapp-9.4.34.v20201102.jar                                                                   bundle         apache2
 commons-lang3-3.1.jar                                                                               bundle         apache2
 jackson-annotations-2.11.3.jar                                                                      bundle         apache2
-org.wso2.micro.integrator.dashboard.utils-4.0.1.jar                                                 bundle         apache2
 jetty-io-9.4.34.v20201102.jar                                                                       bundle         apache2
 oauth2-oidc-sdk-8.19.jar                                                                            bundle         apache2
 nimbus-jose-jwt-8.19.jar                                                                            bundle         apache2
@@ -30,9 +29,10 @@ commons-codec-1.12.jar                                                          
 config-mapper-1.0.2.jar                                                                             jar            apache2
 jaxb-api-2.3.0.jar                                                                                  bundle         cddl1
 jinjava-2.4.14.jar                                                                                  jar            apache2
+org.wso2.ei.dashboard.bootstrap-4.1.0-m2.jar                                                        bundle         apache2
 json-smart-2.3.jar                                                                                  bundle         apache2
+org.wso2.micro.integrator.dashboard.utils-4.1.0-m2.jar                                              bundle         apache2
 asm-1.0.2.jar                                                                                       bundle         bsd
-org.wso2.ei.dashboard.bootstrap-4.0.1.jar                                                           bundle         apache2
 jetty-servlet-9.4.34.v20201102.jar                                                                  bundle         apache2
 jackson-databind-2.7.9.1.jar                                                                        bundle         apache2
 guava-27.0-jre.jar                                                                                  bundle         apache2
