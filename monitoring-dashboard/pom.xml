@@ -425,7 +425,7 @@
 
         <!-- Logging/SLF4J -->
         <slf4j.version>1.7.5</slf4j.version>
-        <version.log4j.core>2.12.0</version.log4j.core>
+        <version.log4j.core>2.16.0</version.log4j.core>
 
         <!-- Databridge -->
         <carbon.analytics-common.version>6.1.26</carbon.analytics-common.version>
