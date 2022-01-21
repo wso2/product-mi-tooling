@@ -452,7 +452,7 @@
         <io.swagger.core.v3.version>2.1.5</io.swagger.core.v3.version>
         <jackson.core.version>2.11.3</jackson.core.version>
         <commons-logging.version>1.2</commons-logging.version>
-        <h2.database.version>1.4.200</h2.database.version>
+        <h2.database.version>2.1.210</h2.database.version>
         <commons.lang3.version>3.1</commons.lang3.version>
         <commons-codec.orbit.version>1.15</commons-codec.orbit.version>
         <hikari.cp.version>3.4.5</hikari.cp.version>
