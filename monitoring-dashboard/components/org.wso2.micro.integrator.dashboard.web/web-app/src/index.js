@@ -31,6 +31,8 @@ import Login from './auth/Login';
 import Logout from './auth/Logout';
 import Dashboard from './home/Dashboard'
 import interceptor from "./auth/Interceptor";
+import CookiePolicy from './policies/CookiePolicy';
+import PrivacyPolicy from "./policies/PrivacyPolicy";
 import Sso from './sso'
 
 const store = createStore(Reducers)
@@ -218,6 +220,8 @@ class App extends Component {
                             <Route exact path='/login' component={Login} />
                             <Route exact path='/logout' component={Logout} />
                             <Route exact path='/sso' component={ Sso }/>
+                            <Route exact path='/cookie-policy' component={CookiePolicy}/>
+                            <Route exact path='/privacy-policy' component={PrivacyPolicy}/>
                             <Route component={Dashboard} />
                         </Switch>
                     </BrowserRouter>
