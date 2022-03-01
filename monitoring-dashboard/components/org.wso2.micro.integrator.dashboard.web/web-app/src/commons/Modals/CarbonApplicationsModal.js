@@ -29,7 +29,7 @@ import HeadingSection from './commons/HeadingSection'
 import Typography from '@material-ui/core/Typography';
 import HTTPClient from '../../utils/HTTPClient';
 
-export default function CarbonApplicationsSideDrawer(props) {
+export default function CarbonApplicationsModal(props) {
     const globalGroupId = useSelector(state => state.groupId);
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;

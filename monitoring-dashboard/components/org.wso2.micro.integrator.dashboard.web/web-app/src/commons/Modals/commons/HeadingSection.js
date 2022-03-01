@@ -25,7 +25,7 @@ import { makeStyles } from '@material-ui/core/styles';
 export default function HeadingSection(props) {
     const {name, nodeId} = props;
     const classes = useStyles();
-    return <Paper className={classes.sideDrawerHeading} square>
+    return <Paper className={classes.modalHeading} square>
                 <Typography variant="h6" color="inherit" noWrap>
                     {name}
                 </Typography>
@@ -36,7 +36,7 @@ export default function HeadingSection(props) {
 }
 
 const useStyles = makeStyles((theme) => ({
-    sideDrawerHeading: {
+    modalHeading: {
         padding: theme.spacing(1),
         height: '72px',
         backgroundColor: theme.palette.background.appBar,

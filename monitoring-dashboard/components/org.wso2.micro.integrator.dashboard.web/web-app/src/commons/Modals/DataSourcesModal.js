@@ -28,7 +28,7 @@ import HeadingSection from './commons/HeadingSection'
 import SourceViewSection from './commons/SourceViewSection'
 import Typography from '@material-ui/core/Typography';
 
-export default function DataSourcesSideDrawer(props) {
+export default function DataSourcesModal(props) {
     const { nodeData } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;

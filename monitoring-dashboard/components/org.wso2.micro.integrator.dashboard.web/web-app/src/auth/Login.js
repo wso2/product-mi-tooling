@@ -123,7 +123,7 @@ function Login(props){
                     />
                     <Box mt={4}>
                         <Typography component="h1" variant="h5">
-                            Sign in
+                            Sign In
                         </Typography>
                     </Box>
 

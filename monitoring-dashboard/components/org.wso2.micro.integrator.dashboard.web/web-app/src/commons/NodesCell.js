@@ -20,29 +20,29 @@
 
 import React from 'react';
 import TableCell from "@material-ui/core/TableCell";
-import Drawer from '@material-ui/core/Drawer';
+import Dialog from '@material-ui/core/Dialog';
 import TableRow from '@material-ui/core/TableRow'
 import { makeStyles } from '@material-ui/core/styles';
-import ProxySideDrawer from './sideDrawers/ProxySideDrawer';
-import EndpointSideDrawer from './sideDrawers/EndpointSideDrawer';
-import HomePageSideDrawer from './sideDrawers/HomePageSideDrawer';
-import ApiSideDrawer from './sideDrawers/ApiSideDrawer';
-import TemplatesSideDrawer from './sideDrawers/TemplatesSideDrawer';
-import SequenceSideDrawer from './sideDrawers/SequenceSideDrawer';
-import InboundEpSideDrawer from './sideDrawers/InboundEpSideDrawer';
-import MessageStoreSideDrawer from './sideDrawers/MessageStoreSideDrawer';
-import MessageProcessorSideDrawer from './sideDrawers/MessageProcessorSideDrawer';
-import TasksSideDrawer from './sideDrawers/TasksSideDrawer';
-import LocalEntriesSideDrawer from './sideDrawers/LocalEntriesSideDrawer';
-import CarbonApplicationsSideDrawer from './sideDrawers/CarbonApplicationsSideDrawer';
-import DataServicesSideDrawer from './sideDrawers/DataServicesSideDrawer';
-import DataSourcesSideDrawer from './sideDrawers/DataSourcesSideDrawer';
+import ProxyModal from './Modals/ProxyModal';
+import EndpointModal from './Modals/EndpointModal';
+import HomePageModal from './Modals/HomePageModal';
+import ApiModal from './Modals/ApiModal';
+import TemplatesModal from './Modals/TemplatesModal';
+import SequenceModal from './Modals/SequenceModal';
+import InboundEpModal from './Modals/InboundEpModal';
+import MessageStoreModal from './Modals/MessageStoreModal';
+import MessageProcessorModal from './Modals/MessageProcessorModal';
+import TasksModal from './Modals/TasksModal';
+import LocalEntriesModal from './Modals/LocalEntriesModal';
+import CarbonApplicationsModal from './Modals/CarbonApplicationsModal';
+import DataServicesModal from './Modals/DataServicesModal';
+import DataSourcesModal from './Modals/DataSourcesModal';
 
 export default function NodesCell(props) {
     const classes = useStyles();
     const { pageId, nodeData, retrieveData } = props;
     const [state, setState] = React.useState({
-        openSideDrawer: false,
+        openModal: false,
     });
 
     const toggleDrawer = (open) => (event) => {
@@ -50,48 +50,48 @@ export default function NodesCell(props) {
             return;
         }
 
-        setState({ ...state, openSideDrawer: open });
+        setState({ ...state, openModal: open });
     };
 
     return <TableRow hover role="presentation">
         <TableCell onClick={toggleDrawer(true)} className={classes.tableCell}>{nodeData.nodeId}</TableCell>
-        <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} classes={{paper: classes.drawerPaper}}>
-            <SideDrawer pageId={pageId} nodeData={nodeData} retrieveData={retrieveData}/>
-        </Drawer>
+        <Dialog classes={{ paper: classes.dialog }} onClose={toggleDrawer(false)} aria-labelledby="artifact-popup" open={state['openModal']} maxWidth="lg">
+            <DetailModal pageId={pageId} nodeData={nodeData} retrieveData={retrieveData}/>
+        </Dialog>
     </TableRow>;
 }
 
-function SideDrawer(props) {
+function DetailModal(props) {
     const { nodeData, retrieveData } = props
     switch(props.pageId) {
         case 'proxy-services':
-            return <ProxySideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <ProxyModal nodeData={nodeData} retrieveData={retrieveData}/>
         case 'endpoints':
-            return <EndpointSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <EndpointModal nodeData={nodeData} retrieveData={retrieveData}/>
         case 'apis':
-            return <ApiSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <ApiModal nodeData={nodeData} retrieveData={retrieveData}/>
         case 'templates':
-            return <TemplatesSideDrawer nodeData={nodeData} />
+            return <TemplatesModal nodeData={nodeData} />
         case 'sequences':
-            return <SequenceSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <SequenceModal nodeData={nodeData} retrieveData={retrieveData}/>
         case 'inbound-endpoints':
-            return <InboundEpSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <InboundEpModal nodeData={nodeData} retrieveData={retrieveData}/>
         case 'message-stores':
-            return <MessageStoreSideDrawer nodeData={nodeData} />
+            return <MessageStoreModal nodeData={nodeData} />
         case 'message-processors':
-            return <MessageProcessorSideDrawer nodeData={nodeData} />
+            return <MessageProcessorModal nodeData={nodeData} />
         case 'tasks':
-            return <TasksSideDrawer nodeData={nodeData} />
+            return <TasksModal nodeData={nodeData} />
         case 'local-entries':
-            return <LocalEntriesSideDrawer nodeData={nodeData} />
+            return <LocalEntriesModal nodeData={nodeData} />
         case 'carbonapps':
-            return <CarbonApplicationsSideDrawer nodeData={nodeData} />
+            return <CarbonApplicationsModal nodeData={nodeData} />
         case 'data-services':
-            return <DataServicesSideDrawer nodeData={nodeData} />
+            return <DataServicesModal nodeData={nodeData} />
         case 'data-sources':
-            return <DataSourcesSideDrawer nodeData={nodeData} />
+            return <DataSourcesModal nodeData={nodeData} />
         default :
-            return <HomePageSideDrawer nodeData={nodeData} />
+            return <HomePageModal nodeData={nodeData} />
     }
 }
 
@@ -105,4 +105,7 @@ const useStyles = makeStyles(() => ({
     drawerPaper: {
         backgroundColor: '#fff',
     },
+    dialog: {
+        height: 700,
+    }
 }));

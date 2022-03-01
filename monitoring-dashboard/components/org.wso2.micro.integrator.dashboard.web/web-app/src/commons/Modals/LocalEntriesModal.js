@@ -24,9 +24,9 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import SourceViewSection from './commons/SourceViewSection'
+import LocalEntryValueSection from './commons/LocalEntryValueSection'
 
-export default function MessageStoreSideDrawer(props) {
+export default function LocalEntriesModal(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
@@ -37,31 +37,33 @@ export default function MessageStoreSideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId} />
-                    <SourceViewSection
+                    <LocalEntryValueSection
+                        name={artifactName}
+                        type={nodeData.details.type}
+                        nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <MessageStoreDetailTable nodeData={nodeData} />
+                                <LocalEntriesDetailTable nodeData={nodeData} />
                             </Paper>
                         </>}
-                        artifactType="message-stores" artifactName={artifactName} nodeId={nodeId} />
+                    />
                 </Grid>
             </Grid>
         </div>
     );
 }
 
-function MessageStoreDetailTable(props) {
+function LocalEntriesDetailTable(props) {
     const nodeData = props.nodeData;
-    const artifactName = nodeData.details.name
 
     return <Table>
         <TableRow>
-            <TableCell>Message Store Name</TableCell>
-            <TableCell>{artifactName}</TableCell>
+            <TableCell>Local Entry Name</TableCell>
+            <TableCell>{nodeData.details.name}</TableCell>
         </TableRow>
         <TableRow>
-            <TableCell>Message Count</TableCell>
-            <TableCell>{nodeData.details.size === '-1' ? "Not Supported" : nodeData.details.size}</TableCell>
+            <TableCell>Type</TableCell>
+            <TableCell>{nodeData.details.type}</TableCell>
         </TableRow>
     </Table>
 }

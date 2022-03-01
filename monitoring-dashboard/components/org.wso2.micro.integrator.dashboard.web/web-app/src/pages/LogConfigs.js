@@ -24,6 +24,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import MenuItem from '@material-ui/core/MenuItem';
+import InputBase from '@material-ui/core/InputBase';
+import SearchIcon from '@material-ui/icons/Search';
 import EnhancedTable from '../commons/EnhancedTable';
 import AuthManager from '../auth/AuthManager';
 import {useSelector} from 'react-redux';
@@ -48,6 +50,8 @@ export default function LogConfigs() {
     const [nodeList, setNodeList] = React.useState([]);
     const [selectedNodeId, setSelectedNodeId] = React.useState('All');
     const [logConfigs, setLogConfigs] = React.useState([]);
+    const [filteredLogConfigs, setFilteredLogConfigs] = React.useState([]);
+    const [searchQuery, setSearchQuery] = React.useState("");
     const globalGroupId = useSelector(state => state.groupId);
 
     const classes = useStyles();
@@ -70,9 +74,16 @@ export default function LogConfigs() {
             })
 
             HTTPClient.getLogConfigs(globalGroupId).then(response => {
-                setLogConfigs(response.data)
+                setLogConfigs(response.data);
             })
         }
+    }
+
+    const getFilteredLogConfigs = (searchQuery) => {
+        setSearchQuery(searchQuery);
+        if (searchQuery){
+            setFilteredLogConfigs(logConfigs.filter((logger)=>logger.componentName.includes(searchQuery)));
+        }      
     }
 
     React.useEffect(() => {
@@ -86,10 +97,15 @@ export default function LogConfigs() {
     }
 
     const getLogConfigByNodeId = (nodeId) => {
+        setSearchQuery("");
         setSelectedNodeId(nodeId);
         if (nodeId !== 'All') {
             HTTPClient.getLogConfigs(globalGroupId, nodeId).then(response => {
                 setLogConfigs(response.data)
+            })
+        } else {
+            HTTPClient.getLogConfigs(globalGroupId).then(response => {
+                setLogConfigs(response.data);
             })
         }
         let param = {
@@ -124,21 +140,69 @@ export default function LogConfigs() {
             </Select>
             <FormHelperText>Node ID</FormHelperText>
         </FormControl>
-        <Button classes={{root: classes.buttonRight}} component={Link} to="/log-configs/add" variant="contained" color="primary">
-            Add Logging Configuration
-        </Button>
-        <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs} retrieveData={retrieveLogConfig}/></>;
+        <div className={classes.buttonsRight}>
+            <div className={classes.search}>
+                <div className={classes.searchIcon}>
+                <SearchIcon />
+                </div>
+                <InputBase
+                placeholder="Search by component…"
+                classes={{
+                    root: classes.inputRoot,
+                    input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                value={searchQuery}
+                onChange={(e)=>getFilteredLogConfigs(e.target.value)}
+                />
+            </div>
+            <Button component={Link} to="/log-configs/add" variant="contained" color="primary">
+                Add Logging Configuration
+            </Button>
+        </div>
+        
+        <EnhancedTable pageInfo={pageInfo} dataSet={searchQuery ? filteredLogConfigs : logConfigs} retrieveData={retrieveLogConfig}/></>;
 }
 
 const useStyles = makeStyles((theme) => ({
     selectRoot: {
         minHeight: '25px',
-        lineHeight: '25px',
+        lineHeight: '25px'
     },
     tabsAppBar: {
         backgroundColor: '#18202c'
     },
-    buttonRight: {
-        float: "right"
-    }
+    buttonsRight: {
+        float: "right",
+        display: "flex",
+        flexDirection:"row"
+    },
+    search: {
+        position: 'relative',
+        marginRight: 20        
+    },
+    searchIcon: {
+        padding: theme.spacing(0, 1),
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color:'black'
+    },
+    inputRoot: {
+        color: 'black'
+    },
+    inputInput: {
+        padding: theme.spacing(1, 1, 1, 0),
+        fontSize: "13px",
+        paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('md')]: {
+          width: '20ch'
+        },
+        borderBottom: "1px solid rgb(100, 100, 100)"
+    },
 }));

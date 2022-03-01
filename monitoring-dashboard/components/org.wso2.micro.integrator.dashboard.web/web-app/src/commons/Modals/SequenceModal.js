@@ -22,21 +22,18 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import { Button, Table, TableCell, TableRow } from '@material-ui/core';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
-import Tooltip from '@material-ui/core/Tooltip';
+import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 
-export default function ProxySideDrawer(props) {
+export default function SequenceModal(props) {
     const { nodeData, retrieveData } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
+
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
@@ -45,26 +42,24 @@ export default function ProxySideDrawer(props) {
                     <SourceViewSection
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <ProxyServiceDetailPage nodeData={nodeData} retrieveData={retrieveData}/>
+                                <SequenceDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
                             </Paper>
-                            <Box pl={4}>
-                                <EndpointsSection endpoints={nodeData.details.eprs} />
-                            </Box>
                         </>}
-                        artifactType="proxy-services" artifactName={artifactName} nodeId={nodeId} />
+                        artifactType="sequences" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
             </Grid>
         </div>
     );
 }
 
-function ProxyServiceDetailPage(props) {
+function SequenceDetailTable(props) {
     const { nodeData, retrieveData } = props;
     const artifactName = nodeData.details.name
-    const pageId = "proxy-services";
+    const pageId = "sequences";
+
     return <Table>
         <TableRow>
-            <TableCell>Service Name</TableCell>
+            <TableCell>Sequence Name</TableCell>
             <TableCell>{artifactName}</TableCell>
         </TableRow>
         <TableRow>
@@ -73,42 +68,6 @@ function ProxyServiceDetailPage(props) {
         </TableRow>
         <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
     </Table>
-}
-
-function EndpointsSection(props) {
-    const [copyMessage, setCopyMessage] = React.useState('Copy to Clipboard');
-
-    const onCopy = () => {
-        setCopyMessage('Copied');
-        const caller = function () {
-            setCopyMessage('Copy to Clipboard');
-        };
-        setTimeout(caller, 2000);
-    }
-
-    const endpoints = props.endpoints;
-    const classes = useStyles();
-    return <>
-        <Typography variant="h6" color="inherit" noWrap>
-            Endpoints
-            </Typography>
-        <Box pr={2}>
-            <Table>
-                {endpoints.map(ep =>
-                    <TableRow>{ep}
-                        <CopyToClipboard
-                            text={ep}
-                            className={classes.clipboard}
-                            onCopy={onCopy}
-                        >
-                            <Tooltip title={copyMessage}>
-                                <Button><FileCopyIcon /></Button>
-                            </Tooltip>
-                        </CopyToClipboard>
-                    </TableRow>)}
-            </Table>
-        </Box>
-    </>
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -120,7 +79,4 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(2),
     },
-    clipboard: {
-        color: '#3f51b5'
-    }
 }));

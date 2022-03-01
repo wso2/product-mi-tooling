@@ -32,7 +32,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-export default function DataServicesSideDrawer(props) {
+export default function DataServicesModal(props) {
     var nodeData = props.nodeData;
     const artifactName = nodeData.details.serviceName;
     const nodeId = nodeData.nodeId;

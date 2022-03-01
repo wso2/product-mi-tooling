@@ -23,14 +23,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import { Table, TableCell, TableRow } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 import Typography from '@material-ui/core/Typography';
 
-export default function InboundEpSideDrawer(props) {
-    const { nodeData, retrieveData } = props;
+export default function MessageProcessorModal(props) {
+    var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -41,68 +40,59 @@ export default function InboundEpSideDrawer(props) {
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId} />
                     <SourceViewSection
-                        artifactType="inbound-endpoints" artifactName={artifactName} nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <InboundEpDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
+                                <MessageProcessorDetailTable nodeData={nodeData} />
                             </Paper>
                             <Box pl={4}>
-                                <Typography variant="h6" color="inherit" noWrap>
-                                    Parameters
-                                </Typography>
-                                <Box pr={2}>
-                                    <ParametersSection parameters={nodeData.details.parameters} />
-                                </Box>
+                                <ParametersSection parameters={nodeData.details.parameters} />
                             </Box>
                         </>}
-                    />
+                        artifactType="message-processors" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
             </Grid>
         </div>
     );
 }
 
-function InboundEpDetailTable(props) {
-    const { nodeData, retrieveData } = props;
-    const artifactName = nodeData.details.name
-    const pageId = "inbound-endpoints";
-
+function MessageProcessorDetailTable(props) {
+    const nodeData = props.nodeData;
     return <Table>
         <TableRow>
-            <TableCell>Inbound Endpoint Name</TableCell>
-            <TableCell>{artifactName}</TableCell>
+            <TableCell>Message Processor Name</TableCell>
+            <TableCell>{nodeData.details.name}</TableCell>
         </TableRow>
         <TableRow>
-            <TableCell>Protocol</TableCell>
-            <TableCell>{nodeData.details.protocol}</TableCell>
-        </TableRow>
-        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
-        <TableRow>
-            <TableCell>Statistics</TableCell>
-            <TableCell>{nodeData.details.stats}</TableCell>
+            <TableCell>Message Store</TableCell>
+            <TableCell>{nodeData.details.messageStore}</TableCell>
         </TableRow>
         <TableRow>
-            <TableCell>Sequence</TableCell>
-            <TableCell>{nodeData.details.sequence}</TableCell>
-        </TableRow>
-        <TableRow>
-            <TableCell>On Error</TableCell>
-            <TableCell>{nodeData.details.error}</TableCell>
+            <TableCell>Type</TableCell>
+            <TableCell>{nodeData.details.type}</TableCell>
         </TableRow>
     </Table>
 }
 
 function ParametersSection(props) {
     const parameters = props.parameters;
-    return <Table size="small" style={{width: '100%'}}>
-        {parameters.map(parameter => <TableRow>
-            <TableCell>{parameter.name}</TableCell>
-            <TableCell>{parameter.value}</TableCell>
-        </TableRow>)}
-    </Table>
-
+    return <>
+        <Typography variant="h6" color="inherit" noWrap>
+            Parameters
+        </Typography>
+        <Box pr={2}>
+            <Table size="small">
+                <TableBody>
+                    {Object.keys(parameters).map(key => (
+                        <TableRow>
+                            <TableCell>{key}</TableCell>
+                            <TableCell>{parameters[key]}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </Box>
+    </>
 }
-
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,

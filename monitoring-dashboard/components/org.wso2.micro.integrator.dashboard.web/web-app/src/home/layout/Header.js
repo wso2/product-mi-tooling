@@ -126,7 +126,7 @@ function Header(props) {
                   keepMounted
                   open={Boolean(anchorEl)}
                   onClose={handlePopOverClose}>
-                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                  <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 </Menu>
               </Popover>
             </Grid>
