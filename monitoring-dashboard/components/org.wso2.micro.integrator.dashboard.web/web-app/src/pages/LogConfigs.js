@@ -103,10 +103,6 @@ export default function LogConfigs() {
             HTTPClient.getLogConfigs(globalGroupId, nodeId).then(response => {
                 setLogConfigs(response.data)
             })
-        } else {
-            HTTPClient.getLogConfigs(globalGroupId).then(response => {
-                setLogConfigs(response.data);
-            })
         }
         let param = {
             selectedNodeId: nodeId
