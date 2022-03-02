@@ -38,7 +38,7 @@ function PrivacyPolicy(props) {
 
     return (
         <Paper className={classes.policyContent}>
-            <Typography variant="h3">WSO2 Micro Integrator Dashboard - Cookie Policy</Typography>
+            <Typography variant="h3">WSO2 Micro Integrator Dashboard - Privacy Policy</Typography>
             <Link variant="h4"
                   href="https://apim.docs.wso2.com/en/latest/observe/mi-observe/working-with-monitoring-dashboard/"
                   style={{color: "#ff5000"}}>WSO2 Micro Integrator Dashboard</Link>

@@ -45,6 +45,7 @@ import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 public class UsersDelegate {
     private static final Log log = LogFactory.getLog(UsersDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final String DOMAIN_SEPARATOR = "/";
 
     public Users fetchUsers(String groupId) throws ManagementApiException {
         log.debug("Fetching users via management api.");
@@ -117,7 +118,14 @@ public class UsersDelegate {
         String userId = user.getAsJsonObject().get("userId").getAsString();
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);
-        String getUsersDetailsUrl = url.concat(userId);
+        String getUsersDetailsUrl;
+        if (userId.contains(DOMAIN_SEPARATOR)) {
+            String[] parts = userId.split(DOMAIN_SEPARATOR);
+            // parts[0] = domain, parts[1] = new userId
+            getUsersDetailsUrl = url.concat(parts[1]).concat("?domain=").concat(parts[0]);
+        } else {
+            getUsersDetailsUrl = url.concat(userId);
+        }
         CloseableHttpResponse userDetailResponse = Utils.doGet(groupId, nodeId, accessToken, getUsersDetailsUrl);
         String userDetail = HttpUtils.getStringResponse(userDetailResponse);
         usersInner.setDetails(userDetail);
