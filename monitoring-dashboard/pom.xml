@@ -368,8 +368,28 @@
             </dependency>
             <dependency>
                 <groupId>net.minidev</groupId>
-                <artifactId>asm</artifactId>
+                <artifactId>accessors-smart</artifactId>
                 <version>${net.minidev.asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${net.minidev.json-smart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.commons.axiom.wso2</groupId>
@@ -434,8 +454,8 @@
         <msf4j.version>2.7.3</msf4j.version>
 
         <!-- Logging/SLF4J -->
-        <slf4j.version>1.7.33</slf4j.version>
-        <version.log4j.core>2.17.0</version.log4j.core>
+        <slf4j.version>1.7.36</slf4j.version>
+        <version.log4j.core>2.17.2</version.log4j.core>
 
         <!-- Databridge -->
         <carbon.analytics-common.version>6.1.26</carbon.analytics-common.version>
@@ -458,9 +478,9 @@
         <glassfish.jersey.version>2.26</glassfish.jersey.version>
         <javax.xml.bind.version>2.3.0</javax.xml.bind.version>
         <javax.activation.version>1.1</javax.activation.version>
-        <io.swagger.version>1.6.2</io.swagger.version>
-        <io.swagger.core.v3.version>2.1.5</io.swagger.core.v3.version>
-        <jackson.core.version>2.13.1</jackson.core.version>
+        <io.swagger.version>1.6.5</io.swagger.version>
+        <io.swagger.core.v3.version>2.1.12</io.swagger.core.v3.version>
+        <jackson.core.version>2.13.2</jackson.core.version>
         <commons-logging.version>1.2</commons-logging.version>
         <h2.database.version>2.1.210</h2.database.version>
         <commons.lang3.version>3.1</commons.lang3.version>
@@ -471,7 +491,10 @@
         <google.guava.version>27.0-jre</google.guava.version>
         <config.mapper.version>1.0.19</config.mapper.version>
         <asgardeo.java.oidc.sdk.version>0.1.13</asgardeo.java.oidc.sdk.version>
-        <net.minidev.asm.version>1.0.2</net.minidev.asm.version>
+        <net.minidev.asm.version>2.4.8</net.minidev.asm.version>
+        <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
+        <jsoup.version>1.14.3</jsoup.version>
+        <guava.version>31.1-jre</guava.version>
         <axiom.version>1.2.11-wso2v17</axiom.version>
         <cipher.tool.version>1.1.15</cipher.tool.version>
     </properties>
