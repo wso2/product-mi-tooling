@@ -107,7 +107,7 @@
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
-            <artifactId>asm</artifactId>
+            <artifactId>accessors-smart</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom.wso2</groupId>
