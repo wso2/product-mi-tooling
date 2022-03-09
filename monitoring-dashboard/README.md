@@ -3,7 +3,7 @@
 ## Building from the source.
 
 ### Setting up the development environment.
-1. Install Node.js [8.X.X](https://nodejs.org/en/download/releases/).
+1. Install Node.js [14.X.X](https://nodejs.org/en/download/releases/).
 2. Fork the [Micro Integrator Tooling repository](https://github.com/wso2/product-mi-tooling).
 3. Clone your fork into any directory.
 4. Access the cloned directory and then navigate to `product-mi-tooling/monitoring-dashboard`. This 
