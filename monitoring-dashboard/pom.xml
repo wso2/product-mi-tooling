@@ -322,6 +322,11 @@
                 <version>${jackson.core.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${jackson.dataformat.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>${commons-logging.version}</version>
@@ -471,6 +476,7 @@
         <io.swagger.version>1.6.5</io.swagger.version>
         <io.swagger.core.v3.version>2.1.12</io.swagger.core.v3.version>
         <jackson.core.version>2.13.2</jackson.core.version>
+        <jackson.dataformat.version>${jackson.core.version}</jackson.dataformat.version>
         <commons-logging.version>1.2</commons-logging.version>
         <h2.database.version>2.1.210</h2.database.version>
         <commons.lang3.version>3.1</commons.lang3.version>
