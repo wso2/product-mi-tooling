@@ -94,6 +94,19 @@ public class Utils {
         return response;
     }
 
+    public static CloseableHttpResponse doPut(String groupId, String nodeId, String accessToken, String url,
+                                                JsonObject payload) throws ManagementApiException {
+        CloseableHttpResponse response = HttpUtils.doPut(accessToken, url, payload);
+        int httpSc = response.getStatusLine().getStatusCode();
+        if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
+            accessToken = retrieveNewAccessToken(groupId, nodeId);
+            response = HttpUtils.doPut(accessToken, url, payload);
+        } else if (isNotSuccessCode(httpSc)) {
+            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+        }
+        return response;
+    }
+
     public static CloseableHttpResponse doDelete(String groupId, String nodeId, String accessToken, String url)
             throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doDelete(accessToken, url);

@@ -21,37 +21,45 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import HeadingSection from './commons/HeadingSection'
+import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import AdminIcon from '@material-ui/icons/CheckRounded';
-import NonAdminIcon from '@material-ui/icons/ClearRounded';
-import UserRolesSection from './commons/UserRolesSection';
+import Box from '@material-ui/core/Box';
 
 import { Table, TableCell, TableBody, TableRow } from '@material-ui/core';
 
-export default function UserSideDrawer(props) {
-    const { user, retrieveData } = props;
+export default function RoleSideDrawer(props) {
+    const { role } = props;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <HeadingSection name={user.userId} />
-                    <UserDetailTable userData={user.details}/>
-                    <UserRolesSection user={user} retrieveData={retrieveData} classes={classes}/>
+                    <HeadingSection name={role.roleName} />
+                    <RolesSection roles={role.details.users} classes={classes}/>
                 </Grid>
             </Grid>
         </div>
     );
 }
 
-function UserDetailTable(props) {
-    const userData = props.userData;
-    return <Table>
-        <TableRow>
-            <TableCell>Admin</TableCell>
-            <TableCell>{userData.isAdmin? <AdminIcon style={{color:"green"}}/> : <NonAdminIcon style={{color:"red"}}/>}</TableCell>
-        </TableRow>
+function RolesSection(props) {
+    const roles = props.roles;
+    const classes = props.classes;
+    return <Box pl={4}>
+                <Typography variant="h6" color="inherit" noWrap>
+                    Users
+                </Typography>
+                <Box pr={2}>
+                    <ParametersSection roles={roles} classes={classes} />
+                </Box>
+            </Box>
+}
+
+function ParametersSection(props) {
+    const {roles, classes} = props;
+    return <Table size="small" className={classes.parameterTable}>
+        {roles.map(role=><TableRow><TableCell>{role}</TableCell></TableRow>)}
     </Table>
 }
 

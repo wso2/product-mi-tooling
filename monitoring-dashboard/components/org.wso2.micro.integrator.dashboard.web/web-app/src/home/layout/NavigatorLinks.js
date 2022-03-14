@@ -11,6 +11,7 @@ import LocalEntriesIcon from '@material-ui/icons/Assignment';
 import ConnectorIcon from '@material-ui/icons/CastConnected';
 import CappIcon from '@material-ui/icons/Dashboard';
 import UserIcon from '@material-ui/icons/People';
+import RoleIcon from '@material-ui/icons/Accessibility';
 import LogFileIcon from '@material-ui/icons/Description';
 import LayersIcon from '@material-ui/icons/Layers';
 import DnsIcon from '@material-ui/icons/Dns';
@@ -41,11 +42,16 @@ export const categories = [
       children: [
         { id: 'Log Configs', to: '/log-configs', icon: <LocalEntriesIcon /> },
         { id: 'Users', to: '/users', icon: <UserIcon /> },
+        { id: 'Roles', to: '/roles', icon: <RoleIcon /> },
       ],
     },
   ];
 
- const nonDisplayItems = [ {id: 'Add Users', to: '/users/add' }, {id: 'Add Log Config', to: '/log-configs/add'}]
+ const nonDisplayItems = [ 
+   {id: 'Add Users', to: '/users/add' }, 
+   {id: 'Add Roles', to: '/roles/add' }, 
+   {id: 'Add Log Config', to: '/log-configs/add'}
+  ]
 
   export const getIdFromRoute = (route) => {
       let allChildren = [];

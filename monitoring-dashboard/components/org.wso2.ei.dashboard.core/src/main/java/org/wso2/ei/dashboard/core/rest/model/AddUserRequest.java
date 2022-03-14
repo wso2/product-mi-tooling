@@ -8,9 +8,9 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class AddUserRequest   {
   private @Valid String userId = null;
+  private @Valid String domain = null;
   private @Valid String password = null;
   private @Valid Boolean isAdmin = null;
 
@@ -21,7 +21,6 @@ public class AddUserRequest   {
     return this;
   }
 
-  
   @ApiModelProperty(value = "")
   @JsonProperty("userId")
 
@@ -34,12 +33,29 @@ public class AddUserRequest   {
 
   /**
    **/
+  public AddUserRequest domain(String domain) {
+    this.domain = domain;
+    return this;
+  }
+
+  @ApiModelProperty(value = "")
+  @JsonProperty("domain")
+
+  public String getDomain() {
+    return domain;
+  }
+  public void setDomain(String domain) {
+    this.domain = domain;
+  }
+
+  /**
+   **/
   public AddUserRequest password(String password) {
     this.password = password;
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("password")
 
@@ -57,7 +73,7 @@ public class AddUserRequest   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("isAdmin")
 
@@ -79,21 +95,23 @@ public class AddUserRequest   {
     }
     AddUserRequest addUserRequest = (AddUserRequest) o;
     return Objects.equals(userId, addUserRequest.userId) &&
-        Objects.equals(password, addUserRequest.password) &&
-        Objects.equals(isAdmin, addUserRequest.isAdmin);
+           Objects.equals(domain, addUserRequest.domain) &&
+           Objects.equals(password, addUserRequest.password) &&
+           Objects.equals(isAdmin, addUserRequest.isAdmin);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userId, password, isAdmin);
+    return Objects.hash(userId, domain, password, isAdmin);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class AddUserRequest {\n");
-    
+
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    domain: ").append(toIndentedString(domain)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    isAdmin: ").append(toIndentedString(isAdmin)).append("\n");
     sb.append("}");
