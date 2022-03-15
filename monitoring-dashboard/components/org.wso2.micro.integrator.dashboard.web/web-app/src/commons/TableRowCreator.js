@@ -23,7 +23,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Switch from "react-switch";
 import ReactSelect from 'react-select';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import EnabledIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import DisabledIcon from '@material-ui/icons/BlockOutlined';
@@ -36,6 +36,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListItemText from '@material-ui/core/ListItemText';
 import Box from '@material-ui/core/Box';
 import NodesCell from './NodesCell';
 import LogsNodeCell from './LogsNodeCell';
@@ -142,6 +146,8 @@ export default function TableRowCreator(props) {
                 return <TableCell>{data.status == "healthy" ? <table>Healthy</table> : <table className={classes.unhealthyNodeCell}>Unhealthy</table>}</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
+            case 'node_action':
+                return <TableCell><NodeActionDropDown nodeData={data}/></TableCell>
 
             // Log Files Page
             case 'nodes_logs':
@@ -198,6 +204,100 @@ function SwitchStatusCell(props) {
     }
 
     return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} /></td></tr>
+}
+
+function NodeActionDropDown(props) {
+
+    const { nodeData } = props;
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const globalGroupId = useSelector(state => state.groupId);
+
+    const handleStyledMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleStyledMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const [confirmationDialog, setConfirmationDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+
+    const handleConfirmationDialogClose = () => {
+        setConfirmationDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+    }
+
+    const handleConfirmationDialogOpen = (action) => {
+        handleStyledMenuClose();
+        var message = 'Are you sure you want to '.concat(action).concat(' the node ').concat(nodeData.nodeId).concat('?')
+        setConfirmationDialog({
+            open: true,
+            title: 'Confirmation',
+            message: message
+        })
+    }
+
+    return <div>
+            <Button
+            aria-controls="customized-menu"
+            aria-haspopup="true"
+            variant="contained"
+            color="primary"
+            onClick={handleStyledMenuOpen}
+            endIcon={<KeyboardArrowDownIcon />}
+            >
+            Manage
+            </Button>
+            <StyledMenu
+            id="customized-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleStyledMenuClose}
+            >
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Graceful Shutdown')}>
+                <ListItemText primary="Graceful Shutdown"/>
+                </StyledMenuItem>
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Forceful Shutdown')}>
+                <ListItemText primary="Forceful Shutdown"/>
+                </StyledMenuItem>
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Graceful Restart')}>
+                <ListItemText primary="Graceful Restart"/>
+                </StyledMenuItem>
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Forceful Restart')}>
+                <ListItemText primary="Forceful Restart"/>
+                </StyledMenuItem>
+            </StyledMenu>
+
+            <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {confirmationDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button variant="contained" autoFocus>
+                        OK
+                    </Button>
+
+                    <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
 }
 
 function LogConfigLevelDropDown(props) {
@@ -520,3 +620,34 @@ const useStyles = makeStyles((theme) => ({
         opacity: '0.26'
     }
 }));
+
+const StyledMenu = withStyles({
+    paper: {
+      border: '1px solid #d3d4d5',
+    },
+  })((props) => (
+    <Menu
+      elevation={0}
+      getContentAnchorEl={null}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+      {...props}
+    />
+));
+  
+const StyledMenuItem = withStyles((theme) => ({
+    root: {
+      '&:focus': {
+        backgroundColor: theme.palette.primary.main,
+        '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+          color: theme.palette.common.white,
+        },
+      },
+    },
+}))(MenuItem);

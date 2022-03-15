@@ -31,7 +31,8 @@ export default function Nodes () {
         headCells: [
             {id: 'nodeId', label: 'Node ID'},
             {id: 'node_status', label: 'Status'},
-            {id: 'role', label: 'Role'}],
+            {id: 'role', label: 'Role'},
+            {id: 'node_action', label: ''}],
         tableOrderBy: 'service'
     });
     const [nodeList, setNodeList] = React.useState([]);
