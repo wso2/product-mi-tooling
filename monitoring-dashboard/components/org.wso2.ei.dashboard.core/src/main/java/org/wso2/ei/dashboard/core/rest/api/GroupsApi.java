@@ -491,7 +491,7 @@ public class GroupsApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "List of message stores deployed in provided nodes",
                      content = @Content(schema = @Schema(implementation = Artifacts.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error",
+        @ApiResponse(responseCode = "500", description = "Unexpected error",
                      content = @Content(schema = @Schema(implementation = Error.class)))
     })
     public Response getMessageStoresByNodeIds(
@@ -499,8 +499,16 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
         MessageStoresDelegate messageStoresDelegate = new MessageStoresDelegate();
-        Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(messageStoresList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(messageStoresList);
+        } catch (ManagementApiException e) {
+            Error error = new Error();
+            error.setCode(e.getErrorCode());
+            error.setMessage(e.getMessage());
+            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
