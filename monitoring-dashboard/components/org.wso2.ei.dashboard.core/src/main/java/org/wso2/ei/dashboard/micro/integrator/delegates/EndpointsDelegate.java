@@ -43,9 +43,10 @@ public class EndpointsDelegate implements ArtifactDelegate {
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-        logger.debug("Fetching Endpoints from database.");
-        return databaseManager.fetchArtifacts(Constants.ENDPOINTS, groupId, nodeList);
+    public Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException {
+        // Endpoints will be fetched from MI to fetch live status
+        logger.debug("Fetching endpoints from MI.");
+        return DelegatesUtil.getArtifactsFromMI(groupId, nodeList, Constants.ENDPOINTS);
     }
 
     @Override

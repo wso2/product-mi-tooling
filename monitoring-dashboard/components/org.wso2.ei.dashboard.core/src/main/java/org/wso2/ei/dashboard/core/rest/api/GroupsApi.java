@@ -324,8 +324,16 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
         EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
-        Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(endpointList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(endpointList);
+        } catch (ManagementApiException e) {
+            Error error = new Error();
+            error.setCode(e.getErrorCode());
+            error.setMessage(e.getMessage());
+            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
