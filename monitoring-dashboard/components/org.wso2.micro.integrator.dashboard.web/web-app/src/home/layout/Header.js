@@ -70,7 +70,7 @@ function Header(props) {
   };
 
   const showNodeSelector = () => {
-    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname === "/");
+    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname.startsWith("/roles") || location.pathname === "/");
   };
 
   const handleLogout = () => {
@@ -147,18 +147,6 @@ function Header(props) {
                 {selected ? selected.id : 'Nodes'}
               </Typography>
             </Grid>
-            {/* <Grid item>
-              <Button className={classes.button} variant="outlined" color="inherit" size="small">
-                Web setup
-              </Button>
-            </Grid>
-            <Grid item>
-              <Tooltip title="Help">
-                <IconButton color="inherit">
-                  <HelpIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid> */}
           </Grid>
         </Toolbar>
       </AppBar>

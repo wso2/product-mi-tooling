@@ -40,6 +40,13 @@ const styles = (theme) => ({
         paddingTop: 10,
         paddingBottom: 10,
     },
+    versionLabel: {
+        color: theme.palette.common.white,
+        backgroundColor: '#232f3e',
+        paddingTop: 10,
+        paddingBottom: 10,
+        textAlign: 'center',
+    },
     firebase: {
         fontSize: 24,
         color: theme.palette.common.white,
@@ -96,6 +103,11 @@ function Navigator(props) {
                             width={200}
                         />
                     </MUILink>
+                </ListItem>
+                <ListItem className={classes.versionLabel}>
+                    <ListItemText>
+                        Version : 4.1.0
+                    </ListItemText>
                 </ListItem>
                 <ListItem 
                     className={clsx(classes.item, classes.itemCategory, selected === '/' && classes.itemActiveItem)} 

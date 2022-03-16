@@ -46,7 +46,9 @@ import CarbonApplications from '../pages/CarbonApplications';
 import LogFiles from '../pages/LogFiles'
 import LogConfigs from '../pages/LogConfigs'
 import Users from '../pages/Users'
+import Roles from '../pages/Roles';
 import AddUsers from '../pages/AddUsers'
+import AddRoles from '../pages/AddRoles';
 import AddLogConfig from '../pages/AddLogConfig'
 import DataSources from '../pages/Datasources';
 import AuthManager from '../auth/AuthManager';
@@ -145,6 +147,8 @@ function Layout(props) {
                                 <Route exact path='/log-configs/add' component={AddLogConfig}/>
                                 <Route exact path='/users' component={Users}/>
                                 <Route exact path='/users/add' component={AddUsers}/>
+                                <Route exact path='/roles/add' component={AddRoles}/>
+                                <Route exact path='/roles' component={Roles}/>
                             </Switch>
                         </Content>
                     </main>

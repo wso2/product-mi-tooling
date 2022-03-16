@@ -23,6 +23,7 @@ package org.wso2.ei.dashboard.micro.integrator.delegates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -45,7 +46,6 @@ import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 public class UsersDelegate {
     private static final Log log = LogFactory.getLog(UsersDelegate.class);
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
-    private static final String DOMAIN_SEPARATOR = "/";
 
     public Users fetchUsers(String groupId) throws ManagementApiException {
         log.debug("Fetching users via management api.");
@@ -68,8 +68,12 @@ public class UsersDelegate {
         return ack;
     }
 
-    public Ack deleteUser(String groupId, String userId) throws ManagementApiException {
-        log.debug("Deleting user " + userId + " in group " + groupId);
+    public Ack deleteUser(String groupId, String userId, String domain) throws ManagementApiException {
+        if (StringUtils.isEmpty(domain)) {
+            log.debug("Deleting user " + userId + " in group " + groupId);
+        } else {
+            log.debug("Deleting user " + userId + " in domain " + domain + " in group " + groupId);
+        }
         Ack ack = new Ack(Constants.FAIL_STATUS);
         NodeList nodeList = databaseManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
@@ -77,6 +81,9 @@ public class UsersDelegate {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users/").concat(userId);
+        if (!StringUtils.isEmpty(domain)) {
+            url = url.concat("?domain=").concat(domain);
+        }
         CloseableHttpResponse httpResponse = Utils.doDelete(groupId, nodeId, accessToken, url);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
             log.error("Error occurred while deleting user " + userId + " in group " + groupId);
@@ -91,6 +98,10 @@ public class UsersDelegate {
     private JsonObject createAddUserPayload(AddUserRequest request) {
         JsonObject payload = new JsonObject();
         payload.addProperty("userId", request.getUserId());
+        String domain = request.getDomain();
+        if (!StringUtils.isEmpty(domain)) {
+            payload.addProperty("domain", domain);
+        }
         payload.addProperty("password", request.getPassword());
         payload.addProperty("isAdmin", request.isIsAdmin().toString());
         return payload;
@@ -119,8 +130,8 @@ public class UsersDelegate {
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);
         String getUsersDetailsUrl;
-        if (userId.contains(DOMAIN_SEPARATOR)) {
-            String[] parts = userId.split(DOMAIN_SEPARATOR);
+        if (userId.contains(Constants.DOMAIN_SEPARATOR)) {
+            String[] parts = userId.split(Constants.DOMAIN_SEPARATOR);
             // parts[0] = domain, parts[1] = new userId
             getUsersDetailsUrl = url.concat(parts[1]).concat("?domain=").concat(parts[0]);
         } else {

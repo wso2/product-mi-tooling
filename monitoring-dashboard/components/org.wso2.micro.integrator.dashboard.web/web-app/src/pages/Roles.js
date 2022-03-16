@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -20,38 +20,37 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import AuthManager from "../auth/AuthManager";
 import {Link, Redirect} from "react-router-dom";
 import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import { changeData } from '../redux/Actions';
 import Progress from '../commons/Progress';
 import HTTPClient from '../utils/HTTPClient';
 import Alert from '@material-ui/lab/Alert';
 
-export default function Users() {
+export default function Roles() {
     const [pageInfo] = React.useState({
-        pageId: "users",
-        title: "Users",
+        pageId: "roles",
+        title: "Roles",
         headCells: [
-            {id: 'userId', label: 'User Id'},
-            {id: 'isAdmin', label: 'Admin'},
-            {id: 'action', label: 'Action'}],
+            {id: 'roleName', label: 'Role Name'},
+            {id: 'roleAction', label: 'Action'}],
         tableOrderBy: 'name'
     });
 
-    const [users, setUsers] = React.useState(null);
+    const [roles, setRoles] = React.useState([]);
     const [error, setError] = React.useState(null);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
 
-    const retrieveUsers = () => {
-        HTTPClient.getUsers(globalGroupId).then(response => {
+    const retrieveRoleList = () => {
+        HTTPClient.getRoles(globalGroupId).then(response => {
             response.data.map(data => data.details = JSON.parse(data.details));
-            setUsers(response.data)
-        }).catch(error => {
+            setRoles(response.data)
+        })
+        .catch(error => {
             if (error.response.status === 500) {
                 setError(error.response.data.message)
             }
@@ -59,7 +58,7 @@ export default function Users() {
     }
 
     React.useEffect(() => {
-        retrieveUsers();
+        retrieveRoleList();
     }, [globalGroupId, dataSet]);
 
     if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
@@ -78,23 +77,23 @@ export default function Users() {
         );
     }
 
-    if (!users) {
+    if (!roles) {
         return(<Progress/>);
     }
 
     const retrieveData = () => {
-        retrieveUsers();
+        retrieveRoleList();
     }
 
     return <>
         <div style={{height: "30px"}}>
-        <Button classes={{root: classes.buttonRight}} component={Link} to="/users/add" variant="contained"
+        <Button classes={{root: classes.buttonRight}} component={Link} to="/roles/add" variant="contained"
                 color="primary">
-            Add New User
+            Add New Role
         </Button>
         </div>
         <br/>
-        <EnhancedTable pageInfo={pageInfo} dataSet={users} retrieveData={retrieveData}/>
+        <EnhancedTable pageInfo={pageInfo} dataSet={roles} retrieveData={retrieveData}/>
     </>
 }
 
