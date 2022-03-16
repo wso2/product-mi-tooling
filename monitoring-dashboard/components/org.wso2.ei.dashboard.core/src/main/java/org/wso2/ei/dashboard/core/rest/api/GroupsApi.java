@@ -527,8 +527,16 @@ public class GroupsApi {
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes) {
         ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
-        Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(proxyList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(proxyList);
+        } catch (ManagementApiException e) {
+            Error error = new Error();
+            error.setCode(e.getErrorCode());
+            error.setMessage(e.getMessage());
+            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
