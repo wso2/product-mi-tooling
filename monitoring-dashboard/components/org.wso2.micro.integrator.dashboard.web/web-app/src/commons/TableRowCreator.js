@@ -394,6 +394,7 @@ function LogConfigLevelDropDown(props) {
 function UserDeleteAction(props) {
     const userId = props.userId;
     const loggedInUser = AuthManager.getUser().username;
+    const superAdmin = useSelector(state => state.superAdmin);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dispatch = useDispatch();
@@ -459,7 +460,7 @@ function UserDeleteAction(props) {
     }
 
     return <div><tr><td><enabledDelete/>
-        {loggedInUser === userId ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
+        {loggedInUser === userId || superAdmin === userId ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
                             <DeleteIcon color="disabled"/>
                             Delete
                         </Box> : <Box display='flex' alignItems='center'>

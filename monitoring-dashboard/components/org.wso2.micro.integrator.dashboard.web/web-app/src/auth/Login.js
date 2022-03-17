@@ -34,6 +34,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import {Redirect} from 'react-router';
 import { useAuthContext } from "@asgardeo/auth-react";
 import AuthManager from './AuthManager'
+import HTTPClient from '../utils/HTTPClient';
+import { useDispatch } from 'react-redux';
+import { setSuperAdmin } from '../redux/Actions';
 
 const styles = theme => ({
     paper: {
@@ -63,6 +66,7 @@ function Login(props){
     const [loginErrorMessage, setLoginErrorMessage] = useState('')
     const [loginError, setLoginError] = useState(false)
     const { signIn } = useAuthContext();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         initAuthenticationFlow();
@@ -77,6 +81,12 @@ function Login(props){
         } else {
             setAuthenticated(true)
         }
+    }
+
+    const getSuperUser = () => {
+        HTTPClient.getSuperUser().then(response => {
+            dispatch(setSuperAdmin(response.data.username));
+        });
     }
 
     const authenticate = (e)  => {
@@ -220,6 +230,7 @@ function Login(props){
     }
 
     if (authenticated) {
+        getSuperUser();
         return <Redirect to="/" />
     }
     return renderDefaultLogin();
