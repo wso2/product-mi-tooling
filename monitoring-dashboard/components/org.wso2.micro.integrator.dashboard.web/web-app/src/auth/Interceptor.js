@@ -23,7 +23,7 @@ import AuthManager from "./AuthManager";
 
 export default function interceptor(logout){
     axios.interceptors.response.use(undefined, function axiosRetryInterceptor(error){
-        if(error.response.status === 401 ){
+        if(AuthManager.isLoggedIn() && error.response.status === 401 ){
             AuthManager.logout()
                 .then(() =>{
                    logout();
