@@ -136,7 +136,7 @@ function Login(props){
                             id="username"
                             label="Username"
                             name="username"
-                            autoComplete="on"
+                            autoComplete="off"
                             value={userName}
                             onChange={(e) => { setUserName(e.target.value)}}
                             autoFocus
@@ -151,7 +151,7 @@ function Login(props){
                             type="password"
                             id="password"
                             value={password}
-                            autoComplete="on"
+                            autoComplete="off"
                             onChange={(e) => {setPassword(e.target.value)}}
                         />
                         <FormControlLabel

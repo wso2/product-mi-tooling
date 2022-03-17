@@ -79,4 +79,6 @@ public final class Constants {
     public static final String SCOPE = "scope";
     public static final String ADMIN = "admin";
 
+    public static final String JWT_COOKIE = "JWT_TOKEN";
+    public static final String COOKIE_HEADER = "SET-COOKIE";
 }
