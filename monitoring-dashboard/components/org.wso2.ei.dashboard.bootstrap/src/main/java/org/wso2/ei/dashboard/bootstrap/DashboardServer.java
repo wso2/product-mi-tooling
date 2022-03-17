@@ -64,12 +64,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.servlet.DispatcherType;
 
 /**
  * This class starting up the jetty server on the port as defined in deployment.toml file.
@@ -230,6 +233,7 @@ public class DashboardServer {
         wwwApp.setContextPath("/");
         wwwApp.setResourceBase(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR);
         wwwApp.setParentLoaderPriority(true);
+        wwwApp.addFilter(SecurityHeaderFilter.class, "/*", EnumSet.of(DispatcherType.INCLUDE, DispatcherType.REQUEST));
         wwwApp.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         handlers.addHandler(wwwApp);
         server.setHandler(handlers);
