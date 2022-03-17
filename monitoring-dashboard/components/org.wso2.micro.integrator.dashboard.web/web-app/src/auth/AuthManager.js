@@ -19,7 +19,6 @@
 import {Constants} from './Constants';
 import qs from 'qs'
 import axios from 'axios'
-import jwt_decode from "jwt-decode";
 
 export default class AuthManager {
 
@@ -45,14 +44,7 @@ export default class AuthManager {
                 }
             })
             .then((response) => {
-                var accessToken = response.data
-                const decodedToken = jwt_decode(accessToken);
-                let scope = "default"
-                if (decodedToken !== undefined) {
-                    scope = decodedToken.scope;
-                }
-                AuthManager.setUser({username: username, scope: scope, sso: false}, isSecure);
-                AuthManager.setCookie(Constants.JWT_TOKEN_COOKIE, accessToken, 3600, window.contextPath, isSecure);
+                AuthManager.setUser(response.data, isSecure);
                 resolve();
             })
             .catch(error => {
@@ -95,7 +87,6 @@ export default class AuthManager {
      */
     static discardSession() {
         AuthManager.deleteCookie(Constants.SESSION_USER_COOKIE);
-        AuthManager.deleteCookie(Constants.JWT_TOKEN_COOKIE);
         window.localStorage.clear();
     }
 
@@ -126,13 +117,9 @@ export default class AuthManager {
      */
     static logout() {
         return new Promise((resolve, reject) => {
-            var token = AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE)
             axios({
                 method: 'get',
-                url: AuthManager.getBasePath().concat('/logout'),
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                }
+                url: AuthManager.getBasePath().concat('/logout')
             })
             .then(() => {
                 AuthManager.discardSession();

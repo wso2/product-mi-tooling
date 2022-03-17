@@ -31,11 +31,11 @@ import org.wso2.ei.dashboard.core.rest.delegates.auth.LogoutDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.Error;
 
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
 
 @Path("/logout")
@@ -52,13 +52,11 @@ public class LogoutApi {
         @ApiResponse(responseCode = "200", description = "Logout successful", content = @Content(schema = @Schema(implementation = Ack.class))),
         @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
     })
-    public Response receiveLogout(@Context HttpHeaders httpHeaders) {
-        String authorizationHeader = httpHeaders.getHeaderString("Authorization");
-        if (authorizationHeader != null) {
+    public Response receiveLogout(@CookieParam(Constants.JWT_COOKIE) Cookie cookie) {
+        if (cookie != null) {
             String token = Constants.EMPTY_STRING;
-            String[] splitResult = authorizationHeader.split(" ");
-            if (splitResult.length > 1) {
-                token = splitResult[1];
+            if (!cookie.getValue().isEmpty()) {
+                token = cookie.getValue();
             }
             return logoutDelegate.logoutUser(token);
         }
