@@ -230,6 +230,7 @@ public class DashboardServer {
         wwwApp.setContextPath("/");
         wwwApp.setResourceBase(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR);
         wwwApp.setParentLoaderPriority(true);
+        wwwApp.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         handlers.addHandler(wwwApp);
         server.setHandler(handlers);
     }
