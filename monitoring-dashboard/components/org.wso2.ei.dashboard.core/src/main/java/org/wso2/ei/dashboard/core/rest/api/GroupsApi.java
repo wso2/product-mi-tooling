@@ -329,10 +329,7 @@ public class GroupsApi {
             Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
             responseBuilder = Response.ok().entity(endpointList);
         } catch (ManagementApiException e) {
-            Error error = new Error();
-            error.setCode(e.getErrorCode());
-            error.setMessage(e.getMessage());
-            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
         }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
@@ -492,10 +489,7 @@ public class GroupsApi {
             Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
             responseBuilder = Response.ok().entity(messageProcessorList);
         } catch (ManagementApiException e) {
-            Error error = new Error();
-            error.setCode(e.getErrorCode());
-            error.setMessage(e.getMessage());
-            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
         }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
@@ -520,10 +514,7 @@ public class GroupsApi {
             Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
             responseBuilder = Response.ok().entity(messageStoresList);
         } catch (ManagementApiException e) {
-            Error error = new Error();
-            error.setCode(e.getErrorCode());
-            error.setMessage(e.getMessage());
-            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
         }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
@@ -548,10 +539,7 @@ public class GroupsApi {
             Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
             responseBuilder = Response.ok().entity(proxyList);
         } catch (ManagementApiException e) {
-            Error error = new Error();
-            error.setCode(e.getErrorCode());
-            error.setMessage(e.getMessage());
-            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
         }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
@@ -849,4 +837,13 @@ public class GroupsApi {
 
         SequencesDelegate sequencesDelegate = new SequencesDelegate();
         return sequencesDelegate.updateArtifact(groupId, request);
-    }}
+    }
+
+    private Error getError(ManagementApiException e) {
+        Error error = new Error();
+        error.setCode(e.getErrorCode());
+        error.setMessage(e.getMessage());
+        return error;
+    }
+}
+
