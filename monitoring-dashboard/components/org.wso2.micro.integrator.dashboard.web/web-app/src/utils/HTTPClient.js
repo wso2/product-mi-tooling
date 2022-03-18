@@ -67,6 +67,10 @@ export default class HTTPClient {
         return this.get(path)
     }
 
+    static getSuperUser() {
+        return this.get("/configs/super-admin")
+    }
+
     static getGroups() {
         return this.getResource()
     }

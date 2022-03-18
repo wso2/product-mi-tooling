@@ -29,6 +29,8 @@ tags:
     description: "Logout Management"
   - name: "heartbeat"
     description: "Heartbeat Management"
+  - name: "configs"
+    description: "Access dashboard configs"
   - name: "groups"
     description: "Access group list"
   - name: "nodes"
@@ -142,6 +144,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/super-admin:
+    get:
+      tags:
+        - "configs"
+      summary: "Get super admin username"
+      operationId: "getSuperAdmin"
+      responses:
+        200:
+          description: "The super admin details configured in dashboard configs"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperAdminUser'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /groups:
     get:
       tags:
@@ -1425,6 +1447,12 @@ components:
               items:
                 $ref: '#/components/schemas/UpdatedArtifact'
       example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
+
+    SuperAdminUser:
+      type: object
+      properties:
+        username:
+          type: string
 
     UpdatedArtifact:
       type: object
