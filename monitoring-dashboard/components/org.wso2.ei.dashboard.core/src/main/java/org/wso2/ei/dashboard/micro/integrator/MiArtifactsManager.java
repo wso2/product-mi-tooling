@@ -216,7 +216,7 @@ public class MiArtifactsManager implements ArtifactsManager {
             String accessToken = databaseManager.getAccessToken(groupId, nodeId);
             String artifactType = updateArtifactObject.getType();
             String artifactName = updateArtifactObject.getName();
-            JsonObject details = getArtifactDetails(groupId, nodeId, mgtApiUrl, artifactType, artifactName,
+            JsonObject details = Utils.getArtifactDetails(groupId, nodeId, mgtApiUrl, artifactType, artifactName,
                                                     accessToken);
             return databaseManager.updateDetails(artifactType, artifactName, groupId, nodeId, details.toString());
         } else {
@@ -269,82 +269,8 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     private JsonObject getArtifactDetails(String artifactType, String artifactName, String accessToken)
             throws ManagementApiException {
-        return getArtifactDetails(heartbeat.getGroupId(), heartbeat.getNodeId(), heartbeat.getMgtApiUrl(), artifactType,
-                                  artifactName, accessToken);
-    }
-
-    private JsonObject getArtifactDetails(String groupId, String nodeId, String mgtApiUrl, String artifactType,
-                                          String artifactName, String accessToken) throws ManagementApiException {
-        String getArtifactDetailsUrl = getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
-        CloseableHttpResponse artifactDetails = Utils.doGet(groupId, nodeId, accessToken,
-                                                            getArtifactDetailsUrl);
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(artifactDetails);
-        return removeValueAndConfiguration(artifactType, jsonResponse);
-    }
-
-    private JsonObject removeValueAndConfiguration(String artifactType, JsonObject jsonResponse) {
-        if (artifactType.equals(CONNECTORS) || artifactType.equals(CARBON_APPLICATIONS)) {
-            return jsonResponse;
-        } else if (artifactType.equals(LOCAL_ENTRIES)) {
-            return removeValueFromResponse(jsonResponse);
-        } else {
-            return removeConfigurationFromResponse(jsonResponse);
-        }
-    }
-
-    private String getArtifactDetailsUrl(String mgtApiUrl, String artifactType, String artifactName) {
-
-        String getArtifactDetailsUrl;
-        String getArtifactsUrl = mgtApiUrl.concat(artifactType);
-        switch (artifactType) {
-            case PROXY_SERVICES:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?proxyServiceName=").concat(artifactName);
-                break;
-            case ENDPOINTS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?endpointName=").concat(artifactName);
-                break;
-            case INBOUND_ENDPOINTS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?inboundEndpointName=").concat(artifactName);
-                break;
-            case MESSAGE_STORES:
-            case MESSAGE_PROCESSORS:
-            case LOCAL_ENTRIES:
-            case DATA_SOURCES:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?name=").concat(artifactName);
-                break;
-            case APIS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?apiName=").concat(artifactName);
-                break;
-            case SEQUENCES:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?sequenceName=").concat(artifactName);
-                break;
-            case TASKS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?taskName=").concat(artifactName);
-                break;
-            case CONNECTORS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?connectorName=").concat(artifactName);
-                break;
-            case CARBON_APPLICATIONS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?carbonAppName=").concat(artifactName);
-                break;
-            case DATA_SERVICES:
-                getArtifactDetailsUrl = mgtApiUrl.concat(DATA_SERVICES).concat("?dataServiceName=")
-                                                 .concat(artifactName);
-                break;
-            default:
-                throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
-        }
-        return getArtifactDetailsUrl;
-    }
-
-    private JsonObject removeConfigurationFromResponse(JsonObject artifact) {
-        artifact.remove("configuration");
-        return artifact;
-    }
-
-    private JsonObject removeValueFromResponse(JsonObject artifact) {
-        artifact.remove("value");
-        return artifact;
+        return Utils.getArtifactDetails(heartbeat.getGroupId(), heartbeat.getNodeId(), heartbeat.getMgtApiUrl(),
+                                        artifactType, artifactName, accessToken);
     }
 
     private void deleteArtifact(String artifactType, String name) {

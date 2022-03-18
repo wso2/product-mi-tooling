@@ -324,8 +324,13 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
         EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
-        Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(endpointList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(endpointList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -479,8 +484,13 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
         MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
-        Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(messageProcessorList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(messageProcessorList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -504,10 +514,7 @@ public class GroupsApi {
             Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
             responseBuilder = Response.ok().entity(messageStoresList);
         } catch (ManagementApiException e) {
-            Error error = new Error();
-            error.setCode(e.getErrorCode());
-            error.setMessage(e.getMessage());
-            responseBuilder = Response.status(e.getErrorCode()).entity(error);
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
         }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
@@ -527,8 +534,13 @@ public class GroupsApi {
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes) {
         ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
-        Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(proxyList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(proxyList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -825,4 +837,13 @@ public class GroupsApi {
 
         SequencesDelegate sequencesDelegate = new SequencesDelegate();
         return sequencesDelegate.updateArtifact(groupId, request);
-    }}
+    }
+
+    private Error getError(ManagementApiException e) {
+        Error error = new Error();
+        error.setCode(e.getErrorCode());
+        error.setMessage(e.getMessage());
+        return error;
+    }
+}
+
