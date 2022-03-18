@@ -34,6 +34,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import {Redirect} from 'react-router';
 import { useAuthContext } from "@asgardeo/auth-react";
 import AuthManager from './AuthManager'
+import Link from "@material-ui/core/Link";
+import {useHistory} from "react-router-dom";
 import HTTPClient from '../utils/HTTPClient';
 import { useDispatch } from 'react-redux';
 import { setSuperAdmin } from '../redux/Actions';
@@ -56,10 +58,21 @@ const styles = theme => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
+    policyBox: {
+        backgroundColor: '#FFFAF3',
+        padding:'5%',
+        fontsize:'20px',
+        marginBottom: '10px',
+        border:'2px',
+        borderColor:'black',
+        boxShadow: '0 0 0 1px #c9ba9b inset, 0 0 0 0 transparent',
+        color:'#573a08',
+    },
 });
 
 function Login(props){
 
+    const history = useHistory();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [authenticated, setAuthenticated] = useState(false);
@@ -168,6 +181,17 @@ function Login(props){
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
                         />
+                        <Box mt={4} className={classes.policyBox}>
+                            <Typography variant="body2" style={{fontSize:13}}>
+                                Browser cookies are used to track your session and provide a better experience.
+                                You can refer our <Link component="button" variant="body2" onClick={() => {history.push('/cookie-policy')}} style={{color:"#ff5000"}}> Cookie Policy</Link> for more details.
+                            </Typography>
+                        </Box>
+                        <Box mt={4} className={classes.policyBox}>
+                            <Typography variant="body2" style={{fontSize:13}}>
+                                By signing in, you agree to our <Link component="button" variant="body2" onClick={() => {history.push('/privacy-policy')}} style={{color:"#ff5000"}}>Privacy Policy.</Link>
+                            </Typography>
+                        </Box>
                         <Button
                             type="submit"
                             fullWidth
