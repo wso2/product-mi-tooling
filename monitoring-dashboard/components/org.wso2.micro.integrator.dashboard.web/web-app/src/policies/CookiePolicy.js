@@ -54,8 +54,7 @@ function CookiePolicy(props) {
             <h2 id="cookie-policy">Cookie Policy</h2>
             <Typography>
                 WSO2 Micro Integrator Dashboard uses cookies so that it can provide the best user experience for
-                you and identify you for security purposes. If you disable cookies, some of the services will
-                (most probably) be
+                you and identify you for security purposes. If you disable cookies, some of the services will be
                 inaccessible to you.
             </Typography>
 
@@ -168,31 +167,6 @@ function CookiePolicy(props) {
             <Typography>WSO2 Micro Integrator Dashboard as a product does not use cookies for analytical
                 purposes.</Typography>
 
-            <h3 id="third-party-cookies">Third party cookies</h3>
-            <Typography>
-                Using WSO2 Micro Integrator Dashboard may cause some third-party cookies to be set in your
-                browser. WSO2 Micro Integrator Dashboard has no
-                control over how any of them operate. The third-party cookies that may be set include:
-            </Typography>
-            <ul>
-                <ul>
-                    <li>
-                        <Typography>
-                            Any social login sites. For example, third-party cookies may be set when WSO2 Micro
-                            Integrator Dashboard is
-                            configured to use &ldquo;social&rdquo; or &ldquo;federated&rdquo; login, and you opt
-                            to
-                            login with your &ldquo;Social Account&rdquo;.
-                        </Typography>
-                    </li>
-                    <li><Typography>Any third party federated login.</Typography></li>
-                </ul>
-            </ul>
-            <Typography>
-                WSO2 strongly advises you to refer the respective cookie policy of such sites carefully as WSO2
-                has no knowledge or use on these cookies.
-            </Typography>
-
             <h2 id="what-type-of-cookies-does-5.8.0-use">What type of cookies does WSO2 Micro Integrator
                 Dashboard use?</h2>
             <Typography>WSO2 Micro Integrator Dashboard uses persistent cookies and session cookies. A
@@ -215,7 +189,7 @@ function CookiePolicy(props) {
             </Typography>
             <Typography>
                 Most likely, disabling cookies will make you unable to use authentication and authorization
-                functionalities offered by WSO2 Micro Integrator Dashboard.
+                functionalities in WSO2 Micro Integrator Dashboard.
             </Typography>
             <Typography>
                 If you have any questions or concerns regarding the use of cookies, please contact the entity or

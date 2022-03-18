@@ -58,11 +58,11 @@ function PrivacyPolicy(props) {
                 Integrator Dashboard.
                 Please see the Disclaimer section for more information
             </Typography>
-            <Typography>Entities, organisations or individuals controlling the use and administration of WSO2 Micro
+            <Typography>Entities, organizations or individuals controlling the use and administration of WSO2 Micro
                 Integrator Dashboard
                 should
                 create their own privacy policies setting out the manner in which data is controlled or
-                processed by the respective entity, organisation or individual.</Typography>
+                processed by the respective entity, organization or individual.</Typography>
 
             <h2 id="what-is-personal-information">What is personal information?</h2>
             <Typography>WSO2 Micro Integrator Dashboard considers anything related to you, and by which you may be
@@ -171,7 +171,7 @@ function PrivacyPolicy(props) {
                 it is required by law.</Typography>
 
             <h3 id="legal-process">Legal process</h3>
-            <Typography>Please note that the organisation, entity or individual running WSO2 Micro Integrator Dashboard
+            <Typography>Please note that the organization, entity or individual running WSO2 Micro Integrator Dashboard
                 may be compelled
                 to disclose your personal information with or without your consent when it is required by law
                 following due and lawful process.</Typography>
@@ -229,17 +229,13 @@ function PrivacyPolicy(props) {
                 channels.</Typography>
 
             <h3 id="your-choices">Your choices</h3>
-            <Typography>If you are already have a user account within WSO2 Micro Integrator Dashboard, you have the
-                right to deactivate
-                your
-                account if you find that this privacy policy is unacceptable to you.</Typography>
-            <Typography>If you do not have an account and you do not agree with our privacy policy, you can
-                chose not to
+            <Typography>If you already have a user account within WSO2 Micro Integrator Dashboard, you have the
+                right to deactivate your account if you find that this privacy policy is unacceptable to you.</Typography>
+            <Typography>If you do not have an account and you do not agree with our privacy policy, you can choose not to
                 create one.</Typography>
 
             <h3 id="contact-us">Contact us</h3>
-            <Typography>Please contact WSO2 if you have any question or concerns regarding this privacy
-                policy.</Typography>
+            <Typography>Please contact WSO2 if you have any questions or concerns regarding this privacy policy.</Typography>
             <Typography><Link variant="body1"
                               href="https://wso2.com/contact/"
                               style={{color: "#ff5000"}}>https://wso2.com/contact/</Link></Typography>
