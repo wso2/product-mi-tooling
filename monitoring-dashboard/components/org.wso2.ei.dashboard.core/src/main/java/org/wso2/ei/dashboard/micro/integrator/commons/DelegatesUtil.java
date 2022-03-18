@@ -19,8 +19,15 @@ import org.wso2.ei.dashboard.core.rest.model.ArtifactsInner;
 import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
+import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
+import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 
 /**
  * Util class to update artifacts deployed in micro integrator and update the database of the dashboard server.
@@ -29,6 +36,9 @@ public class DelegatesUtil {
     private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
 
     private static final Logger logger = LogManager.getLogger(DelegatesUtil.class);
+
+    private static final Set<String> ARTIFACT_TYPES_NOT_STORED_IN_DB = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, MESSAGE_PROCESSORS)));
 
     private DelegatesUtil() {
 
@@ -104,6 +114,9 @@ public class DelegatesUtil {
             String url = mgtApiUrl.concat(artifactType);
             CloseableHttpResponse response = Utils.doPost(groupId, nodeId, accessToken, url, payload);
             if (response.getStatusLine().getStatusCode() == 200) {
+                if (ARTIFACT_TYPES_NOT_STORED_IN_DB.contains(artifactType)) {
+                    return true;
+                }
                 return updateDatabase(artifactType, mgtApiUrl, groupId, request);
             }
         }
