@@ -69,8 +69,7 @@ function CookiePolicy(props) {
             </Typography>
             <Typography>
                 The primary purpose of some cookies used in WSO2 Micro Integrator Dashboard is to personally
-                identify you as this is the main function of the WSO2 Identity Server. However the cookie
-                lifetime ends once your session
+                identify you. However the cookie lifetime ends once your session
                 ends i.e., after you log-out, or after the session expiry time has elapsed.
             </Typography>
             <Typography>
@@ -101,8 +100,7 @@ function CookiePolicy(props) {
             <ol>
                 <li>
                     <Typography>
-                        To identify you and provide security (as this is the main function of WSO2 Micro
-                        Integrator
+                        To identify you and provide security (as this is the main function of WSO2 Micro Integrator
                         Dashboard).
                     </Typography>
                 </li>
