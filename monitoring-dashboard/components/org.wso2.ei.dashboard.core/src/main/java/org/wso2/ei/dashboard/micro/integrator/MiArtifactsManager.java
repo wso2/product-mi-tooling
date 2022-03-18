@@ -49,13 +49,9 @@ import static org.wso2.ei.dashboard.core.commons.Constants.CARBON_APPLICATIONS;
 import static org.wso2.ei.dashboard.core.commons.Constants.CONNECTORS;
 import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SOURCES;
-import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.LIST_ATTRIBUTE;
 import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
-import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
-import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
-import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
 import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
 import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
@@ -67,8 +63,7 @@ public class MiArtifactsManager implements ArtifactsManager {
     private static final Logger logger = LogManager.getLogger(MiArtifactsManager.class);
     private static final String SERVER = "server";
     private static final Set<String> ALL_ARTIFACTS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, INBOUND_ENDPOINTS, MESSAGE_PROCESSORS,
-                                        APIS, TEMPLATES, SEQUENCES, TASKS, LOCAL_ENTRIES, CONNECTORS,
+            new HashSet<>(Arrays.asList(INBOUND_ENDPOINTS, APIS, TEMPLATES, SEQUENCES, TASKS, LOCAL_ENTRIES, CONNECTORS,
                                         CARBON_APPLICATIONS, DATA_SERVICES, DATA_SOURCES)));
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
     private HeartbeatObject heartbeat = null;
@@ -118,13 +113,17 @@ public class MiArtifactsManager implements ArtifactsManager {
         Runnable runnable = () -> {
            List<UpdatedArtifact> undeployedArtifacts = heartbeat.getUndeployedArtifacts();
            for (UpdatedArtifact artifact : undeployedArtifacts) {
-               deleteArtifact(artifact.getType(), artifact.getName());
+               if (ALL_ARTIFACTS.contains(artifact.getType())) {
+                   deleteArtifact(artifact.getType(), artifact.getName());
+               }
            }
 
            List<UpdatedArtifact> deployedArtifacts = heartbeat.getDeployedArtifacts();
             try {
                 for (UpdatedArtifact info : deployedArtifacts) {
-                    fetchAndStoreArtifact(info);
+                    if (ALL_ARTIFACTS.contains(info.getType())) {
+                        fetchAndStoreArtifact(info);
+                    }
                 }
             } catch (ManagementApiException e) {
                 logger.error("Error while fetching updated artifacts", e);
@@ -153,10 +152,6 @@ public class MiArtifactsManager implements ArtifactsManager {
             if (artifactType.equals(CARBON_APPLICATIONS)) {
                 populateCAppDetails(artifactDetails, artifactName,
                         element.getAsJsonObject().get("version").getAsString());
-            } else if (artifactType.equals(MESSAGE_STORES)) {
-                artifactDetails.addProperty("name", artifactName);
-                artifactDetails.addProperty("type", element.getAsJsonObject().get("type").getAsString());
-                artifactDetails.addProperty("size", element.getAsJsonObject().get("size").getAsString());
             } else {
                 artifactDetails = getArtifactDetails(artifactType, artifactName, accessToken);
             }
