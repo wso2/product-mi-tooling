@@ -38,6 +38,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import NodesCell from './NodesCell';
+import UserRoleCell from './UserRoleCell';
 import LogsNodeCell from './LogsNodeCell';
 import StatusCell from './statusCell/StatusCell';
 import AuthManager from '../auth/AuthManager';
@@ -129,11 +130,17 @@ export default function TableRowCreator(props) {
 
             // users page
             case 'userId':
-                return <TableCell>{data.userId}</TableCell>
+                return <TableCell><UserRoleCell pageId={pageId} data={data} retrieveData={retrieveData}/></TableCell>
             case 'isAdmin':
                 return <TableCell>{data.details.isAdmin ? <AdminIcon style={{color:"green"}}/> : <NonAdminIcon style={{color:"red"}}/>}</TableCell>
             case 'action':
                 return <TableCell><UserDeleteAction userId={data.userId}/></TableCell>
+
+            // roles page
+            case 'roleName':
+                return <TableCell><UserRoleCell pageId={pageId} data={data}/></TableCell>
+            case 'roleAction':
+                return <TableCell><RoleDeleteAction roleName={data.roleName}/></TableCell>
             
             // Node page
             case 'nodeId':
@@ -387,6 +394,7 @@ function LogConfigLevelDropDown(props) {
 function UserDeleteAction(props) {
     const userId = props.userId;
     const loggedInUser = AuthManager.getUser().username;
+    const superAdmin = useSelector(state => state.superAdmin);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dispatch = useDispatch();
@@ -449,11 +457,10 @@ function UserDeleteAction(props) {
                 })
             }
         })
-
     }
 
     return <div><tr><td><enabledDelete/>
-        {loggedInUser === userId ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
+        {loggedInUser === userId || superAdmin === userId ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
                             <DeleteIcon color="disabled"/>
                             Delete
                         </Box> : <Box display='flex' alignItems='center'>
@@ -501,6 +508,121 @@ function UserDeleteAction(props) {
                 
             </Dialog>
             </div>
+}
+
+function RoleDeleteAction(props) {
+    const roleName = props.roleName;
+    const classes = useStyles();
+    const globalGroupId = useSelector(state => state.groupId);
+    const dispatch = useDispatch();
+
+    const [confirmationDialog, setConfirmationDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+
+    const [completionStatusDialog, setCompletionStatusDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+
+    const handleConfirmationDialogClose = () => {
+        setConfirmationDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+    }
+
+    const handlecompletionStatusDialogClose = () => {
+        setCompletionStatusDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+        HTTPClient.getRoles(globalGroupId).then(response => {
+            response.data.map(data => data.details = JSON.parse(data.details))
+            dispatch(changeData(response.data))
+        })
+    }
+
+    const confirmDelete = () => {
+        var message = 'Are you sure you want to delete role '.concat(roleName).concat('?')
+        setConfirmationDialog({
+            open: true,
+            title: 'Confirmation',
+            message: message
+        })
+    }
+
+    const deleteRole = () => {
+        handleConfirmationDialogClose();
+        HTTPClient.deleteRole(globalGroupId, roleName).then(response => {
+            if (response.data.status === 'success') {
+                setCompletionStatusDialog({
+                    open: true, 
+                    title: 'Success',
+                    message: "Successfully deleted role."
+                })
+            } else {
+                setCompletionStatusDialog({
+                    open: true, 
+                    title: 'Error',
+                    message: response.data.message
+                })
+            }
+        })
+    }
+
+    return <div><tr><td><enabledDelete/>
+        {roleName === "admin" ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
+                            <DeleteIcon color="disabled"/>
+                            Delete
+                        </Box> : <Box display='flex' alignItems='center'>
+                                <DeleteIcon onClick={() => confirmDelete()}/> 
+                                Delete
+                            </Box>}
+        </td></tr>
+            <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {confirmationDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => deleteRole()} variant="contained" autoFocus>
+                        Confirm
+                    </Button>
+
+                    <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={completionStatusDialog.open} onClose={() => handlecompletionStatusDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{completionStatusDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {completionStatusDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => handlecompletionStatusDialogClose()} variant="contained" autoFocus>
+                        OK
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
 }
 
 const useStyles = makeStyles((theme) => ({

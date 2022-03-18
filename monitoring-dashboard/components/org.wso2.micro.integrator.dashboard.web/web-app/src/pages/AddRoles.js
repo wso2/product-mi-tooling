@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,8 +23,6 @@ import { useSelector } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Select from "@material-ui/core/Select";
 import Box from "@material-ui/core/Box";
 import { Button } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
@@ -36,14 +34,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Link, useHistory } from "react-router-dom";
 import HTTPClient from '../utils/HTTPClient';
 
-export default function AddUsers() {
+export default function AddRoles() {
     const globalGroupId = useSelector(state => state.groupId);
-    const [user, setUser] = React.useState({
-        userId: "",
-        domain: "PRIMARY",
-        password: "",
-        passwordRepeat: "",
-        isAdmin: "false"
+    const [role, setRole] = React.useState({
+        role: "",
+        domain: "PRIMARY"
     });
     const history = useHistory();
 
@@ -58,7 +53,7 @@ export default function AddUsers() {
         const target = event.target;
         const name = target.name;
         const value = target.value;
-        setUser({ ...user, [name]: value });
+        setRole({ ...role, [name]: value });
     }
 
     const handleDialogClose = () => {
@@ -70,46 +65,31 @@ export default function AddUsers() {
             isError: false
         })
         if (!isError) {
-            history.push("/users");
+            history.push("/roles");
         }
     }
 
-    const addUser = () => {
-        const { userId, domain, password, passwordRepeat, isAdmin } = user
-
-        if (userId === '') {
+    const addRole = () => {
+        const { roleName, domain } = role
+        
+        if (roleName === '') {
             setDialog({
                 open: true,
                 title: 'Error',
-                message: 'User id is missing.',
-                isError: true
-            })
-        } else if (password === '') {
-            setDialog({
-                open: true,
-                title: 'Error',
-                message: 'Password is missing.',
-                isError: true
-            })
-        } else if (password !== passwordRepeat) {
-            setDialog({
-                open: true,
-                title: 'Error',
-                message: 'Repeat password must match the password  ',
+                message: 'roleName is missing.',
                 isError: true
             })
         } else {
             var payload = {
-                "userId": userId,
-                "domain": domain,
-                "password": password,
-                "isAdmin": isAdmin
+                "roleName": roleName,
+                "domain": domain
             }
-            HTTPClient.addUser(globalGroupId, payload).then(response => {
+            
+            HTTPClient.addRole(globalGroupId, payload).then(response => {
                     setDialog({
                         open: true,
                         title: 'Success',
-                        message: 'Successfully added user',
+                        message: 'Successfully added role',
                         isError: false
                     })
             }).catch(error => {
@@ -140,7 +120,7 @@ export default function AddUsers() {
                                 autoComplete="off"
                                 onChange={(e) => handleUserInput(e)}
                                 name="domain"
-                                value={user.domain}
+                                value={role.domain}
                             />
                         </Box>
                         <Box mb={2}>
@@ -149,62 +129,18 @@ export default function AddUsers() {
                                 margin='dense'
                                 variant='outlined'
                                 fullWidth
-                                helperText='Enter User Name'
+                                helperText='Enter Role Name'
                                 required
-                                label="User Name"
+                                label="Role Name"
                                 autoComplete="off"
                                 onChange={(e) => handleUserInput(e)}
-                                name="userId"
-                                value={user.userId}
+                                name="roleName"
+                                value={role.roleName}
                             />
                         </Box>
-                        <Box mb={2}>
-                            <TextField
-                                margin='dense'
-                                variant='outlined'
-                                fullWidth
-                                helperText='Enter Password'
-                                required
-                                onChange={(e) => handleUserInput(e)}
-                                name="password" 
-                                label="Password"
-                                autoComplete="off"
-                                type="password"
-                                value={user.password} />
-                        </Box>
-                        <Box mb={2}>
-                            <TextField
-                                margin='dense'
-                                variant='outlined'
-                                fullWidth
-                                helperText='Re Enter The Same Password'
-                                required
-                                onChange={(e) => handleUserInput(e)}
-                                name="passwordRepeat"
-                                label="Repeat Password"
-                                autoComplete="off"
-                                type="password" value={user.passwordRepeat} />
-                        </Box>
-                        <Box mb={4}>
-                            <Select
-                                margin='dense'
-                                variant='outlined'
-                                fullWidth
-                                helperText='Select Role'
-                                native
-                                name="isAdmin"
-                                value={user.isAdmin}
-                                onChange={(e) => handleUserInput(e)}
-                                label="Is Admin"
-                            >
-                                <option value={"true"}>True</option>
-                                <option value={"false"}>False</option>
-                            </Select>
-                            <FormHelperText className={classes.selectHelperText}>Is Admin</FormHelperText>
-                        </Box>
                         <Box mb={2} textAlign='left'>
-                            <Button onClick={() => addUser()} variant="contained" color="primary">Add User</Button>
-                            <Button component={Link} to="/users" color="danger">
+                            <Button onClick={() => addRole()} variant="contained" color="primary">Add Role</Button>
+                            <Button component={Link} to="/roles" color="danger">
                                 Cancel
                                 </Button>
                         </Box>

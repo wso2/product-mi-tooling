@@ -20,21 +20,10 @@
 
 import axios from "axios";
 import AuthManager from "./AuthManager";
-import {Constants} from "./Constants";
 
 export default function interceptor(logout){
-    axios.interceptors.request.use(
-        request => {
-            request.headers['Authorization'] = "Bearer " + AuthManager.getCookie(Constants.JWT_TOKEN_COOKIE);
-            return request;
-        },
-        error => {
-            return Promise.reject(error);
-        }
-    );
-
     axios.interceptors.response.use(undefined, function axiosRetryInterceptor(error){
-        if(error.response.status === 401 ){
+        if(AuthManager.isLoggedIn() && error.response.status === 401 ){
             AuthManager.logout()
                 .then(() =>{
                    logout();
@@ -42,5 +31,4 @@ export default function interceptor(logout){
         }
         return Promise.reject(error);
     })
-
 }

@@ -173,6 +173,7 @@
                 <include>com.fasterxml.jackson.core:jackson-core:jar</include>
                 <include>com.fasterxml.jackson.core:jackson-databind:jar</include>
                 <include>com.fasterxml.jackson.core:jackson-annotations:jar</include>
+                <include>com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar</include>
                 <include>commons-codec:commons-codec:jar</include>
                 <include>com.hubspot.jinjava:jinjava:jar</include>
                 <include>org.apache.commons:commons-lang3:jar</include>
@@ -183,7 +184,7 @@
                 <include>com.nimbusds:oauth2-oidc-sdk:jar</include>
                 <include>com.nimbusds:nimbus-jose-jwt:jar</include>
                 <include>net.minidev:json-smart:jar</include>
-                <include>net.minidev:asm:jar</include>
+                <include>net.minidev:accessors-smart:jar</include>
                 <include>org.wso2.ei:org.wso2.micro.integrator.dashboard.utils:jar</include>
                 <include>org.apache.ws.commons.axiom.wso2:axiom:jar</include>
                 <include>org.wso2.securevault:org.wso2.securevault:jar</include>

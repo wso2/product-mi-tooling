@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,11 +16,15 @@
  * under the License.
  */
 
+import { SET_SUPER_USER } from './Actions'
 
-export const Constants = {
-    PREFIX_GROUPS: "groups",
-    PREFIX_NODES: "nodes",
-    PREFIX_USERS: "users",
-    PREFIX_ROLES: "roles",
-    PREFIX_LOG_CONFIGS: "log-configs"
-};
+const SuperUserReducer = (state = '', action) => {
+    switch(action.type) {
+        case SET_SUPER_USER:
+            return action.payload;
+        default:
+            return state
+    }
+}
+
+export default SuperUserReducer;

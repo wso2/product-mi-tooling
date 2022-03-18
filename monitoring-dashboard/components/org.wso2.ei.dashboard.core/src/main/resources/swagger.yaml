@@ -29,6 +29,8 @@ tags:
     description: "Logout Management"
   - name: "heartbeat"
     description: "Heartbeat Management"
+  - name: "configs"
+    description: "Access dashboard configs"
   - name: "groups"
     description: "Access group list"
   - name: "nodes"
@@ -67,6 +69,8 @@ tags:
     description: "Access log configs details"
   - name: "Users"
     description: "Access users details"
+  - name: "Roles"
+    description: "Access roles details"
   - name: "configuration"
     description: "Access configurations"
 
@@ -140,6 +144,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/super-admin:
+    get:
+      tags:
+        - "configs"
+      summary: "Get super admin username"
+      operationId: "getSuperAdmin"
+      responses:
+        200:
+          description: "The super admin details configured in dashboard configs"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperAdminUser'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /groups:
     get:
       tags:
@@ -1204,9 +1228,133 @@ paths:
           required: true
           schema:
             type: string
+        - name: "domain"
+          in: query
+          description: "domain name"
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: "User deletion status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/roles:
+    get:
+      tags:
+        - "Roles"
+      summary: "Get roles"
+      operationId: "getRoles"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "List of roles"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleList'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - "Roles"
+      summary: "Add role"
+      operationId: "addRole"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/AddRole'
+      responses:
+        200:
+          description: "Role insert status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - "Roles"
+      summary: "Update role"
+      operationId: "updateRole"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateRole'
+      responses:
+        200:
+          description: "Role update status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/roles/{role-name}:
+    delete:
+      tags:
+        - "Roles"
+      summary: "Delete role"
+      operationId: "deleteRole"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID"
+          required: true
+          schema:
+            type: string
+        - name: "role-name"
+          in: path
+          description: "Role Name"
+          required: true
+          schema:
+            type: string
+        - name: "domain"
+          in: query
+          description: "domain name"
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Role deletion status"
           content:
             application/json:
               schema:
@@ -1299,6 +1447,12 @@ components:
               items:
                 $ref: '#/components/schemas/UpdatedArtifact'
       example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
+
+    SuperAdminUser:
+      type: object
+      properties:
+        username:
+          type: string
 
     UpdatedArtifact:
       type: object
@@ -1459,15 +1613,46 @@ components:
             type: string
           details:
             type: string
+    RoleList:
+      type: array
+      items:
+        type: object
+        properties:
+          roleName:
+            type: string
+          details:
+            type: string
     AddUserRequest:
       type: object
       properties:
         userId:
           type: string
+        domain:
+          type: string
         password:
           type: string
         isAdmin:
           type: boolean
+    AddRoleRequest:
+      type: object
+      properties:
+        roleName:
+          type: string
+        domain:
+          type: string
+    UpdateRoleRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        removedRoles:
+          type: array
+          items:
+            type: string
+        addedRoles:
+          type: array
+          items:
+            type: string
     KeyValue:
       type: object
       properties:
@@ -1572,6 +1757,18 @@ components:
           schema:
             $ref: '#/components/schemas/AddUserRequest'
       description: "The request body to add user."
+    AddRole:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AddRoleRequest'
+      description: "The request body to add role."
+    UpdateRole:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateRoleRequest'
+      description: "The request body to update role."
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking

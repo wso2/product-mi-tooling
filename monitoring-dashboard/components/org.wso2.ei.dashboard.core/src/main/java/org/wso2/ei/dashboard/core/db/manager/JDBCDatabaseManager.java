@@ -360,7 +360,7 @@ public final class JDBCDatabaseManager implements DatabaseManager {
             statement.setString(4, artifactName);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DashboardServerException("Error occurred while updating heartbeat information.", e);
+            throw new DashboardServerException("Error occurred while updating artifact details.", e);
         }
     }
 
@@ -470,16 +470,10 @@ public final class JDBCDatabaseManager implements DatabaseManager {
 
     private String getTableName(String artifactType) {
         switch (artifactType) {
-            case Constants.PROXY_SERVICES:
-                return "PROXY_SERVICES";
-            case Constants.ENDPOINTS:
-                return "ENDPOINTS";
             case Constants.INBOUND_ENDPOINTS:
                 return "INBOUND_ENDPOINTS";
             case Constants.MESSAGE_STORES:
                 return "MESSAGE_STORES";
-            case Constants.MESSAGE_PROCESSORS:
-                return "MESSAGE_PROCESSORS";
             case Constants.APIS:
                 return "APIS";
             case Constants.TEMPLATES:

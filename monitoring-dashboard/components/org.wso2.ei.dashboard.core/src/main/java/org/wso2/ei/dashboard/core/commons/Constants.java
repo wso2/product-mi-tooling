@@ -47,6 +47,7 @@ public final class Constants {
     public static final String CARBON_APPLICATIONS = "applications";
     public static final String DATA_SERVICES = "data-services";
     public static final String DATA_SOURCES = "data-sources";
+    public static final String DOMAIN_SEPARATOR = "/";
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";
@@ -78,4 +79,6 @@ public final class Constants {
     public static final String SCOPE = "scope";
     public static final String ADMIN = "admin";
 
+    public static final String JWT_COOKIE = "JWT_TOKEN";
+    public static final String COOKIE_HEADER = "SET-COOKIE";
 }

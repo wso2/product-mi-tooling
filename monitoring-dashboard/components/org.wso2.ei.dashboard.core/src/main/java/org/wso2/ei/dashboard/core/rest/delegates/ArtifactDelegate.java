@@ -31,7 +31,7 @@ import java.util.List;
  * This interface represents the implementation of artifact delegates.
  */
 public interface ArtifactDelegate {
-    Artifacts getArtifactsList(String groupId, List<String> nodeList);
+    Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException;
 
     Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws ManagementApiException;
 }

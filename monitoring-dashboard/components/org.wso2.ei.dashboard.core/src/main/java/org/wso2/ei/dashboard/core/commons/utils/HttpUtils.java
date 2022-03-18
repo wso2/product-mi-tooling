@@ -29,6 +29,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -129,6 +130,20 @@ public class HttpUtils {
         return doPatch(httpPatch);
     }
 
+    public static CloseableHttpResponse doPut(String accessToken, String url, JsonObject payload) {
+        final HttpPut httpPut = new HttpPut(url);
+
+        String authHeader = "Bearer " + accessToken;
+
+        httpPut.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
+        httpPut.setHeader("Content-Type", Constants.HEADER_VALUE_APPLICATION_JSON);
+        httpPut.setHeader("Authorization", authHeader);
+
+        HttpEntity httpEntity = new ByteArrayEntity(payload.toString().getBytes(StandardCharsets.UTF_8));
+        httpPut.setEntity(httpEntity);
+        return doPut(httpPut);
+    }
+
     public static CloseableHttpResponse doDelete(String accessToken, String url) {
         String authHeader = "Bearer " + accessToken;
         final HttpDelete httpDelete = new HttpDelete(url);
@@ -173,6 +188,15 @@ public class HttpUtils {
             return httpClient.execute(httpPatch);
         } catch (IOException e) {
             throw new DashboardServerException("Error occurred while sending http patch request.", e);
+        }
+    }
+
+    private static CloseableHttpResponse doPut(HttpPut httpPut) {
+        CloseableHttpClient httpClient = getHttpClient();
+        try {
+            return httpClient.execute(httpPut);
+        } catch (IOException e) {
+            throw new DashboardServerException("Error occurred while sending http put request.", e);
         }
     }
 

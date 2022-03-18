@@ -36,6 +36,9 @@ import { useAuthContext } from "@asgardeo/auth-react";
 import AuthManager from './AuthManager'
 import Link from "@material-ui/core/Link";
 import {useHistory} from "react-router-dom";
+import HTTPClient from '../utils/HTTPClient';
+import { useDispatch } from 'react-redux';
+import { setSuperAdmin } from '../redux/Actions';
 
 const styles = theme => ({
     paper: {
@@ -76,6 +79,7 @@ function Login(props){
     const [loginErrorMessage, setLoginErrorMessage] = useState('')
     const [loginError, setLoginError] = useState(false)
     const { signIn } = useAuthContext();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         initAuthenticationFlow();
@@ -90,6 +94,12 @@ function Login(props){
         } else {
             setAuthenticated(true)
         }
+    }
+
+    const getSuperUser = () => {
+        HTTPClient.getSuperUser().then(response => {
+            dispatch(setSuperAdmin(response.data.username));
+        });
     }
 
     const authenticate = (e)  => {
@@ -149,7 +159,7 @@ function Login(props){
                             id="username"
                             label="Username"
                             name="username"
-                            autoComplete="on"
+                            autoComplete="off"
                             value={userName}
                             onChange={(e) => { setUserName(e.target.value)}}
                             autoFocus
@@ -164,7 +174,7 @@ function Login(props){
                             type="password"
                             id="password"
                             value={password}
-                            autoComplete="on"
+                            autoComplete="off"
                             onChange={(e) => {setPassword(e.target.value)}}
                         />
                         <FormControlLabel
@@ -244,6 +254,7 @@ function Login(props){
     }
 
     if (authenticated) {
+        getSuperUser();
         return <Redirect to="/" />
     }
     return renderDefaultLogin();

@@ -28,6 +28,7 @@ import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
+import org.wso2.ei.dashboard.core.rest.model.AddRoleRequest;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
@@ -40,6 +41,7 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
+import org.wso2.ei.dashboard.core.rest.model.RoleList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
 
 import java.io.File;
@@ -55,6 +57,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.wso2.ei.dashboard.core.rest.model.UpdateRoleRequest;
 import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
@@ -69,6 +72,7 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.LogsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.RolesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
@@ -157,9 +161,10 @@ public class GroupsApi {
             @Content(schema = @Schema(implementation = Error.class)))
     }) public Response deleteUser(
             @PathParam("group-id") @Parameter(description = "Group ID") String groupId,
-            @PathParam("user-id") @Parameter(description = "User ID") String userId) throws ManagementApiException {
+            @PathParam("user-id") @Parameter(description = "User ID") String userId,
+            @QueryParam("domain") @Parameter(description = "domain name")  String domain) throws ManagementApiException {
         UsersDelegate usersDelegate = new UsersDelegate();
-        Ack ack = usersDelegate.deleteUser(groupId, userId);
+        Ack ack = usersDelegate.deleteUser(groupId, userId, domain);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
@@ -319,8 +324,13 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
         EndpointsDelegate endpointsDelegate = new EndpointsDelegate();
-        Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(endpointList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts endpointList = endpointsDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(endpointList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -474,8 +484,13 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
         MessageProcessorsDelegate messageProcessorsDelegate = new MessageProcessorsDelegate();
-        Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(messageProcessorList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts messageProcessorList = messageProcessorsDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(messageProcessorList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -486,7 +501,7 @@ public class GroupsApi {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "List of message stores deployed in provided nodes",
                      content = @Content(schema = @Schema(implementation = Artifacts.class))),
-        @ApiResponse(responseCode = "200", description = "Unexpected error",
+        @ApiResponse(responseCode = "500", description = "Unexpected error",
                      content = @Content(schema = @Schema(implementation = Error.class)))
     })
     public Response getMessageStoresByNodeIds(
@@ -494,8 +509,13 @@ public class GroupsApi {
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
 
         MessageStoresDelegate messageStoresDelegate = new MessageStoresDelegate();
-        Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(messageStoresList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts messageStoresList = messageStoresDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(messageStoresList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -514,8 +534,13 @@ public class GroupsApi {
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes) {
         ProxyServiceDelegate proxyServiceDelegate = new ProxyServiceDelegate();
-        Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(proxyList);
+        Response.ResponseBuilder responseBuilder;
+        try {
+            Artifacts proxyList = proxyServiceDelegate.getArtifactsList(groupId, nodes);
+            responseBuilder = Response.ok().entity(proxyList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -594,6 +619,90 @@ public class GroupsApi {
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
+
+    @GET
+    @Path("/{group-id}/roles")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get roles", description = "", tags={ "Roles" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of roles",
+                         content = @Content(schema = @Schema(implementation = RoleList.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getRoles(
+            @PathParam("group-id") @Parameter(description = "Group ID") String groupId) throws ManagementApiException {
+        RolesDelegate rolesDelegate = new RolesDelegate();
+        RoleList roleList = rolesDelegate.fetchRoles(groupId);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(roleList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @POST
+    @Path("/{group-id}/roles")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @Operation(summary = "Add role", description = "", tags={ "Roles" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role insert status",
+                         content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))
+    }) public Response addRole(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid AddRoleRequest request) throws ManagementApiException {
+        RolesDelegate rolesDelegate = new RolesDelegate();
+        Ack ack = rolesDelegate.addRole(groupId, request);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @PATCH
+    @Path("/{group-id}/roles")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @Operation(summary = "Update role", description = "", tags={ "Roles" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role update status",
+                         content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response updateRole(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid UpdateRoleRequest request) throws ManagementApiException {
+        RolesDelegate rolesDelegate = new RolesDelegate();
+        Ack ack = rolesDelegate.updateRole(groupId, request);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @DELETE
+    @Path("/{group-id}/roles/{role-name}")
+    @Produces({ "application/json" })
+    @Operation(summary = "Delete role", description = "", tags={ "Roles" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role deletion status",
+                         content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected error",
+                         content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+
+    public Response deleteRole(
+            @PathParam("group-id") @Parameter(description = "Group ID") String groupId,
+            @PathParam("role-name") @Parameter(description = "Role Name") String roleName,
+            @QueryParam("domain") @Parameter(description = "domain name")  String domain)
+            throws ManagementApiException {
+        RolesDelegate rolesDelegate = new RolesDelegate();
+        Ack ack = rolesDelegate.deleteRole(groupId, roleName, domain);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
     @GET
     @Produces({ "application/json" })
     @Operation(summary = "Get set of groups", description = "", tags={ "groups" })
@@ -728,4 +837,13 @@ public class GroupsApi {
 
         SequencesDelegate sequencesDelegate = new SequencesDelegate();
         return sequencesDelegate.updateArtifact(groupId, request);
-    }}
+    }
+
+    private Error getError(ManagementApiException e) {
+        Error error = new Error();
+        error.setCode(e.getErrorCode());
+        error.setMessage(e.getMessage());
+        return error;
+    }
+}
+
