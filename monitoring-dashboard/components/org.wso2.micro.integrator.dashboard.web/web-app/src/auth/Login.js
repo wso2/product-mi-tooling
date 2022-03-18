@@ -183,7 +183,7 @@ function Login(props){
                         />
                         <Box mt={4} className={classes.policyBox}>
                             <Typography variant="body2" style={{fontSize:13}}>
-                                We use browser cookies to track your session to give better experience.
+                                Browser cookies are used to track your session and provide a better experience.
                                 You can refer our <Link component="button" variant="body2" onClick={() => {history.push('/cookie-policy')}} style={{color:"#ff5000"}}> Cookie Policy</Link> for more details.
                             </Typography>
                         </Box>
