@@ -74,7 +74,7 @@ function CookiePolicy(props) {
                 ends i.e., after you log-out, or after the session expiry time has elapsed.
             </Typography>
             <Typography>
-                Some cookies are simply used to give you a more personalised web experience and these cookies
+                Some cookies are simply used to give you a more personalized web experience and these cookies
                 can not be used to personally identify you or your activities.
             </Typography>
             <Typography>
