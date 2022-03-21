@@ -1446,6 +1446,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UpdatedArtifact'
+            stateChangedArtifacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdatedArtifact'
       example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
 
     SuperAdminUser:

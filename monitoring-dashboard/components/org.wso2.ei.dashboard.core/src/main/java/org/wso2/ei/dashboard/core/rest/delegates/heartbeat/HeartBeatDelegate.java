@@ -56,7 +56,8 @@ public class HeartBeatDelegate {
                 heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
                 heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp,
                 heartbeatRequest.getChangeNotification().getDeployedArtifacts(),
-                heartbeatRequest.getChangeNotification().getUndeployedArtifacts());
+                heartbeatRequest.getChangeNotification().getUndeployedArtifacts(),
+                heartbeatRequest.getChangeNotification().getStateChangedArtifacts());
         boolean isSuccess;
         String productName = heartbeat.getProduct();
         ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);

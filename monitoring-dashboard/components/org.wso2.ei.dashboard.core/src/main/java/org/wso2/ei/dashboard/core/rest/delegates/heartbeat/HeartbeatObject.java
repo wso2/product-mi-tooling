@@ -36,10 +36,12 @@ public class HeartbeatObject {
     private long timestamp;
     private List<UpdatedArtifact> deployedArtifacts;
     private List<UpdatedArtifact> undeployedArtifacts;
+    private List<UpdatedArtifact> stateChangedArtifacts;
 
     public HeartbeatObject(
             String product, String groupId, String nodeId, Integer interval, String mgtApiUrl, long timestamp,
-            List<UpdatedArtifact> deployedArtifacts, List<UpdatedArtifact> undeployedArtifacts) {
+            List<UpdatedArtifact> deployedArtifacts, List<UpdatedArtifact> undeployedArtifacts,
+            List<UpdatedArtifact> stateChangedArtifacts) {
 
         this.product = product;
         this.groupId = groupId;
@@ -49,6 +51,7 @@ public class HeartbeatObject {
         this.timestamp = timestamp;
         this.deployedArtifacts = deployedArtifacts;
         this.undeployedArtifacts = undeployedArtifacts;
+        this.stateChangedArtifacts = stateChangedArtifacts;
     }
 
     public String getProduct() {
@@ -129,5 +132,15 @@ public class HeartbeatObject {
     public void setUndeployedArtifacts(List<UpdatedArtifact> undeployedArtifacts) {
 
         this.undeployedArtifacts = undeployedArtifacts;
+    }
+
+    public List<UpdatedArtifact> getStateChangedArtifacts() {
+
+        return stateChangedArtifacts;
+    }
+
+    public void setStateChangedArtifacts(List<UpdatedArtifact> stateChangedArtifacts) {
+
+        this.stateChangedArtifacts = stateChangedArtifacts;
     }
 }

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class HeartbeatRequestChangeNotification   {
   private @Valid List<UpdatedArtifact> deployedArtifacts = new ArrayList<UpdatedArtifact>();
   private @Valid List<UpdatedArtifact> undeployedArtifacts = new ArrayList<UpdatedArtifact>();
+  private @Valid List<UpdatedArtifact> stateChangedArtifacts = new ArrayList<UpdatedArtifact>();
 
   /**
    **/
@@ -23,7 +24,7 @@ public class HeartbeatRequestChangeNotification   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("deployedArtifacts")
 
@@ -41,7 +42,7 @@ public class HeartbeatRequestChangeNotification   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("undeployedArtifacts")
 
@@ -50,6 +51,24 @@ public class HeartbeatRequestChangeNotification   {
   }
   public void setUndeployedArtifacts(List<UpdatedArtifact> undeployedArtifacts) {
     this.undeployedArtifacts = undeployedArtifacts;
+  }
+
+  /**
+   **/
+  public HeartbeatRequestChangeNotification stateChangedArtifacts(List<UpdatedArtifact> stateChangedArtifacts) {
+    this.stateChangedArtifacts = stateChangedArtifacts;
+    return this;
+  }
+
+
+  @ApiModelProperty(value = "")
+  @JsonProperty("stateChangedArtifacts")
+
+  public List<UpdatedArtifact> getStateChangedArtifacts() {
+    return stateChangedArtifacts;
+  }
+  public void setStateChangedArtifacts(List<UpdatedArtifact> stateChangedArtifacts) {
+    this.stateChangedArtifacts = stateChangedArtifacts;
   }
 
 
@@ -63,21 +82,23 @@ public class HeartbeatRequestChangeNotification   {
     }
     HeartbeatRequestChangeNotification heartbeatRequestChangeNotification = (HeartbeatRequestChangeNotification) o;
     return Objects.equals(deployedArtifacts, heartbeatRequestChangeNotification.deployedArtifacts) &&
-        Objects.equals(undeployedArtifacts, heartbeatRequestChangeNotification.undeployedArtifacts);
+           Objects.equals(undeployedArtifacts, heartbeatRequestChangeNotification.undeployedArtifacts) &&
+           Objects.equals(stateChangedArtifacts, heartbeatRequestChangeNotification.stateChangedArtifacts);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(deployedArtifacts, undeployedArtifacts);
+    return Objects.hash(deployedArtifacts, undeployedArtifacts, stateChangedArtifacts);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class HeartbeatRequestChangeNotification {\n");
-    
+
     sb.append("    deployedArtifacts: ").append(toIndentedString(deployedArtifacts)).append("\n");
     sb.append("    undeployedArtifacts: ").append(toIndentedString(undeployedArtifacts)).append("\n");
+    sb.append("    stateChangedArtifacts: ").append(toIndentedString(stateChangedArtifacts)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -2515,6 +2515,12 @@
             "items" : {
               "$ref" : "#/components/schemas/UpdatedArtifact"
             }
+          },
+          "stateChangedArtifacts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/UpdatedArtifact"
+            }
           }
         }
       },
