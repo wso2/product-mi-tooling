@@ -14,8 +14,6 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *
- *
  */
 
 package org.wso2.ei.dashboard.core.rest.model;
@@ -43,7 +41,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("product")
 
@@ -61,7 +59,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("groupId")
 
@@ -79,7 +77,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("nodeId")
 
@@ -97,7 +95,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("interval")
 
@@ -115,7 +113,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("mgtApiUrl")
 
@@ -133,7 +131,7 @@ public class HeartbeatRequest   {
     return this;
   }
 
-  
+
   @ApiModelProperty(value = "")
   @JsonProperty("changeNotification")
 
@@ -155,11 +153,11 @@ public class HeartbeatRequest   {
     }
     HeartbeatRequest heartbeatRequest = (HeartbeatRequest) o;
     return Objects.equals(product, heartbeatRequest.product) &&
-        Objects.equals(groupId, heartbeatRequest.groupId) &&
-        Objects.equals(nodeId, heartbeatRequest.nodeId) &&
-        Objects.equals(interval, heartbeatRequest.interval) &&
-        Objects.equals(mgtApiUrl, heartbeatRequest.mgtApiUrl) &&
-        Objects.equals(changeNotification, heartbeatRequest.changeNotification);
+           Objects.equals(groupId, heartbeatRequest.groupId) &&
+           Objects.equals(nodeId, heartbeatRequest.nodeId) &&
+           Objects.equals(interval, heartbeatRequest.interval) &&
+           Objects.equals(mgtApiUrl, heartbeatRequest.mgtApiUrl) &&
+           Objects.equals(changeNotification, heartbeatRequest.changeNotification);
   }
 
   @Override
@@ -171,7 +169,7 @@ public class HeartbeatRequest   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class HeartbeatRequest {\n");
-    
+
     sb.append("    product: ").append(toIndentedString(product)).append("\n");
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    nodeId: ").append(toIndentedString(nodeId)).append("\n");

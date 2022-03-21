@@ -128,6 +128,18 @@ public class MiArtifactsManager implements ArtifactsManager {
             } catch (ManagementApiException e) {
                 logger.error("Error while fetching updated artifacts", e);
             }
+
+            List<UpdatedArtifact> stateChangedArtifacts = heartbeat.getStateChangedArtifacts();
+            try {
+                for (UpdatedArtifact info : stateChangedArtifacts) {
+                    if (ALL_ARTIFACTS.contains(info.getType())) {
+                        updateTracingDetails(info);
+                    }
+                }
+            } catch (ManagementApiException e) {
+                logger.error("Error occurred while updating tracing details", e);
+            }
+
         };
         ExecutorServiceHolder.getMiArtifactsManagerExecutorService().execute(runnable);
     }
@@ -200,6 +212,20 @@ public class MiArtifactsManager implements ArtifactsManager {
             logger.error("Error occurred while adding server details of node: " + heartbeat.getNodeId() + " in group "
                       + heartbeat.getGroupId());
             addToDelayedQueue();
+        }
+    }
+
+    private void updateTracingDetails(UpdatedArtifact info) throws ManagementApiException {
+        if (heartbeat != null) {
+            String groupId = heartbeat.getGroupId();
+            String nodeId = heartbeat.getNodeId();
+            String mgtApiUrl = heartbeat.getMgtApiUrl();
+            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+            String artifactType = info.getType();
+            String artifactName = info.getName();
+            JsonObject details = Utils.getArtifactDetails(groupId, nodeId, mgtApiUrl, artifactType, artifactName,
+                                                          accessToken);
+            databaseManager.updateDetails(artifactType, artifactName, groupId, nodeId, details.toString());
         }
     }
 
