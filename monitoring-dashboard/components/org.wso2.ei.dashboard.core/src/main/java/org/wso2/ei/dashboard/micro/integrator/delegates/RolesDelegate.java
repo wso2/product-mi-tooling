@@ -43,6 +43,8 @@ import org.wso2.ei.dashboard.core.rest.model.RoleListInner;
 import org.wso2.ei.dashboard.core.rest.model.UpdateRoleRequest;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.util.Objects;
+
 /**
  * Delegate class to handle requests from roles page.
  */
@@ -132,15 +134,17 @@ public class RolesDelegate {
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonArray roles = HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();
         for (JsonElement role : roles) {
-            RoleListInner roleListInner = getRoleDetails(groupId, nodeId, accessToken, url, role);
-            roleList.add(roleListInner);
+            String roleId = role.getAsJsonObject().get("role").getAsString();
+            if (!Objects.equals(roleId, Constants.INTERNAL_EVERYONE)) {
+                RoleListInner roleListInner = getRoleDetails(groupId, nodeId, accessToken, url, roleId);
+                roleList.add(roleListInner);
+            }
         }
         return roleList;
     }
 
     private RoleListInner getRoleDetails(String groupId, String nodeId, String accessToken, String url,
-                                         JsonElement role) throws ManagementApiException {
-        String roleId = role.getAsJsonObject().get("role").getAsString();
+                                         String roleId) throws ManagementApiException {
         RoleListInner roleListInner = new RoleListInner();
         roleListInner.setRoleName(roleId);
         String getRoleDetailsUrl;
