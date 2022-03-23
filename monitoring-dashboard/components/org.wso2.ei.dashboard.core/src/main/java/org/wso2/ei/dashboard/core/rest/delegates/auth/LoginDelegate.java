@@ -21,6 +21,7 @@ package org.wso2.ei.dashboard.core.rest.delegates.auth;
 
 import com.google.gson.JsonElement;
 import net.minidev.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
@@ -48,10 +49,15 @@ public class LoginDelegate {
     public Response authenticateUser(String username, String password) {
         try {
             String accessToken = getTokenFromMI(username, password);
-            storeTokenInCache(accessToken);
-            return Response.ok(getUserInfo(username, accessToken))
-                    .header(Constants.COOKIE_HEADER, getTokenCookieHeader(accessToken, NewCookie.DEFAULT_MAX_AGE))
-                    .build();
+            if (StringUtils.isEmpty(accessToken)) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                                       Constants.NO_SERVER_FOUND_ERROR).build();
+            } else {
+                storeTokenInCache(accessToken);
+                return Response.ok(getUserInfo(username, accessToken))
+                               .header(Constants.COOKIE_HEADER,
+                                       getTokenCookieHeader(accessToken, NewCookie.DEFAULT_MAX_AGE)).build();
+            }
         } catch (ManagementApiException e) {
             logger.error("Error logging into dashboard server due to {} ", e.getMessage());
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -65,7 +71,7 @@ public class LoginDelegate {
         GroupDelegate groupDelegate = new GroupDelegate();
         GroupList groupList = groupDelegate.getGroupList();
         if (groupList.isEmpty()) {
-            logger.error("No running micro integrator instances found. Please start a server and login.");
+            logger.error(Constants.NO_SERVER_FOUND_ERROR);
             return "";
         } else {
             NodesDelegate nodesDelegate = new NodesDelegate();
