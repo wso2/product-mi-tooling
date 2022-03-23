@@ -81,4 +81,6 @@ public final class Constants {
 
     public static final String JWT_COOKIE = "JWT_TOKEN";
     public static final String COOKIE_HEADER = "SET-COOKIE";
+
+    public static final String INTERNAL_EVERYONE = "Internal/everyone";
 }
