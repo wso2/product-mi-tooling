@@ -113,7 +113,10 @@ function Login(props){
                 let errorMessage;
                 if (error.response && error.response.status === 401) {
                     errorMessage = 'Incorrect username or password!';
-                } else {
+                } else if (error.response && error.response.status === 500 && error.response.statusText !== null) {
+                    errorMessage = error.response.statusText;
+                }
+                else {
                     errorMessage = "Error occurred in communication. Please check server logs."
                 }
                 setUserName('')

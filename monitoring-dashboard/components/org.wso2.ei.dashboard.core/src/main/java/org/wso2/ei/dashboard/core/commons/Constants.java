@@ -83,4 +83,7 @@ public final class Constants {
     public static final String COOKIE_HEADER = "SET-COOKIE";
 
     public static final String INTERNAL_EVERYONE = "Internal/everyone";
+
+    public static final String NO_SERVER_FOUND_ERROR =
+            "No running micro integrator instances found. Please start a server and login.";
 }
