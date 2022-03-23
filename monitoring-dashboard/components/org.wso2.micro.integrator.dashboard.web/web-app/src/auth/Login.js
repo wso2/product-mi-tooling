@@ -187,12 +187,12 @@ function Login(props){
                         <Box mt={4} className={classes.policyBox}>
                             <Typography variant="body2" style={{fontSize:13}}>
                                 Browser cookies are used to track your session and provide a better experience.
-                                You can refer our <Link component="button" variant="body2" onClick={() => {history.push('/cookie-policy')}} style={{color:"#ff5000"}}> Cookie Policy</Link> for more details.
+                                You can refer our <Link variant="body2" onClick={() => {history.push('/cookie-policy')}} style={{color:"#ff5000"}}> Cookie Policy</Link> for more details.
                             </Typography>
                         </Box>
                         <Box mt={4} className={classes.policyBox}>
                             <Typography variant="body2" style={{fontSize:13}}>
-                                By signing in, you agree to our <Link component="button" variant="body2" onClick={() => {history.push('/privacy-policy')}} style={{color:"#ff5000"}}>Privacy Policy.</Link>
+                                By signing in, you agree to our <Link variant="body2" onClick={() => {history.push('/privacy-policy')}} style={{color:"#ff5000"}}>Privacy Policy.</Link>
                             </Typography>
                         </Box>
                         <Button
