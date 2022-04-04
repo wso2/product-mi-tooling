@@ -46,8 +46,6 @@ public class HeartBeatDelegate {
     private static final String PRODUCT_MI = "mi";
     private static final String PRODUCT_SI = "si";
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
-    private final ScheduledExecutorService heartbeatScheduledExecutorService =
-            Executors.newScheduledThreadPool(0);
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws ManagementApiException {
         long currentTimestamp = System.currentTimeMillis();
@@ -71,8 +69,6 @@ public class HeartBeatDelegate {
                 artifactsManager.runFetchAllExecutorService();
             }
         }
-        runHeartbeatExecutorService(productName, heartbeat);
-
         if (isSuccess) {
             ack.setStatus(Constants.SUCCESS_STATUS);
         }
@@ -97,23 +93,27 @@ public class HeartBeatDelegate {
         logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
         String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
-        return databaseManager.insertHeartbeat(heartbeat, accessToken);
-    }
-
-    private void runHeartbeatExecutorService(String productName, HeartbeatObject heartbeat) {
+        ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         long heartbeatInterval = heartbeat.getInterval();
-        String timestampOfRegisteredNode =
-                databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
+        String productName = heartbeat.getProduct();
         Runnable runnableTask = () -> {
-            boolean isNodeDeregistered = isNodeShutDown(heartbeat, timestampOfRegisteredNode);
+            String timestampOfRegisteredNode =
+                    databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
+            long longTimestampOfRegisteredNode = Long.parseLong(timestampOfRegisteredNode);
+            long currentTimestamp = System.currentTimeMillis();
+
+            boolean isNodeDeregistered =
+                    (currentTimestamp - longTimestampOfRegisteredNode) > 3 * heartbeatInterval * 1000;
             if (isNodeDeregistered) {
                 logger.info("Node : " + heartbeat.getNodeId() + " of group : " + heartbeat.getGroupId() + " has " +
-                         "de-registered. Hence deleting node information");
+                        "de-registered. Hence deleting node information");
+                heartbeatScheduledExecutorService.shutdownNow();
                 deleteNode(productName, heartbeat);
             }
         };
-        heartbeatScheduledExecutorService.schedule(runnableTask, 3 * heartbeatInterval, TimeUnit.SECONDS);
-        heartbeatScheduledExecutorService.shutdown();
+        heartbeatScheduledExecutorService.scheduleWithFixedDelay(runnableTask, 3 *
+                heartbeatInterval, 3 * heartbeatInterval, TimeUnit.SECONDS);
+        return databaseManager.insertHeartbeat(heartbeat, accessToken);
     }
 
     private boolean isNodeShutDown(HeartbeatObject heartbeat, String initialTimestamp) {
