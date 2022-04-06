@@ -24,9 +24,7 @@ import {Constants} from './Constants';
 
 export default class HTTPClient {
 
-    static httpCall(method, path, params, body) {
-
-        const url = AuthManager.getBasePath().concat(path)
+    static httpCall(method, url, params, body) {
 
         const requestConfig = {
             method: method,
@@ -42,20 +40,24 @@ export default class HTTPClient {
         }
     }
 
-    static get(path, params={}) {
-        return this.httpCall("GET", path, params, null)
+    static get(path, params={}, basePath = "") {
+        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);        
+        return this.httpCall("GET", url, params, null)
     }
 
-    static post(path, body) {
-        return this.httpCall("POST", path, null, body)
+    static post(path, body, basePath = "") {
+        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);
+        return this.httpCall("POST", url, null, body)
     }
 
-    static patch(path, body) {
-        return this.httpCall("PATCH", path, null, body)
+    static patch(path, body, basePath = "") {
+        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);
+        return this.httpCall("PATCH", url, null, body)
     }
 
-    static delete(path) {
-        return this.httpCall("DELETE", path, null, null)
+    static delete(path, basePath = "") {
+        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);
+        return this.httpCall("DELETE", url, null, null)
     }
 
     static getConfiguration(params) {
@@ -74,6 +76,12 @@ export default class HTTPClient {
     static getNodes(groupId) {
         const resourcePath = `${groupId}/${Constants.PREFIX_NODES}`
         return this.getResource(resourcePath)
+    }
+
+    static manageNode(payload) {
+        const path = '/server'
+        const basePath = 'https://localhost:9155/management'
+        return this.patch(path, payload, basePath)
     }
 
     static getUsers(groupId) {

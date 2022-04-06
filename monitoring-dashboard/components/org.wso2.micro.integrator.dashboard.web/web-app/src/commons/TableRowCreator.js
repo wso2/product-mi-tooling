@@ -48,8 +48,11 @@ import AuthManager from '../auth/AuthManager';
 import { changeData } from '../redux/Actions';
 import HTTPClient from '../utils/HTTPClient';
 
+var nodeStatus = "";
+
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers, retrieveData } = props;
+    nodeStatus=data.status;
     const pageId = pageInfo.pageId
     const classes = useStyles();
     return <TableRow>
@@ -143,7 +146,7 @@ export default function TableRowCreator(props) {
             case 'nodeId':
                 return <TableCell><table><NodesCell pageId={pageId} nodeData={data}/></table></TableCell>
             case 'node_status':
-                return <TableCell>{data.status == "healthy" ? <table>Healthy</table> : <table className={classes.unhealthyNodeCell}>Unhealthy</table>}</TableCell>
+                return <TableCell>{nodeStatus === "healthy" ? <table>Healthy</table> : <table className={classes.unhealthyNodeCell}>Unhealthy</table>}</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
             case 'node_action':
@@ -211,7 +214,7 @@ function NodeActionDropDown(props) {
     const { nodeData } = props;
 
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const globalGroupId = useSelector(state => state.groupId);
+    const [nodeAction, setNodeAction] = React.useState("");
 
     const handleStyledMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -242,6 +245,34 @@ function NodeActionDropDown(props) {
             open: true,
             title: 'Confirmation',
             message: message
+        })
+        setNodeAction(action);
+    }
+
+    const handleNodeAction = () => {
+        handleConfirmationDialogClose();
+        var status;
+        switch (nodeAction) {
+            case 'Graceful Shutdown':
+                status="shutdownGracefully";                
+                break;
+            case 'Forceful Shutdown':
+                status="shutdown";                
+                break;
+            case 'Graceful Restart':
+                status="restartGracefully";                
+                break;        
+            default:
+                status="restart";
+                break;
+        }
+        var payload = {
+            status
+        }
+        console.log(payload);
+        HTTPClient.manageNode(payload).then(response => {
+            response.status === 200 ? nodeStatus = "healthy": nodeStatus="unhealthy";
+            // window.location.reload(true)
         })
     }
 
@@ -288,7 +319,7 @@ function NodeActionDropDown(props) {
                 </DialogContent>
 
                 <DialogActions>
-                    <Button variant="contained" autoFocus>
+                    <Button onClick={() => handleNodeAction()} variant="contained" autoFocus>
                         OK
                     </Button>
 
