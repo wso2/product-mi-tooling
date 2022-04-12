@@ -271,6 +271,7 @@ function NodeActionDropDown(props) {
         }
         console.log(payload);
         HTTPClient.manageNode(payload).then(response => {
+            console.log(response);
             response.status === 200 ? nodeStatus = "healthy": nodeStatus="unhealthy";
             // window.location.reload(true)
         })

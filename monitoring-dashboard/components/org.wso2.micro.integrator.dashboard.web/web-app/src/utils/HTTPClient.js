@@ -80,7 +80,7 @@ export default class HTTPClient {
 
     static manageNode(payload) {
         const path = '/server'
-        const basePath = 'https://localhost:9155/management'
+        const basePath = 'http://localhost:9192/management'
         return this.patch(path, payload, basePath)
     }
 
