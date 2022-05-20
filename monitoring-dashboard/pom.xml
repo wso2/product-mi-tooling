@@ -483,7 +483,7 @@
         <commons-codec.orbit.version>1.15</commons-codec.orbit.version>
         <hikari.cp.version>3.4.5</hikari.cp.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
-        <code.gson.version>2.8.6</code.gson.version>
+        <code.gson.version>2.8.9</code.gson.version>
         <config.mapper.version>1.0.20</config.mapper.version>
         <asgardeo.java.oidc.sdk.version>0.1.13</asgardeo.java.oidc.sdk.version>
         <net.minidev.asm.version>2.4.8</net.minidev.asm.version>
