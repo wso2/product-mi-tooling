@@ -1918,6 +1918,35 @@
           }
         }
       }
+    },
+    "/healthz" : {
+      "get" : {
+        "tags" : [ "healthz" ],
+        "summary" : "Get health check for the dashboard",
+        "operationId" : "RetrieveHealth",
+        "responses" : {
+          "200" : {
+            "description" : "Health check status",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/healthz"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -2160,6 +2189,14 @@
         "type" : "object",
         "properties" : {
           "configuration" : {
+            "type" : "string"
+          }
+        }
+      },
+      "healthz" : {
+        "type" : "object",
+        "properties" : {
+          "status" : {
             "type" : "string"
           }
         }
