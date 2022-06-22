@@ -56,6 +56,9 @@ public class HeartBeatDelegate {
                 heartbeatRequest.getChangeNotification().getDeployedArtifacts(),
                 heartbeatRequest.getChangeNotification().getUndeployedArtifacts(),
                 heartbeatRequest.getChangeNotification().getStateChangedArtifacts());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Management API URL received is: " + heartbeat.getMgtApiUrl());
+        }
         boolean isSuccess;
         String productName = heartbeat.getProduct();
         ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
