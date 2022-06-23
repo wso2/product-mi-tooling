@@ -52,6 +52,8 @@ public final class Constants {
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";
 
+    public static final String UTF_8_ENCODING = "UTF-8";
+
     public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 

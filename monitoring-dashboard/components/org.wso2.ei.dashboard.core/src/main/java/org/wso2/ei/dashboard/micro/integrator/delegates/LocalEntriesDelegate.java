@@ -62,6 +62,9 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
         log.debug("Fetching value of local entry " + localEntry + " in node " + nodeId + " of group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        if (localEntry.contains(" ")) {
+            localEntry = Utils.encode(localEntry);
+        }
         String url = mgtApiUrl.concat("local-entries?name=").concat(localEntry);
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);

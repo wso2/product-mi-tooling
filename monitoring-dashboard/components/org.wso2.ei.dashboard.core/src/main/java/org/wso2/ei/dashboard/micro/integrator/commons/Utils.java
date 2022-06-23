@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
@@ -45,6 +46,9 @@ import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
 import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Util class for micro integrator dashboard.
@@ -168,6 +172,9 @@ public class Utils {
 
         String getArtifactDetailsUrl;
         String getArtifactsUrl = mgtApiUrl.concat(artifactType);
+        if (artifactName.contains(" ")) {
+            artifactName = encode(artifactName);
+        }
         switch (artifactType) {
             case PROXY_SERVICES:
                 getArtifactDetailsUrl = getArtifactsUrl.concat("?proxyServiceName=").concat(artifactName);
@@ -207,6 +214,20 @@ public class Utils {
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
         }
         return getArtifactDetailsUrl;
+    }
+
+    /**
+     * Translates a string into application/x-www-form-urlencoded format using UTF 8 encoding scheme.
+     * @param text String to be encoded
+     * @return the translated String
+     */
+    public static String encode(String text) {
+        try {
+            return URLEncoder.encode(text, Constants.UTF_8_ENCODING);
+        } catch (UnsupportedEncodingException e) {
+            throw new DashboardServerException("Error occurred while encoding the artifact name: " + e.getMessage(),
+                                               e.getCause());
+        }
     }
 
     private static String retrieveNewAccessToken(String groupId, String nodeId) throws ManagementApiException {
