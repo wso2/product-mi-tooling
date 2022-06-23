@@ -39,6 +39,7 @@ import { Button } from '@material-ui/core';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Chip from '@material-ui/core/Chip';
 import ListItemText from '@material-ui/core/ListItemText';
 import Box from '@material-ui/core/Box';
 import NodesCell from './NodesCell';
@@ -48,18 +49,21 @@ import AuthManager from '../auth/AuthManager';
 import { changeData } from '../redux/Actions';
 import HTTPClient from '../utils/HTTPClient';
 
-var nodeStatus = "";
-
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers, retrieveData } = props;
-    nodeStatus=data.status;
+    const [nodeStatus, setNodeStatus] = React.useState(data.status);
     const pageId = pageInfo.pageId
     const classes = useStyles();
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             // common
             case 'name':
-                return <TableCell>{data.name}</TableCell>
+                return <TableCell>{data.name}{ pageId === "carbonapps" && data.status ==="faulty" && <>&nbsp;<Chip
+                size="small"
+                label="Faulty"
+                color="primary"
+                style={{backgroundColor:'red'}}
+              /></>}</TableCell>
             case 'nodes':
                 return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} retrieveData={retrieveData}/>)}</table></TableCell>
             case 'type':
@@ -150,7 +154,7 @@ export default function TableRowCreator(props) {
             case 'role':
                 return <TableCell>Member</TableCell>
             case 'node_action':
-                return <TableCell><NodeActionDropDown nodeData={data}/></TableCell>
+                return <TableCell><NodeActionDropDown nodeData={data} setNodeStatus={setNodeStatus}/></TableCell>
 
             // Log Files Page
             case 'nodes_logs':
@@ -210,11 +214,10 @@ function SwitchStatusCell(props) {
 }
 
 function NodeActionDropDown(props) {
-
-    const { nodeData } = props;
-
+    const { nodeData, setNodeStatus } = props;
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [nodeAction, setNodeAction] = React.useState("");
+    const [buttonDisable, setButtonDisable] = React.useState(false);
 
     const handleStyledMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -240,7 +243,8 @@ function NodeActionDropDown(props) {
 
     const handleConfirmationDialogOpen = (action) => {
         handleStyledMenuClose();
-        var message = 'Are you sure you want to '.concat(action).concat(' the node ').concat(nodeData.nodeId).concat('?')
+        var message = 'Are you sure you want to '.concat(action.toLowerCase()).concat(' the node ')
+        .concat(nodeData.nodeId).concat('?')
         setConfirmationDialog({
             open: true,
             title: 'Confirmation',
@@ -254,26 +258,31 @@ function NodeActionDropDown(props) {
         var status;
         switch (nodeAction) {
             case 'Graceful Shutdown':
-                status="shutdownGracefully";                
+                status="shutdownGracefully";  
+                setNodeStatus("Shutting down");              
                 break;
             case 'Forceful Shutdown':
-                status="shutdown";                
+                status="shutdown"; 
+                setNodeStatus("Shutting down");               
                 break;
             case 'Graceful Restart':
-                status="restartGracefully";                
+                status="restartGracefully"; 
+                setNodeStatus("Restarting");               
                 break;        
             default:
                 status="restart";
+                setNodeStatus("Restarting");
                 break;
         }
         var payload = {
             status
         }
-        console.log(payload);
         HTTPClient.manageNode(payload).then(response => {
-            console.log(response);
-            response.status === 200 ? nodeStatus = "healthy": nodeStatus="unhealthy";
-            // window.location.reload(true)
+            response.status === 200 && setNodeStatus("healthy");
+            setButtonDisable(false);
+        }).catch(()=>{
+            setNodeStatus("unhealthy");
+            setButtonDisable(false);
         })
     }
 
@@ -283,6 +292,7 @@ function NodeActionDropDown(props) {
             aria-haspopup="true"
             variant="contained"
             color="primary"
+            disabled={buttonDisable}
             onClick={handleStyledMenuOpen}
             endIcon={<KeyboardArrowDownIcon />}
             >
@@ -320,7 +330,14 @@ function NodeActionDropDown(props) {
                 </DialogContent>
 
                 <DialogActions>
-                    <Button onClick={() => handleNodeAction()} variant="contained" autoFocus>
+                    <Button 
+                    onClick={() => {
+                        handleNodeAction(); 
+                        setButtonDisable(true);
+                    }} 
+                    variant="contained" 
+                    autoFocus
+                    >
                         OK
                     </Button>
 

@@ -97,7 +97,7 @@ export default function LogConfigs() {
     }
 
     const getLogConfigByNodeId = (nodeId) => {
-        setSearchQuery("");
+        setSearchQuery('');
         setSelectedNodeId(nodeId);
         if (nodeId !== 'All') {
             HTTPClient.getLogConfigs(globalGroupId, nodeId).then(response => {
@@ -169,9 +169,9 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#18202c'
     },
     buttonsRight: {
-        float: "right",
-        display: "flex",
-        flexDirection:"row"
+        float: 'right',
+        display: 'flex',
+        flexDirection:'row'
     },
     search: {
         position: 'relative',

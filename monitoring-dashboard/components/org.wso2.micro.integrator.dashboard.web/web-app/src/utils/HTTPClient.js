@@ -40,23 +40,23 @@ export default class HTTPClient {
         }
     }
 
-    static get(path, params={}, basePath = "") {
-        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);        
+    static get(path, params={}, basePath = '') {
+        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);      
         return this.httpCall("GET", url, params, null)
     }
 
-    static post(path, body, basePath = "") {
-        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);
+    static post(path, body, basePath = '') {
+        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);
         return this.httpCall("POST", url, null, body)
     }
 
-    static patch(path, body, basePath = "") {
-        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);
+    static patch(path, body, basePath = '') {
+        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);
         return this.httpCall("PATCH", url, null, body)
     }
 
-    static delete(path, basePath = "") {
-        const url = basePath === "" ? AuthManager.getBasePath().concat(path) : basePath.concat(path);
+    static delete(path, basePath = '') {
+        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);
         return this.httpCall("DELETE", url, null, null)
     }
 
@@ -79,7 +79,7 @@ export default class HTTPClient {
     }
 
     static manageNode(payload) {
-        const path = '/server'
+        const path = '/server';
         const basePath = 'http://localhost:9192/management'
         return this.patch(path, payload, basePath)
     }

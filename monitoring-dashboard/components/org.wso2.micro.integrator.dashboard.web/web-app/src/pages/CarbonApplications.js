@@ -40,9 +40,19 @@ export default function CarbonApplications() {
     const selectedNodeList = useSelector(state => state.nodeList);
 
     React.useEffect(() => {
+        let carbonAppList =[];
         HTTPClient.getArtifacts("capps", globalGroupId, selectedNodeList).then(response => {
-            setCarbonAppsList(response.data)
+            carbonAppList=response.data
+            HTTPClient.getArtifacts("capps", globalGroupId, selectedNodeList).then(response => {
+                response.data.forEach(element => {
+                    carbonAppList.push({...element, status:"faulty"})
+                });
+                console.log(response.data);
+                setCarbonAppsList(carbonAppList)
+            })
         })
+        
+        console.log(carbonAppList);
     },[globalGroupId, selectedNodeList])
 
     return <EnhancedTable pageInfo={pageInfo} dataSet={carbonAppsList}/>
