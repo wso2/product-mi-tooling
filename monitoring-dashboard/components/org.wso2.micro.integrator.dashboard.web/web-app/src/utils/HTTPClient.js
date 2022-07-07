@@ -24,7 +24,9 @@ import {Constants} from './Constants';
 
 export default class HTTPClient {
 
-    static httpCall(method, url, params, body) {
+    static httpCall(method, path, params, body) {
+
+        const url = AuthManager.getBasePath().concat(path)
 
         const requestConfig = {
             method: method,
@@ -40,24 +42,20 @@ export default class HTTPClient {
         }
     }
 
-    static get(path, params={}, basePath = '') {
-        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);      
-        return this.httpCall("GET", url, params, null)
+    static get(path, params={}) {
+        return this.httpCall("GET", path, params, null)
     }
 
-    static post(path, body, basePath = '') {
-        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);
-        return this.httpCall("POST", url, null, body)
+    static post(path, body) {
+        return this.httpCall("POST", path, null, body)
     }
 
-    static patch(path, body, basePath = '') {
-        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);
-        return this.httpCall("PATCH", url, null, body)
+    static patch(path, body) {
+        return this.httpCall("PATCH", path, null, body)
     }
 
-    static delete(path, basePath = '') {
-        const url = (basePath === '' ? AuthManager.getBasePath() : basePath).concat(path);
-        return this.httpCall("DELETE", url, null, null)
+    static delete(path) {
+        return this.httpCall("DELETE", path, null, null)
     }
 
     static getConfiguration(params) {
@@ -78,10 +76,9 @@ export default class HTTPClient {
         return this.getResource(resourcePath)
     }
 
-    static manageNode(payload) {
-        const path = '/server';
-        const basePath = 'http://localhost:9192/management'
-        return this.patch(path, payload, basePath)
+    static manageNode(groupId, nodeId, payload) {
+        const path = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_NODES}/${nodeId}`
+        return this.patch(path, payload)
     }
 
     static getUsers(groupId) {
@@ -139,6 +136,17 @@ export default class HTTPClient {
                 response.data.map(data => 
                     data.nodes.map(node => node.details = JSON.parse(node.details))
                 )
+                resolve(response)
+            }).catch(error => {
+                reject(error)
+            })
+        });
+    }
+
+    static getFaultyCapps(groupId, nodeList) {
+        const resourcePath = `${groupId}/capps/faulty?nodes=${this.getNodeListAsQueryParams(nodeList)}`
+        return new Promise((resolve, reject) => {
+            this.getResource(resourcePath).then(response => {
                 resolve(response)
             }).catch(error => {
                 reject(error)

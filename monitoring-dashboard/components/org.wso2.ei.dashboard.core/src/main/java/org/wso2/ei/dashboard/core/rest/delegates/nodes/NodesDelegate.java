@@ -20,12 +20,19 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates.nodes;
 
+import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.rest.model.ManageServerRuntimeRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
+import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
+import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 /**
  * Delegate class to handle requests from Nodes page (Home page).
@@ -51,5 +58,23 @@ public class NodesDelegate {
             }
         }
         return nodeList;
+    }
+
+    public JsonObject manageNode(String groupId, String nodeId, ManageServerRuntimeRequest request) throws ManagementApiException {
+        logger.debug("Managing the server runtime from management console");
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String url = mgtApiUrl.concat("server");
+
+        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        JsonObject payload = createManageNodePayload(request);
+        CloseableHttpResponse httpResponse = Utils.doPatch(groupId, nodeId, accessToken, url, payload);
+        JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
+        return jsonResponse;
+    }
+    
+    private JsonObject createManageNodePayload(ManageServerRuntimeRequest request) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("status", request.getStatus());
+        return payload;
     }
 }

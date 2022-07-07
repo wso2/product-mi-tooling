@@ -20,6 +20,8 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
@@ -27,24 +29,9 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
-import org.wso2.ei.dashboard.core.rest.model.Ack;
-import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
-import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
-import org.wso2.ei.dashboard.core.rest.model.Artifacts;
-import org.wso2.ei.dashboard.core.rest.model.CAppArtifacts;
-import org.wso2.ei.dashboard.core.rest.model.DatasourceList;
-import org.wso2.ei.dashboard.core.rest.model.Error;
-import org.wso2.ei.dashboard.core.rest.model.GroupList;
-import org.wso2.ei.dashboard.core.rest.model.LocalEntryValue;
-import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
-import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
-import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
-import org.wso2.ei.dashboard.core.rest.model.LogList;
-import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
+import org.wso2.ei.dashboard.core.rest.model.*;
 
 import java.io.File;
-
-import org.wso2.ei.dashboard.core.rest.model.NodeList;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -55,7 +42,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.wso2.ei.dashboard.core.rest.model.Users;
+import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
@@ -73,6 +60,8 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.UsersDelegate;
+
+import com.google.gson.JsonObject;
 
 import java.util.List;
 import javax.validation.constraints.*;
@@ -215,10 +204,37 @@ public class GroupsApi {
     public Response getCarbonApplicationsByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
             @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
-
         CarbonAppsDelegate cappsDelegate = new CarbonAppsDelegate();
         Artifacts cappList = cappsDelegate.getArtifactsList(groupId, nodes);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(cappList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+    @GET
+    @Path("/{group-id}/capps/faulty")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get names of faulty carbon applications by node ids", description = "", tags={ "carbonApplications" })
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "List of faulty carbon applications deployed in provided nodes",
+                     content = @Content(schema = @Schema(implementation = Artifacts.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getFaultyCarbonApplicationsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) 
+            throws ManagementApiException {
+        CarbonAppsDelegate cappsDelegate = new CarbonAppsDelegate();
+        List<JsonObject> cappList = cappsDelegate.getAllCApps(groupId, nodes);
+
+        CAppArtifactCollection collection = new CAppArtifactCollection();
+        for (JsonObject jsonObject : cappList) {
+            for (JsonElement jsonElement : jsonObject.getAsJsonArray("faultyList")) {
+                JsonObject entry = jsonElement.getAsJsonObject();
+                collection.getFaultyArtifacts().add(entry.get("name").getAsString());
+            }
+        }
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(collection);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
@@ -625,6 +641,28 @@ public class GroupsApi {
         NodesDelegate nodesDeligate = new NodesDelegate();
         NodeList nodeList = nodesDeligate.getNodes(groupId);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(nodeList);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+    @PATCH
+    @Path("/{group-id}/nodes/{node-id}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @Operation(summary = "Manage server runtimes of a node", description = "", tags={ "nodes" })
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "Server runtime status",
+                     content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+        @ApiResponse(responseCode = "200", description = "Unexpected error",
+                     content = @Content(schema = @Schema(implementation = Error.class)))})
+    public Response manageNodebyNodeId(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @PathParam("node-id") @Parameter(description = "Node ID") String nodeId,
+            @Valid ManageServerRuntimeRequest request) throws ManagementApiException {
+        NodesDelegate nodesDelegate = new NodesDelegate();
+        JsonObject entry = nodesDelegate.manageNode(groupId, nodeId, request);
+        NodeStatusMessage message = new NodeStatusMessage();
+        message.setMessage(entry.get("Message").getAsString());
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(message);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }

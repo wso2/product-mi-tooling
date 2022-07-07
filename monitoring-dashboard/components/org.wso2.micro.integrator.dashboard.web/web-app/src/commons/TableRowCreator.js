@@ -150,7 +150,7 @@ export default function TableRowCreator(props) {
             case 'nodeId':
                 return <TableCell><table><NodesCell pageId={pageId} nodeData={data}/></table></TableCell>
             case 'node_status':
-                return <TableCell>{nodeStatus === "healthy" ? <table>Healthy</table> : <table className={classes.unhealthyNodeCell}>Unhealthy</table>}</TableCell>
+                return <TableCell>{nodeStatus === "Unhealthy" ? <table className={classes.unhealthyNodeCell}>Unhealthy</table> : <table>{nodeStatus}</table>}</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
             case 'node_action':
@@ -215,6 +215,8 @@ function SwitchStatusCell(props) {
 
 function NodeActionDropDown(props) {
     const { nodeData, setNodeStatus } = props;
+    const globalGroupId = useSelector(state => state.groupId);
+
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [nodeAction, setNodeAction] = React.useState("");
     const [buttonDisable, setButtonDisable] = React.useState(false);
@@ -254,6 +256,7 @@ function NodeActionDropDown(props) {
     }
 
     const handleNodeAction = () => {
+        setButtonDisable(true);
         handleConfirmationDialogClose();
         var status;
         switch (nodeAction) {
@@ -277,12 +280,16 @@ function NodeActionDropDown(props) {
         var payload = {
             status
         }
-        HTTPClient.manageNode(payload).then(response => {
-            response.status === 200 && setNodeStatus("healthy");
-            setButtonDisable(false);
+        HTTPClient.manageNode(globalGroupId, nodeData.nodeId, payload).then(response => {
+            if (response.data.message === 'The server will start to shutdown.' ||
+            response.data.message === 'The server will start to shutdown gracefully.') {
+                setNodeStatus("Unhealthy");
+            } else {
+                setNodeStatus("Healthy");
+                setButtonDisable(false);
+            }
         }).catch(()=>{
             setNodeStatus("unhealthy");
-            setButtonDisable(false);
         })
     }
 
@@ -331,10 +338,7 @@ function NodeActionDropDown(props) {
 
                 <DialogActions>
                     <Button 
-                    onClick={() => {
-                        handleNodeAction(); 
-                        setButtonDisable(true);
-                    }} 
+                    onClick={handleNodeAction} 
                     variant="contained" 
                     autoFocus
                     >
