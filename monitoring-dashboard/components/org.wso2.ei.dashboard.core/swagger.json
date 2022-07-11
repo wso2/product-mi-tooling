@@ -35,6 +35,9 @@
     "name" : "proxyServices",
     "description" : "Access proxy services details"
   }, {
+    "name" : "registryResources",
+    "description" : "Access registry resources details"
+  }, {
     "name" : "endpoints",
     "description" : "Access endpoints details"
   }, {
@@ -372,6 +375,56 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/Ack"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups/{group-id}/registry-resources/{path}" : {
+      "get" : {
+        "tags" : [ "registryResources" ],
+        "summary" : "Get registryResources services",
+        "operationId" : "getRegistryResourcesByNodeIds",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "path",
+          "in" : "path",
+          "description" : "Path of the registry directory/file",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of registry resources deployed in provided nodes",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RegistryArtifacts"
                 }
               }
             }
@@ -2298,6 +2351,23 @@
           "$ref" : "#/components/schemas/DatasourceList_inner"
         }
       },
+      "RegistryArtifacts" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/RegistryArtifacts_inner"
+        }
+      },
+      "RegistryProperty" : {
+        "type" : "object",
+        "properties" : {
+          "propertyName" : {
+            "type" : "string"
+          },
+          "propertyValue" : {
+            "type" : "string"
+          }
+        }
+      },
       "LogList" : {
         "type" : "array",
         "items" : {
@@ -2594,6 +2664,23 @@
                   }
                 }
               }
+            }
+          }
+        }
+      },
+      "RegistryArtifacts_inner" : {
+        "type" : "object",
+        "properties" : {
+          "childName" : {
+            "type" : "string"
+          },
+          "mediaType" : {
+            "type" : "string"
+          },
+          "properties" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RegistryProperty"
             }
           }
         }

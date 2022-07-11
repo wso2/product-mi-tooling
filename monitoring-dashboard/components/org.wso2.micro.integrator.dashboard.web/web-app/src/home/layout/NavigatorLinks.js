@@ -15,6 +15,7 @@ import RoleIcon from '@material-ui/icons/Accessibility';
 import LogFileIcon from '@material-ui/icons/Description';
 import LayersIcon from '@material-ui/icons/Layers';
 import DnsIcon from '@material-ui/icons/Dns';
+import RegistryIcon from '@material-ui/icons/Receipt';
 
 export const categories = [
     {
@@ -35,6 +36,7 @@ export const categories = [
         { id: 'Connectors', to: '/connectors', icon: <ConnectorIcon /> },
         { id: 'Carbon Applications', to: '/carbon-applications', icon: <CappIcon /> },
         { id: 'Log Files', to: '/log-files', icon: <LogFileIcon /> },
+        { id: 'Registry Resources', to: '/registry-resources', icon: <RegistryIcon /> },
       ],
     },
     {

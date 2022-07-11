@@ -37,6 +37,8 @@ tags:
     description: "Access nodes details"
   - name: "proxyServices"
     description: "Access proxy services details"
+  - name: "registryResources"
+    description: "Access registry resources details"
   - name: "endpoints"
     description: "Access endpoints details"
   - name: "inboundEndpoints"
@@ -265,6 +267,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ack'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/registry-resources:
+    get:
+      tags:
+        - "registryResources"
+      summary: "Get registryResources services"
+      operationId: "getRegistryResourcesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "path"
+          in: query
+          description: "Path of the registry directory/file"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "List of registry resources deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryArtifacts'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/registry-resources/content:
+    get:
+      tags:
+        - "registryResources"
+      summary: "Get registry resource content"
+      operationId: "getRegistryContent"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "path"
+          in: query
+          description: "Path of the registry directory/file"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Get registry resource file content"
+          content:
+            text/plain:
+              schema:
+                type: string
         default:
           description: "Unexpected error"
           content:
@@ -1562,6 +1628,28 @@ components:
                   description: Array contains default auto commit, default read only, test on borrow, test on return, test while idle etc.
                   items:
                     $ref: '#/components/schemas/KeyValue'
+
+    RegistryArtifacts:
+      type: array
+      items:
+        type: object
+        properties:
+          childName:
+            type: string
+          mediaType:
+            type: string
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/RegistryProperty'
+    RegistryProperty:
+      type: object
+      properties:
+        propertyName:
+          type: string
+        propertyValue:
+          type: string
+
     LogList:
       type: array
       items:
