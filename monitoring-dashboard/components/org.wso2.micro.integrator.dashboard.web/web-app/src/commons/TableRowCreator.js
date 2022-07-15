@@ -54,11 +54,16 @@ export default function TableRowCreator(props) {
     const [nodeStatus, setNodeStatus] = React.useState(data.status);
     const pageId = pageInfo.pageId
     const classes = useStyles();
+
+    React.useEffect(()=>{
+        setNodeStatus(data.status);
+    },[props])
+
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             // common
             case 'name':
-                return <TableCell>{data.name}{ pageId === "carbonapps" && data.status ==="faulty" && <>&nbsp;<Chip
+                return <TableCell>{data.name}{ pageId === "carbonapps" && data.status === "faulty" && <>&nbsp;<Chip
                 size="small"
                 label="Faulty"
                 color="primary"
@@ -150,11 +155,11 @@ export default function TableRowCreator(props) {
             case 'nodeId':
                 return <TableCell><table><NodesCell pageId={pageId} nodeData={data}/></table></TableCell>
             case 'node_status':
-                return <TableCell>{nodeStatus === "Unhealthy" ? <table className={classes.unhealthyNodeCell}>Unhealthy</table> : <table>{nodeStatus}</table>}</TableCell>
+                return <TableCell>{nodeStatus === "unhealthy" ? <table className={classes.unhealthyNodeCell}>unhealthy</table> : <table>{nodeStatus}</table>}</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
             case 'node_action':
-                return <TableCell><NodeActionDropDown nodeData={data} setNodeStatus={setNodeStatus}/></TableCell>
+                return <TableCell><NodeActionDropDown nodeData={data} setNodeStatus={setNodeStatus} retrieveData={retrieveData}/></TableCell>
 
             // Log Files Page
             case 'nodes_logs':
@@ -214,7 +219,8 @@ function SwitchStatusCell(props) {
 }
 
 function NodeActionDropDown(props) {
-    const { nodeData, setNodeStatus } = props;
+    const { nodeData, setNodeStatus, retrieveData } = props;
+    const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -281,15 +287,11 @@ function NodeActionDropDown(props) {
             status
         }
         HTTPClient.manageNode(globalGroupId, nodeData.nodeId, payload).then(response => {
-            if (response.data.message === 'The server will start to shutdown.' ||
-            response.data.message === 'The server will start to shutdown gracefully.') {
-                setNodeStatus("Unhealthy");
-            } else {
-                setNodeStatus("Healthy");
+            if (response.data.message === 'The server will start to restart.' ||
+            response.data.message === 'The server will start to restart gracefully.') {
                 setButtonDisable(false);
             }
-        }).catch(()=>{
-            setNodeStatus("unhealthy");
+            retrieveData();
         })
     }
 
@@ -299,9 +301,10 @@ function NodeActionDropDown(props) {
             aria-haspopup="true"
             variant="contained"
             color="primary"
+            className={classes.button}
             disabled={buttonDisable}
             onClick={handleStyledMenuOpen}
-            endIcon={<KeyboardArrowDownIcon />}
+            endIcon={<KeyboardArrowDownIcon style={{ color: 'white' }}/>}
             >
             Manage
             </Button>
@@ -342,11 +345,11 @@ function NodeActionDropDown(props) {
                     variant="contained" 
                     autoFocus
                     >
-                        OK
+                        Yes
                     </Button>
 
                     <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
-                        Cancel
+                        No
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -671,6 +674,10 @@ const useStyles = makeStyles((theme) => ({
     disabledButton: {
         color: '#000000',
         opacity: '0.26'
+    },
+    button: {
+        backgroundColor: theme.palette.background.appBar,
+        color: 'white'
     }
 }));
 
@@ -697,7 +704,7 @@ const StyledMenu = withStyles({
 const StyledMenuItem = withStyles((theme) => ({
     root: {
       '&:focus': {
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: theme.palette.background.appBar,
         '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
           color: theme.palette.common.white,
         },

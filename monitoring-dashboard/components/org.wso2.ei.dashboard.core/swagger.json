@@ -1045,6 +1045,59 @@
         }
       }
     },
+    "/groups/{group-id}/nodes/{node-id}" : {
+      "patch" : {
+        "tags" : [ "nodes" ],
+        "summary" : "Manage server runtimes of a node",
+        "operationId" : "manageNodebyNodeId",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "node-id",
+          "in" : "path",
+          "description" : "Node ID",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/ManageServerRuntime"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Server runtime status",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SuccessStatus"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/groups/{group-id}/nodes/{node-id}/local-entries/{local-entry}/value" : {
       "get" : {
         "tags" : [ "localEntries" ],
@@ -1300,6 +1353,60 @@
         "responses" : {
           "200" : {
             "description" : "List of carbon applications deployed in provided nodes",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Artifacts"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups/{group-id}/capps/faulty" : {
+      "get" : {
+        "tags" : [ "carbonApplications" ],
+        "summary" : "Get names of faulty carbon applications by node ids",
+        "operationId" : "getFaultyCarbonApplicationsByNodeIds",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "nodes",
+          "in" : "query",
+          "description" : "ID/IDs of the nodes",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "default" : "all"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of faulty carbon applications deployed in provided nodes",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2131,6 +2238,33 @@
           }
         }
       },
+      "ManageServerRuntimeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "string"
+          }
+        }
+      },
+      "NodeStatusMessage" : {
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CAppArtifactCollection" : {
+        "type" : "object",
+        "properties" : {
+          "faultyArtifacts" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
       "KeyValue" : {
         "type" : "object",
         "properties" : {
@@ -2414,6 +2548,16 @@
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/AddUserRequest"
+            }
+          }
+        }
+      },
+      "ManageServerRuntime" : {
+        "description" : "The request body to manage server.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/ManageServerRuntimeRequest"
             }
           }
         }

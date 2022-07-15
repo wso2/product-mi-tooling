@@ -51,7 +51,7 @@ export default function LogConfigs() {
     const [selectedNodeId, setSelectedNodeId] = React.useState('All');
     const [logConfigs, setLogConfigs] = React.useState([]);
     const [filteredLogConfigs, setFilteredLogConfigs] = React.useState([]);
-    const [searchQuery, setSearchQuery] = React.useState("");
+    const [searchQuery, setSearchQuery] = React.useState('');
     const globalGroupId = useSelector(state => state.groupId);
 
     const classes = useStyles();
@@ -81,8 +81,8 @@ export default function LogConfigs() {
 
     const getFilteredLogConfigs = (searchQuery) => {
         setSearchQuery(searchQuery);
-        if (searchQuery){
-            setFilteredLogConfigs(logConfigs.filter((logger)=>logger.componentName.includes(searchQuery)));
+        if (searchQuery) {
+            setFilteredLogConfigs(logConfigs.filter((logger) => logger.componentName.includes(searchQuery)));
         }      
     }
 
@@ -152,7 +152,7 @@ export default function LogConfigs() {
                 onChange={(e)=>getFilteredLogConfigs(e.target.value)}
                 />
             </div>
-            <Button component={Link} to="/log-configs/add" variant="contained" color="primary">
+            <Button component={Link} to="/log-configs/add" variant="contained" color="primary" className={classes.button}>
                 Add Logging Configuration
             </Button>
         </div>
@@ -172,6 +172,10 @@ const useStyles = makeStyles((theme) => ({
         float: 'right',
         display: 'flex',
         flexDirection:'row'
+    },
+    button: {
+        backgroundColor: theme.palette.background.appBar,
+        color: 'white'
     },
     search: {
         position: 'relative',
