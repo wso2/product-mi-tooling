@@ -234,7 +234,7 @@ function Login(props){
                 </div>
                 <Box mt={8}>
                     <Typography variant="body2" color="textSecondary" align="center">
-                        {`© 2005 - ${new Date().getFullYear()} WSO2 Inc. All Rights Reserved.`}
+                        {`© 2005 - ${new Date().getFullYear()} WSO2 LLC. All Rights Reserved.`}
                     </Typography>
                 </Box>
                 <Dialog open={loginError} onClose={handleLoginErrorDialogClose}

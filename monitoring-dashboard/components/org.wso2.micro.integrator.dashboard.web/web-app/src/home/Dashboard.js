@@ -154,7 +154,7 @@ function Layout(props) {
                     </main>
                     <footer className={classes.footer}>
                         <Typography variant="body2" color="textSecondary" align="center">
-                            {`© 2005 - ${new Date().getFullYear()} WSO2 Inc. All Rights Reserved.`}
+                            {`© 2005 - ${new Date().getFullYear()} WSO2 LLC. All Rights Reserved.`}
                         </Typography>
                     </footer>
                 </div>
