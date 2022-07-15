@@ -28,7 +28,7 @@ import { Button, Table, TableCell, TableRow } from '@material-ui/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 
-export default function HomePageSideDrawer(props) {
+export default function HomePageModal(props) {
     var nodeData = props.nodeData;
     const [copyMessage, setCopyMessage] = useState('Copy to Clipboard');
 
@@ -57,7 +57,7 @@ export default function HomePageSideDrawer(props) {
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <Paper className={classes.sideDrawerHeading} square elevation={0}>
+                    <Paper className={classes.modalHeading} square elevation={0}>
                         <Typography variant="h6" color="inherit" noWrap>
                             {nodeData.nodeId} Information
                         </Typography>
@@ -133,7 +133,7 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         color: theme.palette.text.secondary,
     },
-    sideDrawerHeading: {
+    modalHeading: {
         padding: theme.spacing(1),
         height: '72px',
         backgroundColor: theme.palette.background.appBar,

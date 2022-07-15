@@ -28,7 +28,7 @@ import CopyToClipboardCell from './commons/CopyToClipBoardCell'
 import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 
-export default function EndpointSideDrawer(props) {
+export default function EndpointModal(props) {
     const { nodeData, retrieveData } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;

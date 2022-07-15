@@ -46,6 +46,8 @@ public class HeartBeatDelegate {
     private static final String PRODUCT_MI = "mi";
     private static final String PRODUCT_SI = "si";
     private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final ScheduledExecutorService heartbeatScheduledExecutorService =
+            Executors.newScheduledThreadPool(0);
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws ManagementApiException {
         long currentTimestamp = System.currentTimeMillis();
@@ -54,11 +56,7 @@ public class HeartBeatDelegate {
                 heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
                 heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp,
                 heartbeatRequest.getChangeNotification().getDeployedArtifacts(),
-                heartbeatRequest.getChangeNotification().getUndeployedArtifacts(),
-                heartbeatRequest.getChangeNotification().getStateChangedArtifacts());
-        if (logger.isDebugEnabled()) {
-            logger.debug("Management API URL received is: " + heartbeat.getMgtApiUrl());
-        }
+                heartbeatRequest.getChangeNotification().getUndeployedArtifacts());
         boolean isSuccess;
         String productName = heartbeat.getProduct();
         ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
@@ -72,6 +70,8 @@ public class HeartBeatDelegate {
                 artifactsManager.runFetchAllExecutorService();
             }
         }
+        runHeartbeatExecutorService(productName, heartbeat);
+
         if (isSuccess) {
             ack.setStatus(Constants.SUCCESS_STATUS);
         }
@@ -96,27 +96,23 @@ public class HeartBeatDelegate {
         logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
         String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
-        ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        long heartbeatInterval = heartbeat.getInterval();
-        String productName = heartbeat.getProduct();
-        Runnable runnableTask = () -> {
-            String timestampOfRegisteredNode =
-                    databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
-            long longTimestampOfRegisteredNode = Long.parseLong(timestampOfRegisteredNode);
-            long currentTimestamp = System.currentTimeMillis();
+        return databaseManager.insertHeartbeat(heartbeat, accessToken);
+    }
 
-            boolean isNodeDeregistered =
-                    (currentTimestamp - longTimestampOfRegisteredNode) > 3 * heartbeatInterval * 1000;
+    private void runHeartbeatExecutorService(String productName, HeartbeatObject heartbeat) {
+        long heartbeatInterval = heartbeat.getInterval();
+        String timestampOfRegisteredNode =
+                databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
+        Runnable runnableTask = () -> {
+            boolean isNodeDeregistered = isNodeShutDown(heartbeat, timestampOfRegisteredNode);
             if (isNodeDeregistered) {
                 logger.info("Node : " + heartbeat.getNodeId() + " of group : " + heartbeat.getGroupId() + " has " +
-                        "de-registered. Hence deleting node information");
-                heartbeatScheduledExecutorService.shutdownNow();
+                         "de-registered. Hence deleting node information");
                 deleteNode(productName, heartbeat);
             }
         };
-        heartbeatScheduledExecutorService.scheduleWithFixedDelay(runnableTask, 3 *
-                heartbeatInterval, 3 * heartbeatInterval, TimeUnit.SECONDS);
-        return databaseManager.insertHeartbeat(heartbeat, accessToken);
+        heartbeatScheduledExecutorService.schedule(runnableTask, 3 * heartbeatInterval, TimeUnit.SECONDS);
+        heartbeatScheduledExecutorService.shutdown();
     }
 
     private boolean isNodeShutDown(HeartbeatObject heartbeat, String initialTimestamp) {

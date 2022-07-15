@@ -40,8 +40,16 @@ export default function CarbonApplications() {
     const selectedNodeList = useSelector(state => state.nodeList);
 
     React.useEffect(() => {
+        let carbonAppList =[];
         HTTPClient.getArtifacts("capps", globalGroupId, selectedNodeList).then(response => {
-            setCarbonAppsList(response.data)
+            carbonAppList=response.data
+            HTTPClient.getFaultyCapps(globalGroupId, selectedNodeList).then(response => {
+                carbonAppList.forEach((element,index) => {
+                    if(response.data.faultyArtifacts.includes(element.name))
+                        carbonAppList[index]={...carbonAppList[index], status:"faulty"}
+                });
+                setCarbonAppsList(carbonAppList)
+            })
         })
     },[globalGroupId, selectedNodeList])
 

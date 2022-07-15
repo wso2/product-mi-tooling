@@ -70,7 +70,7 @@ function Header(props) {
   };
 
   const showNodeSelector = () => {
-    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname.startsWith("/roles") || location.pathname === "/");
+    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname === "/");
   };
 
   const handleLogout = () => {
@@ -126,7 +126,7 @@ function Header(props) {
                   keepMounted
                   open={Boolean(anchorEl)}
                   onClose={handlePopOverClose}>
-                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                  <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 </Menu>
               </Popover>
             </Grid>
@@ -147,6 +147,18 @@ function Header(props) {
                 {selected ? selected.id : 'Nodes'}
               </Typography>
             </Grid>
+            {/* <Grid item>
+              <Button className={classes.button} variant="outlined" color="inherit" size="small">
+                Web setup
+              </Button>
+            </Grid>
+            <Grid item>
+              <Tooltip title="Help">
+                <IconButton color="inherit">
+                  <HelpIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid> */}
           </Grid>
         </Toolbar>
       </AppBar>

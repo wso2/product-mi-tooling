@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,12 +24,19 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import LocalEntryValueSection from './commons/LocalEntryValueSection'
+import SourceViewSection from './commons/SourceViewSection'
 
-export default function LocalEntriesSideDrawer(props) {
+export default function TemplatesModal(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
+    const artifactType = nodeData.details.type;
+    var templateType;
+    if (artifactType==="Endpoint Template") {
+        templateType = "templates_endpoint"
+    } else if (artifactType==="Sequence Template") {
+        templateType = "templates_sequence"
+    }
     const classes = useStyles();
 
     return (
@@ -37,13 +44,13 @@ export default function LocalEntriesSideDrawer(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId} />
-                    <LocalEntryValueSection
-                        name={artifactName}
-                        type={nodeData.details.type}
+                    <SourceViewSection
+                        artifactType={templateType}
+                        artifactName={artifactName}
                         nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <LocalEntriesDetailTable nodeData={nodeData} />
+                                <TemplateDetailTable nodeData={nodeData} />
                             </Paper>
                         </>}
                     />
@@ -53,13 +60,14 @@ export default function LocalEntriesSideDrawer(props) {
     );
 }
 
-function LocalEntriesDetailTable(props) {
+function TemplateDetailTable(props) {
     const nodeData = props.nodeData;
+    const artifactName = nodeData.details.name
 
     return <Table>
         <TableRow>
-            <TableCell>Local Entry Name</TableCell>
-            <TableCell>{nodeData.details.name}</TableCell>
+            <TableCell>Template Name</TableCell>
+            <TableCell>{artifactName}</TableCell>
         </TableRow>
         <TableRow>
             <TableCell>Type</TableCell>

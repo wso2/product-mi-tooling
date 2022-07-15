@@ -21,6 +21,5 @@ export const Constants = {
     PREFIX_GROUPS: "groups",
     PREFIX_NODES: "nodes",
     PREFIX_USERS: "users",
-    PREFIX_ROLES: "roles",
     PREFIX_LOG_CONFIGS: "log-configs"
 };

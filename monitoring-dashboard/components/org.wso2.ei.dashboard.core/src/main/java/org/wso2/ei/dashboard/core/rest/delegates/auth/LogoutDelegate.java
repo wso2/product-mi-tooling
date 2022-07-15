@@ -19,12 +19,9 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates.auth;
 
-import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.auth.TokenCache;
 
 import javax.ws.rs.core.Response;
-
-import static org.wso2.ei.dashboard.core.rest.delegates.auth.LoginDelegate.getTokenCookieHeader;
 
 /**
  * Manages login received to the dashboard.
@@ -32,10 +29,10 @@ import static org.wso2.ei.dashboard.core.rest.delegates.auth.LoginDelegate.getTo
 public class LogoutDelegate {
 
     public Response logoutUser(String accessToken) {
-        if (!accessToken.isEmpty()) {
+        if (accessToken.isEmpty()) {
             removeTokenFromCache(accessToken);
         }
-        return Response.ok().header(Constants.COOKIE_HEADER, getTokenCookieHeader(null, 0)).build();
+        return Response.ok().build();
     }
 
     private void removeTokenFromCache(String accessToken) {

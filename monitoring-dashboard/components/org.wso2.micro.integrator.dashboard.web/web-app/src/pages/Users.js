@@ -47,7 +47,7 @@ export default function Users() {
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
 
-    const retrieveUsers = () => {
+    React.useEffect(() => {
         HTTPClient.getUsers(globalGroupId).then(response => {
             response.data.map(data => data.details = JSON.parse(data.details));
             setUsers(response.data)
@@ -56,10 +56,6 @@ export default function Users() {
                 setError(error.response.data.message)
             }
         })
-    }
-
-    React.useEffect(() => {
-        retrieveUsers();
     }, [globalGroupId, dataSet]);
 
     if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
@@ -82,10 +78,6 @@ export default function Users() {
         return(<Progress/>);
     }
 
-    const retrieveData = () => {
-        retrieveUsers();
-    }
-
     return <>
         <div style={{height: "30px"}}>
         <Button classes={{root: classes.buttonRight}} component={Link} to="/users/add" variant="contained"
@@ -94,7 +86,7 @@ export default function Users() {
         </Button>
         </div>
         <br/>
-        <EnhancedTable pageInfo={pageInfo} dataSet={users} retrieveData={retrieveData}/>
+        <EnhancedTable pageInfo={pageInfo} dataSet={users}/>
     </>
 }
 

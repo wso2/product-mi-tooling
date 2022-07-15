@@ -40,7 +40,6 @@ export default function AddUsers() {
     const globalGroupId = useSelector(state => state.groupId);
     const [user, setUser] = React.useState({
         userId: "",
-        domain: "PRIMARY",
         password: "",
         passwordRepeat: "",
         isAdmin: "false"
@@ -75,7 +74,7 @@ export default function AddUsers() {
     }
 
     const addUser = () => {
-        const { userId, domain, password, passwordRepeat, isAdmin } = user
+        const { userId, password, passwordRepeat, isAdmin } = user
 
         if (userId === '') {
             setDialog({
@@ -101,7 +100,6 @@ export default function AddUsers() {
         } else {
             var payload = {
                 "userId": userId,
-                "domain": domain,
                 "password": password,
                 "isAdmin": isAdmin
             }
@@ -132,19 +130,6 @@ export default function AddUsers() {
                     <form>
                         <Box mb={2}>
                             <TextField
-                                margin='dense'
-                                variant='outlined'
-                                fullWidth
-                                helperText='Enter User Store Domain Name'
-                                label="User Store Domain"
-                                autoComplete="off"
-                                onChange={(e) => handleUserInput(e)}
-                                name="domain"
-                                value={user.domain}
-                            />
-                        </Box>
-                        <Box mb={2}>
-                            <TextField
                                 autoFocus
                                 margin='dense'
                                 variant='outlined'
@@ -164,10 +149,9 @@ export default function AddUsers() {
                                 variant='outlined'
                                 fullWidth
                                 helperText='Enter Password'
-                                required
                                 onChange={(e) => handleUserInput(e)}
-                                name="password" 
-                                label="Password"
+                                name="password" l
+                                abel="Password"
                                 autoComplete="off"
                                 type="password"
                                 value={user.password} />
@@ -178,7 +162,6 @@ export default function AddUsers() {
                                 variant='outlined'
                                 fullWidth
                                 helperText='Re Enter The Same Password'
-                                required
                                 onChange={(e) => handleUserInput(e)}
                                 name="passwordRepeat"
                                 label="Repeat Password"
@@ -227,7 +210,7 @@ export default function AddUsers() {
                 </Grid>
             </Grid>
         </Paper>
-    </div>
+    </div >
 }
 
 const useStyles = makeStyles((theme) => ({

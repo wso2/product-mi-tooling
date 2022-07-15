@@ -40,6 +40,7 @@ import org.wso2.ei.dashboard.core.rest.model.CAppArtifacts;
 import org.wso2.ei.dashboard.core.rest.model.CAppArtifactsInner;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,6 +54,20 @@ public class CarbonAppsDelegate implements ArtifactDelegate {
     public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
         log.debug("Fetching carbon applications from database.");
         return databaseManager.fetchArtifacts(Constants.CARBON_APPLICATIONS, groupId, nodeList);
+    }
+
+    public List<JsonObject> getAllCApps(String groupId, List<String> nodeList) throws ManagementApiException {
+        log.debug("Fetching carbon applications from management console");
+        List<JsonObject> jsonResponse = new ArrayList<JsonObject>();
+        for (String nodeId: nodeList) {
+            String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+            String url = mgtApiUrl.concat("applications");
+
+            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+            CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
+            jsonResponse.add(HttpUtils.getJsonResponse(httpResponse));       
+        }
+        return jsonResponse;
     }
 
     public CAppArtifacts getCAppArtifactList(String groupId, String nodeId, String cAppName)

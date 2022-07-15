@@ -28,7 +28,7 @@ import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import SourceViewSection from './commons/SourceViewSection'
 
-export default function TasksSideDrawer(props) {
+export default function TasksModal(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;

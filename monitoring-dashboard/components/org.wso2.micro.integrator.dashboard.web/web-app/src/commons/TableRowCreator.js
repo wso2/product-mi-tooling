@@ -23,7 +23,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Switch from "react-switch";
 import ReactSelect from 'react-select';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import EnabledIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import DisabledIcon from '@material-ui/icons/BlockOutlined';
@@ -36,9 +36,13 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Chip from '@material-ui/core/Chip';
+import ListItemText from '@material-ui/core/ListItemText';
 import Box from '@material-ui/core/Box';
 import NodesCell from './NodesCell';
-import UserRoleCell from './UserRoleCell';
 import LogsNodeCell from './LogsNodeCell';
 import StatusCell from './statusCell/StatusCell';
 import AuthManager from '../auth/AuthManager';
@@ -47,13 +51,24 @@ import HTTPClient from '../utils/HTTPClient';
 
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers, retrieveData } = props;
+    const [nodeStatus, setNodeStatus] = React.useState(data.status);
     const pageId = pageInfo.pageId
     const classes = useStyles();
+
+    React.useEffect(()=>{
+        setNodeStatus(data.status);
+    },[props])
+
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             // common
             case 'name':
-                return <TableCell>{data.name}</TableCell>
+                return <TableCell>{data.name}{ pageId === "carbonapps" && data.status === "faulty" && <>&nbsp;<Chip
+                size="small"
+                label="Faulty"
+                color="primary"
+                style={{backgroundColor:'red'}}
+              /></>}</TableCell>
             case 'nodes':
                 return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} retrieveData={retrieveData}/>)}</table></TableCell>
             case 'type':
@@ -130,25 +145,21 @@ export default function TableRowCreator(props) {
 
             // users page
             case 'userId':
-                return <TableCell><UserRoleCell pageId={pageId} data={data} retrieveData={retrieveData}/></TableCell>
+                return <TableCell>{data.userId}</TableCell>
             case 'isAdmin':
                 return <TableCell>{data.details.isAdmin ? <AdminIcon style={{color:"green"}}/> : <NonAdminIcon style={{color:"red"}}/>}</TableCell>
             case 'action':
                 return <TableCell><UserDeleteAction userId={data.userId}/></TableCell>
-
-            // roles page
-            case 'roleName':
-                return <TableCell><UserRoleCell pageId={pageId} data={data}/></TableCell>
-            case 'roleAction':
-                return <TableCell><RoleDeleteAction roleName={data.roleName}/></TableCell>
             
             // Node page
             case 'nodeId':
                 return <TableCell><table><NodesCell pageId={pageId} nodeData={data}/></table></TableCell>
             case 'node_status':
-                return <TableCell>{data.status == "healthy" ? <table>Healthy</table> : <table className={classes.unhealthyNodeCell}>Unhealthy</table>}</TableCell>
+                return <TableCell>{nodeStatus === "unhealthy" ? <table className={classes.unhealthyNodeCell}>unhealthy</table> : <table>{nodeStatus}</table>}</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
+            case 'node_action':
+                return <TableCell><NodeActionDropDown nodeData={data} setNodeStatus={setNodeStatus} retrieveData={retrieveData}/></TableCell>
 
             // Log Files Page
             case 'nodes_logs':
@@ -205,6 +216,144 @@ function SwitchStatusCell(props) {
     }
 
     return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} /></td></tr>
+}
+
+function NodeActionDropDown(props) {
+    const { nodeData, setNodeStatus, retrieveData } = props;
+    const classes = useStyles();
+    const globalGroupId = useSelector(state => state.groupId);
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [nodeAction, setNodeAction] = React.useState("");
+    const [buttonDisable, setButtonDisable] = React.useState(false);
+
+    const handleStyledMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleStyledMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const [confirmationDialog, setConfirmationDialog] = React.useState({
+        open : false,
+        title: '',
+        message: ''
+    });
+
+    const handleConfirmationDialogClose = () => {
+        setConfirmationDialog({
+            open: false,
+            title: '',
+            message: ''
+        })
+    }
+
+    const handleConfirmationDialogOpen = (action) => {
+        handleStyledMenuClose();
+        var message = 'Are you sure you want to '.concat(action.toLowerCase()).concat(' the node ')
+        .concat(nodeData.nodeId).concat('?')
+        setConfirmationDialog({
+            open: true,
+            title: 'Confirmation',
+            message: message
+        })
+        setNodeAction(action);
+    }
+
+    const handleNodeAction = () => {
+        setButtonDisable(true);
+        handleConfirmationDialogClose();
+        var status;
+        switch (nodeAction) {
+            case 'Graceful Shutdown':
+                status="shutdownGracefully";  
+                setNodeStatus("Shutting down");              
+                break;
+            case 'Forceful Shutdown':
+                status="shutdown"; 
+                setNodeStatus("Shutting down");               
+                break;
+            case 'Graceful Restart':
+                status="restartGracefully"; 
+                setNodeStatus("Restarting");               
+                break;        
+            default:
+                status="restart";
+                setNodeStatus("Restarting");
+                break;
+        }
+        var payload = {
+            status
+        }
+        HTTPClient.manageNode(globalGroupId, nodeData.nodeId, payload).then(response => {
+            if (response.data.message === 'The server will start to restart.' ||
+            response.data.message === 'The server will start to restart gracefully.') {
+                setButtonDisable(false);
+            }
+            retrieveData();
+        })
+    }
+
+    return <div>
+            <Button
+            aria-controls="customized-menu"
+            aria-haspopup="true"
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            disabled={buttonDisable}
+            onClick={handleStyledMenuOpen}
+            endIcon={<KeyboardArrowDownIcon style={{ color: 'white' }}/>}
+            >
+            Manage
+            </Button>
+            <StyledMenu
+            id="customized-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleStyledMenuClose}
+            >
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Graceful Shutdown')}>
+                <ListItemText primary="Graceful Shutdown"/>
+                </StyledMenuItem>
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Forceful Shutdown')}>
+                <ListItemText primary="Forceful Shutdown"/>
+                </StyledMenuItem>
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Graceful Restart')}>
+                <ListItemText primary="Graceful Restart"/>
+                </StyledMenuItem>
+                <StyledMenuItem onClick={() => handleConfirmationDialogOpen('Forceful Restart')}>
+                <ListItemText primary="Forceful Restart"/>
+                </StyledMenuItem>
+            </StyledMenu>
+
+            <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
+                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
+
+                <DialogContent dividers>
+                    <DialogContentText id="alert-dialog-description">
+                        {confirmationDialog.message}
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button 
+                    onClick={handleNodeAction} 
+                    variant="contained" 
+                    autoFocus
+                    >
+                        Yes
+                    </Button>
+
+                    <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
+                        No
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
 }
 
 function LogConfigLevelDropDown(props) {
@@ -394,7 +543,6 @@ function LogConfigLevelDropDown(props) {
 function UserDeleteAction(props) {
     const userId = props.userId;
     const loggedInUser = AuthManager.getUser().username;
-    const superAdmin = useSelector(state => state.superAdmin);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dispatch = useDispatch();
@@ -457,10 +605,11 @@ function UserDeleteAction(props) {
                 })
             }
         })
+
     }
 
     return <div><tr><td><enabledDelete/>
-        {loggedInUser === userId || superAdmin === userId ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
+        {loggedInUser === userId ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
                             <DeleteIcon color="disabled"/>
                             Delete
                         </Box> : <Box display='flex' alignItems='center'>
@@ -510,121 +659,6 @@ function UserDeleteAction(props) {
             </div>
 }
 
-function RoleDeleteAction(props) {
-    const roleName = props.roleName;
-    const classes = useStyles();
-    const globalGroupId = useSelector(state => state.groupId);
-    const dispatch = useDispatch();
-
-    const [confirmationDialog, setConfirmationDialog] = React.useState({
-        open : false,
-        title: '',
-        message: ''
-    });
-
-    const [completionStatusDialog, setCompletionStatusDialog] = React.useState({
-        open : false,
-        title: '',
-        message: ''
-    });
-
-    const handleConfirmationDialogClose = () => {
-        setConfirmationDialog({
-            open: false,
-            title: '',
-            message: ''
-        })
-    }
-
-    const handlecompletionStatusDialogClose = () => {
-        setCompletionStatusDialog({
-            open: false,
-            title: '',
-            message: ''
-        })
-        HTTPClient.getRoles(globalGroupId).then(response => {
-            response.data.map(data => data.details = JSON.parse(data.details))
-            dispatch(changeData(response.data))
-        })
-    }
-
-    const confirmDelete = () => {
-        var message = 'Are you sure you want to delete role '.concat(roleName).concat('?')
-        setConfirmationDialog({
-            open: true,
-            title: 'Confirmation',
-            message: message
-        })
-    }
-
-    const deleteRole = () => {
-        handleConfirmationDialogClose();
-        HTTPClient.deleteRole(globalGroupId, roleName).then(response => {
-            if (response.data.status === 'success') {
-                setCompletionStatusDialog({
-                    open: true, 
-                    title: 'Success',
-                    message: "Successfully deleted role."
-                })
-            } else {
-                setCompletionStatusDialog({
-                    open: true, 
-                    title: 'Error',
-                    message: response.data.message
-                })
-            }
-        })
-    }
-
-    return <div><tr><td><enabledDelete/>
-        {roleName === "admin" ? <Box display='flex' alignItems='center' className={classes.disabledButton}>
-                            <DeleteIcon color="disabled"/>
-                            Delete
-                        </Box> : <Box display='flex' alignItems='center'>
-                                <DeleteIcon onClick={() => confirmDelete()}/> 
-                                Delete
-                            </Box>}
-        </td></tr>
-            <Dialog open={confirmationDialog.open} onClose={() => handleConfirmationDialogClose()}
-                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                <DialogTitle id="alert-dialog-title">{confirmationDialog.title}</DialogTitle>
-
-                <DialogContent dividers>
-                    <DialogContentText id="alert-dialog-description">
-                        {confirmationDialog.message}
-                    </DialogContentText>
-                </DialogContent>
-
-                <DialogActions>
-                    <Button onClick={() => deleteRole()} variant="contained" autoFocus>
-                        Confirm
-                    </Button>
-
-                    <Button onClick={() => handleConfirmationDialogClose()} variant="contained" autoFocus>
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={completionStatusDialog.open} onClose={() => handlecompletionStatusDialogClose()}
-                                    aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                <DialogTitle id="alert-dialog-title">{completionStatusDialog.title}</DialogTitle>
-
-                <DialogContent dividers>
-                    <DialogContentText id="alert-dialog-description">
-                        {completionStatusDialog.message}
-                    </DialogContentText>
-                </DialogContent>
-
-                <DialogActions>
-                    <Button onClick={() => handlecompletionStatusDialogClose()} variant="contained" autoFocus>
-                        OK
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
-}
-
 const useStyles = makeStyles((theme) => ({
     tableCell : {
         paddingLeft: '15px',
@@ -640,5 +674,40 @@ const useStyles = makeStyles((theme) => ({
     disabledButton: {
         color: '#000000',
         opacity: '0.26'
+    },
+    button: {
+        backgroundColor: theme.palette.background.appBar,
+        color: 'white'
     }
 }));
+
+const StyledMenu = withStyles({
+    paper: {
+      border: '1px solid #d3d4d5',
+    },
+  })((props) => (
+    <Menu
+      elevation={0}
+      getContentAnchorEl={null}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+      {...props}
+    />
+));
+  
+const StyledMenuItem = withStyles((theme) => ({
+    root: {
+      '&:focus': {
+        backgroundColor: theme.palette.background.appBar,
+        '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+          color: theme.palette.common.white,
+        },
+      },
+    },
+}))(MenuItem);

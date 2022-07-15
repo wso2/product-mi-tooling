@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -17,58 +17,34 @@
  *
  *
  */
-
 package org.wso2.ei.dashboard.core.rest.model;
 
-import javax.validation.constraints.*;
 import javax.validation.Valid;
-
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
-public class RoleListInner   {
-  private @Valid String roleName = null;
-  private @Valid String details = null;
+public class NodeStatusMessage {
+  private @Valid String message = null;
 
   /**
    **/
-  public RoleListInner roleName(String roleName) {
-    this.roleName = roleName;
+  public NodeStatusMessage message(String message) {
+    this.message = message;
     return this;
   }
 
-  
   @ApiModelProperty(value = "")
-  @JsonProperty("roleName")
+  @JsonProperty("message")
 
-  public String getRoleName() {
-    return roleName;
-  }
-  public void setRoleName(String roleName) {
-    this.roleName = roleName;
+  public String getMessage() {
+    return message;
   }
 
-  /**
-   **/
-  public RoleListInner details(String details) {
-    this.details = details;
-    return this;
+  public void setMessage(String message) {
+    this.message = message;
   }
-
-  
-  @ApiModelProperty(value = "")
-  @JsonProperty("details")
-
-  public String getDetails() {
-    return details;
-  }
-  public void setDetails(String details) {
-    this.details = details;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -78,23 +54,21 @@ public class RoleListInner   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RoleListInner roleListInner = (RoleListInner) o;
-    return Objects.equals(roleName, roleListInner.roleName) &&
-        Objects.equals(details, roleListInner.details);
+    NodeStatusMessage nodeStatusMessage = (NodeStatusMessage) o;
+    return Objects.equals(message, nodeStatusMessage.message);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(roleName, details);
+    return Objects.hash(message);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class RoleListInner {\n");
-    
-    sb.append("    roleName: ").append(toIndentedString(roleName)).append("\n");
-    sb.append("    details: ").append(toIndentedString(details)).append("\n");
+    sb.append("class NodeStatusMessage {\n");
+
+    sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("}");
     return sb.toString();
   }

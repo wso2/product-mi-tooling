@@ -34,12 +34,9 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-
-import static org.wso2.ei.dashboard.core.commons.Constants.JWT_COOKIE;
 
 /**
  * Authenticate the request coming to the rest api.
@@ -60,26 +57,18 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
 
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-        Map<String, Cookie> cookies = requestContext.getCookies();
-        String token;
-        SecurityHandler securityHandler;
-
-        if (isTokenBasedAuthentication(authorizationHeader)) {
-            token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
-            securityHandler = getSSOSecurityHandler(token);
-        } else if (isCookieBasedAuthentication(cookies)) {
-            token = cookies.get(JWT_COOKIE).getValue();
-            securityHandler = new InMemorySecurityHandler();
-        } else {
+        if (!isTokenBasedAuthentication(authorizationHeader)) {
             abortWithUnauthorized(requestContext);
             return;
         }
-
+        String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
         SSOConfig config = null;
         if (servletRequest.getServletContext()
                 .getAttribute(SSOConstants.CONFIG_BEAN_NAME) instanceof SSOConfig) {
             config = (SSOConfig) servletRequest.getServletContext().getAttribute(SSOConstants.CONFIG_BEAN_NAME);
         }
+
+        SecurityHandler securityHandler = getSecurityHandler(token);
 
         if (!securityHandler.isAuthenticated(config, token)) {
             abortWithUnauthorized(requestContext);
@@ -97,8 +86,11 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         return adminOnlyPaths.contains(resource);
     }
 
-    private static SecurityHandler getSSOSecurityHandler(String token) {
+    private static SecurityHandler getSecurityHandler(String token) {
 
+        if (TokenCache.getInstance().getToken(token) != null) {
+            return new InMemorySecurityHandler();
+        }
         if (isJWTToken(token)) {
             return new JWTSecurityHandler();
         }
@@ -108,11 +100,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private boolean isTokenBasedAuthentication(String authorizationHeader) {
         return authorizationHeader != null && authorizationHeader.toLowerCase()
                 .startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ");
-    }
-
-    private boolean isCookieBasedAuthentication(Map<String, Cookie> cookies) {
-
-        return cookies != null && cookies.get(JWT_COOKIE) != null;
     }
 
     private void abortWithUnauthorized(ContainerRequestContext requestContext) {

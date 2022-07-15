@@ -72,9 +72,9 @@ export default function SourceViewSection(props) {
             </Tabs>
         </AppBar>
             {selectedTab === 0 && (<>{designContent}</>)}
-            {selectedTab === 1 && (<Box p={5} overflow='auto'>
+            {selectedTab === 1 && (<Box p={3} overflow='auto'>
                 <Editor
-                    height="70vh"
+                    height="65vh"
                     defaultLanguage="xml"
                     defaultValue={format(source)}
                     options={{

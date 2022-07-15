@@ -29,8 +29,6 @@ tags:
     description: "Logout Management"
   - name: "heartbeat"
     description: "Heartbeat Management"
-  - name: "configs"
-    description: "Access dashboard configs"
   - name: "groups"
     description: "Access group list"
   - name: "nodes"
@@ -69,8 +67,6 @@ tags:
     description: "Access log configs details"
   - name: "Users"
     description: "Access users details"
-  - name: "Roles"
-    description: "Access roles details"
   - name: "configuration"
     description: "Access configurations"
 
@@ -144,26 +140,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /configs/super-admin:
-    get:
-      tags:
-        - "configs"
-      summary: "Get super admin username"
-      operationId: "getSuperAdmin"
-      responses:
-        200:
-          description: "The super admin details configured in dashboard configs"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuperAdminUser'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
   /groups:
     get:
       tags:
@@ -721,6 +697,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /groups/{group-id}/nodes/{node-id}:
+    patch:
+      tags:
+        - "nodes"
+      summary: "Manage server runtimes of a node"
+      operationId: "manageNodebyNodeId"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "node-id"
+          in: path
+          description: "Node ID"
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/ManageServerRuntime'
+      responses:
+        200:
+          description: "Server runtime status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessStatus'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'  
   /groups/{group-id}/nodes/{node-id}/local-entries/{local-entry}/value:
     get:
       tags:
@@ -889,6 +899,41 @@ paths:
       responses:
         200:
           description: "List of carbon applications deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artifacts'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/capps/faulty:
+    get:
+      tags:
+        - "carbonApplications"
+      summary: "Get names of faulty carbon applications by node ids"
+      operationId: "getFaultyCarbonApplicationsByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+      responses:
+        200:
+          description: "List of faulty carbon applications deployed in provided nodes"
           content:
             application/json:
               schema:
@@ -1228,133 +1273,9 @@ paths:
           required: true
           schema:
             type: string
-        - name: "domain"
-          in: query
-          description: "domain name"
-          required: false
-          schema:
-            type: string
       responses:
         200:
           description: "User deletion status"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessStatus'
-        default:
-          description: "Unexpected error"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /groups/{group-id}/roles:
-    get:
-      tags:
-        - "Roles"
-      summary: "Get roles"
-      operationId: "getRoles"
-      parameters:
-        - name: "group-id"
-          in: path
-          description: "Group ID"
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: "List of roles"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleList'
-        default:
-          description: "Unexpected error"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    post:
-      tags:
-        - "Roles"
-      summary: "Add role"
-      operationId: "addRole"
-      parameters:
-        - name: "group-id"
-          in: path
-          description: "Group ID of the node"
-          required: true
-          schema:
-            type: string
-      requestBody:
-        $ref: '#/components/requestBodies/AddRole'
-      responses:
-        200:
-          description: "Role insert status"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessStatus'
-        default:
-          description: "Unexpected error"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    patch:
-      tags:
-        - "Roles"
-      summary: "Update role"
-      operationId: "updateRole"
-      parameters:
-        - name: "group-id"
-          in: path
-          description: "Group ID of the node"
-          required: true
-          schema:
-            type: string
-      requestBody:
-        $ref: '#/components/requestBodies/UpdateRole'
-      responses:
-        200:
-          description: "Role update status"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessStatus'
-        default:
-          description: "Unexpected error"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /groups/{group-id}/roles/{role-name}:
-    delete:
-      tags:
-        - "Roles"
-      summary: "Delete role"
-      operationId: "deleteRole"
-      parameters:
-        - name: "group-id"
-          in: path
-          description: "Group ID"
-          required: true
-          schema:
-            type: string
-        - name: "role-name"
-          in: path
-          description: "Role Name"
-          required: true
-          schema:
-            type: string
-        - name: "domain"
-          in: query
-          description: "domain name"
-          required: false
-          schema:
-            type: string
-      responses:
-        200:
-          description: "Role deletion status"
           content:
             application/json:
               schema:
@@ -1409,25 +1330,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /healthz:
-    get:
-      tags:
-        - "healthz"
-      summary: "Get health check for the dashboard"
-      operationId: "RetrieveHealth"
-      responses:
-        200:
-          description: "Health check status"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/healthz'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
@@ -1465,17 +1367,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UpdatedArtifact'
-            stateChangedArtifacts:
-              type: array
-              items:
-                $ref: '#/components/schemas/UpdatedArtifact'
       example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
-
-    SuperAdminUser:
-      type: object
-      properties:
-        username:
-          type: string
 
     UpdatedArtifact:
       type: object
@@ -1636,43 +1528,29 @@ components:
             type: string
           details:
             type: string
-    RoleList:
-      type: array
-      items:
-        type: object
-        properties:
-          roleName:
-            type: string
-          details:
-            type: string
     AddUserRequest:
       type: object
       properties:
         userId:
           type: string
-        domain:
-          type: string
         password:
           type: string
         isAdmin:
           type: boolean
-    AddRoleRequest:
+    ManageServerRuntimeRequest:
       type: object
       properties:
-        roleName:
+        status:
           type: string
-        domain:
-          type: string
-    UpdateRoleRequest:
+    NodeStatusMessage:
       type: object
       properties:
-        userId:
+        message:
           type: string
-        removedRoles:
-          type: array
-          items:
-            type: string
-        addedRoles:
+    CAppArtifactCollection:
+      type: object
+      properties:
+        faultyArtifacts:
           type: array
           items:
             type: string
@@ -1696,11 +1574,6 @@ components:
       type: object
       properties:
         configuration:
-          type: string
-    healthz:
-      type: object
-      properties:
-        status:
           type: string
     LocalEntryValue:
       type: object
@@ -1785,18 +1658,12 @@ components:
           schema:
             $ref: '#/components/schemas/AddUserRequest'
       description: "The request body to add user."
-    AddRole:
+    ManageServerRuntime:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AddRoleRequest'
-      description: "The request body to add role."
-    UpdateRole:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UpdateRoleRequest'
-      description: "The request body to update role."
+            $ref: '#/components/schemas/ManageServerRuntimeRequest'
+      description: "The request body to manage server."
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking

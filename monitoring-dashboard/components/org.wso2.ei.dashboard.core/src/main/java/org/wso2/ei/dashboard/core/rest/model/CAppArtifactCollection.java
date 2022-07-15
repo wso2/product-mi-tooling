@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -17,23 +17,36 @@
  *
  *
  */
-
 package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.ei.dashboard.core.rest.model.RoleListInner;
-import javax.validation.constraints.*;
 import javax.validation.Valid;
-
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class CAppArtifactCollection {
+  private @Valid List<String> faultyArtifacts = new ArrayList<String>();
 
-public class RoleList extends ArrayList<RoleListInner>  {
+  /**
+   **/
+  public CAppArtifactCollection faultyArtifacts(List<String> faultyArtifacts) {
+    this.faultyArtifacts = faultyArtifacts;
+    return this;
+  }
 
+  @ApiModelProperty(value = "")
+  @JsonProperty("faultyArtifacts")
+
+  public List<String> getFaultyArtifacts() {
+    return faultyArtifacts;
+  }
+
+  public void setFaultyArtifacts(List<String> faultyArtifacts) {
+    this.faultyArtifacts = faultyArtifacts;
+  }
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -43,20 +56,21 @@ public class RoleList extends ArrayList<RoleListInner>  {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RoleList roleList = (RoleList) o;
-    return true;
+    CAppArtifactCollection cappArtifactCollection = (CAppArtifactCollection) o;
+    return Objects.equals(faultyArtifacts, cappArtifactCollection.faultyArtifacts);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash();
+    return Objects.hash(faultyArtifacts);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class RoleList {\n");
-    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("class CAppArtifactCollection {\n");
+
+    sb.append("    faultyArtifacts: ").append(toIndentedString(faultyArtifacts)).append("\n");
     sb.append("}");
     return sb.toString();
   }

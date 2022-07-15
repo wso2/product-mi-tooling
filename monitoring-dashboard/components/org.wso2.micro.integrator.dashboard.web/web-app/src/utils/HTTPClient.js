@@ -67,10 +67,6 @@ export default class HTTPClient {
         return this.get(path)
     }
 
-    static getSuperUser() {
-        return this.get("/configs/super-admin")
-    }
-
     static getGroups() {
         return this.getResource()
     }
@@ -80,51 +76,24 @@ export default class HTTPClient {
         return this.getResource(resourcePath)
     }
 
+    static manageNode(groupId, nodeId, payload) {
+        const path = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_NODES}/${nodeId}`
+        return this.patch(path, payload)
+    }
+
     static getUsers(groupId) {
         const resourcePath = `${groupId}/${Constants.PREFIX_USERS}`
         return this.getResource(resourcePath)
     }
 
     static deleteUser(groupId, userId) {
-        var resourcePath = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_USERS}/`
-        const parts = userId.split("/")
-        if(parts.length===1) {
-            resourcePath = resourcePath.concat(parts[0]);
-        } else {
-            resourcePath = resourcePath.concat(parts[1]).concat("?domain=").concat(parts[0]);
-        }
+        const resourcePath = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_USERS}/${userId}`
         return this.delete(resourcePath)
     }
 
     static addUser(groupId, payload) {
         const path = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_USERS}`
         return this.post(path, payload)
-    }
-
-    static getRoles(groupId) {
-        const resourcePath = `${groupId}/${Constants.PREFIX_ROLES}`
-        return this.getResource(resourcePath)
-    }
-
-    static addRole(groupId, payload) {
-        const path = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_ROLES}`
-        return this.post(path, payload)
-    }
-
-    static updateUserRoles(groupId, payload) {
-        const path = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_ROLES}`
-        return this.patch(path, payload)
-    }
-
-    static deleteRole(groupId, roleName) {
-        var resourcePath = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_ROLES}/`;
-        const parts = roleName.split("/");
-        if(parts.length===1) {
-            resourcePath = resourcePath.concat(parts[0])
-        } else {
-            resourcePath = resourcePath.concat(parts[1]).concat("?domain=").concat(parts[0]);
-        }
-        return this.delete(resourcePath)
     }
 
     static getLogConfigs(groupId, nodeId = "") {
@@ -167,6 +136,17 @@ export default class HTTPClient {
                 response.data.map(data => 
                     data.nodes.map(node => node.details = JSON.parse(node.details))
                 )
+                resolve(response)
+            }).catch(error => {
+                reject(error)
+            })
+        });
+    }
+
+    static getFaultyCapps(groupId, nodeList) {
+        const resourcePath = `${groupId}/capps/faulty?nodes=${this.getNodeListAsQueryParams(nodeList)}`
+        return new Promise((resolve, reject) => {
+            this.getResource(resourcePath).then(response => {
                 resolve(response)
             }).catch(error => {
                 reject(error)

@@ -31,21 +31,30 @@ export default function Nodes () {
         headCells: [
             {id: 'nodeId', label: 'Node ID'},
             {id: 'node_status', label: 'Status'},
-            {id: 'role', label: 'Role'}],
+            {id: 'role', label: 'Role'},
+            {id: 'node_action', label: ''}],
         tableOrderBy: 'service'
     });
     const [nodeList, setNodeList] = React.useState([]);
 
     const globalGroupId = useSelector(state => state.groupId);
 
-    React.useEffect(()=>{
+    const retrieveNodes = () => {
         if (globalGroupId !== "") {
             HTTPClient.getNodes(globalGroupId).then(response => {
                 response.data.map(data => data.details = JSON.parse(data.details))
                 setNodeList(response.data)
             })
         }
+    }
+
+    React.useEffect(()=>{
+        retrieveNodes();
     },[globalGroupId])
 
-    return (<EnhancedTable pageInfo={pageInfo} dataSet={nodeList}/>);
+    const retrieveData = () => {
+        retrieveNodes();
+    }
+
+    return (<EnhancedTable pageInfo={pageInfo} dataSet={nodeList} retrieveData={retrieveData}/>);
 }

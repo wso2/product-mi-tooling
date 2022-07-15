@@ -34,11 +34,6 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import {Redirect} from 'react-router';
 import { useAuthContext } from "@asgardeo/auth-react";
 import AuthManager from './AuthManager'
-import Link from "@material-ui/core/Link";
-import {useHistory} from "react-router-dom";
-import HTTPClient from '../utils/HTTPClient';
-import { useDispatch } from 'react-redux';
-import { setSuperAdmin } from '../redux/Actions';
 
 const styles = theme => ({
     paper: {
@@ -58,28 +53,16 @@ const styles = theme => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-    policyBox: {
-        backgroundColor: '#FFFAF3',
-        padding:'5%',
-        fontsize:'20px',
-        marginBottom: '10px',
-        border:'2px',
-        borderColor:'black',
-        boxShadow: '0 0 0 1px #c9ba9b inset, 0 0 0 0 transparent',
-        color:'#573a08',
-    },
 });
 
 function Login(props){
 
-    const history = useHistory();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [authenticated, setAuthenticated] = useState(false);
     const [loginErrorMessage, setLoginErrorMessage] = useState('')
     const [loginError, setLoginError] = useState(false)
     const { signIn } = useAuthContext();
-    const dispatch = useDispatch();
 
     useEffect(() => {
         initAuthenticationFlow();
@@ -96,12 +79,6 @@ function Login(props){
         }
     }
 
-    const getSuperUser = () => {
-        HTTPClient.getSuperUser().then(response => {
-            dispatch(setSuperAdmin(response.data.username));
-        });
-    }
-
     const authenticate = (e)  => {
 
         e.preventDefault();
@@ -113,10 +90,7 @@ function Login(props){
                 let errorMessage;
                 if (error.response && error.response.status === 401) {
                     errorMessage = 'Incorrect username or password!';
-                } else if (error.response && error.response.status === 500 && error.response.statusText !== null) {
-                    errorMessage = error.response.statusText;
-                }
-                else {
+                } else {
                     errorMessage = "Error occurred in communication. Please check server logs."
                 }
                 setUserName('')
@@ -149,7 +123,7 @@ function Login(props){
                     />
                     <Box mt={4}>
                         <Typography component="h1" variant="h5">
-                            Sign in
+                            Sign In
                         </Typography>
                     </Box>
 
@@ -162,7 +136,7 @@ function Login(props){
                             id="username"
                             label="Username"
                             name="username"
-                            autoComplete="off"
+                            autoComplete="on"
                             value={userName}
                             onChange={(e) => { setUserName(e.target.value)}}
                             autoFocus
@@ -177,24 +151,13 @@ function Login(props){
                             type="password"
                             id="password"
                             value={password}
-                            autoComplete="off"
+                            autoComplete="on"
                             onChange={(e) => {setPassword(e.target.value)}}
                         />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
                         />
-                        <Box mt={4} className={classes.policyBox}>
-                            <Typography variant="body2" style={{fontSize:13}}>
-                                Browser cookies are used to track your session and provide a better experience.
-                                You can refer our <Link variant="body2" onClick={() => {history.push('/cookie-policy')}} style={{color:"#ff5000"}}> Cookie Policy</Link> for more details.
-                            </Typography>
-                        </Box>
-                        <Box mt={4} className={classes.policyBox}>
-                            <Typography variant="body2" style={{fontSize:13}}>
-                                By signing in, you agree to our <Link variant="body2" onClick={() => {history.push('/privacy-policy')}} style={{color:"#ff5000"}}>Privacy Policy.</Link>
-                            </Typography>
-                        </Box>
                         <Button
                             type="submit"
                             fullWidth
@@ -257,7 +220,6 @@ function Login(props){
     }
 
     if (authenticated) {
-        getSuperUser();
         return <Redirect to="/" />
     }
     return renderDefaultLogin();

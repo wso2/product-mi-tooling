@@ -47,12 +47,9 @@ public final class Constants {
     public static final String CARBON_APPLICATIONS = "applications";
     public static final String DATA_SERVICES = "data-services";
     public static final String DATA_SOURCES = "data-sources";
-    public static final String DOMAIN_SEPARATOR = "/";
 
     public static final String SUCCESS_STATUS = "success";
     public static final String FAIL_STATUS = "fail";
-
-    public static final String UTF_8_ENCODING = "UTF-8";
 
     public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
@@ -81,11 +78,4 @@ public final class Constants {
     public static final String SCOPE = "scope";
     public static final String ADMIN = "admin";
 
-    public static final String JWT_COOKIE = "JWT_TOKEN";
-    public static final String COOKIE_HEADER = "SET-COOKIE";
-
-    public static final String INTERNAL_EVERYONE = "Internal/everyone";
-
-    public static final String NO_SERVER_FOUND_ERROR =
-            "No running micro integrator instances found. Please start a server and login.";
 }

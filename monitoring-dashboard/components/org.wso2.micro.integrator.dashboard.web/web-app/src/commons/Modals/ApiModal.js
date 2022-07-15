@@ -34,7 +34,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-export default function ApiSideDrawer(props) {
+export default function ApiModal(props) {
     const { nodeData, retrieveData } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;

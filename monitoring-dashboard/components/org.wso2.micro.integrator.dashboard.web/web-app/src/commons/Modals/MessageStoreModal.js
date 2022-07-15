@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,17 +26,10 @@ import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import SourceViewSection from './commons/SourceViewSection'
 
-export default function TemplatesSideDrawer(props) {
+export default function MessageStoreModal(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
-    const artifactType = nodeData.details.type;
-    var templateType;
-    if (artifactType==="Endpoint Template") {
-        templateType = "templates_endpoint"
-    } else if (artifactType==="Sequence Template") {
-        templateType = "templates_sequence"
-    }
     const classes = useStyles();
 
     return (
@@ -45,33 +38,30 @@ export default function TemplatesSideDrawer(props) {
                 <Grid item xs={12}>
                     <HeadingSection name={artifactName} nodeId={nodeId} />
                     <SourceViewSection
-                        artifactType={templateType}
-                        artifactName={artifactName}
-                        nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <TemplateDetailTable nodeData={nodeData} />
+                                <MessageStoreDetailTable nodeData={nodeData} />
                             </Paper>
                         </>}
-                    />
+                        artifactType="message-stores" artifactName={artifactName} nodeId={nodeId} />
                 </Grid>
             </Grid>
         </div>
     );
 }
 
-function TemplateDetailTable(props) {
+function MessageStoreDetailTable(props) {
     const nodeData = props.nodeData;
     const artifactName = nodeData.details.name
 
     return <Table>
         <TableRow>
-            <TableCell>Template Name</TableCell>
+            <TableCell>Message Store Name</TableCell>
             <TableCell>{artifactName}</TableCell>
         </TableRow>
         <TableRow>
-            <TableCell>Type</TableCell>
-            <TableCell>{nodeData.details.type}</TableCell>
+            <TableCell>Message Count</TableCell>
+            <TableCell>{nodeData.details.size === '-1' ? "Not Supported" : nodeData.details.size}</TableCell>
         </TableRow>
     </Table>
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -17,58 +17,34 @@
  *
  *
  */
-
 package org.wso2.ei.dashboard.core.rest.model;
 
-import javax.validation.constraints.*;
 import javax.validation.Valid;
-
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
-public class AddRoleRequest   {
-  private @Valid String roleName = null;
-  private @Valid String domain = null;
+public class ManageServerRuntimeRequest {
+  private @Valid String status = null;
 
   /**
    **/
-  public AddRoleRequest roleName(String roleName) {
-    this.roleName = roleName;
+  public ManageServerRuntimeRequest status(String status) {
+    this.status = status;
     return this;
   }
 
-  
   @ApiModelProperty(value = "")
-  @JsonProperty("roleName")
+  @JsonProperty("status")
 
-  public String getRoleName() {
-    return roleName;
-  }
-  public void setRoleName(String roleName) {
-    this.roleName = roleName;
+  public String getStatus() {
+    return status;
   }
 
-  /**
-   **/
-  public AddRoleRequest domain(String domain) {
-    this.domain = domain;
-    return this;
+  public void setStatus(String status) {
+    this.status = status;
   }
-
-  
-  @ApiModelProperty(value = "")
-  @JsonProperty("domain")
-
-  public String getDomain() {
-    return domain;
-  }
-  public void setDomain(String domain) {
-    this.domain = domain;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -78,23 +54,21 @@ public class AddRoleRequest   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AddRoleRequest addRoleRequest = (AddRoleRequest) o;
-    return Objects.equals(roleName, addRoleRequest.roleName) &&
-        Objects.equals(domain, addRoleRequest.domain);
+    ManageServerRuntimeRequest manageServerRuntimeRequest = (ManageServerRuntimeRequest) o;
+    return Objects.equals(status, manageServerRuntimeRequest.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(roleName, domain);
+    return Objects.hash(status);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AddRoleRequest {\n");
-    
-    sb.append("    roleName: ").append(toIndentedString(roleName)).append("\n");
-    sb.append("    domain: ").append(toIndentedString(domain)).append("\n");
+    sb.append("class ManageServerRuntimeRequest {\n");
+
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -25,30 +25,11 @@ import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
 import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
-import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
-
-import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
-import static org.wso2.ei.dashboard.core.commons.Constants.CARBON_APPLICATIONS;
-import static org.wso2.ei.dashboard.core.commons.Constants.CONNECTORS;
-import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SERVICES;
-import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SOURCES;
-import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
-import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
-import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
-import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
-import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
-import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
-import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
-import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * Util class for micro integrator dashboard.
@@ -113,19 +94,6 @@ public class Utils {
         return response;
     }
 
-    public static CloseableHttpResponse doPut(String groupId, String nodeId, String accessToken, String url,
-                                                JsonObject payload) throws ManagementApiException {
-        CloseableHttpResponse response = HttpUtils.doPut(accessToken, url, payload);
-        int httpSc = response.getStatusLine().getStatusCode();
-        if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
-            accessToken = retrieveNewAccessToken(groupId, nodeId);
-            response = HttpUtils.doPut(accessToken, url, payload);
-        } else if (isNotSuccessCode(httpSc)) {
-            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
-        }
-        return response;
-    }
-
     public static CloseableHttpResponse doDelete(String groupId, String nodeId, String accessToken, String url)
             throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doDelete(accessToken, url);
@@ -137,97 +105,6 @@ public class Utils {
             throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
         }
         return response;
-    }
-
-    public static JsonObject getArtifactDetails(String groupId, String nodeId, String mgtApiUrl, String artifactType,
-                                                String artifactName, String accessToken) throws ManagementApiException {
-        String getArtifactDetailsUrl = getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
-        CloseableHttpResponse artifactDetails = Utils.doGet(groupId, nodeId, accessToken,
-                                                            getArtifactDetailsUrl);
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(artifactDetails);
-        return removeValueAndConfiguration(artifactType, jsonResponse);
-    }
-
-    private static JsonObject removeValueAndConfiguration(String artifactType, JsonObject jsonResponse) {
-        if (artifactType.equals(CONNECTORS) || artifactType.equals(CARBON_APPLICATIONS)) {
-            return jsonResponse;
-        } else if (artifactType.equals(LOCAL_ENTRIES)) {
-            return removeValueFromResponse(jsonResponse);
-        } else {
-            return removeConfigurationFromResponse(jsonResponse);
-        }
-    }
-
-    private static JsonObject removeConfigurationFromResponse(JsonObject artifact) {
-        artifact.remove("configuration");
-        return artifact;
-    }
-
-    private static JsonObject removeValueFromResponse(JsonObject artifact) {
-        artifact.remove("value");
-        return artifact;
-    }
-
-    private static String getArtifactDetailsUrl(String mgtApiUrl, String artifactType, String artifactName) {
-
-        String getArtifactDetailsUrl;
-        String getArtifactsUrl = mgtApiUrl.concat(artifactType);
-        if (artifactName.contains(" ")) {
-            artifactName = encode(artifactName);
-        }
-        switch (artifactType) {
-            case PROXY_SERVICES:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?proxyServiceName=").concat(artifactName);
-                break;
-            case ENDPOINTS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?endpointName=").concat(artifactName);
-                break;
-            case INBOUND_ENDPOINTS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?inboundEndpointName=").concat(artifactName);
-                break;
-            case MESSAGE_STORES:
-            case MESSAGE_PROCESSORS:
-            case LOCAL_ENTRIES:
-            case DATA_SOURCES:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?name=").concat(artifactName);
-                break;
-            case APIS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?apiName=").concat(artifactName);
-                break;
-            case SEQUENCES:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?sequenceName=").concat(artifactName);
-                break;
-            case TASKS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?taskName=").concat(artifactName);
-                break;
-            case CONNECTORS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?connectorName=").concat(artifactName);
-                break;
-            case CARBON_APPLICATIONS:
-                getArtifactDetailsUrl = getArtifactsUrl.concat("?carbonAppName=").concat(artifactName);
-                break;
-            case DATA_SERVICES:
-                getArtifactDetailsUrl = mgtApiUrl.concat(DATA_SERVICES).concat("?dataServiceName=")
-                                                 .concat(artifactName);
-                break;
-            default:
-                throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");
-        }
-        return getArtifactDetailsUrl;
-    }
-
-    /**
-     * Translates a string into application/x-www-form-urlencoded format using UTF 8 encoding scheme.
-     * @param text String to be encoded
-     * @return the translated String
-     */
-    public static String encode(String text) {
-        try {
-            return URLEncoder.encode(text, Constants.UTF_8_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            throw new DashboardServerException("Error occurred while encoding the artifact name: " + e.getMessage(),
-                                               e.getCause());
-        }
     }
 
     private static String retrieveNewAccessToken(String groupId, String nodeId) throws ManagementApiException {
