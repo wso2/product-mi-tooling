@@ -18,32 +18,24 @@
  *
  */
 
-package org.wso2.ei.dashboard.core.db.manager;
+package org.wso2.ei.dashboard.core.data.manager;
 
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
-import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 
-import java.util.List;
-
 /**
- * This interface represents database operations.
+ * This interface represents data related operations.
  */
-public interface DatabaseManager {
+public interface DataManager {
 
     boolean insertHeartbeat(HeartbeatObject heartbeat, String accessToken);
 
     boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo);
 
-    boolean insertArtifact(String groupId, String nodeId, String artifactType, String artifactName,
-                           String artifactDetails);
-
     GroupList fetchGroups();
 
     NodeList fetchNodes(String groupId);
-
-    Artifacts fetchArtifacts(String artifactType, String groupId, List<String> nodeList);
 
     String getMgtApiUrl(String groupId, String nodeId);
 
@@ -59,13 +51,8 @@ public interface DatabaseManager {
 
     boolean updateAccessToken(String groupId, String nodeId, String accessToken);
 
-    boolean updateDetails(String artifactType, String artifactName, String groupId, String nodeId, String details);
-
     int deleteHeartbeat(HeartbeatObject heartbeat);
 
     boolean deleteServerInformation(String groupId, String nodeId);
-
-    boolean deleteAllArtifacts(String artifactType, String groupId, String nodeId);
-
-    boolean deleteArtifact(String artifactType, String name, String groupId, String nodeId);
+    
 }

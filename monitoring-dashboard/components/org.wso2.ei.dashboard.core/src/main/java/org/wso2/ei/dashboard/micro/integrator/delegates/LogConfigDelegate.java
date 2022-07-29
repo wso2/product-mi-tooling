@@ -29,8 +29,8 @@ import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
@@ -46,7 +46,7 @@ import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
  */
 public class LogConfigDelegate {
     private static final Logger logger = LogManager.getLogger(LogConfigDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public LogConfigs fetchLogConfigs(String groupId) throws ManagementApiException {
         logger.debug("Fetching log configs via management api.");
@@ -65,7 +65,7 @@ public class LogConfigDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
 
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         for (NodeListInner node : nodeList) {
             String nodeId = node.getNodeId();
             CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
@@ -102,12 +102,12 @@ public class LogConfigDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddLoggerPayload(request);
 
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
 
         for (NodeListInner node : nodeList) {
             String nodeId = node.getNodeId();
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+            String accessToken = dataManager.getAccessToken(groupId, nodeId);
             String addLoggerUrl = mgtApiUrl.concat("logging");
             logger.debug("Adding new logger on node " + nodeId);
             CloseableHttpResponse httpResponse = Utils.doPatch(groupId, nodeId, accessToken, addLoggerUrl, payload);
@@ -123,7 +123,7 @@ public class LogConfigDelegate {
     }
 
     private JsonArray getLogConfigs(String groupId) throws ManagementApiException {
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, log configs of all nodes in the group should be identical
         String nodeId = nodeList.get(0).getNodeId();
         return getLogConfigByNodeId(groupId, nodeId);
@@ -131,7 +131,7 @@ public class LogConfigDelegate {
 
     private JsonArray getLogConfigByNodeId(String groupId, String nodeId) throws ManagementApiException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("logging");
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         return HttpUtils.getJsonArray(httpResponse);
@@ -173,7 +173,7 @@ public class LogConfigDelegate {
     private CloseableHttpResponse updateLogLevelByNodeId(String groupId, String nodeId, JsonObject payload)
             throws ManagementApiException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String updateLoggerUrl = mgtApiUrl.concat("logging");
         logger.debug("Updating logger on node " + nodeId);
         return Utils.doPatch(groupId, nodeId, accessToken, updateLoggerUrl, payload);

@@ -8,37 +8,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
-import org.wso2.ei.dashboard.core.rest.delegates.UpdateArtifactObject;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactDetails;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactsInner;
-import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
-import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
-import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 
 /**
  * Util class to update artifacts deployed in micro integrator and update the database of the dashboard server.
  */
 public class DelegatesUtil {
-    private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final DataManager DATA_MANAGER = DataManagerSingleton.getDataManager();
 
     private static final Logger logger = LogManager.getLogger(DelegatesUtil.class);
-
-    private static final Set<String> ARTIFACT_TYPES_NOT_STORED_IN_DB = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(PROXY_SERVICES, ENDPOINTS, MESSAGE_PROCESSORS)));
 
     private DelegatesUtil() {
 
@@ -49,7 +36,7 @@ public class DelegatesUtil {
         Artifacts artifacts = new Artifacts();
         for (String nodeId: nodeList) {
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+            String accessToken = DATA_MANAGER.getAccessToken(groupId, nodeId);
 
             JsonArray artifactList = getArtifactList(groupId, nodeId, artifactType, mgtApiUrl, accessToken);
 
@@ -110,26 +97,14 @@ public class DelegatesUtil {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
 
         if (null != mgtApiUrl && !mgtApiUrl.isEmpty()) {
-            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+            String accessToken = DATA_MANAGER.getAccessToken(groupId, nodeId);
             String url = mgtApiUrl.concat(artifactType);
             CloseableHttpResponse response = Utils.doPost(groupId, nodeId, accessToken, url, payload);
             if (response.getStatusLine().getStatusCode() == 200) {
-                if (ARTIFACT_TYPES_NOT_STORED_IN_DB.contains(artifactType)) {
-                    return true;
-                }
-                return updateDatabase(artifactType, mgtApiUrl, groupId, request);
+                return true;
             }
         }
         return false;
     }
 
-    private static boolean updateDatabase(String artifactType, String mgtApiUrl, String groupId,
-                                          ArtifactUpdateRequest request) throws ManagementApiException {
-
-        UpdateArtifactObject updateArtifactObject = new UpdateArtifactObject(mgtApiUrl, artifactType,
-                                                                             request.getArtifactName(), groupId,
-                                                                             request.getNodeId());
-        MiArtifactsManager miArtifactsManager = new MiArtifactsManager(updateArtifactObject);
-        return miArtifactsManager.updateArtifactDetails();
-    }
 }

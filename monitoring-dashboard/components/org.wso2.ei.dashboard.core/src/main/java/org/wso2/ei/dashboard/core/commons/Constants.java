@@ -20,8 +20,6 @@
 
 package org.wso2.ei.dashboard.core.commons;
 
-import java.io.File;
-
 /**
  * Constants for the dashboard core.
  */
@@ -59,11 +57,6 @@ public final class Constants {
 
     public static final String DASHBOARD_HOME = System.getProperty("dashboard.home");
     public static final String HEARTBEAT_POOL_SIZE = System.getProperty("heartbeat_pool_size");
-    public static final String DATABASE_URL = "jdbc:h2:mem:ei-dashboard-db;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM '"
-                                              + Constants.DASHBOARD_HOME + File.separator + "dbscripts" + File.separator
-                                              + "h2.sql'";
-    public static final String DATABASE_USERNAME = "wso2carbon";
-    public static final String DATABASE_PASSWORD = "wso2carbon";
 
     public static final String EMPTY_STRING = "";
     public static final String LIST_ATTRIBUTE = "list";

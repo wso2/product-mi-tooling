@@ -27,16 +27,19 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
+import org.wso2.ei.dashboard.core.data.manager.InMemoryDataManager;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.LocalEntryValue;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,12 +47,12 @@ import java.util.List;
  */
 public class LocalEntriesDelegate implements ArtifactDelegate {
     private static final Log log = LogFactory.getLog(LocalEntriesDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-        log.debug("Fetching local entries from database.");
-        return databaseManager.fetchArtifacts(Constants.LOCAL_ENTRIES, groupId, nodeList);
+    public Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException {
+        log.debug("Fetching local entries from MI.");
+        return DelegatesUtil.getArtifactsFromMI(groupId, nodeList,  Constants.LOCAL_ENTRIES);
     }
 
     @Override
@@ -61,7 +64,8 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
     public LocalEntryValue getValue(String groupId, String nodeId, String localEntry) throws ManagementApiException {
         log.debug("Fetching value of local entry " + localEntry + " in node " + nodeId + " of group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        HashMap valueMap = InMemoryDataManager.heartBeatStore.get(groupId + nodeId);
+        String accessToken = valueMap.get("accessToken").toString();
         if (localEntry.contains(" ")) {
             localEntry = Utils.encode(localEntry);
         }

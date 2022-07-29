@@ -24,8 +24,6 @@ import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
@@ -40,12 +38,10 @@ import java.util.List;
  */
 public class SequencesDelegate implements ArtifactDelegate {
     private static final Logger logger = LogManager.getLogger(SequencesDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
-
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-        logger.debug("Fetching sequences from database.");
-        return databaseManager.fetchArtifacts(Constants.SEQUENCES, groupId, nodeList);
+    public Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException {
+        logger.debug("Fetching sequences from MI.");
+        return DelegatesUtil.getArtifactsFromMI(groupId, nodeList, Constants.SEQUENCES);
     }
 
     @Override

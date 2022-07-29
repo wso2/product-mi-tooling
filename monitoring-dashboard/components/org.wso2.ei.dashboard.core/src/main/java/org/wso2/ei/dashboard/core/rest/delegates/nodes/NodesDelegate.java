@@ -22,8 +22,8 @@ package org.wso2.ei.dashboard.core.rest.delegates.nodes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
 
@@ -31,16 +31,16 @@ import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
  * Delegate class to handle requests from Nodes page (Home page).
  */
 public class NodesDelegate {
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
     private static final Logger logger = LogManager.getLogger(NodesDelegate.class);
 
     public NodeList getNodes(String groupId) {
-        logger.debug("Fetching node list in " + groupId + " from database.");
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        logger.debug("Fetching node list in " + groupId + " from MI.");
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         for (NodeListInner nodeListInner : nodeList) {
             String nodeId = nodeListInner.getNodeId();
-            long heartbeatInterval = Long.parseLong(databaseManager.getHeartbeatInterval(groupId, nodeId));
-            long lastTimestamp = Long.parseLong(databaseManager.retrieveTimestampOfLastHeartbeat(groupId, nodeId));
+            long heartbeatInterval = Long.parseLong(dataManager.getHeartbeatInterval(groupId, nodeId));
+            long lastTimestamp = Long.parseLong(dataManager.retrieveTimestampOfLastHeartbeat(groupId, nodeId));
             long currentTimestamp = System.currentTimeMillis();
             // check if the node is unhealthy. If the server does not receive a heartbeat by
             // at least 1.5 * heartbeat_interval, the node will be denoted as unhealthy.

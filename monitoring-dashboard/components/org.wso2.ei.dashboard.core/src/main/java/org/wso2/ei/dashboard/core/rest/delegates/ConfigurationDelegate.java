@@ -27,8 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.ModelConfiguration;
@@ -44,7 +44,7 @@ public class ConfigurationDelegate {
     private String artifactName;
 
     private static final Logger logger = LogManager.getLogger(ConfigurationDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public ConfigurationDelegate(String groupId, String nodeId, String artifactType, String artifactName) {
         this.groupId = groupId;
@@ -63,7 +63,7 @@ public class ConfigurationDelegate {
         }
         String url = mgtApiUrl.concat(type).concat("?").concat(queryParamName).concat("=").concat(artifactName);
 
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
 
         JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);

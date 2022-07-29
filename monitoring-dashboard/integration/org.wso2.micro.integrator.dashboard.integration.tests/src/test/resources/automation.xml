@@ -58,7 +58,7 @@
     Database configuration to be used for data service testing. DB configuration in dbs files will be replaced with
                below configuration at test run time
     -->
-    <datasources>
+    <!--datasources>
         <datasource name="dataService">
             <url>jdbc:h2:</url>
             <username>wso2carbon</username>
@@ -71,7 +71,7 @@
             <password>wso2carbon</password>
             <driverClassName>org.h2.Driver</driverClassName>
         </datasource>
-    </datasources>
+    </datasources-->
     <security>
         <!--
                     KeyStore which will be used for encrypting/decrypting passwords

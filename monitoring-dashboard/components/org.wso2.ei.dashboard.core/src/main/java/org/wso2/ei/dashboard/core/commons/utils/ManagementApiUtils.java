@@ -23,8 +23,8 @@ package org.wso2.ei.dashboard.core.commons.utils;
 import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
 import java.util.Base64;
@@ -38,10 +38,10 @@ public class ManagementApiUtils {
 
     }
 
-    private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final DataManager DATA_MANAGER = DataManagerSingleton.getDataManager();
 
     public static String getMgtApiUrl(String groupId, String nodeId) {
-        return databaseManager.getMgtApiUrl(groupId, nodeId);
+        return DATA_MANAGER.getMgtApiUrl(groupId, nodeId);
     }
 
     public static String getAccessToken(String mgtApiUrl) throws ManagementApiException {

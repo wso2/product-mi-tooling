@@ -22,8 +22,8 @@ package org.wso2.ei.dashboard.core.rest.delegates.groups;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
 
 /**
@@ -31,10 +31,10 @@ import org.wso2.ei.dashboard.core.rest.model.GroupList;
  */
 public class GroupDelegate {
     private static final Logger logger = LogManager.getLogger(GroupDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public GroupList getGroupList() {
         logger.debug("Fetching group list registered with the dashboard.");
-        return databaseManager.fetchGroups();
+        return dataManager.fetchGroups();
     }
 }

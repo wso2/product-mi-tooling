@@ -78,20 +78,6 @@
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/resources/dbscripts</directory>
-            <outputDirectory>dbscripts</outputDirectory>
-            <includes>
-                <include>h2.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/target/database</directory>
-            <outputDirectory>repository/database</outputDirectory>
-            <includes>
-                <include>WSO2_EI_DASHBOARD_DB.mv.db</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}/../components/org.wso2.micro.integrator.dashboard.web/target/www</directory>
             <outputDirectory>server/www</outputDirectory>
             <includes>

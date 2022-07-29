@@ -28,8 +28,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MessageStoresDelegate implements ArtifactDelegate {
     private static final Log log = LogFactory.getLog(MessageStoresDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     @Override
     public Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException {
@@ -100,7 +100,7 @@ public class MessageStoresDelegate implements ArtifactDelegate {
     private JsonArray getMessageStoreList(String groupId, String nodeId) throws ManagementApiException {
 
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("message-stores/");
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         return HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();

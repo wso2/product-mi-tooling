@@ -18,15 +18,24 @@
  *
  */
 
-package org.wso2.ei.dashboard.core.rest.delegates;
+package org.wso2.ei.dashboard.core.data.manager;
 
 /**
- * This interface should be implemented by all products to store, update and delete node data.
+ * Create data sources.
  */
-public interface ArtifactsManager {
+public class DataManagerSingleton {
 
-    void runFetchAllExecutorService();
+    private DataManagerSingleton() {
 
-    void runDeleteAllExecutorService();
+    }
+
+    private static DataManager dataManager;
+
+    public static DataManager getDataManager() {
+          if (dataManager == null) {
+              dataManager = new InMemoryDataManager();
+          }
+          return dataManager;
+    }
 
 }

@@ -205,7 +205,7 @@ public class GroupsApi {
     })
     public Response getApisByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         ApisDelegate apisDelegate = new ApisDelegate();
         Artifacts apiList = apisDelegate.getArtifactsList(groupId, nodes);
@@ -225,7 +225,7 @@ public class GroupsApi {
     })
     public Response getCarbonApplicationsByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         CarbonAppsDelegate cappsDelegate = new CarbonAppsDelegate();
         Artifacts cappList = cappsDelegate.getArtifactsList(groupId, nodes);
@@ -270,7 +270,7 @@ public class GroupsApi {
     })
     public Response getConnectorsByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         ConnectorsDelegate connectorsDelegate = new ConnectorsDelegate();
         Artifacts connectorList = connectorsDelegate.getArtifactsList(groupId, nodes);
@@ -289,7 +289,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response getDataServicesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         DataServicesDelegate dataServicesDelegate = new DataServicesDelegate();
         Artifacts dataServicesList = dataServicesDelegate.getArtifactsList(groupId, nodes);
@@ -307,7 +307,7 @@ public class GroupsApi {
     })
     public Response getDatasourcesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         DataSourcesDelegate dataSourcesDelegate = new DataSourcesDelegate();
         Artifacts dataSourcesList = dataSourcesDelegate.getArtifactsList(groupId, nodes);
@@ -352,7 +352,7 @@ public class GroupsApi {
     })
     public Response getInboundEpsByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         InboundEndpointDelegate inboundEndpointDelegate = new InboundEndpointDelegate();
         Artifacts inboundEndpointList = inboundEndpointDelegate.getArtifactsList(groupId, nodes);
@@ -371,7 +371,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response getLocalEntriesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         LocalEntriesDelegate localEntriesDelegate = new LocalEntriesDelegate();
         Artifacts localEntriesList = localEntriesDelegate.getArtifactsList(groupId, nodes);
@@ -599,7 +599,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))
     }) public Response getSequencesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
         SequencesDelegate sequencesDelegate = new SequencesDelegate();
         Artifacts sequenceList = sequencesDelegate.getArtifactsList(groupId, nodes);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(sequenceList);
@@ -617,7 +617,7 @@ public class GroupsApi {
                      content = @Content(schema = @Schema(implementation = Error.class)))})
     public Response getTasksByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
 
         TasksDelegate tasksDelegate = new TasksDelegate();
         Artifacts tasksList = tasksDelegate.getArtifactsList(groupId, nodes);
@@ -637,7 +637,7 @@ public class GroupsApi {
     })
     public Response getTemplatesByNodeIds(
             @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
-            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) {
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes) throws ManagementApiException {
         TemplatesDelegate templatesDelegate = new TemplatesDelegate();
         Artifacts templateList =templatesDelegate.getArtifactsList(groupId, nodes);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(templateList);

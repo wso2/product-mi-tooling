@@ -34,11 +34,6 @@ public class SiArtifactsFetcher implements ArtifactsManager {
     }
 
     @Override
-    public void runUpdateExecutorService() {
-
-    }
-
-    @Override
     public void runFetchAllExecutorService() {
 
     }

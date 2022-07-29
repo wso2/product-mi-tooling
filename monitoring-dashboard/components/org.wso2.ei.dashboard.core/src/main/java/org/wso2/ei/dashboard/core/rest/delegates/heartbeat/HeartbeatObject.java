@@ -21,7 +21,6 @@
 package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 
 import org.wso2.ei.dashboard.core.rest.model.UpdatedArtifact;
-
 import java.util.List;
 
 /**

@@ -284,7 +284,6 @@
         <jackson.core.version>2.13.2</jackson.core.version>
         <jackson.dataformat.version>${jackson.core.version}</jackson.dataformat.version>
         <commons-logging.version>1.2</commons-logging.version>
-        <h2.database.version>2.1.214</h2.database.version>
         <commons.lang3.version>3.1</commons.lang3.version>
         <commons-codec.orbit.version>1.15</commons-codec.orbit.version>
         <hikari.cp.version>3.4.5</hikari.cp.version>

@@ -24,8 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
@@ -45,7 +45,7 @@ public class HeartBeatDelegate {
     private static final Logger logger = LogManager.getLogger(HeartBeatDelegate.class);
     private static final String PRODUCT_MI = "mi";
     private static final String PRODUCT_SI = "si";
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws ManagementApiException {
         long currentTimestamp = System.currentTimeMillis();
@@ -65,7 +65,6 @@ public class HeartBeatDelegate {
 
         if (isNodeRegistered(heartbeat)) {
             isSuccess = updateHeartbeat(heartbeat);
-            artifactsManager.runUpdateExecutorService();
         } else {
             isSuccess = registerNode(heartbeat);
             if (isSuccess) {
@@ -80,7 +79,7 @@ public class HeartBeatDelegate {
 
     private boolean isNodeRegistered(HeartbeatObject heartbeat) {
         String timestamp =
-                databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
+                dataManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
         return (null != timestamp && !timestamp.isEmpty());
     }
 
@@ -89,7 +88,7 @@ public class HeartBeatDelegate {
             logger.debug("Updating heartbeat information of node " + heartbeat.getNodeId() + " in group : " +
                       heartbeat.getGroupId());
         }
-        return databaseManager.updateHeartbeat(heartbeat);
+        return dataManager.updateHeartbeat(heartbeat);
     }
 
     private boolean registerNode(HeartbeatObject heartbeat) throws ManagementApiException {
@@ -101,7 +100,7 @@ public class HeartBeatDelegate {
         String productName = heartbeat.getProduct();
         Runnable runnableTask = () -> {
             String timestampOfRegisteredNode =
-                    databaseManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
+                    dataManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
             long longTimestampOfRegisteredNode = Long.parseLong(timestampOfRegisteredNode);
             long currentTimestamp = System.currentTimeMillis();
 
@@ -116,15 +115,15 @@ public class HeartBeatDelegate {
         };
         heartbeatScheduledExecutorService.scheduleWithFixedDelay(runnableTask, 3 *
                 heartbeatInterval, 3 * heartbeatInterval, TimeUnit.SECONDS);
-        return databaseManager.insertHeartbeat(heartbeat, accessToken);
+        return dataManager.insertHeartbeat(heartbeat, accessToken);
     }
 
     private boolean isNodeShutDown(HeartbeatObject heartbeat, String initialTimestamp) {
-        return !databaseManager.checkIfTimestampExceedsInitial(heartbeat, initialTimestamp);
+        return !dataManager.checkIfTimestampExceedsInitial(heartbeat, initialTimestamp);
     }
 
     private void deleteNode(String productName, HeartbeatObject heartbeat) {
-        int rowCount = databaseManager.deleteHeartbeat(heartbeat);
+        int rowCount = dataManager.deleteHeartbeat(heartbeat);
         if (rowCount > 0) {
             logger.info("Successfully deleted node where group_id : " + heartbeat.getGroupId() + " and node_id : "
                      + heartbeat.getNodeId() + ".");

@@ -32,8 +32,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddRoleRequest;
@@ -50,7 +50,7 @@ import java.util.Objects;
  */
 public class RolesDelegate {
     private static final Log log = LogFactory.getLog(RolesDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public RoleList fetchRoles(String groupId) throws ManagementApiException {
         log.debug("Fetching roles via management api.");
@@ -62,11 +62,11 @@ public class RolesDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddRolePayload(request);
 
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles");
         CloseableHttpResponse httpResponse = Utils.doPost(groupId, nodeId, accessToken, url, payload);
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
@@ -79,11 +79,11 @@ public class RolesDelegate {
         log.debug("Updating roles of " + request.getUserId() + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdatePayload(request);
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles/");
         CloseableHttpResponse httpResponse = Utils.doPut(groupId, nodeId, accessToken, url, payload);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
@@ -103,11 +103,11 @@ public class RolesDelegate {
             log.debug("Deleting role " + roleName + " in domain " + domain + " in group " + groupId);
         }
         Ack ack = new Ack(Constants.FAIL_STATUS);
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles/").concat(roleName);
         if (!StringUtils.isEmpty(domain)) {
             url = url.concat("?domain=").concat(domain);
@@ -125,11 +125,11 @@ public class RolesDelegate {
 
     private RoleList getRoles(String groupId) throws ManagementApiException {
         RoleList roleList = new RoleList();
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, roles in all nodes in the group should be identical
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles/");
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonArray roles = HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();

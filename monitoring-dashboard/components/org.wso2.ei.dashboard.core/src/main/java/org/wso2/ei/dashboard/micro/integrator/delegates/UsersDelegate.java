@@ -30,8 +30,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
@@ -45,7 +45,7 @@ import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
  */
 public class UsersDelegate {
     private static final Log log = LogFactory.getLog(UsersDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public Users fetchUsers(String groupId) throws ManagementApiException {
         log.debug("Fetching users via management api.");
@@ -57,11 +57,11 @@ public class UsersDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddUserPayload(request);
 
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users");
         Utils.doPost(groupId, nodeId, accessToken, url, payload);
         ack.setStatus(Constants.SUCCESS_STATUS);
@@ -75,11 +75,11 @@ public class UsersDelegate {
             log.debug("Deleting user " + userId + " in domain " + domain + " in group " + groupId);
         }
         Ack ack = new Ack(Constants.FAIL_STATUS);
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users/").concat(userId);
         if (!StringUtils.isEmpty(domain)) {
             url = url.concat("?domain=").concat(domain);
@@ -109,11 +109,11 @@ public class UsersDelegate {
 
     private Users getUsers(String groupId) throws ManagementApiException {
         Users users = new Users();
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, users of all nodes in the group should be identical
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users/");
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonArray userList = HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();

@@ -23,12 +23,12 @@ package org.wso2.ei.dashboard.micro.integrator.delegates;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 
 import java.util.List;
 
@@ -37,12 +37,10 @@ import java.util.List;
  */
 public class TemplatesDelegate implements ArtifactDelegate {
     private static final Logger logger = LogManager.getLogger(TemplatesDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
-
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-        logger.debug("Fetching templates from database.");
-        return databaseManager.fetchArtifacts(Constants.TEMPLATES, groupId, nodeList);
+    public Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException {
+        logger.debug("Fetching templates from MI.");
+        return DelegatesUtil.getArtifactsFromMI(groupId, nodeList, Constants.TEMPLATES);
     }
 
     @Override

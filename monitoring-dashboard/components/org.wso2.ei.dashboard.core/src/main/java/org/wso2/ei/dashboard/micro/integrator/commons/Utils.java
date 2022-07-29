@@ -28,8 +28,8 @@ import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
@@ -55,7 +55,7 @@ import java.net.URLEncoder;
  */
 public class Utils {
     private static final Logger logger = LogManager.getLogger(Utils.class);
-    private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final DataManager DATA_MANAGER = DataManagerSingleton.getDataManager();
     private static final int HTTP_SC_UNAUTHORIZED = 401;
 
     public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, String url)
@@ -234,7 +234,7 @@ public class Utils {
         logger.debug("Retrieving new access-token from node " + nodeId + " in group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
-        databaseManager.updateAccessToken(groupId, nodeId, accessToken);
+        DATA_MANAGER.updateAccessToken(groupId, nodeId, accessToken);
         return accessToken;
     }
 
