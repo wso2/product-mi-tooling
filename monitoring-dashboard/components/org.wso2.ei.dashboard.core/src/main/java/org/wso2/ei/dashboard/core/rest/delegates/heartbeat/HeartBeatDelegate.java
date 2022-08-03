@@ -32,7 +32,6 @@ import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.HeartbeatRequest;
 import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
-import org.wso2.ei.dashboard.streaming.integrator.SiArtifactsFetcher;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -145,8 +144,6 @@ public class HeartBeatDelegate {
     private ArtifactsManager getArtifactManager(String productName, HeartbeatObject heartbeat) {
         if (productName.equals(PRODUCT_MI)) {
             return new MiArtifactsManager(heartbeat);
-        } else if (productName.equals(PRODUCT_SI)) {
-            return new SiArtifactsFetcher(heartbeat);
         } else {
             throw new DashboardServerException("Unsupported product : " + productName);
         }
