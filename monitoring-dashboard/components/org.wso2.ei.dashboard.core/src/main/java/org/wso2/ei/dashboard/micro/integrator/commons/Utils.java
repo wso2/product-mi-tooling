@@ -49,6 +49,7 @@ import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Util class for micro integrator dashboard.
@@ -79,6 +80,27 @@ public class Utils {
         return response;
     }
 
+    public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, 
+        String url, Map<String, String> params)
+            throws ManagementApiException {
+        CloseableHttpResponse response = HttpUtils.doGet(accessToken, url, params);
+        int httpSc = response.getStatusLine().getStatusCode();
+        if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
+            accessToken = retrieveNewAccessToken(groupId, nodeId);
+            response = HttpUtils.doGet(accessToken, url, params);
+        } else if (isNotSuccessCode(httpSc)) {
+            JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
+            String errorMessage = "Error occurred. Please check server logs.";
+            if (error != null) {
+                String message = error.getAsString();
+                if (null != message && !message.isEmpty()) {
+                    errorMessage = message;
+                }
+            }
+            throw new ManagementApiException(errorMessage, httpSc);
+        }
+        return response;
+    }
     public static CloseableHttpResponse doPost(String groupId, String nodeId, String accessToken, String url,
                                                JsonObject payload) throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doPost(accessToken, url, payload);

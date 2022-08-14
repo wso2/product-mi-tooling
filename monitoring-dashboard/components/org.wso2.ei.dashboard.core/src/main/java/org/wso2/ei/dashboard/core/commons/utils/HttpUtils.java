@@ -30,6 +30,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -49,6 +50,7 @@ import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -72,6 +74,28 @@ public class HttpUtils {
         httpGet.setHeader("Authorization", authHeader);
 
         return doGet(httpGet);
+    }
+
+    public static CloseableHttpResponse doGet(String accessToken, String url, Map<String, String> params) {
+
+        URIBuilder builder;
+        try {
+            builder = new URIBuilder(url);
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                builder.setParameter(entry.getKey(), entry.getValue());
+            }
+    
+            final HttpGet httpGet = new HttpGet(builder.build());
+            String authHeader = "Bearer " + accessToken;
+
+            httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
+            httpGet.setHeader("Authorization", authHeader);
+            return doGet(httpGet);
+
+        } catch (URISyntaxException e) {
+            throw new DashboardServerException("Error occurred while sending get http request.", e);
+        }
+        
     }
 
     public static CloseableHttpResponse doGet(HttpGet httpGet) {

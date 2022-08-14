@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function CarbonApplications() {
     const [pageInfo] = React.useState({
@@ -33,17 +31,6 @@ export default function CarbonApplications() {
             {id: 'version', label: 'Version'}],
         tableOrderBy: 'name'
     });
-    
-    const [carbonAppsList, setCarbonAppsList] = React.useState([]);
 
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    React.useEffect(() => {
-        HTTPClient.getArtifacts("capps", globalGroupId, selectedNodeList).then(response => {
-            setCarbonAppsList(response.data)
-        })
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={carbonAppsList}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

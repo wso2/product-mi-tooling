@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function LocalEntries() {
     const [pageInfo] = React.useState({
@@ -34,16 +32,5 @@ export default function LocalEntries() {
         tableOrderBy: 'name'
     });
 
-    const [localEntryList, setLocalEntryList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-    
-    React.useEffect(() => {
-        HTTPClient.getArtifacts("local-entries", globalGroupId, selectedNodeList).then(response => {
-            setLocalEntryList(response.data)
-        })
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={localEntryList}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

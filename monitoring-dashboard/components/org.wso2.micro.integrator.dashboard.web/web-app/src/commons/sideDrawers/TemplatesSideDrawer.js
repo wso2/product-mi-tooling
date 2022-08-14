@@ -32,9 +32,9 @@ export default function TemplatesSideDrawer(props) {
     const artifactName = nodeData.details.name;
     const artifactType = nodeData.details.type;
     var templateType;
-    if (artifactType==="Endpoint Template") {
+    if (artifactType==="endpoint") {
         templateType = "templates_endpoint"
-    } else if (artifactType==="Sequence Template") {
+    } else if (artifactType==="sequence") {
         templateType = "templates_sequence"
     }
     const classes = useStyles();

@@ -28,7 +28,7 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
-import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 
 import java.util.List;
@@ -39,10 +39,15 @@ import java.util.List;
 public class SequencesDelegate implements ArtifactDelegate {
     private static final Logger logger = LogManager.getLogger(SequencesDelegate.class);
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException {
-        logger.debug("Fetching sequences from MI.");
-        return DelegatesUtil.getArtifactsFromMI(groupId, nodeList, Constants.SEQUENCES);
+    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        throws ManagementApiException {
+        
+        logger.debug("Fetching Searched Sequences from MI.");
+        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.SEQUENCES, 
+            searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
+
 
     @Override
     public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws ManagementApiException {

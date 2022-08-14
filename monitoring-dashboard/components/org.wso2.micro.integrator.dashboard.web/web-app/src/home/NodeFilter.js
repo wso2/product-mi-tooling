@@ -40,7 +40,7 @@ export default function NodeFilter () {
 
     React.useEffect(()=>{
         if (globalGroupId !== '') {
-            HTTPClient.getNodes(globalGroupId).then(response => {
+            HTTPClient.getAllNodes(globalGroupId).then(response => {
                 var list = [];
                 response.data.map(data => list.push(data.nodeId))
                 setNodeList(list)

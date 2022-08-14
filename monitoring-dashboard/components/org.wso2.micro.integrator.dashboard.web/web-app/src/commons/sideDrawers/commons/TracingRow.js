@@ -48,7 +48,7 @@ export default function TracingRow(props) {
         }
         HTTPClient.updateArtifact(globalGroupId, pageId, payload).then(response => {
             if (response.data.status === 'success') {
-                retrieveData();
+                retrieveData('', true);
             }
         });
     }

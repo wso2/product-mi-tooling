@@ -23,10 +23,12 @@ package org.wso2.ei.dashboard.micro.integrator.delegates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
+
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
@@ -38,18 +40,45 @@ import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.core.rest.model.UsersInner;
+import org.wso2.ei.dashboard.core.rest.model.UsersResourceResponse;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 /**
  * Delegate class to handle requests from users page.
  */
 public class UsersDelegate {
     private static final Log log = LogFactory.getLog(UsersDelegate.class);
-    private final DataManager dataManager = DataManagerSingleton.getDataManager();
+    private static final DataManager dataManager = DataManagerSingleton.getDataManager();
+    private static List<UsersInner>  searchedList;
+    private static String prevSearchKey = null;
+    private static int count;
 
-    public Users fetchUsers(String groupId) throws ManagementApiException {
-        log.debug("Fetching users via management api.");
-        return getUsers(groupId);
+
+    public UsersResourceResponse fetchPaginatedUsers(String groupId, String searchKey, 
+        String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        throws ManagementApiException {
+        
+        log.debug("Fetching Searched Users from MI.");
+        int fromIndex = Integer.parseInt(lowerLimit);
+        int toIndex = Integer.parseInt(upperLimit);
+        boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
+
+        log.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
+
+        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))) {
+            searchedList = getSearchedUsers(groupId, searchKey, order, orderBy);
+            count = searchedList.size();
+        }
+        Users paginatedUsers = getPaginatedUsersResultsFromMI(searchedList, fromIndex, toIndex);
+        UsersResourceResponse usersResourceResponse = new UsersResourceResponse();
+        usersResourceResponse.setResourceList(paginatedUsers);
+        usersResourceResponse.setCount(count);
+        prevSearchKey = searchKey;
+        return usersResourceResponse;
     }
 
     public Ack addUser(String groupId, AddUserRequest request) throws ManagementApiException {
@@ -107,7 +136,7 @@ public class UsersDelegate {
         return payload;
     }
 
-    private Users getUsers(String groupId) throws ManagementApiException {
+    private static Users getUsers(String groupId) throws ManagementApiException {
         Users users = new Users();
         NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, users of all nodes in the group should be identical
@@ -124,8 +153,66 @@ public class UsersDelegate {
         return users;
     }
 
-    private UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url, JsonElement user)
-            throws ManagementApiException {
+    private static Users getSearchedUsers(String groupId, String searchKey, 
+        String order, String orderBy) throws ManagementApiException {
+
+        Users users = new Users();
+        NodeList nodeList = dataManager.fetchNodes(groupId);
+        // assumption - In a group, users of all nodes in the group should be identical
+        String nodeId = nodeList.get(0).getNodeId();
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
+        String url = mgtApiUrl.concat("users/");
+        JsonArray usersList = DelegatesUtil.getResourceResultList(groupId, nodeId, "users", 
+                mgtApiUrl, accessToken, searchKey);
+
+        for (JsonElement user : usersList) {
+            UsersInner usersInner = getUserDetails(groupId, nodeId, accessToken, url, user);
+            users.add(usersInner);
+        }
+        Comparator<UsersInner> comparatorObject;
+        switch (orderBy.toLowerCase()) {
+            //for any other ordering options
+            default: comparatorObject = Comparator.comparing(UsersInner::getUserId); break;
+        }
+
+        if (order.equalsIgnoreCase("desc")) {
+            Collections.sort(users, comparatorObject.reversed());
+        } else {
+            Collections.sort(users, comparatorObject);
+        }
+        return users;
+    }
+
+    private Users getPaginatedUsersResultsFromMI(List<UsersInner> users, int lowerLimit, int upperLimit) 
+        throws ManagementApiException {
+
+        Users resultList = new Users();
+        try {
+            if (users.size() < upperLimit) {
+                upperLimit = users.size();
+            }
+            if (upperLimit < lowerLimit) {
+                lowerLimit = upperLimit;
+            }
+            List<UsersInner> paginatedList = users.subList(lowerLimit, upperLimit);
+        
+            for (UsersInner user : paginatedList) {
+                resultList.add(user);
+            }
+            
+            return resultList;
+
+        } catch (IndexOutOfBoundsException e) {
+            log.error("Index values are out of bound", e);
+        } catch (IllegalArgumentException e) {
+            log.error("Illegal arguments for index values", e);
+        }
+        return null;      
+    }
+
+    private static UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url, 
+        JsonElement user)throws ManagementApiException {
         String userId = user.getAsJsonObject().get("userId").getAsString();
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);

@@ -75,13 +75,13 @@ export default class HTTPClient {
         return this.getResource()
     }
 
-    static getNodes(groupId) {
-        const resourcePath = `${groupId}/${Constants.PREFIX_NODES}`
+    static getNodes(groupId, lowerLimit, upperLimit) {
+        const resourcePath = `${groupId}/${Constants.PREFIX_NODES}?lowerLimit=${lowerLimit}&upperLimit=${upperLimit}`;
         return this.getResource(resourcePath)
     }
 
-    static getUsers(groupId) {
-        const resourcePath = `${groupId}/${Constants.PREFIX_USERS}`
+    static getAllNodes(groupId) {
+        const resourcePath = `${groupId}/all-nodes`;
         return this.getResource(resourcePath)
     }
 
@@ -101,8 +101,8 @@ export default class HTTPClient {
         return this.post(path, payload)
     }
 
-    static getRoles(groupId) {
-        const resourcePath = `${groupId}/${Constants.PREFIX_ROLES}`
+    static getAllRoles(groupId) {
+        const resourcePath = `${groupId}/${Constants.PREFIX_ALLROLES}`
         return this.getResource(resourcePath)
     }
 
@@ -160,11 +160,34 @@ export default class HTTPClient {
         return this.getResource(resourcePath)
     }
 
-    static getArtifacts(artifactType, groupId, nodeList) {
-        const resourcePath = `${groupId}/${artifactType}?nodes=${this.getNodeListAsQueryParams(nodeList)}`
+    static getRegistryProperty(groupId, registryPath){
+        const resourcePath = `${groupId}/registry-resources/properties?path=${registryPath}`
+        return this.getResource(resourcePath)
+    }
+
+    static getPaginatedUsersAndRoles(searchKey, lowerLimit, upperLimit, resourceType,order, orderBy, groupId, isUpdate) {
+        const resourcePath = `${groupId}/${resourceType}?searchKey=${searchKey}&lowerLimit=${lowerLimit}&upperLimit=${upperLimit}&order=${order}&orderBy=${orderBy}&isUpdate=${isUpdate}`;
+        return this.getResource(resourcePath)
+    }
+
+    static getPaginatedResults(searchKey, lowerLimit, upperLimit, resourceType, order, orderBy, groupId, nodeList, isUpdate) {
+        var resourcePath = `${groupId}/${resourceType}?`;
+    
+        if(resourceType == Constants.PREFIX_LOG_CONFIGS && nodeList == 'All') {
+            resourcePath = `${resourcePath}nodes=all&searchKey=${searchKey}&lowerLimit=${lowerLimit}&upperLimit=${upperLimit}&order=${order}&orderBy=${orderBy}&isUpdate=${isUpdate}`;
+        } else if(resourceType == Constants.PREFIX_LOG_CONFIGS){//one specific node is selected
+            resourcePath = `${resourcePath}nodes=${this.getNodeListAsQueryParams([nodeList])}&searchKey=${searchKey}&lowerLimit=${lowerLimit}&upperLimit=${upperLimit}&order=${order}&orderBy=${orderBy}&isUpdate=${isUpdate}`;
+        } else {
+            resourcePath = `${resourcePath}nodes=${this.getNodeListAsQueryParams(nodeList)}&searchKey=${searchKey}&lowerLimit=${lowerLimit}&upperLimit=${upperLimit}&order=${order}&orderBy=${orderBy}&isUpdate=${isUpdate}`;
+        }
+
+        if(resourceType === Constants.PREFIX_LOGS || resourceType === Constants.PREFIX_LOG_CONFIGS) {
+            return this.getResource(resourcePath);
+        }
+
         return new Promise((resolve, reject) => {
             this.getResource(resourcePath).then(response => {
-                response.data.map(data => 
+                response.data.resourceList.map(data =>
                     data.nodes.map(node => node.details = JSON.parse(node.details))
                 )
                 resolve(response)
@@ -172,10 +195,11 @@ export default class HTTPClient {
                 reject(error)
             })
         });
+
     }
 
-    static getRegistryArtifacts(groupId,path) {
-        const resourcePath = `${groupId}/registry-resources?path=${path}`
+    static getPaginatedRegistryArtifacts(searchKey, lowerLimit, upperLimit,order, orderBy, groupId, path) {
+        const resourcePath = `${groupId}/registry-resources?path=${path}&searchKey=${searchKey}&lowerLimit=${lowerLimit}&upperLimit=${upperLimit}&order=${order}&orderBy=${orderBy}`;
         return this.getResource(resourcePath)
     }
 

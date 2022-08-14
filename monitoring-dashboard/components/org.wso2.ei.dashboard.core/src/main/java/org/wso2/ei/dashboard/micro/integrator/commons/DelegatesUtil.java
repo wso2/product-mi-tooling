@@ -3,6 +3,7 @@ package org.wso2.ei.dashboard.micro.integrator.commons;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,8 +16,14 @@ import org.wso2.ei.dashboard.core.rest.model.ArtifactDetails;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactsInner;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -27,18 +34,46 @@ public class DelegatesUtil {
 
     private static final Logger logger = LogManager.getLogger(DelegatesUtil.class);
 
+    private static List<ArtifactsInner> searchedArtifacts;
+    private static String prevSearchKey = null;
+    private static String prevResourceType = null;
+    private static int count;
+
     private DelegatesUtil() {
 
     }
 
-    public static Artifacts getArtifactsFromMI(String groupId, List<String> nodeList, String artifactType)
+    public static int getNodesCount (String groupId) {
+        return DATA_MANAGER.fetchNodes(groupId).size();
+    }
+
+    public static int getArtifactCount(List<ArtifactsInner> artifacts) {
+        int count = 0;
+        List<String> artifactNames = new ArrayList<>();
+        String name;
+        for (ArtifactsInner artifact : artifacts) {
+            name = artifact.getName();
+            if (!artifactNames.contains(name)) {
+                count++;
+                artifactNames.add(name);
+            }
+        }
+        return count;
+    }
+    
+
+    public static List<ArtifactsInner> getSearchedArtifactsFromMI(String groupId, List<String> nodeList, 
+        String artifactType, String searchKey, String order, String orderBy)
             throws ManagementApiException {
+        
         Artifacts artifacts = new Artifacts();
+     
         for (String nodeId: nodeList) {
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
             String accessToken = DATA_MANAGER.getAccessToken(groupId, nodeId);
-
-            JsonArray artifactList = getArtifactList(groupId, nodeId, artifactType, mgtApiUrl, accessToken);
+            
+            JsonArray artifactList = getResourceResultList(groupId, nodeId, artifactType, 
+                mgtApiUrl, accessToken, searchKey);
 
             for (JsonElement jsonElement : artifactList) {
                 JsonObject artifact = (JsonObject) jsonElement;
@@ -63,7 +98,79 @@ public class DelegatesUtil {
                 }
             }
         }
+        
+        //ordering   
+        Comparator<ArtifactsInner> comparatorObject;
+        switch (orderBy.toLowerCase()) {
+            //for any other ordering options
+            default: comparatorObject = Comparator.comparing(ArtifactsInner::getNameIgnoreCase); break;
+        }
+        if (order.equalsIgnoreCase("desc")) {
+            Collections.sort(artifacts, comparatorObject.reversed());
+        } else {
+            Collections.sort(artifacts, comparatorObject);
+        }  
+
         return artifacts;
+    }
+    
+    public static ArtifactsResourceResponse getPaginatedArtifactResponse(String groupId, List<String> nodeList, 
+        String artifactType, String searchKey, String lowerLimit, String upperLimit, String order, String orderBy,
+        String isUpdate)
+        throws ManagementApiException {
+        int fromIndex = Integer.parseInt(lowerLimit);
+        int toIndex = Integer.parseInt(upperLimit);
+        boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
+
+        ArtifactsResourceResponse artifactsResourceResponse = new ArtifactsResourceResponse();
+        logger.debug("prevSearchkey :" + prevSearchKey + ", currentSearchkey:" + searchKey);
+        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey)) || 
+            !(prevResourceType.equals(artifactType))) {
+                
+            searchedArtifacts = getSearchedArtifactsFromMI(groupId, nodeList, artifactType,
+                    searchKey, order, orderBy);
+            count = getArtifactCount(searchedArtifacts);
+        }
+        Artifacts paginatedList = getPaginationResults(searchedArtifacts, fromIndex, toIndex);
+        artifactsResourceResponse.setResourceList(paginatedList);
+        artifactsResourceResponse.setCount(count);
+        prevSearchKey = searchKey;
+        prevResourceType = artifactType;
+        return artifactsResourceResponse;
+    }
+    
+     /**
+     * Returns the results list items within the given range
+     *
+     * @param itemsList the list containing all the items of a specific type
+     * @param lowerLimit from index of the required range
+     * @param upperLimit to index of the required range
+     * @return the List if no error. Else return null
+     */
+    public static Artifacts getPaginationResults(List<ArtifactsInner> itemsList, int lowerLimit, int upperLimit) {
+        
+        Artifacts resultList = new Artifacts();
+        try {
+            if (itemsList.size() < upperLimit) {
+                upperLimit = itemsList.size();
+            }
+            if (upperLimit < lowerLimit) {
+                lowerLimit = upperLimit;
+            }
+            List<ArtifactsInner> paginatedList = itemsList.subList(lowerLimit, upperLimit);
+        
+            for (ArtifactsInner artifact : paginatedList) {
+                resultList.add(artifact);
+            }
+            
+            return resultList;
+
+        } catch (IndexOutOfBoundsException e) {
+            logger.error("Index values are out of bound", e);
+        } catch (IllegalArgumentException e) {
+            logger.error("Illegal arguments for index values", e);
+        }
+        return null;
     }
 
     private static ArtifactDetails getArtifactDetails(String groupId, String nodeId, String type, String name,
@@ -77,19 +184,28 @@ public class DelegatesUtil {
         return artifactDetails;
     }
 
-    private static JsonArray getArtifactList(String groupId, String nodeId, String type, String mgtApiUrl,
-                                             String accessToken) throws ManagementApiException {
+    public static JsonArray getResourceResultList(String groupId, String nodeId, String type, 
+        String mgtApiUrl, String accessToken, String searchKey) throws ManagementApiException {
+        
         String url = mgtApiUrl.concat(type);
-        JsonObject artifacts = invokeManagementApi(groupId, nodeId, url, accessToken);
+        JsonObject artifacts = invokeManagementApi(groupId, nodeId, url, 
+            accessToken, searchKey);
         return artifacts.get("list").getAsJsonArray();
-    }
+    }    
 
-    private static JsonObject invokeManagementApi(String groupId, String nodeId, String url, String accessToken)
+    private static JsonObject invokeManagementApi(String groupId, String nodeId, String url, 
+        String accessToken, String searchKey)
             throws ManagementApiException {
-        CloseableHttpResponse response = Utils.doGet(groupId, nodeId, accessToken, url);
+        CloseableHttpResponse response;
+        if (searchKey == null) {
+            response = Utils.doGet(groupId, nodeId, accessToken, url);
+        } else {
+            Map<String, String> paramMap = new HashMap<>();
+            paramMap.put("searchKey", searchKey);
+            response = Utils.doGet(groupId, nodeId, accessToken, url, paramMap);
+        }
         return HttpUtils.getJsonResponse(response);
     }
-
 
     public static boolean updateArtifact(String artifactType, String groupId, ArtifactUpdateRequest request,
                                          JsonObject payload) throws ManagementApiException {

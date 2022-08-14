@@ -27,7 +27,7 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
-import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 
 import java.util.List;
@@ -36,13 +36,18 @@ import java.util.List;
  * Delegate class to handle requests from connectors page.
  */
 public class ConnectorsDelegate implements ArtifactDelegate {
-    private static final Log log = LogFactory.getLog(ConnectorsDelegate.class);
+    private static final Log logger = LogFactory.getLog(ConnectorsDelegate.class);
 
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException {
-        log.debug("Fetching connectors from  MI.");
-        return DelegatesUtil.getArtifactsFromMI(groupId, nodeList, Constants.CONNECTORS);
+    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        throws ManagementApiException {
+            
+        logger.debug("Fetching Searched Connectors from MI.");
+        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.CONNECTORS, 
+            searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
+
 
     @Override
     public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) {

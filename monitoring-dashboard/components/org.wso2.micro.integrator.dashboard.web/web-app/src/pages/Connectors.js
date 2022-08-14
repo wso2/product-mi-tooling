@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function Connectors() {
     const [pageInfo] = React.useState({
@@ -36,16 +34,5 @@ export default function Connectors() {
         tableOrderBy: 'name'
     });
 
-    const [connectorList, setConnectorList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    React.useEffect(() => {
-        HTTPClient.getArtifacts("connectors", globalGroupId, selectedNodeList).then(response => {
-            setConnectorList(response.data)
-        })
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={connectorList}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

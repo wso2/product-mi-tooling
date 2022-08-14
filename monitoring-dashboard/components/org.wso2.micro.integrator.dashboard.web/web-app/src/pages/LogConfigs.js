@@ -47,7 +47,6 @@ export default function LogConfigs() {
 
     const [nodeList, setNodeList] = React.useState([]);
     const [selectedNodeId, setSelectedNodeId] = React.useState('All');
-    const [logConfigs, setLogConfigs] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
 
     const classes = useStyles();
@@ -58,7 +57,7 @@ export default function LogConfigs() {
             value: 'All'
         }]
         if (globalGroupId !== '') {
-            HTTPClient.getNodes(globalGroupId).then(response => {
+            HTTPClient.getAllNodes(globalGroupId).then(response => {
                 response.data.filter(node => {
                     var node = {
                         label: node.nodeId,
@@ -68,16 +67,12 @@ export default function LogConfigs() {
                 })
                 setNodeList(allNodes)
             })
-
-            HTTPClient.getLogConfigs(globalGroupId).then(response => {
-                setLogConfigs(response.data)
-            })
         }
     }
 
     React.useEffect(() => {
         getDefaultLogConfigs();
-    }, [globalGroupId])
+    }, [globalGroupId, selectedNodeId])
 
     if (AuthManager.getUser().scope !== "admin") {
         return (
@@ -87,25 +82,13 @@ export default function LogConfigs() {
 
     const getLogConfigByNodeId = (nodeId) => {
         setSelectedNodeId(nodeId);
-        if (nodeId !== 'All') {
-            HTTPClient.getLogConfigs(globalGroupId, nodeId).then(response => {
-                setLogConfigs(response.data)
-            })
-        }
+
         let param = {
             selectedNodeId: nodeId
         }
         setPageInfo({...pageInfo, additionalParams: param})
     }
 
-    const retrieveLogConfig = (nodeId) => {
-        if (nodeId == undefined) {
-            getDefaultLogConfigs();
-        } else {
-            getLogConfigByNodeId(nodeId)
-        }
-        
-    }
 
     return <>
 
@@ -120,14 +103,13 @@ export default function LogConfigs() {
                 {nodeList.map((option) => (
                     <MenuItem value={option.value}>{option.label}</MenuItem>
                 ))}
-
             </Select>
             <FormHelperText>Node ID</FormHelperText>
         </FormControl>
         <Button classes={{root: classes.buttonRight}} component={Link} to="/log-configs/add" variant="contained" color="primary">
             Add Logging Configuration
         </Button>
-        <EnhancedTable pageInfo={pageInfo} dataSet={logConfigs} retrieveData={retrieveLogConfig}/></>;
+        <EnhancedTable pageInfo={pageInfo}/></>;
 }
 
 const useStyles = makeStyles((theme) => ({

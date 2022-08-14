@@ -23,7 +23,7 @@ package org.wso2.ei.dashboard.core.rest.delegates;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
-import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
 
 import java.util.List;
 
@@ -31,7 +31,8 @@ import java.util.List;
  * This interface represents the implementation of artifact delegates.
  */
 public interface ArtifactDelegate {
-    Artifacts getArtifactsList(String groupId, List<String> nodeList) throws ManagementApiException;
-
+    ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList,
+    String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+    throws ManagementApiException;
     Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws ManagementApiException;
 }

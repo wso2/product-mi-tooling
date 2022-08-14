@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../../utils/HTTPClient'
 
 export default function Nodes () {
 
@@ -34,18 +32,6 @@ export default function Nodes () {
             {id: 'role', label: 'Role'}],
         tableOrderBy: 'service'
     });
-    const [nodeList, setNodeList] = React.useState([]);
 
-    const globalGroupId = useSelector(state => state.groupId);
-
-    React.useEffect(()=>{
-        if (globalGroupId !== "") {
-            HTTPClient.getNodes(globalGroupId).then(response => {
-                response.data.map(data => data.details = JSON.parse(data.details))
-                setNodeList(response.data)
-            })
-        }
-    },[globalGroupId])
-
-    return (<EnhancedTable pageInfo={pageInfo} dataSet={nodeList}/>);
+    return (<EnhancedTable pageInfo={pageInfo}/>);
 }

@@ -26,7 +26,7 @@ import AdminIcon from '@material-ui/icons/CheckRounded';
 import NonAdminIcon from '@material-ui/icons/ClearRounded';
 import UserRolesSection from './commons/UserRolesSection';
 
-import { Table, TableCell, TableBody, TableRow } from '@material-ui/core';
+import { Table, TableCell,TableRow } from '@material-ui/core';
 
 export default function UserSideDrawer(props) {
     const { user, retrieveData } = props;

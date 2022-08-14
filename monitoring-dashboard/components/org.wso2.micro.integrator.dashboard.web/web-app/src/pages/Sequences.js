@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function Sequences() {
     const [pageInfo] = React.useState({
@@ -34,24 +32,5 @@ export default function Sequences() {
         tableOrderBy: 'name'
     });
 
-    const [sequenceList, setSequenceList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    const retrieveSequences = () => {
-        HTTPClient.getArtifacts("sequences", globalGroupId, selectedNodeList).then(response => {
-            setSequenceList(response.data)
-        })
-    }
-
-    React.useEffect(() => {
-        retrieveSequences();
-    },[globalGroupId, selectedNodeList])
-
-    const retrieveData = () => {
-        retrieveSequences();
-    }
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={sequenceList} retrieveData={retrieveData}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

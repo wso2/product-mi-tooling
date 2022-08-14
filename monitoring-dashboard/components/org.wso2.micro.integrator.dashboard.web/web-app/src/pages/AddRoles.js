@@ -31,8 +31,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import { makeStyles } from "@material-ui/core/styles";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, Redirect } from "react-router-dom";
 import HTTPClient from '../utils/HTTPClient';
+import Roles from './Roles';
 
 export default function AddRoles() {
     const globalGroupId = useSelector(state => state.groupId);
@@ -65,7 +66,9 @@ export default function AddRoles() {
             isError: false
         })
         if (!isError) {
-            history.push("/roles");
+            //update roles list
+            HTTPClient.getPaginatedUsersAndRoles('', 0, 5, 'roles', 'asc', 'name', globalGroupId, true);
+            window.location.reload();
         }
     }
 

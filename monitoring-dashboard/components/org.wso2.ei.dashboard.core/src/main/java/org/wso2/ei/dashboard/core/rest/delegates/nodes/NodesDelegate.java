@@ -22,11 +22,14 @@ package org.wso2.ei.dashboard.core.rest.delegates.nodes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
+import org.wso2.ei.dashboard.core.rest.model.NodesResourceResponse;
 
+import java.util.List;
 /**
  * Delegate class to handle requests from Nodes page (Home page).
  */
@@ -52,4 +55,48 @@ public class NodesDelegate {
         }
         return nodeList;
     }
+
+    public NodeList getPaginatedNodesList(String groupId, int lowerLimit, int upperLimit) {
+        
+        NodeList nodeList = getNodes(groupId);
+        NodeList resultList = new NodeList();
+        
+        try {
+            if (nodeList.size() < upperLimit) {
+                upperLimit = nodeList.size();
+            }
+            if (upperLimit < lowerLimit) {
+                lowerLimit = upperLimit;
+            }
+            List<NodeListInner> paginatedList = nodeList.subList(lowerLimit, upperLimit);
+        
+            for (NodeListInner node : paginatedList) {
+                resultList.add(node);
+            }
+            
+            return resultList;
+
+        } catch (IndexOutOfBoundsException e) {
+            logger.error("Index values are out of bound", e);
+        } catch (IllegalArgumentException e) {
+            logger.error("Illegal arguments for index values", e);
+        }
+        return null;
+        
+    }
+
+    private int getCount(String groupId) {
+        return getNodes(groupId).size();
+    }
+
+    public NodesResourceResponse getNodesResponse(String groupId, String lowerLimit, String upperLimit) {
+        int fromIndex = Integer.parseInt(lowerLimit);
+        int toIndex = Integer.parseInt(upperLimit);
+        NodesResourceResponse nodesResourceResponse = new NodesResourceResponse();
+        NodeList nodeList = getPaginatedNodesList(groupId, fromIndex, toIndex);
+        int count = getCount(groupId);
+        nodesResourceResponse.setResourceList(nodeList);
+        nodesResourceResponse.setCount(count);
+        return nodesResourceResponse;
+    }    
 }

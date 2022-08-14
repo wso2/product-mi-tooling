@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function LogFiles() {
     const [pageInfo] = React.useState({
@@ -34,16 +32,5 @@ export default function LogFiles() {
         tableOrderBy: 'name'
     });
 
-    const [logList, setlogList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    React.useEffect(() => {
-        if (selectedNodeList.length > 0) {
-            HTTPClient.getLogFiles(globalGroupId, selectedNodeList).then(response => setlogList(response.data))
-        }
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={logList} />
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

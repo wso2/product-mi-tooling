@@ -20,14 +20,11 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useDispatch, useSelector } from 'react-redux';
+import {useSelector } from 'react-redux';
 import AuthManager from "../auth/AuthManager";
 import {Link, Redirect} from "react-router-dom";
 import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import { changeData } from '../redux/Actions';
-import Progress from '../commons/Progress';
-import HTTPClient from '../utils/HTTPClient';
 import Alert from '@material-ui/lab/Alert';
 
 export default function Users() {
@@ -41,25 +38,13 @@ export default function Users() {
         tableOrderBy: 'name'
     });
 
-    const [users, setUsers] = React.useState(null);
     const [error, setError] = React.useState(null);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
 
-    const retrieveUsers = () => {
-        HTTPClient.getUsers(globalGroupId).then(response => {
-            response.data.map(data => data.details = JSON.parse(data.details));
-            setUsers(response.data)
-        }).catch(error => {
-            if (error.response.status === 500) {
-                setError(error.response.data.message)
-            }
-        })
-    }
 
     React.useEffect(() => {
-        retrieveUsers();
     }, [globalGroupId, dataSet]);
 
     if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
@@ -78,14 +63,6 @@ export default function Users() {
         );
     }
 
-    if (!users) {
-        return(<Progress/>);
-    }
-
-    const retrieveData = () => {
-        retrieveUsers();
-    }
-
     return <>
         <div style={{height: "30px"}}>
         <Button classes={{root: classes.buttonRight}} component={Link} to="/users/add" variant="contained"
@@ -94,7 +71,7 @@ export default function Users() {
         </Button>
         </div>
         <br/>
-        <EnhancedTable pageInfo={pageInfo} dataSet={users} retrieveData={retrieveData}/>
+        <EnhancedTable pageInfo={pageInfo}/>
     </>
 }
 

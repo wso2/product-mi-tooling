@@ -41,9 +41,9 @@ export default function UserRolesSection(props) {
     const [unassignedRoles, setUnassignedRoles] = React.useState([]);
 
     React.useEffect(() => {
-        HTTPClient.getRoles(globalGroupId).then(response => {
+        HTTPClient.getAllRoles(globalGroupId).then(response => {
             const allRoles = [];
-            response.data.map(data => allRoles.push(data.roleName));
+            response.data.resourceList.map(data => allRoles.push(data.roleName));
             const unassignedRoles = allRoles.filter(n => !assignedRoles.includes(n));
             setAllRoles(allRoles);
             setUnassignedRoles(unassignedRoles);
@@ -165,7 +165,7 @@ function UpdateRolesButton(props) {
         }
         HTTPClient.updateUserRoles(globalGroupId, payload).then(response => {
             if (response.data.status === 'success') {
-                retrieveData();
+                retrieveData('', true);
                 setCompletionStatusDialog({
                     open: true, 
                     title: 'Success',

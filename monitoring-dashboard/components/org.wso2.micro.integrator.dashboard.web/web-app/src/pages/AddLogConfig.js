@@ -42,7 +42,7 @@ export default function AddLogConfig() {
     React.useEffect(() => {
         let allNodes = [{label: 'All', value: 'All'}]
         if (globalGroupId !== '') {
-            HTTPClient.getNodes().then(response => {
+            HTTPClient.getAllNodes().then(response => {
                 response.data.filter(node => {
                     var node = {
                         label: node.nodeId,

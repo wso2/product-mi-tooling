@@ -25,8 +25,6 @@ import AuthManager from "../auth/AuthManager";
 import {Link, Redirect} from "react-router-dom";
 import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import Progress from '../commons/Progress';
-import HTTPClient from '../utils/HTTPClient';
 import Alert from '@material-ui/lab/Alert';
 
 export default function Roles() {
@@ -39,26 +37,13 @@ export default function Roles() {
         tableOrderBy: 'name'
     });
 
-    const [roles, setRoles] = React.useState([]);
     const [error, setError] = React.useState(null);
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
 
-    const retrieveRoleList = () => {
-        HTTPClient.getRoles(globalGroupId).then(response => {
-            response.data.map(data => data.details = JSON.parse(data.details));
-            setRoles(response.data)
-        })
-        .catch(error => {
-            if (error.response.status === 500) {
-                setError(error.response.data.message)
-            }
-        })
-    }
-
     React.useEffect(() => {
-        retrieveRoleList();
+    
     }, [globalGroupId, dataSet]);
 
     if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
@@ -77,14 +62,6 @@ export default function Roles() {
         );
     }
 
-    if (!roles) {
-        return(<Progress/>);
-    }
-
-    const retrieveData = () => {
-        retrieveRoleList();
-    }
-
     return <>
         <div style={{height: "30px"}}>
         <Button classes={{root: classes.buttonRight}} component={Link} to="/roles/add" variant="contained"
@@ -93,7 +70,7 @@ export default function Roles() {
         </Button>
         </div>
         <br/>
-        <EnhancedTable pageInfo={pageInfo} dataSet={roles} retrieveData={retrieveData}/>
+        <EnhancedTable pageInfo={pageInfo}/>
     </>
 }
 

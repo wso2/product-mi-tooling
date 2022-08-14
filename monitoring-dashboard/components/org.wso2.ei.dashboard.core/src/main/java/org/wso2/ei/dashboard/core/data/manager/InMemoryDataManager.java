@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,20 +36,16 @@ public final class InMemoryDataManager implements DataManager {
 
     private static final Logger logger = LogManager.getLogger(InMemoryDataManager.class);
     public static HashMap<String, HashMap> heartBeatStore;
-
     public static HashMap<String, HashMap> serviceInfoStore;
-
 
     public InMemoryDataManager() {
         heartBeatStore = new HashMap<>();
         serviceInfoStore = new HashMap<>();
-
         logger.debug("heartBeatStore and serviceInfoStore created ");
     }
 
     @Override
     public boolean insertHeartbeat(HeartbeatObject heartbeat, String accessToken) {
-
         try {
             HashMap map = new HashMap<>();
             map.put("groupId", heartbeat.getGroupId());
@@ -62,7 +58,6 @@ public final class InMemoryDataManager implements DataManager {
             heartBeatStore.put(keyString, map);
             logger.info("Inserted heartbeat to node " + heartbeat.getNodeId() +  " of group " + heartbeat.getGroupId());
             return heartBeatStore.size() > 0;
-
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
         }
@@ -70,7 +65,6 @@ public final class InMemoryDataManager implements DataManager {
 
     @Override
     public boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo) {
-
         try {
             HashMap map = new HashMap();
             map.put("groupId", heartbeat.getGroupId());
@@ -157,7 +151,6 @@ public final class InMemoryDataManager implements DataManager {
                                                + " node " + nodeId, e);
         }
     }
-
 
     @Override
     public boolean checkIfTimestampExceedsInitial(HeartbeatObject heartbeat, String initialTimestamp) {
