@@ -44,6 +44,7 @@ import StatusCell from './statusCell/StatusCell';
 import AuthManager from '../auth/AuthManager';
 import { changeData } from '../redux/Actions';
 import HTTPClient from '../utils/HTTPClient';
+import IconCell from './IconCell';
 
 export default function TableRowCreator(props) {
     const { pageInfo, data, headers, retrieveData } = props;
@@ -67,6 +68,13 @@ export default function TableRowCreator(props) {
             case 'isRunning':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
                         nodeId={node.nodeId} status={node.details.isRunning} retrieveData={retrieveData} />)}</TableCell>
+
+            // Registry Resources
+            case 'childName':
+                return <TableCell><IconCell pageId={pageId}  handleDoubleClick={props.handleDoubleClick} registryPath={props.registryPath} data={data}/></TableCell>
+            case 'mediaType':
+                return <TableCell>{data.mediaType}</TableCell>
+
             // Endpoints
             case 'state':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 

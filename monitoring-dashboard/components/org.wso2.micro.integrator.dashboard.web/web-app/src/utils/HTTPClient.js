@@ -174,6 +174,11 @@ export default class HTTPClient {
         });
     }
 
+    static getRegistryArtifacts(groupId,path) {
+        const resourcePath = `${groupId}/registry-resources?path=${path}`
+        return this.getResource(resourcePath)
+    }
+
     static getCappArtifacts(groupId, nodeId, artifactName) {
         const resourcePath = `${groupId}/${Constants.PREFIX_NODES}/${nodeId}/capps/${artifactName}/artifacts`
         return this.getResource(resourcePath)

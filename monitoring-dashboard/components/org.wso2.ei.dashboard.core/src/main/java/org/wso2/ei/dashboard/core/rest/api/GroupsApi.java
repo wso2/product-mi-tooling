@@ -20,6 +20,12 @@
 
 package org.wso2.ei.dashboard.core.rest.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
@@ -41,22 +47,10 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogList;
+import org.wso2.ei.dashboard.core.rest.model.NodeList;
+import org.wso2.ei.dashboard.core.rest.model.RegistryArtifacts;
 import org.wso2.ei.dashboard.core.rest.model.RoleList;
 import org.wso2.ei.dashboard.core.rest.model.SuccessStatus;
-
-import java.io.File;
-
-import org.wso2.ei.dashboard.core.rest.model.NodeList;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.wso2.ei.dashboard.core.rest.model.UpdateRoleRequest;
 import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
@@ -72,15 +66,27 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.LogsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.RegistryResourceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.RolesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.UsersDelegate;
 
+import java.io.File;
 import java.util.List;
-import javax.validation.constraints.*;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 @Secured
 @Path("/groups")
@@ -541,6 +547,43 @@ public class GroupsApi {
         } catch (ManagementApiException e) {
             responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
         }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/registry-resources")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get registryResources services", description = "", tags={ "registryResources" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of registry resources deployed in provided nodes", content = @Content(schema = @Schema(implementation = RegistryArtifacts.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getRegistryResourcesByNodeIds(
+            @PathParam("group-id")
+            @Parameter(description = "Group ID of the node") String groupId,
+            @QueryParam("path") @Parameter(description = "Path of the registry")  String path) throws ManagementApiException {
+        RegistryResourceDelegate registryResourceDelegate = new RegistryResourceDelegate();
+        RegistryArtifacts registryArtifacts = registryResourceDelegate.getRegistryList(groupId,path);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(registryArtifacts);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/registry-resources/content")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get registry resource content", description = "", tags={ "registryResources" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get registry resource file content", content = @Content(schema = @Schema(implementation = RegistryArtifacts.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error", content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getRegistryResourceContent(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @QueryParam("path") @Parameter(description = "Path of the registry")  String path) throws ManagementApiException {
+        RegistryResourceDelegate registryResourceDelegate = new RegistryResourceDelegate();
+        String registryContent = registryResourceDelegate.getRegistryContent(groupId,path);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(registryContent);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }

@@ -30,6 +30,7 @@ import Navigator from './layout/Navigator';
 import Content from './layout/Content';
 import Header from './layout/Header';
 import ProxyService from '../pages/ProxyService';
+import RegistryResources from '../pages/RegistryResources';
 import Endpoints from '../pages/Endpoints';
 import Nodes from '../pages/nodes/Nodes';
 import InboundEndpoints from '../pages/InboundEndpoints';
@@ -129,6 +130,7 @@ function Layout(props) {
                             <Switch>
                                 <Route exact path='/' component={Nodes} />
                                 <Route exact path='/proxy-services' component={ProxyService} />
+                                <Route exact path='/registry-resources' component={RegistryResources} />
                                 <Route exact path='/endpoints' component={Endpoints} />
                                 <Route exact path='/inbound-endpoints' component={InboundEndpoints} />
                                 <Route exact path='/message-processors' component={MessageProcessors} />
