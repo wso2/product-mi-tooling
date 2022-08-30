@@ -40,46 +40,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Carbon -->
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.core</artifactId>
-                <version>${carbon.kernel5.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.launcher</artifactId>
-                <version>${carbon.kernel5.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.server.feature</artifactId>
-                <version>${carbon.kernel5.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.osgi.feature</artifactId>
-                <version>${carbon.kernel5.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.runtime.feature</artifactId>
-                <version>${carbon.kernel5.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.config</groupId>
-                <artifactId>org.wso2.carbon.config</artifactId>
-                <version>${carbon.config.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.config</groupId>
-                <artifactId>org.wso2.carbon.config.feature</artifactId>
-                <version>${carbon.config.version}</version>
-                <type>zip</type>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.secvault</groupId>
                 <artifactId>org.wso2.carbon.secvault.feature</artifactId>
@@ -119,63 +79,6 @@
                 <artifactId>org.wso2.securevault</artifactId>
                 <version>${securevault.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.utils</groupId>
-                <artifactId>org.wso2.carbon.utils</artifactId>
-                <version>${carbon.utils.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.utils</groupId>
-                <artifactId>org.wso2.carbon.utils.feature</artifactId>
-                <version>${carbon.utils.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.touchpoint</groupId>
-                <artifactId>org.wso2.carbon.touchpoint.feature</artifactId>
-                <version>${carbon.touchpoint.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.deployment</groupId>
-                <artifactId>org.wso2.carbon.deployment.engine</artifactId>
-                <version>${carbon.deployment.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.deployment</groupId>
-                <artifactId>org.wso2.carbon.deployment.engine.feature</artifactId>
-                <version>${carbon.deployment.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.datasources</groupId>
-                <artifactId>org.wso2.carbon.datasource.core.feature</artifactId>
-                <version>${carbon.datasources.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.jndi</groupId>
-                <artifactId>org.wso2.carbon.jndi.feature</artifactId>
-                <version>${carbon.jndi.version}</version>
-                <type>zip</type>
-            </dependency>
-
-            <!-- OSGi -->
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>${osgi.api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.eclipse.osgi</groupId>
-                <artifactId>org.eclipse.osgi</artifactId>
-                <version>${equinox.osgi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.eclipse.osgi</groupId>
-                <artifactId>org.eclipse.osgi.services</artifactId>
-                <version>${equinox.osgi.services.version}</version>
-            </dependency>
 
             <!-- Logging/SLF4J -->
             <dependency>
@@ -207,67 +110,6 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-jcl</artifactId>
                 <version>${version.log4j.core}</version>
-            </dependency>
-
-            <!-- Metrics -->
-            <dependency>
-                <groupId>org.wso2.carbon.metrics</groupId>
-                <artifactId>org.wso2.carbon.metrics.core.feature</artifactId>
-                <version>${carbon.metrics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.metrics</groupId>
-                <artifactId>org.wso2.carbon.metrics.jdbc.core.feature</artifactId>
-                <version>${carbon.metrics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.metrics</groupId>
-                <artifactId>org.wso2.carbon.metrics.das.core.feature</artifactId>
-                <version>${carbon.metrics.version}</version>
-                <type>zip</type>
-            </dependency>
-
-            <!-- MSF4J -->
-            <dependency>
-                <groupId>org.wso2.msf4j</groupId>
-                <artifactId>msf4j-core</artifactId>
-                <version>${msf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.msf4j</groupId>
-                <artifactId>org.wso2.msf4j.feature</artifactId>
-                <version>${msf4j.version}</version>
-                <type>zip</type>
-            </dependency>
-
-            <!-- Databridge -->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.agent.feature</artifactId>
-                <version>${carbon.analytics-common.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.commons.thrift.feature</artifactId>
-                <version>${carbon.analytics-common.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.commons.feature</artifactId>
-                <version>${carbon.analytics-common.version}</version>
-                <type>zip</type>
-            </dependency>
-
-            <!--Carbon UI Server-->
-            <dependency>
-                <groupId>org.wso2.carbon.uiserver</groupId>
-                <artifactId>org.wso2.carbon.uiserver.feature</artifactId>
-                <version>${carbon.uis.version}</version>
-                <type>zip</type>
             </dependency>
 
             <!-- Rest Api-->
@@ -415,48 +257,15 @@
                 </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.wso2.carbon.maven</groupId>
-                    <artifactId>carbon-feature-plugin</artifactId>
-                    <version>${carbon.feature.plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <properties>
-        <!-- Carbon -->
-        <carbon.kernel5.version>5.2.16</carbon.kernel5.version>
-        <carbon.config.version>2.1.12</carbon.config.version>
-        <carbon.config.version.range>[2.1.0, 3.0.0)</carbon.config.version.range>
         <securevault.version>1.1.2</securevault.version>
         <carbon.kernel.version>4.5.3</carbon.kernel.version>
-        <carbon.utils.version>2.0.8</carbon.utils.version>
-        <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
-        <carbon.deployment.version>5.2.0</carbon.deployment.version>
-        <carbon.datasources.version>1.1.4</carbon.datasources.version>
-        <carbon.jndi.version>1.0.5</carbon.jndi.version>
-        <carbon.metrics.version>2.3.8</carbon.metrics.version>
-
-        <!-- OSGi -->
-        <osgi.api.version>6.0.0</osgi.api.version>
-        <equinox.osgi.version>3.11.0.v20160603-1336</equinox.osgi.version>
-        <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
-
-        <!-- MSF4J -->
-        <msf4j.version>2.7.3</msf4j.version>
 
         <!-- Logging/SLF4J -->
         <slf4j.version>1.7.36</slf4j.version>
         <version.log4j.core>2.17.2</version.log4j.core>
-
-        <!-- Databridge -->
-        <carbon.analytics-common.version>6.1.26</carbon.analytics-common.version>
-
-        <!-- Carbon UI Server -->
-        <carbon.uis.version>1.0.2</carbon.uis.version>
 
         <!-- Maven-->
         <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version>
@@ -465,9 +274,6 @@
         <maven.exec.plugin.version>1.5.0</maven.exec.plugin.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- Carbon kernel4 version that is used in Micro Integrator -->
-        <carbon.kernel4.version>4.5.3</carbon.kernel4.version>
 
         <!-- Rest api -->
         <glassfish.jersey.version>2.26</glassfish.jersey.version>
