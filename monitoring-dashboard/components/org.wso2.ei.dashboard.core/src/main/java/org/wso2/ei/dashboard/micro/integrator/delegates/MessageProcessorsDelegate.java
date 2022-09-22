@@ -45,6 +45,8 @@ public class MessageProcessorsDelegate implements ArtifactDelegate {
         throws ManagementApiException {
 
         logger.debug("Fetching Searched Mesage Processors from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, 
             Constants.MESSAGE_PROCESSORS, searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }

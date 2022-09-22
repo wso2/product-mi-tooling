@@ -65,11 +65,14 @@ public class TemplatesDelegate implements ArtifactDelegate {
         throws ManagementApiException {
         
         logger.debug("Fetching Searched Templates from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
-
-        logger.debug("prevSearchkey :" + prevSearchKey + ", currentSearchkey:" + searchKey);
+        if (logger.isDebugEnabled()) {
+            logger.debug("prevSearchkey :" + prevSearchKey + ", currentSearchkey:" + searchKey);
+        }
         if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))) {
             searchedList = getSearchedTemplatesResultsFromMI(groupId, nodeList, 
                 searchKey, order, orderBy);
@@ -131,7 +134,7 @@ public class TemplatesDelegate implements ArtifactDelegate {
             //for any other ordering options
             default: comparatorObject = Comparator.comparing(ArtifactsInner::getNameIgnoreCase); break;
         }
-        if (order.equalsIgnoreCase("desc")) {
+        if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(artifacts, comparatorObject.reversed());
         } else {
             Collections.sort(artifacts, comparatorObject);
@@ -144,12 +147,11 @@ public class TemplatesDelegate implements ArtifactDelegate {
         throws ManagementApiException {
         
         JsonObject details = getArtifactDetails(groupId, nodeId, mgtApiUrl, type, name, accessToken);
-
         ArtifactDetails artifactDetails = new ArtifactDetails();
         artifactDetails.setNodeId(nodeId);
         artifactDetails.setDetails(details.toString());
         return artifactDetails;
-        }
+    }
 
     private static JsonObject getArtifactDetails(String groupId, String nodeId, String mgtApiUrl, String templateType,
                                                 String templateName, String accessToken) throws ManagementApiException {

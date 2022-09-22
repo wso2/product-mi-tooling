@@ -40,12 +40,14 @@ public class MessageStoresDelegate implements ArtifactDelegate {
 
     @Override
     public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
-        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdare) 
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate)
         throws ManagementApiException {
         
         logger.debug("Fetching Searched Message Stores from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.MESSAGE_STORES, 
-            searchKey, lowerLimit, upperLimit, order, orderBy, isUpdare);
+            searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
 
     @Override

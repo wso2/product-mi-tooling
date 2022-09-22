@@ -45,6 +45,8 @@ public class ProxyServiceDelegate implements ArtifactDelegate {
         throws ManagementApiException {
         
         logger.debug("Fetching Searched Proxy Services from MI.");
+        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.PROXY_SERVICES, 
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }

@@ -22,14 +22,13 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
 import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 
 export default function SequenceSideDrawer(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -42,7 +41,7 @@ export default function SequenceSideDrawer(props) {
                     <SourceViewSection
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <SequenceDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
+                                <SequenceDetailTable nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
                             </Paper>
                         </>}
                         artifactType="sequences" artifactName={artifactName} nodeId={nodeId} />
@@ -53,7 +52,7 @@ export default function SequenceSideDrawer(props) {
 }
 
 function SequenceDetailTable(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const artifactName = nodeData.details.name
     const pageId = "sequences";
 
@@ -66,7 +65,7 @@ function SequenceDetailTable(props) {
             <TableCell>Statistics</TableCell>
             <TableCell>{nodeData.details.stats}</TableCell>
         </TableRow>
-        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
     </Table>
 }
 

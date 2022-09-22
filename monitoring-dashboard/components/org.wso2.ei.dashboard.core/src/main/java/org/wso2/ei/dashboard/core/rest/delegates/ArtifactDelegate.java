@@ -31,8 +31,10 @@ import java.util.List;
  * This interface represents the implementation of artifact delegates.
  */
 public interface ArtifactDelegate {
+
     ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList,
-    String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
-    throws ManagementApiException;
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        throws ManagementApiException;
+
     Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws ManagementApiException;
 }

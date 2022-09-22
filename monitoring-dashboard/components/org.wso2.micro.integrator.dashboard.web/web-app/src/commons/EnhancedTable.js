@@ -99,6 +99,31 @@ export default function EnhancedTable(props) {
         }
     };    
 
+    const retrieveUpdatedArtifact = (nodeId, artifactName, isTracingEnabled) => {
+        var tracing = 'disabled';
+
+        if (isTracingEnabled) {
+            tracing = 'enabled';
+        }
+        var data_new = data;
+        var updated = false;
+        
+        for (var index in data_new) {
+            if (data_new[index].name === artifactName) {
+                for (var n in data_new[index].nodes) {
+                    if(data_new[index].nodes[n].nodeId === nodeId) {
+                        data_new[index].nodes[n].details.tracing = tracing;
+                        updated = true;
+                        break;
+                    }
+                }
+            }
+            if (updated) {
+                setData(data_new);
+                break;
+            }
+        }
+    }
 
     React.useEffect(() => {
         if ((data !== null || globalGroupId !== '') ||
@@ -149,7 +174,7 @@ export default function EnhancedTable(props) {
                             rowCount = {rowCount}
                         />
                         <TableBody>
-                            {data.map(row => <TableRowCreator groupId = {globalGroupId} pageInfo = {pageInfo} data = {row} headers = {headCells} retrieveData = {retrieveResources}/>
+                            {data.map(row => <TableRowCreator groupId = {globalGroupId} pageInfo = {pageInfo} data = {row} headers = {headCells} retrieveData = {retrieveResources} retrieveUpdatedArtifact = {retrieveUpdatedArtifact}/>
                             )}
                         </TableBody>
                     </Table>

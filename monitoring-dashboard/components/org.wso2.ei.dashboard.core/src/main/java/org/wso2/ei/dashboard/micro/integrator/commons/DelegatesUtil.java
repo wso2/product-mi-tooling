@@ -105,7 +105,7 @@ public class DelegatesUtil {
             //for any other ordering options
             default: comparatorObject = Comparator.comparing(ArtifactsInner::getNameIgnoreCase); break;
         }
-        if (order.equalsIgnoreCase("desc")) {
+        if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(artifacts, comparatorObject.reversed());
         } else {
             Collections.sort(artifacts, comparatorObject);

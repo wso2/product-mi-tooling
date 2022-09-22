@@ -46,7 +46,7 @@ import HTTPClient from '../utils/HTTPClient';
 import IconCell from './IconCell';
 
 export default function TableRowCreator(props) {
-    const { groupId, pageInfo, data, headers, retrieveData } = props;
+    const { groupId, pageInfo, data, headers, retrieveData, retrieveUpdatedArtifact } = props;
     const pageId = pageInfo.pageId
     const classes = useStyles();
     return <TableRow>
@@ -55,7 +55,7 @@ export default function TableRowCreator(props) {
             case 'name':
                 return <TableCell>{data.name}</TableCell>
             case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} retrieveData={retrieveData}/>)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} retrieveUpdatedArtifact = {retrieveUpdatedArtifact}/>)}</table></TableCell>
             case 'type':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
 

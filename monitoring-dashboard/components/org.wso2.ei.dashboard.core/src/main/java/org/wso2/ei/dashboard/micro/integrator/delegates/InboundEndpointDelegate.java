@@ -44,6 +44,8 @@ public class InboundEndpointDelegate implements ArtifactDelegate {
         throws ManagementApiException {
             
         logger.debug("Fetching Searched Inbound Endpoints from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.INBOUND_ENDPOINTS, 
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }

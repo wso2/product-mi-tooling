@@ -66,6 +66,9 @@ public class RolesDelegate {
         
         log.debug("Fetching Searched Roles from MI.");
 
+        log.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        log.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
@@ -168,7 +171,7 @@ public class RolesDelegate {
             log.error("Illegal arguments for index values", e);
         }
         return null;      
-        }
+    }
 
     public Ack addRole(String groupId, AddRoleRequest request) throws ManagementApiException {
         log.debug("Adding role " + request.getRoleName() + " in group " + groupId);

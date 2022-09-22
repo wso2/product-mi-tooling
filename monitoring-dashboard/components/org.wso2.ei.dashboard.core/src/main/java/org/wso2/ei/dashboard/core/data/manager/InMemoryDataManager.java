@@ -35,6 +35,13 @@ import java.util.HashMap;
 public final class InMemoryDataManager implements DataManager {
 
     private static final Logger logger = LogManager.getLogger(InMemoryDataManager.class);
+    private static final String GROUP_ID = "groupId";
+    private static final String NODE_ID = "nodeId";
+    private static final String SERVICE_INFO = "serviceInfo";
+    private static final String ACCESS_TOKEN = "accessToken";
+    private static final String TIMESTAMP = "timeStamp";
+    private static final String MGT_URL = "mgtUrl";
+    private static final String INTERVAL = "interval";
     public static HashMap<String, HashMap> heartBeatStore;
     public static HashMap<String, HashMap> serviceInfoStore;
 
@@ -46,14 +53,18 @@ public final class InMemoryDataManager implements DataManager {
 
     @Override
     public boolean insertHeartbeat(HeartbeatObject heartbeat, String accessToken) {
+        if (heartbeat == null) {
+            logger.debug("Received heartbeat object is null");
+            return false;
+        }
         try {
             HashMap map = new HashMap<>();
-            map.put("groupId", heartbeat.getGroupId());
-            map.put("nodeId", heartbeat.getNodeId());
-            map.put("interval", heartbeat.getInterval());
-            map.put("mgtUrl", heartbeat.getMgtApiUrl());
-            map.put("timeStamp", heartbeat.getTimestamp());
-            map.put("accessToken", accessToken);
+            map.put(GROUP_ID, heartbeat.getGroupId());
+            map.put(NODE_ID, heartbeat.getNodeId());
+            map.put(INTERVAL, heartbeat.getInterval());
+            map.put(MGT_URL, heartbeat.getMgtApiUrl());
+            map.put(TIMESTAMP, heartbeat.getTimestamp());
+            map.put(ACCESS_TOKEN, accessToken);
             String keyString = heartbeat.getGroupId() + heartbeat.getNodeId();
             heartBeatStore.put(keyString, map);
             logger.info("Inserted heartbeat to node " + heartbeat.getNodeId() +  " of group " + heartbeat.getGroupId());
@@ -67,9 +78,9 @@ public final class InMemoryDataManager implements DataManager {
     public boolean insertServerInformation(HeartbeatObject heartbeat, String serverInfo) {
         try {
             HashMap map = new HashMap();
-            map.put("groupId", heartbeat.getGroupId());
-            map.put("nodeId", heartbeat.getNodeId());
-            map.put("serviceInfo", serverInfo);
+            map.put(GROUP_ID, heartbeat.getGroupId());
+            map.put(NODE_ID, heartbeat.getNodeId());
+            map.put(SERVICE_INFO, serverInfo);
             String keyString = heartbeat.getGroupId() + heartbeat.getNodeId();
             serviceInfoStore.put(keyString, map);
             logger.info("Added serverInfo to node " + heartbeat.getNodeId() +  " of group " + heartbeat.getGroupId());
@@ -86,7 +97,7 @@ public final class InMemoryDataManager implements DataManager {
         try {
             GroupList groupList = new GroupList();
             for (HashMap entry: heartBeatStore.values()) {
-                groupId = entry.get("groupId").toString();
+                groupId = entry.get(GROUP_ID).toString();
                 if (!groupList.contains(groupId)) {
                     groupList.add(groupId);
                 }
@@ -102,10 +113,10 @@ public final class InMemoryDataManager implements DataManager {
         try {
             NodeList nodeList = new NodeList();
             for (HashMap entry: serviceInfoStore.values()) {
-                if (entry.get("groupId").toString().equals(groupId)) {
+                if (entry.get(GROUP_ID).toString().equals(groupId)) {
                     NodeListInner nodeListInner = new NodeListInner();
-                    nodeListInner.setNodeId(entry.get("nodeId").toString());
-                    nodeListInner.setDetails(entry.get("serviceInfo").toString());
+                    nodeListInner.setNodeId(entry.get(NODE_ID).toString());
+                    nodeListInner.setDetails(entry.get(SERVICE_INFO).toString());
                     nodeList.add(nodeListInner);
                 }
             }
@@ -120,7 +131,7 @@ public final class InMemoryDataManager implements DataManager {
         String mgtApiUrl = "";
         try  {
             HashMap valueMap = heartBeatStore.get(groupId + nodeId);
-            mgtApiUrl = valueMap.get("mgtUrl").toString();
+            mgtApiUrl = valueMap.get(MGT_URL).toString();
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while retrieveTimestampOfRegisteredNode results.", e);
         }
@@ -132,7 +143,7 @@ public final class InMemoryDataManager implements DataManager {
         String accessToken = "";
         try {
             HashMap valueMap = heartBeatStore.get(groupId + nodeId);
-            accessToken = valueMap.get("accessToken").toString();
+            accessToken = valueMap.get(ACCESS_TOKEN).toString();
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while retrieving access token of node: " + nodeId
                                                + " in group " + groupId, e);
@@ -144,7 +155,7 @@ public final class InMemoryDataManager implements DataManager {
     public String getHeartbeatInterval(String groupId, String nodeId) {
         try  {
             HashMap valueMap = heartBeatStore.get(groupId + nodeId);
-            String heartBeatInterval = valueMap.get("interval").toString();
+            String heartBeatInterval = valueMap.get(INTERVAL).toString();
             return heartBeatInterval;
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while fetching heartbeat interval of group " + groupId
@@ -157,7 +168,7 @@ public final class InMemoryDataManager implements DataManager {
         boolean isExists = false;
         try  {
             HashMap valueMap = heartBeatStore.get(heartbeat.getGroupId() + heartbeat.getNodeId());
-            String timeStamp = valueMap.get("timeStamp").toString();
+            String timeStamp = valueMap.get(TIMESTAMP).toString();
 
             if (Integer.parseInt(timeStamp) > Integer.parseInt(initialTimestamp)) {
                 isExists =  true;
@@ -175,7 +186,7 @@ public final class InMemoryDataManager implements DataManager {
         try {
             if (heartBeatStore.containsKey(keyString)) {
                 HashMap valueMap = heartBeatStore.get(groupId + nodeId);
-                timeStamp = valueMap.get("timeStamp").toString();
+                timeStamp = valueMap.get(TIMESTAMP).toString();
             }
             return timeStamp;
         } catch (DashboardServerException e) {
@@ -188,7 +199,7 @@ public final class InMemoryDataManager implements DataManager {
         String keyString = heartbeat.getGroupId() + heartbeat.getNodeId();
         try  {
             HashMap valueMap = heartBeatStore.get(keyString);
-            valueMap.put("timeStamp", String.valueOf(heartbeat.getTimestamp()));
+            valueMap.put(TIMESTAMP, String.valueOf(heartbeat.getTimestamp()));
             heartBeatStore.put(keyString, valueMap);
             logger.debug("Updated Access token for " + heartbeat.getNodeId() + " in group " + heartbeat.getGroupId());
             return true;
@@ -202,7 +213,7 @@ public final class InMemoryDataManager implements DataManager {
         String keyString = groupId + nodeId;
         try  {
             HashMap valueMap = heartBeatStore.get(keyString);
-            valueMap.put("accessToken", accessToken);
+            valueMap.put(ACCESS_TOKEN, accessToken);
             heartBeatStore.put(keyString, valueMap);
             logger.debug("Access token Updated of node " + nodeId + " in group " + groupId);
             return true;

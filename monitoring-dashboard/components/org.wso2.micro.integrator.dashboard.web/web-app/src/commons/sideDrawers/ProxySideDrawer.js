@@ -33,7 +33,7 @@ import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 
 export default function ProxySideDrawer(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -45,7 +45,7 @@ export default function ProxySideDrawer(props) {
                     <SourceViewSection
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <ProxyServiceDetailPage nodeData={nodeData} retrieveData={retrieveData}/>
+                                <ProxyServiceDetailPage nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
                             </Paper>
                             <Box pl={4}>
                                 <EndpointsSection endpoints={nodeData.details.eprs} />
@@ -59,7 +59,7 @@ export default function ProxySideDrawer(props) {
 }
 
 function ProxyServiceDetailPage(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const artifactName = nodeData.details.name
     const pageId = "proxy-services";
     return <Table>
@@ -71,7 +71,7 @@ function ProxyServiceDetailPage(props) {
             <TableCell>Statistics</TableCell>
             <TableCell>{nodeData.details.stats}</TableCell>
         </TableRow>
-        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
     </Table>
 }
 

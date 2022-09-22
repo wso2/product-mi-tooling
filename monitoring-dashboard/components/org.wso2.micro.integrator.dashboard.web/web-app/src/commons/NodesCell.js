@@ -40,7 +40,7 @@ import DataSourcesSideDrawer from './sideDrawers/DataSourcesSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
-    const { pageId, nodeData, retrieveData } = props;
+    const { pageId, nodeData, retrieveUpdatedArtifact } = props;
     const [state, setState] = React.useState({
         openSideDrawer: false,
     });
@@ -56,26 +56,26 @@ export default function NodesCell(props) {
     return <TableRow hover role="presentation">
         <TableCell onClick={toggleDrawer(true)} className={classes.tableCell}>{nodeData.nodeId}</TableCell>
         <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} classes={{paper: classes.drawerPaper}}>
-            <SideDrawer pageId={pageId} nodeData={nodeData} retrieveData={retrieveData}/>
+            <SideDrawer pageId={pageId} nodeData={nodeData} retrieveUpdatedArtifact = {retrieveUpdatedArtifact} />
         </Drawer>
     </TableRow>;
 }
 
 function SideDrawer(props) {
-    const { nodeData, retrieveData } = props
+    const { nodeData, retrieveUpdatedArtifact } = props
     switch(props.pageId) {
         case 'proxy-services':
-            return <ProxySideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <ProxySideDrawer nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
         case 'endpoints':
-            return <EndpointSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <EndpointSideDrawer nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
         case 'apis':
-            return <ApiSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <ApiSideDrawer nodeData={nodeData} retrieveUpdatedArtifact = {retrieveUpdatedArtifact}/>
         case 'templates':
             return <TemplatesSideDrawer nodeData={nodeData} />
         case 'sequences':
-            return <SequenceSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <SequenceSideDrawer nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
         case 'inbound-endpoints':
-            return <InboundEpSideDrawer nodeData={nodeData} retrieveData={retrieveData}/>
+            return <InboundEpSideDrawer nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
         case 'message-stores':
             return <MessageStoreSideDrawer nodeData={nodeData} />
         case 'message-processors':

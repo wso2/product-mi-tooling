@@ -56,41 +56,7 @@ public class RegistryResourceDelegate {
     private static final Logger logger = LogManager.getLogger(RegistryResourceDelegate.class);
     private static final DataManager dataManager = DataManagerSingleton.getDataManager();
     
-    public List<RegistryProperty> getRgistryFilePoperties(String groupId, String registryPath) 
-     throws ManagementApiException {
-
-        NodeList nodeList = dataManager.fetchNodes(groupId);
-        // assumption - In a group, all nodes use a shared registry directory.
-        String nodeId = nodeList.get(0).getNodeId();
-        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String url = mgtApiUrl.concat("registry-resources");
-        String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        
-        Map<String, String> paramMap = new HashMap<>();
-        paramMap.put("pathForProp", registryPath);
-
-        JsonArray propertyArray = new JsonArray();
-        List<RegistryProperty> properties = new ArrayList<>();
-        
-        try (CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url, paramMap)) {
-            propertyArray = HttpUtils.getJsonResponse(httpResponse).getAsJsonArray("list");
-
-            for (JsonElement propertyElement : propertyArray) {
-                RegistryProperty registryProperty = new RegistryProperty();
-                JsonObject propertyObject = propertyElement.getAsJsonObject();
-                String propertyName = propertyObject.get("name").getAsString();
-                String propertyValue = propertyObject.get("value").getAsString();
-                registryProperty.setPropertyName(propertyName);
-                registryProperty.setPropertyValue(propertyValue);
-                properties.add(registryProperty);
-            }
-
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-        return properties;
-    }
-        /**
+    /**
      * Returns a list of registry artifacts with their name, metadata and properties.
      * @param groupId Group ID
      * @param searchKey String
@@ -249,30 +215,6 @@ public class RegistryResourceDelegate {
         return registryArray;
     }
 
-    /**
-     * Returns a JSONArray containing registry artifacts from the Management API invocation.
-     * @param groupId Group ID
-     * @param filePath Parent directory to fetch registry artifacts
-     * @return A JSONArray containing registry artifacts, metadata and properties
-     * @throws ManagementApiException Error response from the MI Management API
-     */
-    public JsonArray getRegistryInPath(String groupId, String filePath) throws ManagementApiException {
-
-        NodeList nodeList = dataManager.fetchNodes(groupId);
-        // assumption - In a group, all nodes use a shared registry directory.
-        String nodeId = nodeList.get(0).getNodeId();
-        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String url = mgtApiUrl.concat("registry-resources?path=").concat(filePath).concat("&expand=false");
-        String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        JsonArray registryArray = new JsonArray();
-        try (CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url)) {
-            registryArray = HttpUtils.getJsonResponse(httpResponse).getAsJsonArray("list");
-            } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-        return registryArray;
-    }
-
     private static void getRegistryArrayFromResponse(JsonObject jsonObject, String path, JsonArray registryArray) {
         String name = jsonObject.get("name").getAsString();
         path += "/" + name;
@@ -323,7 +265,7 @@ public class RegistryResourceDelegate {
         return response;
     }
 
-        /**
+    /**
      * Returns content of a specified registry artifact as a string.
      * @param groupId Group ID
      * @param filePath File path of the registry artifact
@@ -357,9 +299,9 @@ public class RegistryResourceDelegate {
                 }
             }
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Unable to get Registry properties", e);
         }
-         
+
         return propertyList;
     }
 }

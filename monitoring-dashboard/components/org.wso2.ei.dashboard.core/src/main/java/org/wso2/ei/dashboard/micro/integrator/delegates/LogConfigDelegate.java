@@ -64,6 +64,8 @@ public class LogConfigDelegate {
         List<String> nodeList, String searchKey, String lowerLimit, String upperLimit, String order,
         String orderBy, String isUpdate) throws ManagementApiException {
 
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
@@ -81,60 +83,58 @@ public class LogConfigDelegate {
         logsResourceResponse.setCount(count);
         prevSearchKey = searchKey;
         return logsResourceResponse;
-}   
+    }   
 
-public List<LogConfigsInner> getSearchedLogConfigsResultsFromMI(String groupId, List<String> nodeList, 
-    String searchKey, String order, String orderBy)
-        throws ManagementApiException {
-    
-    if (nodeList.contains("all")) {
-        NodeList nodes = dataManager.fetchNodes(groupId);
-    
-        nodeList = new ArrayList<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            nodeList.add(nodes.get(i).getNodeId());
-        }
-    }
-
-    LogConfigs logConfigs = new LogConfigs();
-    
-    for (String nodeId: nodeList) {
-        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = dataManager.getAccessToken(groupId, nodeId);
-
-        JsonArray logConfigsArray = DelegatesUtil.getResourceResultList(groupId, nodeId, "logging",
-            mgtApiUrl, accessToken, searchKey);
-         
-        for (JsonElement element : logConfigsArray) {
-            LogConfigsInner logConfigsInner = createLogConfig(element);
-            logConfigs.add(logConfigsInner);
+    public List<LogConfigsInner> getSearchedLogConfigsResultsFromMI(String groupId, List<String> nodeList, 
+        String searchKey, String order, String orderBy) throws ManagementApiException {
+        
+        if (nodeList.contains("all")) {
+            NodeList nodes = dataManager.fetchNodes(groupId);
+            nodeList = new ArrayList<>();
+            for (NodeListInner nodeListInner : nodes) {
+                nodeList.add(nodeListInner.getNodeId());
+            }
         }
 
-    }
-    //ordering   
-    Comparator<LogConfigsInner> comparatorObject;
-    switch (orderBy) {
-        case "level":comparatorObject = Comparator.comparing(LogConfigsInner::getLevelIgnoreCase); break;
-        case "componentName":comparatorObject = Comparator.comparing
-            (LogConfigsInner::getComponentNameIgnoreCase); break;
-        default: comparatorObject = Comparator.comparing(LogConfigsInner::getNameIgnoreCase); break;
-    }
-    if (order.equalsIgnoreCase("desc")) {
-        Collections.sort(logConfigs, comparatorObject.reversed());
-    } else {
-        Collections.sort(logConfigs, comparatorObject);
-    }
-    return logConfigs;
-}
+        LogConfigs logConfigs = new LogConfigs();
+        
+        for (String nodeId: nodeList) {
+            String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+            String accessToken = dataManager.getAccessToken(groupId, nodeId);
 
-private LogConfigsInner createLogConfig(JsonElement element) {
-    JsonObject logConfig = element.getAsJsonObject();
-    LogConfigsInner logConfigsInner = new LogConfigsInner();
-    logConfigsInner.setName(logConfig.get("loggerName").getAsString());
-    logConfigsInner.setComponentName(logConfig.get("componentName").getAsString());
-    logConfigsInner.setLevel(logConfig.get("level").getAsString());
-    return logConfigsInner;
-}
+            JsonArray logConfigsArray = DelegatesUtil.getResourceResultList(groupId, nodeId, "logging",
+                mgtApiUrl, accessToken, searchKey);
+            
+            for (JsonElement element : logConfigsArray) {
+                LogConfigsInner logConfigsInner = createLogConfig(element);
+                logConfigs.add(logConfigsInner);
+            }
+
+        }
+        //ordering   
+        Comparator<LogConfigsInner> comparatorObject;
+        switch (orderBy) {
+            case "level":comparatorObject = Comparator.comparing(LogConfigsInner::getLevelIgnoreCase); break;
+            case "componentName":comparatorObject = Comparator.comparing
+                (LogConfigsInner::getComponentNameIgnoreCase); break;
+            default: comparatorObject = Comparator.comparing(LogConfigsInner::getNameIgnoreCase); break;
+        }
+        if (order.equalsIgnoreCase("desc")) {
+            Collections.sort(logConfigs, comparatorObject.reversed());
+        } else {
+            Collections.sort(logConfigs, comparatorObject);
+        }
+        return logConfigs;
+    }
+
+    private LogConfigsInner createLogConfig(JsonElement element) {
+        JsonObject logConfig = element.getAsJsonObject();
+        LogConfigsInner logConfigsInner = new LogConfigsInner();
+        logConfigsInner.setName(logConfig.get("loggerName").getAsString());
+        logConfigsInner.setComponentName(logConfig.get("componentName").getAsString());
+        logConfigsInner.setLevel(logConfig.get("level").getAsString());
+        return logConfigsInner;
+    }
 
      /**
      * Returns the results list items within the given range

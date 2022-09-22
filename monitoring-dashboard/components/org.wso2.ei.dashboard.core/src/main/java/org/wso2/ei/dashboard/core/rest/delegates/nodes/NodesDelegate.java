@@ -56,11 +56,9 @@ public class NodesDelegate {
         return nodeList;
     }
 
-    public NodeList getPaginatedNodesList(String groupId, int lowerLimit, int upperLimit) {
-        
+    public NodeList getPaginatedNodesList(String groupId, int lowerLimit, int upperLimit) {  
         NodeList nodeList = getNodes(groupId);
         NodeList resultList = new NodeList();
-        
         try {
             if (nodeList.size() < upperLimit) {
                 upperLimit = nodeList.size();
@@ -69,20 +67,15 @@ public class NodesDelegate {
                 lowerLimit = upperLimit;
             }
             List<NodeListInner> paginatedList = nodeList.subList(lowerLimit, upperLimit);
-        
             for (NodeListInner node : paginatedList) {
                 resultList.add(node);
             }
-            
             return resultList;
-
         } catch (IndexOutOfBoundsException e) {
-            logger.error("Index values are out of bound", e);
+            throw new IndexOutOfBoundsException("Index values are out of bound : " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("Illegal arguments for index values", e);
+            throw new IllegalArgumentException("Illegal arguments for index values", e);
         }
-        return null;
-        
     }
 
     private int getCount(String groupId) {

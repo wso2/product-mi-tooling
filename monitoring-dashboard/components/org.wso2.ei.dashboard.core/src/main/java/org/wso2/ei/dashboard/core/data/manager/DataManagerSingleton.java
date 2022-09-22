@@ -21,7 +21,7 @@
 package org.wso2.ei.dashboard.core.data.manager;
 
 /**
- * Create data sources.
+ * Creates a single instance of InMemoryDataManager.
  */
 public class DataManagerSingleton {
 

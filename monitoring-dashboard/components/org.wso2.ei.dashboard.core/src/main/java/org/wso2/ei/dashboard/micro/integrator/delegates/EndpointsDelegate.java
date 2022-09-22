@@ -45,6 +45,8 @@ public class EndpointsDelegate implements ArtifactDelegate {
         throws ManagementApiException {
         
         logger.debug("Fetching Searched Endpoints from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.ENDPOINTS, 
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }

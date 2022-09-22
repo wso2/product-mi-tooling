@@ -44,6 +44,8 @@ public class SequencesDelegate implements ArtifactDelegate {
         throws ManagementApiException {
         
         logger.debug("Fetching Searched Sequences from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.SEQUENCES, 
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
