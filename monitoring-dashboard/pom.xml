@@ -297,5 +297,6 @@
         <guava.version>31.1-jre</guava.version>
         <axiom.version>1.2.11-wso2v17</axiom.version>
         <cipher.tool.version>1.1.15</cipher.tool.version>
+        <maven.war.plugin.version>3.3.2</maven.war.plugin.version>
     </properties>
 </project>
