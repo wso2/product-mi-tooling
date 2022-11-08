@@ -31,6 +31,7 @@ import javax.validation.Valid;
 public class RegistryArtifactsInner   {
   private @Valid String childName = null;
   private @Valid String mediaType = null;
+  private @Valid String childPath = null;
   private @Valid List<RegistryProperty> properties = new ArrayList<RegistryProperty>();
 
   /**
@@ -50,6 +51,23 @@ public class RegistryArtifactsInner   {
   public void setChildName(String childName) {
     this.childName = childName;
   }
+
+  public String getChildNameIgnoreCase() {
+    return childName.toLowerCase();
+  }
+  
+  /** 
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("childPath")
+
+  public String getChildPath() {
+    return childPath;
+  }
+  public void setChildPath(String childPath) {
+    this.childPath = childPath;
+  }
+
 
   /**
    **/

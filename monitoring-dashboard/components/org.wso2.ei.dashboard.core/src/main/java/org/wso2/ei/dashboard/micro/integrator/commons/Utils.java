@@ -28,8 +28,8 @@ import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
@@ -49,13 +49,14 @@ import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Util class for micro integrator dashboard.
  */
 public class Utils {
     private static final Logger logger = LogManager.getLogger(Utils.class);
-    private static final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final DataManager DATA_MANAGER = DataManagerSingleton.getDataManager();
     private static final int HTTP_SC_UNAUTHORIZED = 401;
 
     public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, String url)
@@ -79,6 +80,27 @@ public class Utils {
         return response;
     }
 
+    public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, 
+        String url, Map<String, String> params)
+            throws ManagementApiException {
+        CloseableHttpResponse response = HttpUtils.doGet(accessToken, url, params);
+        int httpSc = response.getStatusLine().getStatusCode();
+        if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
+            accessToken = retrieveNewAccessToken(groupId, nodeId);
+            response = HttpUtils.doGet(accessToken, url, params);
+        } else if (isNotSuccessCode(httpSc)) {
+            JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
+            String errorMessage = "Error occurred. Please check server logs.";
+            if (error != null) {
+                String message = error.getAsString();
+                if (null != message && !message.isEmpty()) {
+                    errorMessage = message;
+                }
+            }
+            throw new ManagementApiException(errorMessage, httpSc);
+        }
+        return response;
+    }
     public static CloseableHttpResponse doPost(String groupId, String nodeId, String accessToken, String url,
                                                JsonObject payload) throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doPost(accessToken, url, payload);
@@ -234,7 +256,7 @@ public class Utils {
         logger.debug("Retrieving new access-token from node " + nodeId + " in group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = ManagementApiUtils.getAccessToken(mgtApiUrl);
-        databaseManager.updateAccessToken(groupId, nodeId, accessToken);
+        DATA_MANAGER.updateAccessToken(groupId, nodeId, accessToken);
         return accessToken;
     }
 

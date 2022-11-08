@@ -30,6 +30,11 @@ public class LogListInner   {
   public String getName() {
     return name;
   }
+
+  public String getNameIgnoreCase() {
+    return name.toLowerCase();
+  }
+
   public void setName(String name) {
     this.name = name;
   }

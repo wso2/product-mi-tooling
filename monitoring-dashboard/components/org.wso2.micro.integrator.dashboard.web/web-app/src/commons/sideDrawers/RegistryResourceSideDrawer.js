@@ -27,10 +27,23 @@ import { Table, TableCell, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection';
 import TableHead from '@material-ui/core/TableHead';
 import RegistrySourceViewSection from './commons/RegistrySourceViewSection'
+import HTTPClient from '../../commons/../utils/HTTPClient';
 
 export default function RegistryResourceSideDrawer(props) {
-    const { data,registryPath } = props;
+    const {groupId, data,registryPath } = props;
     const registryName = data.childName;
+    const [properties, setProperties] = React.useState([]);
+
+    const retrieveProperties = (query = '') => {
+        HTTPClient.getRegistryProperty(groupId, registryPath).then(response => {
+            setProperties(response.data)
+        })
+    };
+
+    React.useEffect(() => {
+        retrieveProperties(registryPath);
+    },[registryPath])
+
 
     const classes = useStyles();
     return (
@@ -44,7 +57,7 @@ export default function RegistryResourceSideDrawer(props) {
                                 <RegistryResourceDetailPage data={data} />
                             </Paper>
                             <Paper className={classes.paper} elevation={0} square>
-                                <PropertiesSection properties={data.properties} />
+                                <PropertiesSection properties={properties} />
                             </Paper>
                         </>}
                         registryPath={registryPath} data={data}/>

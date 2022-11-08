@@ -22,5 +22,8 @@ export const Constants = {
     PREFIX_NODES: "nodes",
     PREFIX_USERS: "users",
     PREFIX_ROLES: "roles",
-    PREFIX_LOG_CONFIGS: "log-configs"
+    PREFIX_ALLROLES: "all-roles",
+    PREFIX_LOG_CONFIGS: "log-configs",
+    PREFIX_LOGS: "logs",
+    PREFIX_RESOURCE_TYPE: "resource-type"
 };

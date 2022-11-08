@@ -25,7 +25,7 @@ import Switch from "react-switch";
 import HTTPClient from '../../../utils/HTTPClient';
 
 export default function TracingRow(props) {
-    const {pageId, artifactName, nodeId, tracing, retrieveData} = props;
+    const {pageId, artifactName, nodeId, tracing, retrieveUpdatedArtifact} = props;
     var isTracingEnabled = false;
 
     if(tracing === 'enabled') {
@@ -34,8 +34,8 @@ export default function TracingRow(props) {
 
     const globalGroupId = useSelector(state => state.groupId);
 
-    const changeTracingStatus = () => {
-        isTracingEnabled = !isTracingEnabled
+    const changeTracingStatus = (checked) => {
+        isTracingEnabled = checked;
         updateArtifact();
     };
 
@@ -48,7 +48,7 @@ export default function TracingRow(props) {
         }
         HTTPClient.updateArtifact(globalGroupId, pageId, payload).then(response => {
             if (response.data.status === 'success') {
-                retrieveData();
+                retrieveUpdatedArtifact(nodeId, artifactName, isTracingEnabled);
             }
         });
     }

@@ -1,7 +1,5 @@
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function Templates() {
     const [pageInfo] = React.useState({
@@ -14,16 +12,5 @@ export default function Templates() {
         tableOrderBy: 'name'
     });
 
-    const [templateList, setTemplateList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    React.useEffect(() => {
-        HTTPClient.getArtifacts("templates", globalGroupId, selectedNodeList).then(response => {
-            setTemplateList(response.data)
-        })
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={templateList}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

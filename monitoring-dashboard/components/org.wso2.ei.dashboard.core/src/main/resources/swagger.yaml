@@ -198,6 +198,44 @@ paths:
           required: true
           schema:
             type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "The paginated list of nodes in group"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodesResourceResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/all-nodes:
+    get:
+      tags:
+        - "nodes"
+      summary: "Get all nodes in the group"
+      operationId: "RetrieveAllNodesByGroupId"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: "The list of nodes in group"
@@ -211,6 +249,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /groups/{group-id}/proxy-services:
     get:
       tags:
@@ -233,13 +272,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of proxy services deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Proxy Services and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -292,13 +367,43 @@ paths:
           required: true
           schema:
             type: string
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
       responses:
         200:
-          description: "List of registry resources deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Registry Resources and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RegistryArtifacts'
+                $ref: '#/components/schemas/RegistryResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -359,13 +464,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of endpoints deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Endpoints and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -421,13 +562,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of inbound endpoints deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Inbund Endpoints and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -483,13 +660,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of message processorss deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Message Processors and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -545,13 +758,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of message stores deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Message Stores and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -580,13 +829,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of APIs deployed in provided nodes"
+          description: "Response object containing paginated list of resulting APIs and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -642,13 +927,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of templates deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Templates and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -677,13 +998,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of sequences deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Sequences and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -739,13 +1096,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of tasks deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Tasks and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -774,13 +1167,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of local entries deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Local Entries and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -847,13 +1276,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of data-services deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Data Services and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -882,13 +1347,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of datsources deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Data Sources and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DatasourceList'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -917,13 +1418,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of connectors deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Connectors and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -952,13 +1489,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of carbon applications deployed in provided nodes"
+          description: "Response object containing paginated list of resulting Carbon Apps and the count of search results, deployed in provided nodes"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Artifacts'
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -1025,13 +1598,49 @@ paths:
             items:
               type: string
               default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of log files of provided nodes"
+          description: "Response object containing paginated list of resulting Log Files and the count of search results, deployed in provided group"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogList'
+                $ref: '#/components/schemas/LogsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -1154,13 +1763,49 @@ paths:
           required: true
           schema:
             type: string
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of log configs"
+          description: "Response object containing paginated list of resulting Log Files and the count of search results, deployed in provided group"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogConfigs'
+                $ref: '#/components/schemas/LogConfigsResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -1235,13 +1880,49 @@ paths:
           required: true
           schema:
             type: string
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of users"
+          description: "Response object containing paginated list of resulting Users and the count of search results, deployed in provided group"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users'
+                $ref: '#/components/schemas/UsersResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -1313,6 +1994,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /groups/{group-id}/all-roles:
+    get:
+      tags:
+        - "Roles"
+      summary: "Get All roles"
+      operationId: "getAllRoles"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID"
+          required: true
+          schema:
+            type: string  
+      responses:
+        200:
+          description: "Response object containing all Roles and the count in the provided group"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolesResourceResponse'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /groups/{group-id}/roles:
     get:
       tags:
@@ -1326,13 +2033,49 @@ paths:
           required: true
           schema:
             type: string
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string 
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string     
       responses:
         200:
-          description: "List of roles"
+          description: "Response object containing paginated list of resulting Roles and the count of search results, deployed in provided group"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RoleList'
+                $ref: '#/components/schemas/RolesResourceResponse'
         default:
           description: "Unexpected error"
           content:
@@ -1583,7 +2326,15 @@ components:
       example: [{ nodeId: node_01,
                   details: {\"productVersion\":\"1.2.0\",\"osVersion\":\"10.15.7\",\"javaVersion\":\"1.8.0_191\"}
                 }]
-
+    NodesResourceResponse:
+      type: object
+      properties: 
+        count: 
+          type: integer
+        resourceList:
+          type: array
+          $ref: '#/components/schemas/NodeList'
+                  
     ArtifactDetails:
       type: object
       properties:
@@ -1593,16 +2344,25 @@ components:
           type: string
 
     Artifacts:
-      type: array
-      items:
-        type: object
-        properties:
-          name:
-            type: string
-          nodes:
             type: array
             items:
-              $ref: '#/components/schemas/ArtifactDetails'
+              type: object
+              properties:
+                name:
+                  type: string
+                nodes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ArtifactDetails'
+    ArtifactsResourceResponse:
+      type: object
+      properties:
+        count: 
+          type: integer
+        resourceList: 
+          type: array
+          $ref: '#/components/schemas/Artifacts'
+
     CAppArtifacts:
       type: array
       items:
@@ -1668,7 +2428,14 @@ components:
           type: string
         propertyValue:
           type: string
-
+    RegistryResourceResponse:
+      type: object
+      properties:
+        count: 
+          type: integer
+        resourceList: 
+          type: array
+          $ref: '#/components/schemas/RegistryArtifacts'
     LogList:
       type: array
       items:
@@ -1680,6 +2447,14 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/LogDetail'
+    LogsResourceResponse:
+      type: object
+      properties:
+        count: 
+          type: integer
+        resourceList: 
+          type: array
+          $ref: '#/components/schemas/LogList'
     LogDetail:
       type: object
       properties:
@@ -1687,18 +2462,26 @@ components:
           type: string
         logSize:
           type: string
-
     LogConfigs:
-      type: array
-      items:
-        type: object
-        properties:
-          name:
-            type: string
-          componentName:
-            type: string
-          level:
-            type: string
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              componentName:
+                type: string
+              level:
+                type: string
+    LogConfigsResourceResponse:
+      type: object
+      properties:
+        count: 
+          type: integer
+        resourceList: 
+          type: array
+          $ref: '#/components/schemas/LogConfigs'
+        
     LogConfigAddRequest:
       type: object
       properties:
@@ -1724,6 +2507,14 @@ components:
             type: string
           details:
             type: string
+    UsersResourceResponse:
+      type: object
+      properties:
+        count: 
+          type: integer
+        resourceList: 
+          type: array
+          $ref: '#/components/schemas/Users'
     RoleList:
       type: array
       items:
@@ -1732,7 +2523,15 @@ components:
           roleName:
             type: string
           details:
-            type: string
+            type: string     
+    RolesResourceResponse:
+      type: object
+      properties:
+        count: 
+          type: integer
+        resourceList: 
+          type: array
+          $ref: '#/components/schemas/RoleList'
     AddUserRequest:
       type: object
       properties:

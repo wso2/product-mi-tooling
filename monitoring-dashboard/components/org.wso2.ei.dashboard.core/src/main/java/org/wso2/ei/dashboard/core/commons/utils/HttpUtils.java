@@ -30,6 +30,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -49,6 +50,7 @@ import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -65,13 +67,29 @@ public class HttpUtils {
 
     public static CloseableHttpResponse doGet(String accessToken, String url) {
         final HttpGet httpGet = new HttpGet(url);
-
         String authHeader = "Bearer " + accessToken;
-
         httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
         httpGet.setHeader("Authorization", authHeader);
 
         return doGet(httpGet);
+    }
+
+    public static CloseableHttpResponse doGet(String accessToken, String url, Map<String, String> params) {
+        URIBuilder builder;
+        try {
+            builder = new URIBuilder(url);
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                builder.setParameter(entry.getKey(), entry.getValue());
+            }
+            final HttpGet httpGet = new HttpGet(builder.build());
+            String authHeader = "Bearer " + accessToken;
+            httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
+            httpGet.setHeader("Authorization", authHeader);
+            return doGet(httpGet);
+        } catch (URISyntaxException e) {
+            throw new DashboardServerException("Error occurred while sending get http request.", e);
+        }
+        
     }
 
     public static CloseableHttpResponse doGet(HttpGet httpGet) {
@@ -86,7 +104,6 @@ public class HttpUtils {
     public static CloseableHttpResponse doPost(String accessToken, String url, JsonObject payload) {
         final HttpPost httpPost = new HttpPost(url);
         String authHeader = "Bearer " + accessToken;
-
         httpPost.setHeader("Authorization", authHeader);
         httpPost.setHeader("content-type", Constants.HEADER_VALUE_APPLICATION_JSON);
         try {
@@ -100,12 +117,10 @@ public class HttpUtils {
 
     public static CloseableHttpResponse doPost(String url, Map<String, String> params) {
         final HttpPost httpPost = new HttpPost(url);
-
         StringBuilder payload = new StringBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             payload.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
-
         httpPost.setHeader("Content-type", Constants.APPLICATION_X_WWW_FORM_URLENCODED);
         try {
             StringEntity entity = new StringEntity(payload.toString());
@@ -118,13 +133,10 @@ public class HttpUtils {
 
     public static CloseableHttpResponse doPatch(String accessToken, String url, JsonObject payload) {
         final HttpPatch httpPatch = new HttpPatch(url);
-
         String authHeader = "Bearer " + accessToken;
-
         httpPatch.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
         httpPatch.setHeader("Content-Type", Constants.HEADER_VALUE_APPLICATION_JSON);
         httpPatch.setHeader("Authorization", authHeader);
-
         HttpEntity httpEntity = new ByteArrayEntity(payload.toString().getBytes(StandardCharsets.UTF_8));
         httpPatch.setEntity(httpEntity);
         return doPatch(httpPatch);
@@ -134,11 +146,9 @@ public class HttpUtils {
         final HttpPut httpPut = new HttpPut(url);
 
         String authHeader = "Bearer " + accessToken;
-
         httpPut.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
         httpPut.setHeader("Content-Type", Constants.HEADER_VALUE_APPLICATION_JSON);
         httpPut.setHeader("Authorization", authHeader);
-
         HttpEntity httpEntity = new ByteArrayEntity(payload.toString().getBytes(StandardCharsets.UTF_8));
         httpPut.setEntity(httpEntity);
         return doPut(httpPut);
@@ -147,7 +157,6 @@ public class HttpUtils {
     public static CloseableHttpResponse doDelete(String accessToken, String url) {
         String authHeader = "Bearer " + accessToken;
         final HttpDelete httpDelete = new HttpDelete(url);
-
         httpDelete.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
         httpDelete.setHeader("Authorization", authHeader);
 
@@ -216,13 +225,11 @@ public class HttpUtils {
                                                .loadTrustMaterial(null, acceptingTrustStrategy).build();
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
                                                                                       NoopHostnameVerifier.INSTANCE);
-
             Registry<ConnectionSocketFactory> socketFactoryRegistry =
                     RegistryBuilder.<ConnectionSocketFactory>create()
                             .register("https", socketFactory)
                             .register("http", new PlainConnectionSocketFactory())
                             .build();
-
             BasicHttpClientConnectionManager connectionManager =
                     new BasicHttpClientConnectionManager(socketFactoryRegistry);
             return HttpClients.custom().setSSLSocketFactory(socketFactory)

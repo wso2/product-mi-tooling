@@ -18,10 +18,8 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function DataSources() {
     const [pageInfo] = useState({
@@ -34,16 +32,5 @@ export default function DataSources() {
         tableOrderBy: 'name'
     });
 
-    const [dataSourcesList, setDataSourcesList] = useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    useEffect(() => {
-        HTTPClient.getArtifacts("datasources", globalGroupId, selectedNodeList).then(response => {
-            setDataSourcesList(response.data)
-        })
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={dataSourcesList}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

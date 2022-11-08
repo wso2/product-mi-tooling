@@ -2,8 +2,6 @@ package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.ei.dashboard.core.rest.model.ArtifactDetails;
-import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -14,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ArtifactsInner   {
   private @Valid String name = null;
+  private @Valid String templateType = null;
   private @Valid List<ArtifactDetails> nodes = new ArrayList<ArtifactDetails>();
 
   /**
@@ -30,8 +29,22 @@ public class ArtifactsInner   {
   public String getName() {
     return name;
   }
+
+  public String getNameIgnoreCase() {
+    return name.toLowerCase();
+  }
+
   public void setName(String name) {
     this.name = name;
+  }
+
+  //for templates artifact, there are 2 types (sequence and endpoints)
+  public void setType(String type) {
+    this.templateType = type;
+  }
+
+  public String getType() {
+    return this.templateType;
   }
 
   /**

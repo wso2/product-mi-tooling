@@ -27,8 +27,6 @@ public interface ArtifactsManager {
 
     void runFetchAllExecutorService();
 
-    void runUpdateExecutorService();
-
     void runDeleteAllExecutorService();
 
 }

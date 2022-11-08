@@ -30,7 +30,7 @@ import SourceViewSection from './commons/SourceViewSection'
 import Typography from '@material-ui/core/Typography';
 
 export default function InboundEpSideDrawer(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -44,7 +44,7 @@ export default function InboundEpSideDrawer(props) {
                         artifactType="inbound-endpoints" artifactName={artifactName} nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <InboundEpDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
+                                <InboundEpDetailTable nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
                             </Paper>
                             <Box pl={4}>
                                 <Typography variant="h6" color="inherit" noWrap>
@@ -63,7 +63,7 @@ export default function InboundEpSideDrawer(props) {
 }
 
 function InboundEpDetailTable(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const artifactName = nodeData.details.name
     const pageId = "inbound-endpoints";
 
@@ -76,7 +76,7 @@ function InboundEpDetailTable(props) {
             <TableCell>Protocol</TableCell>
             <TableCell>{nodeData.details.protocol}</TableCell>
         </TableRow>
-        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+        <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
         <TableRow>
             <TableCell>Statistics</TableCell>
             <TableCell>{nodeData.details.stats}</TableCell>

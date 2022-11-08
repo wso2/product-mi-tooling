@@ -48,6 +48,9 @@ public class LogConfigsInner   {
   public String getName() {
     return name;
   }
+  public String getNameIgnoreCase() {
+    return name.toLowerCase();
+  }
   public void setName(String name) {
     this.name = name;
   }
@@ -66,6 +69,9 @@ public class LogConfigsInner   {
   public String getComponentName() {
     return componentName;
   }
+  public String getComponentNameIgnoreCase() {
+    return componentName.toLowerCase();
+  }
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -83,6 +89,9 @@ public class LogConfigsInner   {
 
   public String getLevel() {
     return level;
+  }
+  public String getLevelIgnoreCase() {
+    return level.toLowerCase();
   }
   public void setLevel(String level) {
     this.level = level;

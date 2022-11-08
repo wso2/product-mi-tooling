@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function APIs() {
     const [pageInfo] = React.useState({
@@ -34,24 +32,5 @@ export default function APIs() {
         tableOrderBy: 'name'
     });
 
-    const [apiList, setApiList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    const retrieveApis = () => {
-        HTTPClient.getArtifacts("apis", globalGroupId, selectedNodeList).then(response => {
-            setApiList(response.data)
-        })
-    }
-
-    React.useEffect(() => {
-        retrieveApis();
-    },[globalGroupId, selectedNodeList])
-
-    const retrieveData = () => {
-        retrieveApis();
-    }
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={apiList} retrieveData={retrieveData}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

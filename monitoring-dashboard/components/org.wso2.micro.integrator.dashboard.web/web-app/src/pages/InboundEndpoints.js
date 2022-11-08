@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function InboundEndpoints() {
     const [pageInfo] = React.useState({
@@ -34,24 +32,5 @@ export default function InboundEndpoints() {
         tableOrderBy: 'name'
     });
 
-    const [inboundEpList, setInboundEpList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    const retrieveInboundEps = () => {
-        HTTPClient.getArtifacts("inbound-endpoints", globalGroupId, selectedNodeList).then(response => {
-            setInboundEpList(response.data)
-        })
-    }
-
-    React.useEffect(() => {
-        retrieveInboundEps();
-    },[globalGroupId, selectedNodeList])
-
-    const retrieveData = () => {
-        retrieveInboundEps();
-    }
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={inboundEpList} retrieveData={retrieveData}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

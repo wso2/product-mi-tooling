@@ -39,7 +39,6 @@ export default function RegistrySourceViewSection(props) {
     const [isLoading, setIsLoading] = React.useState(true);
     const [sourceLanguage, setSourceLanguage] = React.useState("text");
     const [selectedTab, setSelectedTab] = React.useState(0);
-    const selectedPath = registryPath.concat('/').concat(registryName);
     const [downloadMessage, setDownloadMessage] = React.useState('Download Registry');
 
     const [open] = React.useState(false);
@@ -77,7 +76,7 @@ export default function RegistrySourceViewSection(props) {
 
     const changeTab = (e, tab) => {
         if (tab === 1 && (!registryName.endsWith('.properties')) && (data.fileIcon !== 'folder')) {
-            const resourcePath = '/groups/'.concat(globalGroupId).concat('/registry-resources/').concat('content?path=').concat(selectedPath);
+            const resourcePath = '/groups/'.concat(globalGroupId).concat('/registry-resources/').concat('content?path=').concat(registryPath);
             HTTPClient.get(resourcePath).then(response => {
                 setSource(getResponseString(response.data));
                 setIsLoading(false);

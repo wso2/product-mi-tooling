@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function Tasks() {
     const [pageInfo] = React.useState({
@@ -34,16 +32,5 @@ export default function Tasks() {
         tableOrderBy: 'name'
     });
 
-    const [taskList, setTaskList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    React.useEffect(() => {
-        HTTPClient.getArtifacts("tasks", globalGroupId, selectedNodeList).then(response => {
-            setTaskList(response.data)
-        })
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={taskList}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

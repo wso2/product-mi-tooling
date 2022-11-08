@@ -29,7 +29,7 @@ import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 
 export default function EndpointSideDrawer(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const nodeId = nodeData.nodeId;
     const artifactName = nodeData.details.name;
     const classes = useStyles();
@@ -45,7 +45,7 @@ export default function EndpointSideDrawer(props) {
                         nodeId={nodeId}
                         designContent={<>
                             <Paper className={classes.paper} elevation={0} square>
-                                <EndpointsDetailTable nodeData={nodeData} retrieveData={retrieveData}/>
+                                <EndpointsDetailTable nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
                             </Paper>
                         </>}
                     />
@@ -56,7 +56,7 @@ export default function EndpointSideDrawer(props) {
 }
 
 function EndpointsDetailTable(props) {
-    const { nodeData, retrieveData } = props;
+    const { nodeData, retrieveUpdatedArtifact } = props;
     const artifactName = nodeData.details.name
     const artifactType = nodeData.details.type
     const pageId = "endpoints";
@@ -80,7 +80,7 @@ function EndpointsDetailTable(props) {
                     <TableCell>URI Template</TableCell>
                     <CopyToClipboardCell text={nodeData.details.uriTemplate} />
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
             </Table>
         case 'Address Endpoint':
             return <Table>
@@ -96,7 +96,7 @@ function EndpointsDetailTable(props) {
                     <TableCell>Address</TableCell>
                     <CopyToClipboardCell text={nodeData.details.address} />
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
             </Table>
         case 'WSDL Endpoint':
             return <Table>
@@ -120,7 +120,7 @@ function EndpointsDetailTable(props) {
                     <TableCell>Port</TableCell>
                     <TableCell>{nodeData.details.portName}</TableCell>
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
             </Table>
         case 'Template Endpoint':
             return <Table>
@@ -140,7 +140,7 @@ function EndpointsDetailTable(props) {
                     <TableCell>URI</TableCell>
                     <TableCell>{nodeData.details.parameters.uri}</TableCell>
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
             </Table>
         case 'Indirect Endpoint':
             return <Table>
@@ -156,7 +156,7 @@ function EndpointsDetailTable(props) {
                     <TableCell>Key</TableCell>
                     <CopyToClipboardCell text={nodeData.details.key} />
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
             </Table>
         default:
             return <Table>
@@ -168,7 +168,7 @@ function EndpointsDetailTable(props) {
                     <TableCell>Type</TableCell>
                     <TableCell>{artifactType}</TableCell>
                 </TableRow>
-                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveData={retrieveData}/>
+                <TracingRow pageId={pageId} artifactName={artifactName} nodeId={nodeData.nodeId} tracing={nodeData.details.tracing} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
             </Table>
     }
 }

@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTableRegistry from '../commons/EnhancedTableRegistry';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 import RegistryBreadCrumbs from '../commons/RegistryBreadCrumbs';
 
 export default function RegistryResources() {
@@ -34,15 +32,12 @@ export default function RegistryResources() {
         ],
         tableOrderBy: 'childName'
     });
-    const [registryList, setRegistryList] = React.useState([]);
-    const [registryPath, setRegistryPath] = React.useState('registry');
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
 
-    const retrieveRegistryList = () => {
-        HTTPClient.getRegistryArtifacts(globalGroupId,registryPath).then(response => {
-            setRegistryList(response.data)
-        })
+    const [registryPath, setRegistryPath] = React.useState('registry');
+
+    const handleBreadCrumbClick = (index, pathArray) => {
+        const newPath = (pathArray.slice(0,index+1)).map(el => el[0]).join("/");
+        setRegistryPath(newPath);
     }
 
     const handleDoubleClick = (name,iconType,path) => {
@@ -52,19 +47,10 @@ export default function RegistryResources() {
         }
     }
 
-    const handleBreadCrumbClick = (index, pathArray) => {
-        const newPath = (pathArray.slice(0,index+1)).map(el => el[0]).join("/");
-        setRegistryPath(newPath);
-    }
-
-    React.useEffect(() => {
-        retrieveRegistryList();
-    },[globalGroupId, selectedNodeList, registryPath])
-
     return (
         <>
-        <RegistryBreadCrumbs registryPath={registryPath} handleBreadCrumbClick={handleBreadCrumbClick}/>
-        <EnhancedTableRegistry pageInfo={pageInfo} dataSet={registryList} handleDoubleClick={handleDoubleClick} registryPath={registryPath}/>
+        <RegistryBreadCrumbs registryPath = {registryPath} handleBreadCrumbClick = {handleBreadCrumbClick} handleDoubleClick = {handleDoubleClick}/>
+        <EnhancedTableRegistry pageInfo={pageInfo} registryPath = {registryPath} handleDoubleClick = {handleDoubleClick}/>
         </>
         )
 }

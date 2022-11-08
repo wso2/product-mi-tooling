@@ -27,22 +27,49 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TablePagination from '@material-ui/core/TablePagination';
 import EnhancedTableHead from './TableHeaderCreater';
 import TableRowCreator from './TableRowCreator';
+import SearchBox from '../commons/SearchBox';
+import { useSelector } from 'react-redux';
+import HTTPClient from '../utils/HTTPClient';
+import Progress from '../commons/Progress';
 
 export default function EnhancedTableRegistry(props) {
-    const { pageInfo, dataSet, handleDoubleClick, registryPath } = props;
+    const { pageInfo, registryPath, handleDoubleClick, } = props;
+    const [queryString, setQueryString] = React.useState('');
+    const [registryList, setRegistryList] = React.useState([]);
+    const globalGroupId = useSelector(state => state.groupId);
+    const selectedNodeList = useSelector(state => state.nodeList);
 
-    const newDataSet = dataSet.map(data => ({...data, fileIcon: addIconType(data)}));
+    const newDataSet = registryList.map(data => ({...data, fileIcon: addIconType(data)}));
     const dataSetFiles = newDataSet.filter(data => data.mediaType !== 'directory');
     const dataSetFolders = (newDataSet.filter(data => data.mediaType === 'directory')).map(folder => ({...folder, mediaType:''}));
-    
+    const [rowCount, setRowCount] = React.useState(0);
     var headCells = pageInfo.headCells;
-    var rowCount = dataSet.length;
 
     const classes = useStyles();
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState(pageInfo.tableOrderBy);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [page, setPage] = React.useState(0);
+
+
+    const retrieveResources = React.useCallback((query = '') => {
+        if(query !== queryString) {
+            setPage(0);
+        }
+        setQueryString(query);
+
+        HTTPClient.getPaginatedRegistryArtifacts(query, page * rowsPerPage, page * rowsPerPage + rowsPerPage, 
+            order, orderBy, globalGroupId, registryPath).then(response => {
+            setRegistryList(response.data.resourceList)
+            setRowCount(response.data.count)
+        }).catch(error => {
+            console.log(error.response.data.message);
+        });
+    }, [globalGroupId, registryPath, rowsPerPage,page, order, orderBy, queryString ]);
+    
+    React.useEffect(() => {
+        retrieveResources(queryString);
+    },[retrieveResources, queryString, rowCount]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -81,78 +108,42 @@ export default function EnhancedTableRegistry(props) {
         }       
     }
 
+    if ((registryList === null || globalGroupId === '') || selectedNodeList === null) {
+        return <Progress/>
+    }
+    
     return (
-        <div className={classes.root}>
-            <Paper className={classes.paper}>
+        <div className = {classes.root}>
+            <SearchBox passSearchQuery = {retrieveResources}/>
+            <Paper className = {classes.paper}>
                 <TableContainer>
                     <Table
-                        className={classes.table}
+                        className = {classes.table}
                     >
                         <EnhancedTableHead
-                            headCells={headCells}
-                            order={order}
-                            orderBy={orderBy}
-                            onRequestSort={handleRequestSort}
-                            rowCount={rowCount}
+                            headCells = {headCells}
+                            order = {order}
+                            orderBy = {orderBy}
+                            onRequestSort = {handleRequestSort}
+                            rowCount = {rowCount}
                         />
                         <TableBody>
-                            {getPageComponents(stableSort(dataSetFolders, getComparator(order, orderBy)), 
-                            stableSort(dataSetFiles, getComparator(order, orderBy)),page, rowsPerPage).map(row => <TableRowCreator pageInfo={pageInfo} data={row} headers={headCells} handleDoubleClick={handleDoubleClick} registryPath={registryPath}/>)}
+                            {dataSetFolders.concat(dataSetFiles).map(row => <TableRowCreator groupId = {globalGroupId} pageInfo = {pageInfo} data = {row} headers = {headCells} handleDoubleClick = {handleDoubleClick} registryPath = {registryPath} retrieveData = {null}/>)}
                         </TableBody>
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[10, 25, 50]}
-                    component="div"
-                    count={rowCount}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                    rowsPerPageOptions = {[10, 25, 50]}
+                    component = "div"
+                    count = {rowCount}
+                    rowsPerPage = {rowsPerPage}
+                    page = {page}
+                    onChangePage = {handleChangePage}
+                    onChangeRowsPerPage = {handleChangeRowsPerPage}
                 />
             </Paper>
         </div>
     );
-}
-
-function stableSort(array, comparator) {
-    if(array.length > 0) {
-        const stabilizedThis = array.map((el, index) => [el, index]);
-        stabilizedThis.sort((a, b) => {
-            const order = comparator(a[0], b[0]);
-            if (order !== 0) return order;
-            return a[1] - b[1];
-        });
-        return stabilizedThis.map((el) => el[0]);
-    } else {
-        return []
-    }
-}
-
-function getComparator(order, orderBy) {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy].toLowerCase() < a[orderBy].toLowerCase()) {
-        return -1;
-    }
-    if (b[orderBy].toLowerCase() > a[orderBy].toLowerCase()) {
-        return 1;
-    }
-    return 0;
-}
-
-function getPageComponents(folderArr, fileArr, page, rowsPerPage){
-
-    const finalArr = folderArr.concat(fileArr)
-    if (finalArr.length > 0 ) {
-        return finalArr.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-    } else {
-        return [];
-    }
 }
 
 const useStyles = makeStyles((theme) => ({

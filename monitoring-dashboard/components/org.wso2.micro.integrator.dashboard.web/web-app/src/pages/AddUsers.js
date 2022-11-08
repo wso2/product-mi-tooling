@@ -70,7 +70,9 @@ export default function AddUsers() {
             isError: false
         })
         if (!isError) {
-            history.push("/users");
+            //update roles list
+            HTTPClient.getPaginatedUsersAndRoles('', 0, 5, 'users', 'asc', 'name', globalGroupId, true);
+            window.location.reload();
         }
     }
 

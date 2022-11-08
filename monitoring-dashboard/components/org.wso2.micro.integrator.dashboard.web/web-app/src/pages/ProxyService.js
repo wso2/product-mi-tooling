@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function ProxyService() {
     const [pageInfo] = React.useState({
@@ -35,24 +33,6 @@ export default function ProxyService() {
         ],
         tableOrderBy: 'name'
     });
-    const [proxyList, setProxyList] = React.useState([]);
 
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    const retrieveProxyList = () => {
-        HTTPClient.getArtifacts("proxy-services", globalGroupId, selectedNodeList).then(response => {
-            setProxyList(response.data)
-        })
-    }
-
-    React.useEffect(() => {
-        retrieveProxyList();
-    },[globalGroupId, selectedNodeList])
-
-    const retrieveData = () => {
-        retrieveProxyList();
-    }
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={proxyList} retrieveData={retrieveData}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

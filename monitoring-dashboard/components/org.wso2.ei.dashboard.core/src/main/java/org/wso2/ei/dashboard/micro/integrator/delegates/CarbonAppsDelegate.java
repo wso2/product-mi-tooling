@@ -29,15 +29,16 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
-import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
 import org.wso2.ei.dashboard.core.rest.model.CAppArtifacts;
 import org.wso2.ei.dashboard.core.rest.model.CAppArtifactsInner;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 import java.util.List;
@@ -46,22 +47,28 @@ import java.util.List;
  * Delegate class to handle requests from carbon application page.
  */
 public class CarbonAppsDelegate implements ArtifactDelegate {
-    private static final Log log = LogFactory.getLog(CarbonAppsDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final Log logger = LogFactory.getLog(CarbonAppsDelegate.class);
+    private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-        log.debug("Fetching carbon applications from database.");
-        return databaseManager.fetchArtifacts(Constants.CARBON_APPLICATIONS, groupId, nodeList);
+    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        throws ManagementApiException {
+        
+        logger.debug("Fetching Searched carbon applications from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.CARBON_APPLICATIONS,
+            searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
 
     public CAppArtifacts getCAppArtifactList(String groupId, String nodeId, String cAppName)
             throws ManagementApiException {
-        log.debug("Fetching artifacts in carbon applications from management console");
+        logger.debug("Fetching artifacts in carbon applications from management console");
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String url = mgtApiUrl.concat("applications").concat("?").concat("carbonAppName").concat("=").concat(cAppName);
 
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
         JsonArray artifacts = jsonResponse.getAsJsonArray("artifacts");

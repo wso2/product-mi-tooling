@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function MessageProcessors() {
     const [pageInfo] = React.useState({
@@ -35,24 +33,5 @@ export default function MessageProcessors() {
         tableOrderBy: 'name'
     })
     
-    const [messageProcessorList, setMessageProcessorList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    const retrieveMessageProcessors = () => {
-        HTTPClient.getArtifacts("message-processors", globalGroupId, selectedNodeList).then(response => {
-            setMessageProcessorList(response.data)
-        })
-    }
-
-    React.useEffect(() => {
-        retrieveMessageProcessors();
-    },[globalGroupId, selectedNodeList])
-
-    const retrieveData = () => {
-        retrieveMessageProcessors();
-    }
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={messageProcessorList} retrieveData={retrieveData}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

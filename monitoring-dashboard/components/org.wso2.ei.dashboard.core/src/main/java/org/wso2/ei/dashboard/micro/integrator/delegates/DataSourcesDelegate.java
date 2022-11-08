@@ -23,12 +23,12 @@ package org.wso2.ei.dashboard.micro.integrator.delegates;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactDelegate;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
-import org.wso2.ei.dashboard.core.rest.model.Artifacts;
+import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 
 import java.util.List;
 
@@ -37,14 +37,18 @@ import java.util.List;
  */
 public class DataSourcesDelegate implements ArtifactDelegate {
 
-    private static final Log log = LogFactory.getLog(DataSourcesDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final Log logger = LogFactory.getLog(DataSourcesDelegate.class);
 
     @Override
-    public Artifacts getArtifactsList(String groupId, List<String> nodeList) {
-
-        log.debug("Fetching data-sources from database.");
-        return databaseManager.fetchArtifacts(Constants.DATA_SOURCES, groupId, nodeList);
+    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        throws ManagementApiException {
+            
+        logger.debug("Fetching Searched data-sources from MI.");
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.DATA_SOURCES, 
+            searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
 
     @Override

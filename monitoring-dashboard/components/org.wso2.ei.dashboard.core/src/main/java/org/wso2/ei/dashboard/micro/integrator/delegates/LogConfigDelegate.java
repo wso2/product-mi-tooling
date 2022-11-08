@@ -23,41 +23,152 @@ package org.wso2.ei.dashboard.micro.integrator.delegates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigsInner;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigsResourceResponse;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 
 /**
  * Delegate class to handle requests from log-configs page.
  */
 public class LogConfigDelegate {
     private static final Logger logger = LogManager.getLogger(LogConfigDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final DataManager dataManager = DataManagerSingleton.getDataManager();
+    private static List<LogConfigsInner>  searchedList;
+    private static String prevSearchKey = null;
+    private static int count;
 
-    public LogConfigs fetchLogConfigs(String groupId) throws ManagementApiException {
-        logger.debug("Fetching log configs via management api.");
-        JsonArray logConfigsArray = getLogConfigs(groupId);
-        return createLogConfigsObject(logConfigsArray);
+    public LogConfigsResourceResponse fetchPaginatedLogConfigsResponse(String groupId,
+        List<String> nodeList, String searchKey, String lowerLimit, String upperLimit, String order,
+        String orderBy, String isUpdate) throws ManagementApiException {
+
+        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        int fromIndex = Integer.parseInt(lowerLimit);
+        int toIndex = Integer.parseInt(upperLimit);
+        boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
+
+        LogConfigsResourceResponse logsResourceResponse = new LogConfigsResourceResponse();
+        logger.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
+
+        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))) {
+            searchedList = getSearchedLogConfigsResultsFromMI(groupId,
+                    nodeList, searchKey, order, orderBy);
+            count = searchedList.size();
+        }
+        LogConfigs paginatedList = getPaginationResults(searchedList, fromIndex, toIndex);
+        logsResourceResponse.setResourceList(paginatedList);
+        logsResourceResponse.setCount(count);
+        prevSearchKey = searchKey;
+        return logsResourceResponse;
+    }   
+
+    public List<LogConfigsInner> getSearchedLogConfigsResultsFromMI(String groupId, List<String> nodeList, 
+        String searchKey, String order, String orderBy) throws ManagementApiException {
+        
+        if (nodeList.contains("all")) {
+            NodeList nodes = dataManager.fetchNodes(groupId);
+            nodeList = new ArrayList<>();
+            for (NodeListInner nodeListInner : nodes) {
+                nodeList.add(nodeListInner.getNodeId());
+            }
+        }
+
+        LogConfigs logConfigs = new LogConfigs();
+        
+        for (String nodeId: nodeList) {
+            String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+            String accessToken = dataManager.getAccessToken(groupId, nodeId);
+
+            JsonArray logConfigsArray = DelegatesUtil.getResourceResultList(groupId, nodeId, "logging",
+                mgtApiUrl, accessToken, searchKey);
+            
+            for (JsonElement element : logConfigsArray) {
+                LogConfigsInner logConfigsInner = createLogConfig(element);
+                logConfigs.add(logConfigsInner);
+            }
+
+        }
+        //ordering   
+        Comparator<LogConfigsInner> comparatorObject;
+        switch (orderBy) {
+            case "level":comparatorObject = Comparator.comparing(LogConfigsInner::getLevelIgnoreCase); break;
+            case "componentName":comparatorObject = Comparator.comparing
+                (LogConfigsInner::getComponentNameIgnoreCase); break;
+            default: comparatorObject = Comparator.comparing(LogConfigsInner::getNameIgnoreCase); break;
+        }
+        if (order.equalsIgnoreCase("desc")) {
+            Collections.sort(logConfigs, comparatorObject.reversed());
+        } else {
+            Collections.sort(logConfigs, comparatorObject);
+        }
+        return logConfigs;
     }
 
-    public LogConfigs fetchLogConfigsByNodeId(String groupId, String nodeId) throws ManagementApiException {
-        logger.debug("Fetching log configs in node " + nodeId + " in group " + groupId);
-        JsonArray logConfigsArray = getLogConfigByNodeId(groupId, nodeId);
-        return createLogConfigsObject(logConfigsArray);
+    private LogConfigsInner createLogConfig(JsonElement element) {
+        JsonObject logConfig = element.getAsJsonObject();
+        LogConfigsInner logConfigsInner = new LogConfigsInner();
+        logConfigsInner.setName(logConfig.get("loggerName").getAsString());
+        logConfigsInner.setComponentName(logConfig.get("componentName").getAsString());
+        logConfigsInner.setLevel(logConfig.get("level").getAsString());
+        return logConfigsInner;
+    }
+
+     /**
+     * Returns the results list items within the given range
+     *
+     * @param itemsList the list containing all the items of a specific type
+     * @param lowerLimit from index of the required range
+     * @param upperLimit to index of the required range
+     * @return the List if no error. Else return null
+     */
+    public static LogConfigs getPaginationResults(List<LogConfigsInner> itemsList, 
+        int lowerLimit, int upperLimit) {
+        
+        LogConfigs resultList = new LogConfigs();
+        try {
+            if (itemsList.size() < upperLimit) {
+                upperLimit = itemsList.size();
+            }
+            if (upperLimit < lowerLimit) {
+                lowerLimit = upperLimit;
+            }
+            List<LogConfigsInner> paginatedList = itemsList.subList(lowerLimit, upperLimit);
+        
+            for (LogConfigsInner artifact : paginatedList) {
+                resultList.add(artifact);
+            }
+            
+            return resultList;
+
+        } catch (IndexOutOfBoundsException e) {
+            logger.error("Index values are out of bound", e);
+        } catch (IllegalArgumentException e) {
+            logger.error("Illegal arguments for index values", e);
+        }
+        return null;
     }
 
     public Ack updateLogLevel(String groupId, LogConfigUpdateRequest request) throws ManagementApiException {
@@ -65,7 +176,7 @@ public class LogConfigDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
 
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         for (NodeListInner node : nodeList) {
             String nodeId = node.getNodeId();
             CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
@@ -102,12 +213,12 @@ public class LogConfigDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddLoggerPayload(request);
 
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
 
         for (NodeListInner node : nodeList) {
             String nodeId = node.getNodeId();
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-            String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+            String accessToken = dataManager.getAccessToken(groupId, nodeId);
             String addLoggerUrl = mgtApiUrl.concat("logging");
             logger.debug("Adding new logger on node " + nodeId);
             CloseableHttpResponse httpResponse = Utils.doPatch(groupId, nodeId, accessToken, addLoggerUrl, payload);
@@ -120,30 +231,6 @@ public class LogConfigDelegate {
         }
         ack.setStatus(Constants.SUCCESS_STATUS);
         return ack;
-    }
-
-    private JsonArray getLogConfigs(String groupId) throws ManagementApiException {
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
-        // assumption - In a group, log configs of all nodes in the group should be identical
-        String nodeId = nodeList.get(0).getNodeId();
-        return getLogConfigByNodeId(groupId, nodeId);
-    }
-
-    private JsonArray getLogConfigByNodeId(String groupId, String nodeId) throws ManagementApiException {
-        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
-        String url = mgtApiUrl.concat("logging");
-        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
-        return HttpUtils.getJsonArray(httpResponse);
-    }
-
-    private LogConfigs createLogConfigsObject(JsonArray logConfigsArray) {
-        LogConfigs logConfigs = new LogConfigs();
-        for (JsonElement element : logConfigsArray) {
-            LogConfigsInner logConfigsInner = createLogConfig(element);
-            logConfigs.add(logConfigsInner);
-        }
-        return logConfigs;
     }
 
     private JsonObject createUpdateLoggerPayload(LogConfigUpdateRequest request) {
@@ -161,19 +248,10 @@ public class LogConfigDelegate {
         return payload;
     }
 
-    private LogConfigsInner createLogConfig(JsonElement element) {
-        JsonObject logConfig = element.getAsJsonObject();
-        LogConfigsInner logConfigsInner = new LogConfigsInner();
-        logConfigsInner.setName(logConfig.get("loggerName").getAsString());
-        logConfigsInner.setComponentName(logConfig.get("componentName").getAsString());
-        logConfigsInner.setLevel(logConfig.get("level").getAsString());
-        return logConfigsInner;
-    }
-
     private CloseableHttpResponse updateLogLevelByNodeId(String groupId, String nodeId, JsonObject payload)
             throws ManagementApiException {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String updateLoggerUrl = mgtApiUrl.concat("logging");
         logger.debug("Updating logger on node " + nodeId);
         return Utils.doPatch(groupId, nodeId, accessToken, updateLoggerUrl, payload);

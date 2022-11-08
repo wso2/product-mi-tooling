@@ -32,17 +32,22 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManager;
-import org.wso2.ei.dashboard.core.db.manager.DatabaseManagerFactory;
+import org.wso2.ei.dashboard.core.data.manager.DataManager;
+import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddRoleRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.RoleList;
 import org.wso2.ei.dashboard.core.rest.model.RoleListInner;
+import org.wso2.ei.dashboard.core.rest.model.RolesResourceResponse;
 import org.wso2.ei.dashboard.core.rest.model.UpdateRoleRequest;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -50,11 +55,122 @@ import java.util.Objects;
  */
 public class RolesDelegate {
     private static final Log log = LogFactory.getLog(RolesDelegate.class);
-    private final DatabaseManager databaseManager = DatabaseManagerFactory.getDbManager();
+    private static final DataManager dataManager = DataManagerSingleton.getDataManager();
+    private static List<RoleListInner>  searchedList;
+    private static String prevSearchKey = null;
+    private static int count;
 
-    public RoleList fetchRoles(String groupId) throws ManagementApiException {
-        log.debug("Fetching roles via management api.");
-        return getRoles(groupId);
+    public RolesResourceResponse fetchPaginatedRolesResponse(String groupId, String searchKey, 
+        String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        throws ManagementApiException {
+        
+        log.debug("Fetching Searched Roles from MI.");
+
+        log.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        log.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+
+        int fromIndex = Integer.parseInt(lowerLimit);
+        int toIndex = Integer.parseInt(upperLimit);
+        boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
+
+        log.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
+
+        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))) {
+            searchedList = getSearchedRoles(groupId, searchKey, order, orderBy);
+            count = searchedList.size();
+        }
+        RoleList paginatedList = getPaginatedRolesResultsFromMI(searchedList, fromIndex, toIndex);
+        RolesResourceResponse rolesResourceResponse = new RolesResourceResponse();
+        rolesResourceResponse.setResourceList(paginatedList);
+        rolesResourceResponse.setCount(count);
+        prevSearchKey = searchKey;
+        return rolesResourceResponse;
+    }
+
+    private  List<RoleListInner> getSearchedRoles(String groupId, String searchKey, 
+        String order, String orderBy) throws ManagementApiException {
+
+        RoleList roles = new RoleList();
+        NodeList nodeList = dataManager.fetchNodes(groupId);
+        // assumption - In a group, roles of all nodes in the group should be identical
+        String nodeId = nodeList.get(0).getNodeId();
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
+        String url = mgtApiUrl.concat("roles/");
+        JsonArray roleList = DelegatesUtil.getResourceResultList(groupId, nodeId, "roles", 
+                mgtApiUrl, accessToken, searchKey);
+
+        for (JsonElement role : roleList) {
+            String roleId = role.getAsJsonObject().get("role").getAsString();
+            if (!Objects.equals(roleId, Constants.INTERNAL_EVERYONE)) {
+                RoleListInner roleListInner = getRoleDetails(groupId, nodeId, accessToken, url, roleId);
+                roles.add(roleListInner);
+            }
+        }
+        Comparator<RoleListInner> comparatorObject;
+        switch (orderBy.toLowerCase()) {
+            //for any other ordering options
+            default: comparatorObject = Comparator.comparing(RoleListInner::getRoleName); break;
+        }
+        if (order.equalsIgnoreCase("desc")) {
+            Collections.sort(roles, comparatorObject.reversed());
+        } else {
+            Collections.sort(roles, comparatorObject);
+        }
+
+        return roles;
+    }
+
+    public RolesResourceResponse getAllRoles(String groupId) throws ManagementApiException {
+
+        RoleList roles = new RoleList();
+        NodeList nodeList = dataManager.fetchNodes(groupId);
+        // assumption - In a group, roles of all nodes in the group should be identical
+        String nodeId = nodeList.get(0).getNodeId();
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
+        String url = mgtApiUrl.concat("roles/");
+        JsonArray roleList = DelegatesUtil.getResourceResultList(groupId, nodeId, "roles", 
+                mgtApiUrl, accessToken, null);
+
+        for (JsonElement role : roleList) {
+            String roleId = role.getAsJsonObject().get("role").getAsString();
+            if (!Objects.equals(roleId, Constants.INTERNAL_EVERYONE)) {
+                RoleListInner roleListInner = getRoleDetails(groupId, nodeId, accessToken, url, roleId);
+                roles.add(roleListInner);
+            }
+        }
+        RolesResourceResponse rolesResourceResponse = new RolesResourceResponse();
+        rolesResourceResponse.setResourceList(roles);
+        rolesResourceResponse.setCount(roles.size());
+        return rolesResourceResponse;
+    }
+
+    private RoleList getPaginatedRolesResultsFromMI(List<RoleListInner> roles, int lowerLimit, int upperLimit) 
+        throws ManagementApiException {
+        
+        RoleList resultList = new RoleList();
+        try {
+            if (roles.size() < upperLimit) {
+                upperLimit = roles.size();
+            }
+            if (upperLimit < lowerLimit) {
+                lowerLimit = upperLimit;
+            }
+            List<RoleListInner> paginatedList = roles.subList(lowerLimit, upperLimit);
+        
+            for (RoleListInner roleListInner : paginatedList) {
+                resultList.add(roleListInner);
+            }
+            
+            return resultList;
+
+        } catch (IndexOutOfBoundsException e) {
+            log.error("Index values are out of bound", e);
+        } catch (IllegalArgumentException e) {
+            log.error("Illegal arguments for index values", e);
+        }
+        return null;      
     }
 
     public Ack addRole(String groupId, AddRoleRequest request) throws ManagementApiException {
@@ -62,11 +178,11 @@ public class RolesDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createAddRolePayload(request);
 
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles");
         CloseableHttpResponse httpResponse = Utils.doPost(groupId, nodeId, accessToken, url, payload);
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
@@ -79,11 +195,11 @@ public class RolesDelegate {
         log.debug("Updating roles of " + request.getUserId() + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdatePayload(request);
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles/");
         CloseableHttpResponse httpResponse = Utils.doPut(groupId, nodeId, accessToken, url, payload);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
@@ -103,11 +219,11 @@ public class RolesDelegate {
             log.debug("Deleting role " + roleName + " in domain " + domain + " in group " + groupId);
         }
         Ack ack = new Ack(Constants.FAIL_STATUS);
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, all nodes use a shared user-store
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles/").concat(roleName);
         if (!StringUtils.isEmpty(domain)) {
             url = url.concat("?domain=").concat(domain);
@@ -125,11 +241,11 @@ public class RolesDelegate {
 
     private RoleList getRoles(String groupId) throws ManagementApiException {
         RoleList roleList = new RoleList();
-        NodeList nodeList = databaseManager.fetchNodes(groupId);
+        NodeList nodeList = dataManager.fetchNodes(groupId);
         // assumption - In a group, roles in all nodes in the group should be identical
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = databaseManager.getAccessToken(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles/");
         CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
         JsonArray roles = HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();
@@ -143,7 +259,7 @@ public class RolesDelegate {
         return roleList;
     }
 
-    private RoleListInner getRoleDetails(String groupId, String nodeId, String accessToken, String url,
+    private static RoleListInner getRoleDetails(String groupId, String nodeId, String accessToken, String url,
                                          String roleId) throws ManagementApiException {
         RoleListInner roleListInner = new RoleListInner();
         roleListInner.setRoleName(roleId);

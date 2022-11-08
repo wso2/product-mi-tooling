@@ -29,12 +29,30 @@ import { FolderFill, FiletypeJson, FiletypeXml, FiletypeTxt, FiletypeCsv, FileEa
 
 export default function IconCell(props) {
     const classes = useStyles();
-    const { pageId, handleDoubleClick, registryPath, data } = props;
+    const {groupId, pageId, handleDoubleClick, registryPath, data } = props;
     const name = data.childName;
     const iconType= data.fileIcon;
     const [state, setState] = React.useState({
         openSideDrawer: false,
     });
+
+    var updatedName = name;
+    var updatedPath = registryPath;
+    var propertyPath = registryPath.concat('/').concat(name);
+
+    if(data.childPath !== '') { //search result
+        var commonDir = data.childPath.split('/')[0]
+        if(data.childPath[0] === '/') {
+            commonDir = data.childPath.split('/')[1];
+        }
+        updatedPath =  registryPath.concat(data.childPath.substring(commonDir.length + 1));
+        if(iconType === 'folder') {
+            updatedPath = updatedPath.substring(0, updatedPath.length - name.length -1)
+        } else {
+            updatedName = updatedPath.concat('/').concat(name);
+        }
+        propertyPath = updatedPath;
+    }
 
     const toggleDrawer = (open,name) => (event) => {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -69,13 +87,13 @@ export default function IconCell(props) {
     }
 
     return <TableRow hover role="presentation">
-        <TableCell onClick={() => handleSingleClick()} onDoubleClick={() => handleDoubleClickCell(name,iconType,registryPath,handleDoubleClick)} className={classes.tableCell}> 
+        <TableCell onClick={() => handleSingleClick()} onDoubleClick={() => handleDoubleClickCell(name,iconType,updatedPath,handleDoubleClick)} className={classes.tableCell}> 
             <Button variant="text" startIcon={<FileIcon className={classes.icon} iconType={iconType}/>}>
-                {name}
+                {updatedName.length<45? updatedName :updatedName.substring(0,20).concat("...").concat(updatedName.substring(updatedName.length-20))}
             </Button>   
         </TableCell>
         <Drawer anchor='right' open={state['openSideDrawer']} onClose={toggleDrawer(false)} classes={{paper: classes.drawerPaper}}>
-            <RegistryResourceSideDrawer pageId={pageId} data={data} registryPath={registryPath}/>
+            <RegistryResourceSideDrawer groupId={groupId} pageId={pageId} data={data} registryPath={propertyPath}/>
         </Drawer>
     </TableRow>;
 }

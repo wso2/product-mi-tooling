@@ -20,8 +20,6 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
-import { useSelector } from 'react-redux';
-import HTTPClient from '../utils/HTTPClient';
 
 export default function MessageStores() {
     const [pageInfo] = React.useState({
@@ -35,16 +33,5 @@ export default function MessageStores() {
         tableOrderBy: 'name'
     });
 
-    const [messageStoreList, setMessageStoreList] = React.useState([]);
-
-    const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
-
-    React.useEffect(() => {
-        HTTPClient.getArtifacts("message-stores", globalGroupId, selectedNodeList).then(response => {
-            setMessageStoreList(response.data)
-        })
-    },[globalGroupId, selectedNodeList])
-
-    return <EnhancedTable pageInfo={pageInfo} dataSet={messageStoreList}/>
+    return <EnhancedTable pageInfo={pageInfo}/>
 }

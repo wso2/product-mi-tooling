@@ -42,12 +42,11 @@ import UserRoleCell from './UserRoleCell';
 import LogsNodeCell from './LogsNodeCell';
 import StatusCell from './statusCell/StatusCell';
 import AuthManager from '../auth/AuthManager';
-import { changeData } from '../redux/Actions';
 import HTTPClient from '../utils/HTTPClient';
 import IconCell from './IconCell';
 
 export default function TableRowCreator(props) {
-    const { pageInfo, data, headers, retrieveData } = props;
+    const { groupId, pageInfo, data, headers, retrieveData, retrieveUpdatedArtifact } = props;
     const pageId = pageInfo.pageId
     const classes = useStyles();
     return <TableRow>
@@ -56,7 +55,7 @@ export default function TableRowCreator(props) {
             case 'name':
                 return <TableCell>{data.name}</TableCell>
             case 'nodes':
-                return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} retrieveData={retrieveData}/>)}</table></TableCell>
+                return <TableCell><table>{data.nodes.map(node=><NodesCell pageId={pageId} nodeData={node} retrieveUpdatedArtifact = {retrieveUpdatedArtifact}/>)}</table></TableCell>
             case 'type':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.type} />)}</table></TableCell>
 
@@ -71,7 +70,7 @@ export default function TableRowCreator(props) {
 
             // Registry Resources
             case 'childName':
-                return <TableCell><IconCell pageId={pageId}  handleDoubleClick={props.handleDoubleClick} registryPath={props.registryPath} data={data}/></TableCell>
+                return <TableCell><IconCell groupId={groupId} pageId={pageId} handleDoubleClick={props.handleDoubleClick} registryPath={props.registryPath} data={data}/></TableCell>
             case 'mediaType':
                 return <TableCell>{data.mediaType}</TableCell>
 
@@ -142,13 +141,13 @@ export default function TableRowCreator(props) {
             case 'isAdmin':
                 return <TableCell>{data.details.isAdmin ? <AdminIcon style={{color:"green"}}/> : <NonAdminIcon style={{color:"red"}}/>}</TableCell>
             case 'action':
-                return <TableCell><UserDeleteAction userId={data.userId}/></TableCell>
+                return <TableCell><UserDeleteAction userId={data.userId} retrieveData={retrieveData}/></TableCell>
 
             // roles page
             case 'roleName':
                 return <TableCell><UserRoleCell pageId={pageId} data={data}/></TableCell>
             case 'roleAction':
-                return <TableCell><RoleDeleteAction roleName={data.roleName}/></TableCell>
+                return <TableCell><RoleDeleteAction roleName={data.roleName} retrieveData={retrieveData} /></TableCell>
             
             // Node page
             case 'nodeId':
@@ -207,7 +206,7 @@ function SwitchStatusCell(props) {
         }
         HTTPClient.updateArtifact(globalGroupId, pageId, payload).then(response => {
             if (response.data.status === 'success') {
-                retrieveData();
+                retrieveData('', true);
             }
         });
     }
@@ -278,7 +277,7 @@ function LogConfigLevelDropDown(props) {
             open: false,
             title: '',
             message: ''
-        })
+        });
     }
 
     const handlecompletionStatusDialogClose = () => {
@@ -307,7 +306,7 @@ function LogConfigLevelDropDown(props) {
         }
         HTTPClient.updateAllLogConfig(globalGroupId, payload).then(response => {
             if (response.data.status === 'success') {
-                retrieveData();
+                retrieveData('', true);
                 setLevel(tmpLevel)
                 setCompletionStatusDialog({
                     open: true, 
@@ -332,7 +331,7 @@ function LogConfigLevelDropDown(props) {
         }
         HTTPClient.updateLogConfig(globalGroupId, selectedNode, payload).then(response => {
             if (response.data.status === 'success') {
-                retrieveData(selectedNode);
+                retrieveData('', true);
                 setLevel(tmpLevel)
                 setCompletionStatusDialog({
                     open: true, 
@@ -400,7 +399,7 @@ function LogConfigLevelDropDown(props) {
 }
 
 function UserDeleteAction(props) {
-    const userId = props.userId;
+    const {userId, retrieveData} = props;
     const loggedInUser = AuthManager.getUser().username;
     const superAdmin = useSelector(state => state.superAdmin);
     const classes = useStyles();
@@ -433,10 +432,7 @@ function UserDeleteAction(props) {
             title: '',
             message: ''
         })
-        HTTPClient.getUsers(globalGroupId).then(response => {
-            response.data.map(data => data.details = JSON.parse(data.details))
-            dispatch(changeData(response.data))
-        })
+        retrieveData('', true);
     }
 
     const confirmDelete = () => {
@@ -519,7 +515,7 @@ function UserDeleteAction(props) {
 }
 
 function RoleDeleteAction(props) {
-    const roleName = props.roleName;
+    const {roleName, retrieveData} = props;
     const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dispatch = useDispatch();
@@ -550,10 +546,7 @@ function RoleDeleteAction(props) {
             title: '',
             message: ''
         })
-        HTTPClient.getRoles(globalGroupId).then(response => {
-            response.data.map(data => data.details = JSON.parse(data.details))
-            dispatch(changeData(response.data))
-        })
+        retrieveData('', true);
     }
 
     const confirmDelete = () => {
