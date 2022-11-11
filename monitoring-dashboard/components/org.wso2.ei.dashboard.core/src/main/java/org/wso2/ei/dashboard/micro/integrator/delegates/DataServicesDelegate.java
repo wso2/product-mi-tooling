@@ -44,8 +44,8 @@ public class DataServicesDelegate implements ArtifactDelegate {
         throws ManagementApiException {
 
         logger.debug("Fetching Searched data-services from MI.");
-        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.DATA_SERVICES, 
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }

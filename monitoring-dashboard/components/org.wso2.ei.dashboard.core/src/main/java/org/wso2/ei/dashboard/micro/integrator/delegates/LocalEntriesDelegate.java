@@ -52,8 +52,8 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
         throws ManagementApiException {
             
         logger.debug("Fetching Searched Local Entries from MI.");
-        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.LOCAL_ENTRIES, 
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }

@@ -56,8 +56,8 @@ public class CarbonAppsDelegate implements ArtifactDelegate {
         throws ManagementApiException {
         
         logger.debug("Fetching Searched carbon applications from MI.");
-        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.CARBON_APPLICATIONS,
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
