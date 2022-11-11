@@ -44,8 +44,8 @@ public class TasksDelegate implements ArtifactDelegate {
         throws ManagementApiException {
 
         logger.debug("Fetching Searched Tasks from MI.");
-        logger.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        logger.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.TASKS, searchKey, 
             lowerLimit, upperLimit, order, orderBy, isUpdate);
     }

@@ -63,8 +63,8 @@ public class UsersDelegate {
         throws ManagementApiException {
         
         log.debug("Fetching Searched Users from MI.");
-        log.info("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        log.info("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        log.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
+        log.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
