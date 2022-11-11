@@ -106,7 +106,7 @@ function Navigator(props) {
                 </ListItem>
                 <ListItem className={classes.versionLabel}>
                     <ListItemText>
-                        Version : 4.1.0
+                        Version : 4.2.0-m1
                     </ListItemText>
                 </ListItem>
                 <ListItem 
