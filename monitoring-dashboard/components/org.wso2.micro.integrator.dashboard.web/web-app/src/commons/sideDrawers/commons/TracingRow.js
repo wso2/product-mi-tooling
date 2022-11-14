@@ -18,7 +18,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TableCell, TableRow } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import Switch from "react-switch";
@@ -32,10 +32,13 @@ export default function TracingRow(props) {
         isTracingEnabled = true;
     }
 
+    const [tracingState, setTracingState] = useState(isTracingEnabled);
+    
     const globalGroupId = useSelector(state => state.groupId);
 
     const changeTracingStatus = (checked) => {
         isTracingEnabled = checked;
+        setTracingState(checked);
         updateArtifact();
     };
 
@@ -53,11 +56,14 @@ export default function TracingRow(props) {
         });
     }
 
+    useEffect(() => {
+    },[tracingState]);
+
     return <TableRow>
                 <TableCell>Tracing</TableCell>
                 <TableCell>
                     <label>
-                        <Switch checked={isTracingEnabled} onChange={changeTracingStatus} height={16} width={36} />
+                        <Switch checked={tracingState} onChange={changeTracingStatus} height={16} width={36} />
                     </label>
                 </TableCell>
             </TableRow>
