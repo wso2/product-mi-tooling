@@ -28,7 +28,7 @@
     <groupId>org.wso2.ei</groupId>
     <artifactId>wso2-micro-integrator-tooling</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.0-m1</version>
+    <version>4.2.0-SNAPSHOT</version>
     <name>WSO2 Micro Integrator Tooling</name>
     <url>http://wso2.com/products/enterprise-integrator/</url>
     <description>WSO2 Micro Integrator tooling</description>
@@ -44,7 +44,7 @@
         <url>https://github.com/wso2/product-mi-tooling.git</url>
         <developerConnection>scm:git:https://github.com/wso2/product-mi-tooling.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/product-mi-tooling.git</connection>
-        <tag>v4.2.0-m1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
