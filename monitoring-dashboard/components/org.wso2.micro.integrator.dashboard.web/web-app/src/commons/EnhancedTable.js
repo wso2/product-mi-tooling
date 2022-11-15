@@ -49,7 +49,7 @@ export default function EnhancedTable(props) {
     const [data, setData] = React.useState(null);
 
     const [queryString, setQueryString] = React.useState('');
-
+    const [isOrderChanged, setIsOrderChanged] = React.useState(false);
     var pageId=pageInfo.pageId;
 
     const retrieveResources = (query = '', isUpdate = false) => {
@@ -97,6 +97,7 @@ export default function EnhancedTable(props) {
                 console.log(error.response.data.message);
             });
         }
+        setIsOrderChanged(false);
     };    
 
     const retrieveUpdatedArtifact = (nodeId, artifactName, isTracingEnabled) => {
@@ -130,7 +131,7 @@ export default function EnhancedTable(props) {
             (pageId === 'log-configs' && selectedNodeId !== null) ||
             (pageId !== 'log-configs' && pageId !== 'users' && pageId!== 'roles' && pageId !== 'nodesPage' && selectedNodeList.length > 0)
             ) {
-            retrieveResources(queryString);
+            retrieveResources(queryString, isOrderChanged);
         }
     },[globalGroupId, selectedNodeList, selectedNodeId, rowsPerPage, page, pageInfo, order, orderBy])
 
@@ -140,6 +141,7 @@ export default function EnhancedTable(props) {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
+        setIsOrderChanged(true);
     };
 
     const handleChangePage = (event, newPage) => {
