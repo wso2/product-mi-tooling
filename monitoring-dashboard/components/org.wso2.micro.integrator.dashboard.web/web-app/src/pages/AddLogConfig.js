@@ -186,7 +186,6 @@ function AddLogConfigsSection() {
                                 </Box>
                                 <Box mb={2}>
                                     <TextField
-                                        autoFocus
                                         margin='dense'
                                         variant='outlined'
                                         fullWidth
