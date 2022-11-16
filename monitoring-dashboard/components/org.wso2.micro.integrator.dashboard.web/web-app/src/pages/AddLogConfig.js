@@ -154,12 +154,14 @@ function AddLogConfigsSection() {
                     isError: true
                 })
             } else {
-                setCompletionStatusDialog({
-                    open: true,
-                    title: 'Success',
-                    message: 'Successfully added logger',
-                    isError: false
-                })
+                HTTPClient.getPaginatedResults('', 0, 5, 'log-configs', 'asc', 'name', globalGroupId, 'All', true).then(() => {
+                    setCompletionStatusDialog({
+                        open: true,
+                        title: 'Success',
+                        message: 'Successfully added logger',
+                        isError: false
+                    })
+                }) 
             }
         });
     }
@@ -184,7 +186,6 @@ function AddLogConfigsSection() {
                                 </Box>
                                 <Box mb={2}>
                                     <TextField
-                                        autoFocus
                                         margin='dense'
                                         variant='outlined'
                                         fullWidth
