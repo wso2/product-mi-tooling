@@ -20,7 +20,15 @@ import React from 'react';
 import Alert from '@material-ui/lab/Alert';
 
 export default function Error(props) {
+
+    
     return (
-        <Alert severity="error">{props.msg}</Alert>
+        <>
+            {props.err.message ? 
+                <Alert severity="error">{props.err.message}</Alert> 
+                : 
+                <Alert severity="error">An error occurred while retrieving data. Please check server logs.</Alert>
+            }
+        </> 
     );
 }
