@@ -23,7 +23,6 @@ import EnhancedTable from '../commons/EnhancedTable';
 import {useSelector } from 'react-redux';
 import AuthManager from "../auth/AuthManager";
 import { Redirect } from "react-router-dom";
-import Alert from '@material-ui/lab/Alert';
 
 export default function Users() {
     const [pageInfo] = React.useState({
@@ -36,7 +35,6 @@ export default function Users() {
         tableOrderBy: 'name'
     });
 
-    const [error, setError] = React.useState(null);
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
 
@@ -47,16 +45,6 @@ export default function Users() {
     if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
         return (
             <Redirect to={{pathname: '/'}}/>
-        );
-    }
-
-    if (error) {
-        return (
-        <div>
-            <Alert severity="error">
-                {error}
-            </Alert>
-        </div>
         );
     }
 
