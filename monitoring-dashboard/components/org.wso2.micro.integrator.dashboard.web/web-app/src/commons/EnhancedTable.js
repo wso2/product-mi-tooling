@@ -31,6 +31,8 @@ import TableRowCreator from './TableRowCreator';
 import HTTPClient from '../utils/HTTPClient';
 import SearchBox from '../commons/SearchBox';
 import Progress from '../commons/Progress';
+import { Link } from "react-router-dom";
+import { Button } from "@material-ui/core";
 
 export default function EnhancedTable(props) {
     const { pageInfo} = props;
@@ -47,6 +49,7 @@ export default function EnhancedTable(props) {
     var selectedNodeId = pageInfo.additionalParams?.selectedNodeId;
 
     const [data, setData] = React.useState(null);
+    const [error, setError] = React.useState(null);
 
     const [queryString, setQueryString] = React.useState('');
     const [isOrderChanged, setIsOrderChanged] = React.useState(false);
@@ -72,6 +75,7 @@ export default function EnhancedTable(props) {
                     setData(response.data.resourceList)
                     setRowCount(response.data.count)
             }).catch(error => {
+                setError(error.response.data);
                 console.log(error.response.data.message);
             });
         } else if (pageId === 'log-configs') {
@@ -127,6 +131,7 @@ export default function EnhancedTable(props) {
     }
 
     React.useEffect(() => {
+        setError(null);
         if ((data !== null || globalGroupId !== '') ||
             (pageId === 'log-configs' && selectedNodeId !== null) ||
             (pageId !== 'log-configs' && pageId !== 'users' && pageId!== 'roles' && pageId !== 'nodesPage' && selectedNodeList.length > 0)
@@ -153,6 +158,10 @@ export default function EnhancedTable(props) {
         setPage(0);
     };
 
+    if (error && error.code === 403){
+        return <>{error.message}</>
+    }
+
     if ((data === null || globalGroupId === '') ||
         (pageId === 'log-configs' && selectedNodeId === null) ||
         (pageId !== 'log-configs' && pageId !== 'users' && pageId!== 'roles' && pageId !== 'nodesPage' && selectedNodeList === null)) {
@@ -162,7 +171,24 @@ export default function EnhancedTable(props) {
     
     return (
         <div className={classes.root}>
+            {pageInfo.pageId === 'roles' || pageInfo.pageId === 'users' ?
+            <>
+                <div style={{height: "30px"}}>
+                <Button className={classes.buttonRight} component={Link} to={`/${pageInfo.pageId}/add`} variant="contained" color="primary">
+                    {pageInfo.pageId === 'roles' ?
+                    <>Add New Role</>
+                    :
+                    <>Add New User</>
+                    }  
+                </Button>
+                </div>
+                <br/>
+            </> 
+            : null
+            }
+        
             {pageInfo.pageId === 'nodesPage' ? null :<SearchBox passSearchQuery = {retrieveResources}/>}
+
             <Paper className={classes.paper}>
                 <TableContainer>
                     <Table
@@ -224,4 +250,7 @@ const useStyles = makeStyles((theme) => ({
     divider: {
         height: 0
     },
+    buttonRight: {
+        float: "right"
+    }
 }));
