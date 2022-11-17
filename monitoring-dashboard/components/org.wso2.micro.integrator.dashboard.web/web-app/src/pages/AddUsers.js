@@ -70,9 +70,7 @@ export default function AddUsers() {
             isError: false
         })
         if (!isError) {
-            //update roles list
-            HTTPClient.getPaginatedUsersAndRoles('', 0, 5, 'users', 'asc', 'name', globalGroupId, true);
-            window.location.reload();
+            history.push("/users");
         }
     }
 
@@ -108,12 +106,15 @@ export default function AddUsers() {
                 "isAdmin": isAdmin
             }
             HTTPClient.addUser(globalGroupId, payload).then(response => {
+                // Update the user list so user can also see added one
+                HTTPClient.getPaginatedUsersAndRoles('', 0, 5, 'users', 'asc', 'name', globalGroupId, true).then(() => {
                     setDialog({
                         open: true,
                         title: 'Success',
                         message: 'Successfully added user',
                         isError: false
                     })
+                })     
             }).catch(error => {
                 setDialog({
                     open: true,
