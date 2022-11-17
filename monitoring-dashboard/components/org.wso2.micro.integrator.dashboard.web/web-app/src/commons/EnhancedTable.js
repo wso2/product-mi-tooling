@@ -31,6 +31,7 @@ import TableRowCreator from './TableRowCreator';
 import HTTPClient from '../utils/HTTPClient';
 import SearchBox from '../commons/SearchBox';
 import Progress from '../commons/Progress';
+import Error from '../commons/Error';
 import { Link } from "react-router-dom";
 import { Button } from "@material-ui/core";
 
@@ -159,7 +160,7 @@ export default function EnhancedTable(props) {
     };
 
     if (error && error.code === 403){
-        return <>{error.message}</>
+        return <Error msg={error.message}/>
     }
 
     if ((data === null || globalGroupId === '') ||
