@@ -159,8 +159,8 @@ export default function EnhancedTable(props) {
         setPage(0);
     };
 
-    if (error && error.code === 403){
-        return <Error msg={error.message}/>
+    if (error){
+        return <Error err={error}/>
     }
 
     if ((data === null || globalGroupId === '') ||
