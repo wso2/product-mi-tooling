@@ -22,9 +22,7 @@ import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
 import {useSelector } from 'react-redux';
 import AuthManager from "../auth/AuthManager";
-import {Link, Redirect} from "react-router-dom";
-import {Button} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import { Redirect } from "react-router-dom";
 import Alert from '@material-ui/lab/Alert';
 
 export default function Users() {
@@ -39,7 +37,6 @@ export default function Users() {
     });
 
     const [error, setError] = React.useState(null);
-    const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
 
@@ -63,20 +60,7 @@ export default function Users() {
         );
     }
 
-    return <>
-        <div style={{height: "30px"}}>
-        <Button classes={{root: classes.buttonRight}} component={Link} to="/users/add" variant="contained"
-                color="primary">
-            Add New User
-        </Button>
-        </div>
-        <br/>
+    return (
         <EnhancedTable pageInfo={pageInfo}/>
-    </>
+    );
 }
-
-const useStyles = makeStyles((theme) => ({
-    buttonRight: {
-        float: "right"
-    }
-}));
