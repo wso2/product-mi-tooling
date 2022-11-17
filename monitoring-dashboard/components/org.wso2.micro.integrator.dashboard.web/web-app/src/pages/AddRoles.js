@@ -66,9 +66,7 @@ export default function AddRoles() {
             isError: false
         })
         if (!isError) {
-            //update roles list
-            HTTPClient.getPaginatedUsersAndRoles('', 0, 5, 'roles', 'asc', 'name', globalGroupId, true);
-            window.location.reload();
+            history.push("/roles");
         }
     }
 
@@ -89,12 +87,15 @@ export default function AddRoles() {
             }
             
             HTTPClient.addRole(globalGroupId, payload).then(response => {
+                // Update the role list so user can also see added one
+                HTTPClient.getPaginatedUsersAndRoles('', 0, 5, 'roles', 'asc', 'name', globalGroupId, true).then(() => {
                     setDialog({
                         open: true,
                         title: 'Success',
                         message: 'Successfully added role',
                         isError: false
                     })
+                })       
             }).catch(error => {
                 setDialog({
                     open: true,
