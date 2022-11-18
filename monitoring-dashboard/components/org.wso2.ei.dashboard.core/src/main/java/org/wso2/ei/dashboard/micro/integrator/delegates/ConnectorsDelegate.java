@@ -43,7 +43,7 @@ public class ConnectorsDelegate implements ArtifactDelegate {
         String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
         throws ManagementApiException {
             
-        logger.debug("Fetching Searched Connectors from MI.");
+        logger.info("Fetching Searched Connectors from MI.");
         logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
         logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.CONNECTORS, 
