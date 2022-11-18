@@ -64,7 +64,7 @@ public class TemplatesDelegate implements ArtifactDelegate {
         String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
         throws ManagementApiException {
         
-        logger.debug("Fetching Searched Templates from MI.");
+        logger.info("Fetching Searched Templates from MI.");
         logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
         logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);

@@ -64,7 +64,7 @@ public class RolesDelegate {
         String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
         throws ManagementApiException {
         
-        log.debug("Fetching Searched Roles from MI.");
+        log.info("Fetching Searched Roles from MI.");
 
         log.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
         log.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
