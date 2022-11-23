@@ -22,10 +22,7 @@ import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
 import { useSelector } from 'react-redux';
 import AuthManager from "../auth/AuthManager";
-import {Link, Redirect} from "react-router-dom";
-import {Button} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
-import Alert from '@material-ui/lab/Alert';
+import { Redirect } from "react-router-dom";
 
 export default function Roles() {
     const [pageInfo] = React.useState({
@@ -37,8 +34,6 @@ export default function Roles() {
         tableOrderBy: 'name'
     });
 
-    const [error, setError] = React.useState(null);
-    const classes = useStyles();
     const globalGroupId = useSelector(state => state.groupId);
     const dataSet = useSelector(state => state.data);
 
@@ -52,30 +47,7 @@ export default function Roles() {
         );
     }
 
-    if (error) {
-        return (
-        <div>
-            <Alert severity="error">
-                {error}
-            </Alert>
-        </div>
-        );
-    }
-
-    return <>
-        <div style={{height: "30px"}}>
-        <Button classes={{root: classes.buttonRight}} component={Link} to="/roles/add" variant="contained"
-                color="primary">
-            Add New Role
-        </Button>
-        </div>
-        <br/>
+    return (
         <EnhancedTable pageInfo={pageInfo}/>
-    </>
+    );
 }
-
-const useStyles = makeStyles((theme) => ({
-    buttonRight: {
-        float: "right"
-    }
-}));
