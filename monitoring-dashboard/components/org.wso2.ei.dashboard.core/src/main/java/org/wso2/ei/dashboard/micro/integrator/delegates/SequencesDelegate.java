@@ -42,14 +42,12 @@ public class SequencesDelegate implements ArtifactDelegate {
     public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
         String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
         throws ManagementApiException {
-        
-        logger.info("Fetching Searched Sequences from MI.");
+        logger.debug("Fetching Searched Sequences from MI.");
         logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
         logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.SEQUENCES, 
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
-
 
     @Override
     public Ack updateArtifact(String groupId, ArtifactUpdateRequest request) throws ManagementApiException {
