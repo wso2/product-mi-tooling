@@ -63,18 +63,13 @@ public class RolesDelegate {
     public RolesResourceResponse fetchPaginatedRolesResponse(String groupId, String searchKey, 
         String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
         throws ManagementApiException {
-        
-        log.info("Fetching Searched Roles from MI.");
-
+        log.debug("Fetching Searched Roles from MI.");
         log.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
         log.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
-
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
-
         log.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
-
         if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))) {
             searchedList = getSearchedRoles(groupId, searchKey, order, orderBy);
             count = searchedList.size();

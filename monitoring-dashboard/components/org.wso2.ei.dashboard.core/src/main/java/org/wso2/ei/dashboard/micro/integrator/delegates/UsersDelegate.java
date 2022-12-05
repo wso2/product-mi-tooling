@@ -61,8 +61,7 @@ public class UsersDelegate {
     public UsersResourceResponse fetchPaginatedUsers(String groupId, String searchKey, 
         String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
         throws ManagementApiException {
-        
-        log.info("Fetching Searched Users from MI.");
+        log.debug("Fetching Searched Users from MI.");
         log.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
         log.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
