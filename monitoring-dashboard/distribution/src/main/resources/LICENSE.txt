@@ -1,62 +1,62 @@
 
-This product is licensed by WSO2 Inc. under Apache License 2.0. The license
+This product is licensed by WSO2 LLC. under Apache License 2.0. The license
 can be downloaded from the following locations:
 	http://www.apache.org/licenses/LICENSE-2.0.html
 	http://www.apache.org/licenses/LICENSE-2.0.txt
 
 This product also contains software under different licenses. This table below
-all the contained libraries (jar files) and the license under which they are 
+all the contained libraries (jar files) and the license under which they are
 provided to you.
 
 At the bottom of this file is a table that shows what each license indicated
 below is and where the actual text of the license can be found.
 
 
-Name                                                                                                Type           License             
+Name                                                                                                Type           License
 _________________________________________________________________________________________________________________________________________________
-org.wso2.micro.integrator.dashboard.utils-4.1.0.jar                                                 bundle         apache2             
-guava-31.1-jre.jar                                                                                  bundle         apache2             
-jsoup-1.14.2.jar                                                                                    bundle         mit                 
-jetty-io-9.4.45.v20220203.jar                                                                       bundle         apache2             
-re2j-1.2.jar                                                                                        jar            golang              
-jetty-server-9.4.45.v20220203.jar                                                                   bundle         apache2             
-jetty-util-9.4.45.v20220203.jar                                                                     bundle         apache2             
-config-mapper-1.0.20.jar                                                                            jar            apache2             
-jackson-dataformat-yaml-2.13.2.jar                                                                  bundle         apache2             
-jinjava-2.6.0.jar                                                                                   jar            apache2             
-json-smart-2.4.7.jar                                                                                bundle         apache2             
-commons-lang3-3.1.jar                                                                               bundle         apache2             
-jackson-databind-2.13.2.jar                                                                         bundle         apache2             
-jackson-annotations-2.13.2.jar                                                                      bundle         apache2             
-commons-codec-1.15.jar                                                                              bundle         apache2             
-oauth2-oidc-sdk-8.19.jar                                                                            bundle         apache2             
-nimbus-jose-jwt-8.19.jar                                                                            bundle         apache2             
-axiom-1.2.11-wso2v17.jar                                                                            bundle         apache2             
-jetty-webapp-9.4.45.v20220203.jar                                                                   bundle         apache2             
-org.wso2.carbon.securevault-4.5.3.jar                                                               bundle         apache2             
-jaxb-api-2.3.0.jar                                                                                  bundle         cddl1               
-jetty-xml-9.4.45.v20220203.jar                                                                      bundle         apache2             
-log4j-slf4j-impl-2.17.2.jar                                                                         bundle         apache2             
-log4j-jcl-2.17.2.jar                                                                                bundle         apache2             
-log4j-core-2.17.2.jar                                                                               bundle         apache2             
-jackson-core-2.13.2.jar                                                                             bundle         apache2             
-jetty-http-9.4.45.v20220203.jar                                                                     bundle         apache2             
-accessors-smart-2.4.8.jar                                                                           bundle         apache2             
-javax.servlet-api-3.1.0.jar                                                                         bundle         cddl1               
-jetty-security-9.4.45.v20220203.jar                                                                 bundle         apache2             
-log4j-api-2.17.2.jar                                                                                bundle         apache2             
-io.asgardeo.java.oidc.sdk-0.1.13.jar                                                                jar            apache2             
-jetty-servlet-9.4.45.v20220203.jar                                                                  bundle         apache2             
-cava-toml-0.5.0.jar                                                                                 jar            apache2             
-org.wso2.ei.dashboard.bootstrap-4.1.0.jar                                                           bundle         apache2             
-org.wso2.ciphertool-1.1.15.jar                                                                      bundle         apache2             
-antlr4-runtime-4.7.1.jar                                                                            bundle         bsd                 
-slf4j-api-1.7.36.jar                                                                                bundle         mit                 
-activation-1.1.jar                                                                                  jar            cddl1               
-gson-2.8.6.jar                                                                                      bundle         apache2             
-org.wso2.securevault-1.1.2.jar                                                                      bundle         apache2             
-commons-lang-2.6.0.wso2v1.jar                                                                       bundle         apache2             
-commons-logging-1.2.jar                                                                             bundle         apache2             
+guava-31.1-jre.jar                                                                                  bundle         apache2
+jsoup-1.14.2.jar                                                                                    bundle         mit
+jetty-io-9.4.45.v20220203.jar                                                                       bundle         apache2
+re2j-1.2.jar                                                                                        jar            golang
+jetty-server-9.4.45.v20220203.jar                                                                   bundle         apache2
+jetty-util-9.4.45.v20220203.jar                                                                     bundle         apache2
+config-mapper-1.0.20.jar                                                                            jar            apache2
+jackson-dataformat-yaml-2.13.2.jar                                                                  bundle         apache2
+jinjava-2.6.0.jar                                                                                   jar            apache2
+json-smart-2.4.7.jar                                                                                bundle         apache2
+commons-lang3-3.1.jar                                                                               bundle         apache2
+org.wso2.micro.integrator.dashboard.utils-4.2.0.jar                                                 bundle         apache2
+jackson-databind-2.13.2.jar                                                                         bundle         apache2
+jackson-annotations-2.13.2.jar                                                                      bundle         apache2
+commons-codec-1.15.jar                                                                              bundle         apache2
+oauth2-oidc-sdk-8.19.jar                                                                            bundle         apache2
+nimbus-jose-jwt-8.19.jar                                                                            bundle         apache2
+axiom-1.2.11-wso2v17.jar                                                                            bundle         apache2
+jetty-webapp-9.4.45.v20220203.jar                                                                   bundle         apache2
+org.wso2.carbon.securevault-4.5.3.jar                                                               bundle         apache2
+jaxb-api-2.3.0.jar                                                                                  bundle         cddl1
+jetty-xml-9.4.45.v20220203.jar                                                                      bundle         apache2
+log4j-slf4j-impl-2.17.2.jar                                                                         bundle         apache2
+log4j-jcl-2.17.2.jar                                                                                bundle         apache2
+log4j-core-2.17.2.jar                                                                               bundle         apache2
+gson-2.9.1.jar                                                                                      bundle         apache2
+jackson-core-2.13.2.jar                                                                             bundle         apache2
+jetty-http-9.4.45.v20220203.jar                                                                     bundle         apache2
+org.wso2.ei.dashboard.bootstrap-4.2.0.jar                                                           bundle         apache2
+accessors-smart-2.4.8.jar                                                                           bundle         apache2
+javax.servlet-api-3.1.0.jar                                                                         bundle         cddl1
+jetty-security-9.4.45.v20220203.jar                                                                 bundle         apache2
+log4j-api-2.17.2.jar                                                                                bundle         apache2
+io.asgardeo.java.oidc.sdk-0.1.13.jar                                                                jar            apache2
+jetty-servlet-9.4.45.v20220203.jar                                                                  bundle         apache2
+cava-toml-0.5.0.jar                                                                                 jar            apache2
+org.wso2.ciphertool-1.1.15.jar                                                                      bundle         apache2
+antlr4-runtime-4.7.1.jar                                                                            bundle         bsd
+slf4j-api-1.7.36.jar                                                                                bundle         mit
+activation-1.1.jar                                                                                  jar            cddl1
+org.wso2.securevault-1.1.2.jar                                                                      bundle         apache2
+commons-lang-2.6.0.wso2v1.jar                                                                       bundle         apache2
+commons-logging-1.2.jar                                                                             bundle         apache2
 
 
 The license types used by the above libraries and their information is given below:
