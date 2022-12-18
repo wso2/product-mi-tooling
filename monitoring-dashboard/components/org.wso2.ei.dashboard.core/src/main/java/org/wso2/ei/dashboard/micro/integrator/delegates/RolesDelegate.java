@@ -107,7 +107,7 @@ public class RolesDelegate {
             //for any other ordering options
             default: comparatorObject = Comparator.comparing(RoleListInner::getRoleName); break;
         }
-        if (order.equalsIgnoreCase("desc")) {
+        if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(roles, comparatorObject.reversed());
         } else {
             Collections.sort(roles, comparatorObject);

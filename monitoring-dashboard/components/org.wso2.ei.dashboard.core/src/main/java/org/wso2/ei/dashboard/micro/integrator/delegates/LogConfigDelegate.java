@@ -119,7 +119,7 @@ public class LogConfigDelegate {
                 (LogConfigsInner::getComponentNameIgnoreCase); break;
             default: comparatorObject = Comparator.comparing(LogConfigsInner::getNameIgnoreCase); break;
         }
-        if (order.equalsIgnoreCase("desc")) {
+        if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(logConfigs, comparatorObject.reversed());
         } else {
             Collections.sort(logConfigs, comparatorObject);

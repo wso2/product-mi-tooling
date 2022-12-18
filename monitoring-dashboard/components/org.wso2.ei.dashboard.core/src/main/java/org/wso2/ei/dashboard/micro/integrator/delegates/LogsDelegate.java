@@ -96,6 +96,7 @@ public class LogsDelegate {
         }
         return count;
     }
+
     public static List<LogListInner> getSearchedLogsListFromMI(String groupId, List<String> nodeList,
         String searchKey, String order, String orderBy) throws ManagementApiException {
             
@@ -140,7 +141,7 @@ public class LogsDelegate {
             //add if any other parms
             default: comparatorObject = Comparator.comparing(LogListInner::getNameIgnoreCase); break;
         }
-        if (order.equalsIgnoreCase("desc")) {
+        if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(logList, comparatorObject.reversed());
         } else {
             Collections.sort(logList, comparatorObject);
