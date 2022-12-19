@@ -129,7 +129,7 @@ public class RegistryResourceDelegate {
             //for any other ordering options
             default: comparatorObject = Comparator.comparing(RegistryArtifactsInner::getChildNameIgnoreCase); break;
         }
-        if (order.equalsIgnoreCase("desc")) {
+        if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(registryList, comparatorObject.reversed());
         } else {
             Collections.sort(registryList, comparatorObject);

@@ -177,7 +177,7 @@ public class UsersDelegate {
             default: comparatorObject = Comparator.comparing(UsersInner::getUserId); break;
         }
 
-        if (order.equalsIgnoreCase("desc")) {
+        if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(users, comparatorObject.reversed());
         } else {
             Collections.sort(users, comparatorObject);
