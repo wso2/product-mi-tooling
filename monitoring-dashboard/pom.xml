@@ -304,7 +304,7 @@
         <javax.activation.version>1.1</javax.activation.version>
         <io.swagger.version>1.6.5</io.swagger.version>
         <io.swagger.core.v3.version>2.1.12</io.swagger.core.v3.version>
-        <jackson.core.version>2.13.2</jackson.core.version>
+        <jackson.core.version>2.13.5</jackson.core.version>
         <jackson.dataformat.version>${jackson.core.version}</jackson.dataformat.version>
         <commons-logging.version>1.2</commons-logging.version>
         <commons.lang3.version>3.1</commons.lang3.version>
