@@ -67,7 +67,7 @@ public final class InMemoryDataManager implements DataManager {
             map.put(ACCESS_TOKEN, accessToken);
             String keyString = heartbeat.getGroupId() + heartbeat.getNodeId();
             heartBeatStore.put(keyString, map);
-            logger.info("Inserted heartbeat to node " + heartbeat.getNodeId() +  " of group " + heartbeat.getGroupId());
+            logger.info("Inserting heartbeat details of node " + heartbeat.getNodeId() +  " in group " + heartbeat.getGroupId());
             return heartBeatStore.size() > 0;
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
@@ -83,7 +83,7 @@ public final class InMemoryDataManager implements DataManager {
             map.put(SERVICE_INFO, serverInfo);
             String keyString = heartbeat.getGroupId() + heartbeat.getNodeId();
             serviceInfoStore.put(keyString, map);
-            logger.info("Added serverInfo to node " + heartbeat.getNodeId() +  " of group " + heartbeat.getGroupId());
+            logger.info("Adding serverInfo of node " + heartbeat.getNodeId() +  " in group " + heartbeat.getGroupId());
             return serviceInfoStore.size() > 0;
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while inserting server information of node : "
