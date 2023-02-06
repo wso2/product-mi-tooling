@@ -79,6 +79,11 @@
                 <artifactId>org.wso2.securevault</artifactId>
                 <version>${securevault.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${org.jsoup.version}</version>
+            </dependency>
 
             <!-- Logging/SLF4J -->
             <dependency>
@@ -284,6 +289,7 @@
     <properties>
         <securevault.version>1.1.2</securevault.version>
         <carbon.kernel.version>4.5.3</carbon.kernel.version>
+        <org.jsoup.version>1.15.3</org.jsoup.version>
 
         <!-- Logging/SLF4J -->
         <slf4j.version>1.7.36</slf4j.version>
