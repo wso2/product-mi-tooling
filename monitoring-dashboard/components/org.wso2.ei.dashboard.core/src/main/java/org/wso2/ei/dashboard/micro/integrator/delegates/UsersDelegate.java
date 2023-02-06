@@ -20,8 +20,8 @@
 
 package org.wso2.ei.dashboard.micro.integrator.delegates;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -38,22 +38,23 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
+import org.wso2.ei.dashboard.core.rest.model.User;
 import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.core.rest.model.UsersInner;
 import org.wso2.ei.dashboard.core.rest.model.UsersResourceResponse;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+
 /**
  * Delegate class to handle requests from users page.
  */
 public class UsersDelegate {
     private static final Log log = LogFactory.getLog(UsersDelegate.class);
     private static final DataManager dataManager = DataManagerSingleton.getDataManager();
-    private static List<UsersInner>  searchedList;
+    private static User[] allUserIds;
     private static String prevSearchKey = null;
     private static int count;
 
@@ -71,10 +72,11 @@ public class UsersDelegate {
         log.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
 
         if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))) {
-            searchedList = getSearchedUsers(groupId, searchKey, order, orderBy);
-            count = searchedList.size();
+            allUserIds = getSearchedUsers(groupId, searchKey);
+            Arrays.sort(allUserIds);
+            count = allUserIds.length;
         }
-        Users paginatedUsers = getPaginatedUsersResultsFromMI(searchedList, fromIndex, toIndex);
+        Users paginatedUsers = getPaginatedUsersResultsFromMI(allUserIds, fromIndex, toIndex, groupId, order, orderBy);
         UsersResourceResponse usersResourceResponse = new UsersResourceResponse();
         usersResourceResponse.setResourceList(paginatedUsers);
         usersResourceResponse.setCount(count);
@@ -137,25 +139,7 @@ public class UsersDelegate {
         return payload;
     }
 
-    private static Users getUsers(String groupId) throws ManagementApiException {
-        Users users = new Users();
-        NodeList nodeList = dataManager.fetchNodes(groupId);
-        // assumption - In a group, users of all nodes in the group should be identical
-        String nodeId = nodeList.get(0).getNodeId();
-        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        String url = mgtApiUrl.concat("users/");
-        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
-        JsonArray userList = HttpUtils.getJsonResponse(httpResponse).get("list").getAsJsonArray();
-        for (JsonElement user : userList) {
-            UsersInner usersInner = getUserDetails(groupId, nodeId, accessToken, url, user);
-            users.add(usersInner);
-        }
-        return users;
-    }
-
-    private static Users getSearchedUsers(String groupId, String searchKey, 
-        String order, String orderBy) throws ManagementApiException {
+    private static User[] getSearchedUsers(String groupId, String searchKey) throws ManagementApiException {
 
         Users users = new Users();
         NodeList nodeList = dataManager.fetchNodes(groupId);
@@ -163,45 +147,31 @@ public class UsersDelegate {
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        String url = mgtApiUrl.concat("users/");
         JsonArray usersList = DelegatesUtil.getResourceResultList(groupId, nodeId, "users", 
                 mgtApiUrl, accessToken, searchKey);
-
-        for (JsonElement user : usersList) {
-            UsersInner usersInner = getUserDetails(groupId, nodeId, accessToken, url, user);
-            users.add(usersInner);
-        }
-        Comparator<UsersInner> comparatorObject;
-        switch (orderBy.toLowerCase()) {
-            //for any other ordering options
-            default: comparatorObject = Comparator.comparing(UsersInner::getUserId); break;
-        }
-
-        if ("desc".equalsIgnoreCase(order)) {
-            Collections.sort(users, comparatorObject.reversed());
-        } else {
-            Collections.sort(users, comparatorObject);
-        }
-        return users;
+        return new Gson().fromJson(usersList, User[].class);
     }
 
-    private Users getPaginatedUsersResultsFromMI(List<UsersInner> users, int lowerLimit, int upperLimit) 
-        throws ManagementApiException {
+    private Users getPaginatedUsersResultsFromMI(User[] users, int lowerLimit, int upperLimit, String groupId,
+                                                 String order, String orderBy) throws ManagementApiException {
 
         Users resultList = new Users();
         try {
-            if (users.size() < upperLimit) {
-                upperLimit = users.size();
+            if (users.length < upperLimit) {
+                upperLimit = users.length;
             }
             if (upperLimit < lowerLimit) {
                 lowerLimit = upperLimit;
             }
-            List<UsersInner> paginatedList = users.subList(lowerLimit, upperLimit);
-        
-            for (UsersInner user : paginatedList) {
-                resultList.add(user);
+            users = Arrays.copyOfRange(users, lowerLimit, upperLimit);
+
+            // creating the URL and fetch role info of user in the current page
+            fetchUserInfo(users, groupId, resultList);
+            Collections.sort(resultList);
+
+            if ("desc".equalsIgnoreCase(order)) {
+                Collections.reverse(resultList);
             }
-            
             return resultList;
 
         } catch (IndexOutOfBoundsException e) {
@@ -212,9 +182,29 @@ public class UsersDelegate {
         return null;      
     }
 
-    private static UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url, 
-        JsonElement user)throws ManagementApiException {
-        String userId = user.getAsJsonObject().get("userId").getAsString();
+    /**
+     * Fetch individual user details only for the user of the current page.
+     *
+     * @param users      all users
+     * @param groupId    groupId
+     * @param resultList list of user details
+     * @throws ManagementApiException error occurred while fetching user details.
+     */
+    private void fetchUserInfo(User[] users, String groupId, Users resultList)
+            throws ManagementApiException {
+        NodeList nodeList = dataManager.fetchNodes(groupId);
+        String nodeId = nodeList.get(0).getNodeId();
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
+        String url = mgtApiUrl.concat("users/");
+        for (User user : users) {
+            UsersInner usersInner = getUserDetails(groupId, nodeId, accessToken, url, user.getUserId());
+            resultList.add(usersInner);
+        }
+    }
+
+    private static UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url,
+                                             String userId)throws ManagementApiException {
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);
         String getUsersDetailsUrl;

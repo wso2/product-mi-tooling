@@ -1,6 +1,5 @@
 package org.wso2.ei.dashboard.core.rest.model;
 
-import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 
@@ -9,7 +8,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class UsersInner   {
+public class UsersInner implements Comparable<UsersInner>  {
   private @Valid String userId = null;
   private @Valid String details = null;
 
@@ -88,5 +87,10 @@ public class UsersInner   {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  @Override
+  public int compareTo(UsersInner o) {
+    return this.userId.toLowerCase().compareTo(o.userId.toLowerCase());
   }
 }
