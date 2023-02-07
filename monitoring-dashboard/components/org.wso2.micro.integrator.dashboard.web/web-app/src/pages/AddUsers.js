@@ -75,6 +75,10 @@ export default function AddUsers() {
     }
 
     const addUser = () => {
+        if (user.domain.toLowerCase() !== "primary") {
+            // only the primary userstore can have admin users.
+            user.isAdmin = "false"
+        }
         const { userId, domain, password, passwordRepeat, isAdmin } = user
 
         if (userId === '') {
@@ -199,6 +203,7 @@ export default function AddUsers() {
                                 value={user.isAdmin}
                                 onChange={(e) => handleUserInput(e)}
                                 label="Is Admin"
+                                disabled={user.domain.toLowerCase() !== "primary"}
                             >
                                 <option value={"true"}>True</option>
                                 <option value={"false"}>False</option>
