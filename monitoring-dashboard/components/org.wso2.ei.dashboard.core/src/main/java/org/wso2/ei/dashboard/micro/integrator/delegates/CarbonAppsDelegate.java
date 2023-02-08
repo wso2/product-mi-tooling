@@ -57,8 +57,12 @@ public class CarbonAppsDelegate implements ArtifactDelegate {
         logger.debug("Fetching Searched carbon applications from MI.");
         logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
         logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
-        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.CARBON_APPLICATIONS,
-            searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
+        // changing the keyword before calling Management API and restoring to default value.
+        DelegatesUtil.setListKeyName("activeList");
+        ArtifactsResourceResponse response = DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList,
+                Constants.CARBON_APPLICATIONS, searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
+        DelegatesUtil.setListKeyName(Constants.DEFAULT_LIST_KEY);
+        return response;
     }
 
     public CAppArtifacts getCAppArtifactList(String groupId, String nodeId, String cAppName)

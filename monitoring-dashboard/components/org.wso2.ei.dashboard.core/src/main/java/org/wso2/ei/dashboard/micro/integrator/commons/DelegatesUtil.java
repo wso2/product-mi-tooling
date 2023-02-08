@@ -38,6 +38,14 @@ public class DelegatesUtil {
     private static String prevSearchKey = null;
     private static String prevResourceType = null;
     private static int count;
+    /*
+        introducing this variable to dynamically change the keyword of the result list we get from the management API.
+        keyword is different only when fetching CAPP details.
+    */
+    private static String listKeyName = "list";
+    public static void setListKeyName(String listKeyName) {
+        DelegatesUtil.listKeyName = listKeyName;
+    }
 
     private DelegatesUtil() {
 
@@ -190,7 +198,7 @@ public class DelegatesUtil {
         String url = mgtApiUrl.concat(type);
         JsonObject artifacts = invokeManagementApi(groupId, nodeId, url, 
             accessToken, searchKey);
-        return artifacts.get("list").getAsJsonArray();
+        return artifacts.get(listKeyName).getAsJsonArray();
     }    
 
     private static JsonObject invokeManagementApi(String groupId, String nodeId, String url, 
