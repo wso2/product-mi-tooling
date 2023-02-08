@@ -67,7 +67,8 @@ public final class InMemoryDataManager implements DataManager {
             map.put(ACCESS_TOKEN, accessToken);
             String keyString = heartbeat.getGroupId() + heartbeat.getNodeId();
             heartBeatStore.put(keyString, map);
-            logger.info("Inserting heartbeat details of node " + heartbeat.getNodeId() +  " in group " + heartbeat.getGroupId());
+            logger.info("Inserting heartbeat details of node " + heartbeat.getNodeId() +
+                        " in group " + heartbeat.getGroupId());
             return heartBeatStore.size() > 0;
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while inserting heartbeat information.", e);
