@@ -246,7 +246,8 @@ public class HttpUtils {
                                 + " frame-ancestors 'none'; form-action 'self';")
                 .header("X-Frame-Options", "DENY")
                 .header("X-Content-Type-Options", "nosniff")
-                .header("Referrer-Policy", "same-origin");
+                .header("Referrer-Policy", "same-origin")
+                .header("X-XSS-Protection", "1; mode=block");
     }
 
 }

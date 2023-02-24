@@ -47,6 +47,7 @@ public class SecurityHeaderFilter implements Filter {
         httpResponse.addHeader("X-Frame-Options", "DENY");
         httpResponse.addHeader("X-Content-Type-Options", "nosniff");
         httpResponse.addHeader("Referrer-Policy", "same-origin");
+        httpResponse.addHeader("X-XSS-Protection", "1; mode=block");
         filterChain.doFilter(servletRequest, servletResponse);
 
     }
