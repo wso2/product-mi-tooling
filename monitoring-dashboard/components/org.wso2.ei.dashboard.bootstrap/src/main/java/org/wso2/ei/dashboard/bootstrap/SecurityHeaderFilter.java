@@ -43,7 +43,7 @@ public class SecurityHeaderFilter implements Filter {
             throws IOException, ServletException {
 
         final HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
-        httpResponse.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
+        httpResponse.addHeader("Content-Security-Policy", "frame-ancestors 'none'; object-src 'none';");
         httpResponse.addHeader("X-Frame-Options", "DENY");
         httpResponse.addHeader("X-Content-Type-Options", "nosniff");
         httpResponse.addHeader("Referrer-Policy", "same-origin");
