@@ -79,7 +79,7 @@ export default class AuthManager {
      */
     static setUser(user, isSecure) {
         // secure user cookie will only be set in https mode
-        AuthManager.setCookie(Constants.SESSION_USER_COOKIE, JSON.stringify(user), 3000, window.contextPath, isSecure);
+        AuthManager.setCookie(Constants.SESSION_USER_COOKIE, JSON.stringify(user)+";SameSite=Strict", 3000, window.contextPath, isSecure);
     }
 
     /**

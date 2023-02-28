@@ -242,11 +242,12 @@ public class HttpUtils {
     public static void setHeaders(Response.ResponseBuilder responseBuilder) {
         responseBuilder
                 .header("Content-Security-Policy",
-                        "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';"
-                                + " frame-ancestors 'none'; form-action 'self';")
+                        "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self';" +
+                                " style-src 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none';")
                 .header("X-Frame-Options", "DENY")
                 .header("X-Content-Type-Options", "nosniff")
-                .header("Referrer-Policy", "same-origin");
+                .header("Referrer-Policy", "same-origin")
+                .header("X-XSS-Protection", "1; mode=block");
     }
 
 }
