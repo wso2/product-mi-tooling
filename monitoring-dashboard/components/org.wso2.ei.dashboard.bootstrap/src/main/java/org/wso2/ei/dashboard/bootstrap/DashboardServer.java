@@ -28,6 +28,7 @@ import net.consensys.cava.toml.TomlParseResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.DetectorConnectionFactory;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
@@ -192,6 +193,8 @@ public class DashboardServer {
 
         HttpConfiguration https = new HttpConfiguration();
         https.addCustomizer(new SecureRequestCustomizer());
+        https.setSecureScheme("https");
+        https.setSecurePort(serverPort);
         https.setSendServerVersion(false);
         server.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", 2000);
 
@@ -202,9 +205,11 @@ public class DashboardServer {
         sslContextFactory.setKeyStorePassword(keyStorePassword);
         sslContextFactory.setKeyManagerPassword(keyManagerPassword);
 
+        SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, "http/1.1");
+
         ServerConnector sslConnector = new ServerConnector(server,
-                                                           new SslConnectionFactory(sslContextFactory, "http/1.1"),
-                                                           new HttpConnectionFactory(https));
+                new DetectorConnectionFactory(sslConnectionFactory),
+                new HttpConnectionFactory(https));
         sslConnector.setPort(serverPort);
 
         server.setConnectors(new Connector[] { sslConnector });
