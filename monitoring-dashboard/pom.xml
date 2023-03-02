@@ -288,7 +288,7 @@
 
     <properties>
         <securevault.version>1.1.2</securevault.version>
-        <carbon.kernel.version>4.5.3</carbon.kernel.version>
+        <carbon.kernel.version>4.8.1</carbon.kernel.version>
         <org.jsoup.version>1.15.3</org.jsoup.version>
 
         <!-- Logging/SLF4J -->
