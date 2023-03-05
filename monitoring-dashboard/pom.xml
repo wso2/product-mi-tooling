@@ -23,14 +23,14 @@
     <parent>
         <artifactId>wso2-micro-integrator-tooling</artifactId>
         <groupId>org.wso2.ei</groupId>
-        <version>4.2.0-SNAPSHOT</version>
+        <version>4.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>monitoring-dashboard-parent</artifactId>
     <packaging>pom</packaging>
     <name>MI Monitoring Dashboard - Parent</name>
-    <version>4.2.0-SNAPSHOT</version>
+    <version>4.2.0</version>
 
     <modules>
         <module>components</module>
