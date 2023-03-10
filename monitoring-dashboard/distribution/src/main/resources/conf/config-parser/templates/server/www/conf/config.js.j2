@@ -44,6 +44,9 @@ window.sso = {
             {% if sso.end_session_endpoint is defined %}
             endSessionEndpoint: "{{sso.end_session_endpoint}}",
             {% endif %}
+            {% if sso.jwt_issuer is defined %}
+            issuer: "{{sso.jwt_issuer}}",
+            {% endif %}
         },
         {% endif %}
     	{% if sso.enable_PKCE is defined %}
