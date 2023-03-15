@@ -45,6 +45,8 @@ import org.wso2.ei.dashboard.core.rest.model.UpdateRoleRequest;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -221,7 +223,7 @@ public class RolesDelegate {
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("roles/").concat(roleName);
         if (!StringUtils.isEmpty(domain)) {
-            url = url.concat("?domain=").concat(domain);
+            url = url.concat("?domain=").concat(urlEncode(domain));
         }
         CloseableHttpResponse httpResponse = Utils.doDelete(groupId, nodeId, accessToken, url);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
@@ -263,7 +265,7 @@ public class RolesDelegate {
         if (roleId.contains(Constants.DOMAIN_SEPARATOR)) {
             String[] parts = roleId.split(Constants.DOMAIN_SEPARATOR);
             // parts[0] = domain, parts[1] = new roleId
-            getRoleDetailsUrl = url.concat(parts[1]).concat("?domain=").concat(parts[0]);
+            getRoleDetailsUrl = url.concat(parts[1]).concat("?domain=").concat(urlEncode(parts[0]));
         } else {
             getRoleDetailsUrl = url.concat(roleId);
         }
@@ -289,5 +291,14 @@ public class RolesDelegate {
         payload.add("removedRoles", JsonParser.parseString(new Gson().toJson(request.getRemovedRoles())));
         payload.add("addedRoles", JsonParser.parseString(new Gson().toJson(request.getAddedRoles())));
         return payload;
+    }
+
+    private static String urlEncode(String userId) {
+        try {
+            return URLEncoder.encode(userId, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error occurred while encoding user id " + userId, e);
+            return userId;
+        }
     }
 }

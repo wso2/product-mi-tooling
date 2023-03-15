@@ -45,6 +45,8 @@ import org.wso2.ei.dashboard.core.rest.model.UsersResourceResponse;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -112,9 +114,9 @@ public class UsersDelegate {
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        String url = mgtApiUrl.concat("users/").concat(userId);
+        String url = mgtApiUrl.concat("users/").concat(urlEncode(userId));
         if (!StringUtils.isEmpty(domain)) {
-            url = url.concat("?domain=").concat(domain);
+            url = url.concat("?domain=").concat(urlEncode(domain));
         }
         CloseableHttpResponse httpResponse = Utils.doDelete(groupId, nodeId, accessToken, url);
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
@@ -211,13 +213,22 @@ public class UsersDelegate {
         if (userId.contains(Constants.DOMAIN_SEPARATOR)) {
             String[] parts = userId.split(Constants.DOMAIN_SEPARATOR);
             // parts[0] = domain, parts[1] = new userId
-            getUsersDetailsUrl = url.concat(parts[1]).concat("?domain=").concat(parts[0]);
+            getUsersDetailsUrl = url.concat(urlEncode(parts[1])).concat("?domain=").concat(urlEncode(parts[0]));
         } else {
-            getUsersDetailsUrl = url.concat(userId);
+            getUsersDetailsUrl = url.concat(urlEncode(userId));
         }
         CloseableHttpResponse userDetailResponse = Utils.doGet(groupId, nodeId, accessToken, getUsersDetailsUrl);
         String userDetail = HttpUtils.getStringResponse(userDetailResponse);
         usersInner.setDetails(userDetail);
         return usersInner;
+    }
+
+    private static String urlEncode(String userId) {
+        try {
+            return URLEncoder.encode(userId, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error occurred while encoding user id " + userId, e);
+            return userId;
+        }
     }
 }
