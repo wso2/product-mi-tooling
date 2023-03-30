@@ -231,4 +231,13 @@ public class DelegatesUtil {
         return false;
     }
 
+    public static void logDebugLogs(String artifactType, String groupId, String lowerLimit, String upperLimit,
+                                    String order, String orderBy, String isUpdate) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Fetching Searched " + artifactType + " from MI.");
+            logger.debug("group id :" + groupId + ", lower limit :" + lowerLimit + ", upper limit: " + upperLimit);
+            logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        }
+    }
+
 }

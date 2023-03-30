@@ -64,8 +64,7 @@ public class LogConfigDelegate {
         List<String> nodeList, String searchKey, String lowerLimit, String upperLimit, String order,
         String orderBy, String isUpdate) throws ManagementApiException {
 
-        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        DelegatesUtil.logDebugLogs(Constants.LOG_CONFIGS, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);

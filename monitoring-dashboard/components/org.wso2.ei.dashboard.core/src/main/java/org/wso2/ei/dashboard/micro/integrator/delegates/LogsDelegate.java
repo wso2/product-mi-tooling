@@ -61,10 +61,8 @@ public class LogsDelegate {
     public LogsResourceResponse getPaginatedLogsListResponse(String groupId, List<String> nodeList, String searchKey, 
         String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
         throws ManagementApiException {
-        
-        logger.debug("Fetching Searched Endpoints from MI.");
-        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+
+        DelegatesUtil.logDebugLogs(Constants.LOGS, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);

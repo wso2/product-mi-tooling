@@ -47,6 +47,8 @@ public final class Constants {
     public static final String DATA_SOURCES = "data-sources";
     public static final String LOGS = "logs";
     public static final String LOG_CONFIGS = "log-configs";
+    public static final String USERS = "users";
+    public static final String ROLES = "roles";
     public static final String DOMAIN_SEPARATOR = "/";
 
     public static final String SUCCESS_STATUS = "success";
