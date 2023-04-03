@@ -46,6 +46,7 @@ public final class Constants {
     public static final String DATA_SERVICES = "data-services";
     public static final String DATA_SOURCES = "data-sources";
     public static final String LOGS = "logs";
+    public static final String REGISTRY_RESOURCES = "registry-resources";
     public static final String LOG_CONFIGS = "log-configs";
     public static final String USERS = "users";
     public static final String ROLES = "roles";

@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
@@ -86,8 +87,15 @@ public class DelegatesUtil {
             for (JsonElement jsonElement : artifactList) {
                 JsonObject artifact = (JsonObject) jsonElement;
                 String artifactName = artifact.get("name").getAsString();
-                ArtifactDetails artifactDetails = getArtifactDetails(groupId, nodeId, artifactType, artifactName,
-                                                                     mgtApiUrl, accessToken);
+                String artifactDetailsUrl = Utils.getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
+                if (artifactType.equals(Constants.TEMPLATES)) {
+                    String type = artifact.get("type").getAsString();
+                    artifactDetailsUrl =
+                            artifactDetailsUrl.concat("&type=").concat(type);
+                }
+                ArtifactDetails artifactDetails =
+                        getArtifactDetails(groupId, nodeId, artifactType, artifactDetailsUrl, accessToken);
+
                 AtomicBoolean isRecordExist = new AtomicBoolean(false);
                 artifacts.stream().filter(o -> o.getName().equals(artifactName)).forEach(
                         o -> {
@@ -181,10 +189,9 @@ public class DelegatesUtil {
         return null;
     }
 
-    private static ArtifactDetails getArtifactDetails(String groupId, String nodeId, String type, String name,
-                                                      String mgtApiUrl, String accessToken)
-            throws ManagementApiException {
-        JsonObject details = Utils.getArtifactDetails(groupId, nodeId, mgtApiUrl, type, name, accessToken);
+    private static ArtifactDetails getArtifactDetails(String groupId, String nodeId, String type, String url,
+                                                      String accessToken) throws ManagementApiException {
+        JsonObject details = Utils.getArtifactDetails(groupId, nodeId, type, url, accessToken);
 
         ArtifactDetails artifactDetails = new ArtifactDetails();
         artifactDetails.setNodeId(nodeId);
@@ -231,6 +238,16 @@ public class DelegatesUtil {
         return false;
     }
 
+    /**
+     * This method is used to log debug logs.
+     * @param artifactType artifact type
+     * @param groupId group id
+     * @param lowerLimit lower limit
+     * @param upperLimit upper limit
+     * @param order order
+     * @param orderBy order by
+     * @param isUpdate whether the content is updated
+     */
     public static void logDebugLogs(String artifactType, String groupId, String lowerLimit, String upperLimit,
                                     String order, String orderBy, String isUpdate) {
         if (logger.isDebugEnabled()) {
@@ -238,6 +255,22 @@ public class DelegatesUtil {
             logger.debug("group id :" + groupId + ", lower limit :" + lowerLimit + ", upper limit: " + upperLimit);
             logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
         }
+    }
+
+    /**
+     * This method is used to get the previous resource page loaded.
+     * @return the previous resource page name
+     */
+    public static String getPrevResourceType() {
+        return prevResourceType;
+    }
+
+    /**
+     * This method is used to set the previous resource page loaded.
+     * @param resourceType the previous resource page name
+     */
+    public static void setPrevResourceType(String resourceType) {
+        prevResourceType = resourceType;
     }
 
 }
