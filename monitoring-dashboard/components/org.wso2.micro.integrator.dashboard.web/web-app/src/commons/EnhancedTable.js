@@ -34,11 +34,14 @@ import Progress from '../commons/Progress';
 import Error from '../commons/Error';
 import { Link } from "react-router-dom";
 import { Button } from "@material-ui/core";
+import { setIsRefreshed } from '../redux/Actions';
+import { useDispatch } from 'react-redux';
 
 export default function EnhancedTable(props) {
     const { pageInfo} = props;
     var headCells = pageInfo.headCells;
     const classes = useStyles();
+    const dispatch = useDispatch();
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState(pageInfo.tableOrderBy);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -46,6 +49,7 @@ export default function EnhancedTable(props) {
     const [rowCount, setRowCount] = React.useState(0);
     const globalGroupId = useSelector(state => state.groupId);
     const selectedNodeList = useSelector(state => state.nodeList);
+    const isRefreshed = useSelector(state => state.isRefreshed);
 
     var selectedNodeId = pageInfo.additionalParams?.selectedNodeId;
 
@@ -61,6 +65,9 @@ export default function EnhancedTable(props) {
             setPage(0);
         }
         setQueryString(query);
+        if (isRefreshed === true) {
+            isUpdate = true;
+        }
         if(pageId === 'nodesPage') {
             HTTPClient.getNodes(globalGroupId,page * rowsPerPage, page * rowsPerPage + rowsPerPage ).then(response => {
                 response.data.resourceList.map(data => data.details = JSON.parse(data.details))
@@ -75,6 +82,7 @@ export default function EnhancedTable(props) {
                     response.data.resourceList.map(data => data.details = JSON.parse(data.details))
                     setData(response.data.resourceList)
                     setRowCount(response.data.count)
+                    dispatch(setIsRefreshed(false))
             }).catch(error => {
                 setError(error.response.data);
                 console.log(error.response.data.message);
@@ -84,6 +92,7 @@ export default function EnhancedTable(props) {
                 pageId, order, orderBy, globalGroupId, selectedNodeId, isUpdate).then(response => {
                 setData(response.data.resourceList)
                 setRowCount(response.data.count)
+                dispatch(setIsRefreshed(false))
             }).catch(error => {
                 console.log(error.response.data.message);
             });
@@ -98,6 +107,7 @@ export default function EnhancedTable(props) {
                 pageId, order, orderBy, globalGroupId, selectedNodeList, isUpdate).then(response => {
                     setData(response.data.resourceList)
                     setRowCount(response.data.count)
+                    dispatch(setIsRefreshed(false))
             }).catch(error => {
                 console.log(error.response.data.message);
             });

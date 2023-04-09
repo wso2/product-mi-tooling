@@ -28,7 +28,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
-import { filterNodes } from '../redux/Actions';
+import { filterNodes, setIsRefreshed } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
 import Divider from "@material-ui/core/Divider";
 import HTTPClient from '../utils/HTTPClient';
@@ -74,6 +74,7 @@ function MultipleSelect(props) {
 
     useEffect(()=> {
         dispatch(filterNodes(selectedNodeList));
+        dispatch(setIsRefreshed(true));
     },[selectedNodeList])
 
     const handleChange = (event) => {
