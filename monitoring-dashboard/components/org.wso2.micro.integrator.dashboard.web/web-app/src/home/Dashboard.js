@@ -53,6 +53,8 @@ import AddRoles from '../pages/AddRoles';
 import AddLogConfig from '../pages/AddLogConfig'
 import DataSources from '../pages/Datasources';
 import AuthManager from '../auth/AuthManager';
+import { setIsRefreshed } from '../redux/Actions';
+import { useDispatch } from 'react-redux';
 
 const drawerWidth = 256;
 
@@ -87,6 +89,7 @@ function Layout(props) {
     const { classes } = props;
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const { signIn } = useAuthContext();
+    const dispatch = useDispatch();
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -96,6 +99,7 @@ function Layout(props) {
         if (AuthManager.getUser()?.sso) {
             signIn()
         }
+        dispatch(setIsRefreshed(true))
     },[])
 
     // if the user is not logged in Redirect to login
