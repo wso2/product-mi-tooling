@@ -39,14 +39,6 @@ public class DelegatesUtil {
     private static String prevSearchKey = null;
     private static String prevResourceType = null;
     private static int count;
-    /*
-        introducing this variable to dynamically change the keyword of the result list we get from the management API.
-        keyword is different only when fetching CAPP details.
-    */
-    private static String listKeyName = "list";
-    public static void setListKeyName(String listKeyName) {
-        DelegatesUtil.listKeyName = listKeyName;
-    }
 
     private DelegatesUtil() {
 
@@ -87,19 +79,26 @@ public class DelegatesUtil {
             for (JsonElement jsonElement : artifactList) {
                 JsonObject artifact = (JsonObject) jsonElement;
                 String artifactName = artifact.get("name").getAsString();
-                String artifactDetailsUrl = Utils.getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
-                if (artifactType.equals(Constants.TEMPLATES)) {
-                    String type = artifact.get("type").getAsString();
-                    artifactDetailsUrl =
-                            artifactDetailsUrl.concat("&type=").concat(type);
+                ArtifactDetails artifactDetails;
+
+                if (artifactType.equals(Constants.CARBON_APPLICATIONS)) {
+                    artifactDetails = getArtifactDetails(nodeId, artifact);
+                } else {
+                    String artifactDetailsUrl = Utils.getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
+                    if (artifactType.equals(Constants.TEMPLATES)) {
+                        String type = artifact.get("type").getAsString();
+                        artifactDetailsUrl =
+                                artifactDetailsUrl.concat("&type=").concat(type);
+                    }
+                    artifactDetails =
+                            getArtifactDetails(groupId, nodeId, artifactType, artifactDetailsUrl, accessToken);
                 }
-                ArtifactDetails artifactDetails =
-                        getArtifactDetails(groupId, nodeId, artifactType, artifactDetailsUrl, accessToken);
 
                 AtomicBoolean isRecordExist = new AtomicBoolean(false);
+                ArtifactDetails finalArtifactDetails = artifactDetails;
                 artifacts.stream().filter(o -> o.getName().equals(artifactName)).forEach(
                         o -> {
-                            o.getNodes().add(artifactDetails);
+                            o.getNodes().add(finalArtifactDetails);
                             isRecordExist.set(true);
                         });
                 if (!isRecordExist.get()) {
@@ -192,7 +191,10 @@ public class DelegatesUtil {
     private static ArtifactDetails getArtifactDetails(String groupId, String nodeId, String type, String url,
                                                       String accessToken) throws ManagementApiException {
         JsonObject details = Utils.getArtifactDetails(groupId, nodeId, type, url, accessToken);
+        return getArtifactDetails(nodeId, details);
+    }
 
+    private static ArtifactDetails getArtifactDetails(String nodeId, JsonObject details) {
         ArtifactDetails artifactDetails = new ArtifactDetails();
         artifactDetails.setNodeId(nodeId);
         artifactDetails.setDetails(details.toString());
@@ -205,7 +207,22 @@ public class DelegatesUtil {
         String url = mgtApiUrl.concat(type);
         JsonObject artifacts = invokeManagementApi(groupId, nodeId, url, 
             accessToken, searchKey);
-        return artifacts.get(listKeyName).getAsJsonArray();
+        if (type.equals(Constants.CARBON_APPLICATIONS)) {
+            JsonArray activeArray = artifacts.get("activeList").getAsJsonArray();
+            JsonArray faultyArray = artifacts.get("faultyList").getAsJsonArray();
+            JsonArray allCApps = new JsonArray();
+            for (JsonElement app : activeArray) {
+                app.getAsJsonObject().addProperty("status", "enabled");
+                allCApps.add(app);
+            }
+            for (JsonElement app : faultyArray) {
+                app.getAsJsonObject().addProperty("status", "disabled");
+                allCApps.add(app);
+            }
+            return allCApps;
+        } else {
+            return artifacts.get("list").getAsJsonArray();
+        }
     }    
 
     private static JsonObject invokeManagementApi(String groupId, String nodeId, String url, 

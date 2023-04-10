@@ -56,11 +56,8 @@ public class CarbonAppsDelegate implements ArtifactDelegate {
         throws ManagementApiException {
         DelegatesUtil.logDebugLogs(Constants.CARBON_APPLICATIONS, groupId, lowerLimit, upperLimit, order, orderBy,
                 isUpdate);
-        // changing the keyword before calling Management API and restoring to default value.
-        DelegatesUtil.setListKeyName("activeList");
         ArtifactsResourceResponse response = DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList,
                 Constants.CARBON_APPLICATIONS, searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
-        DelegatesUtil.setListKeyName(Constants.DEFAULT_LIST_KEY);
         return response;
     }
 

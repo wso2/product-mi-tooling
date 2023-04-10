@@ -28,7 +28,8 @@ export default function CarbonApplications() {
         headCells: [
             {id: 'name', label: 'Carbon Application'},
             {id: 'nodes', label: 'Nodes'},
-            {id: 'version', label: 'Version'}],
+            {id: 'version', label: 'Version'},
+            {id: 'capp_status', label: 'Status'}],
         tableOrderBy: 'name'
     });
 
