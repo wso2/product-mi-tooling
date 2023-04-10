@@ -63,17 +63,18 @@ public class LogConfigDelegate {
     public LogConfigsResourceResponse fetchPaginatedLogConfigsResponse(String groupId,
         List<String> nodeList, String searchKey, String lowerLimit, String upperLimit, String order,
         String orderBy, String isUpdate) throws ManagementApiException {
-
-        logger.debug("group id :" + groupId + ", lowerlimit :" + lowerLimit + ", upperlimit: " + upperLimit);
-        logger.debug("Order:" + order + ", OrderBy:" + orderBy + ", isUpdate:" + isUpdate);
+        String resourceType = Constants.LOG_CONFIGS;
+        DelegatesUtil.logDebugLogs(Constants.LOG_CONFIGS, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
+        String prevResourceType = DelegatesUtil.getPrevResourceType();
 
         LogConfigsResourceResponse logsResourceResponse = new LogConfigsResourceResponse();
         logger.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
 
-        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))) {
+        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))
+                || !(prevResourceType.equals(resourceType))) {
             searchedList = getSearchedLogConfigsResultsFromMI(groupId,
                     nodeList, searchKey, order, orderBy);
             count = searchedList.size();
@@ -82,6 +83,7 @@ public class LogConfigDelegate {
         logsResourceResponse.setResourceList(paginatedList);
         logsResourceResponse.setCount(count);
         prevSearchKey = searchKey;
+        DelegatesUtil.setPrevResourceType(resourceType);
         return logsResourceResponse;
     }   
 

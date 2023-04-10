@@ -46,6 +46,7 @@ import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
 import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
+import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -161,11 +162,11 @@ public class Utils {
         return response;
     }
 
-    public static JsonObject getArtifactDetails(String groupId, String nodeId, String mgtApiUrl, String artifactType,
-                                                String artifactName, String accessToken) throws ManagementApiException {
-        String getArtifactDetailsUrl = getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
+    public static JsonObject getArtifactDetails(
+            String groupId, String nodeId, String artifactType, String artifactDetailsUrl, String accessToken)
+            throws ManagementApiException {
         CloseableHttpResponse artifactDetails = Utils.doGet(groupId, nodeId, accessToken,
-                                                            getArtifactDetailsUrl);
+                                                            artifactDetailsUrl);
         JsonObject jsonResponse = HttpUtils.getJsonResponse(artifactDetails);
         return removeValueAndConfiguration(artifactType, jsonResponse);
     }
@@ -190,7 +191,7 @@ public class Utils {
         return artifact;
     }
 
-    private static String getArtifactDetailsUrl(String mgtApiUrl, String artifactType, String artifactName) {
+    protected static String getArtifactDetailsUrl(String mgtApiUrl, String artifactType, String artifactName) {
 
         String getArtifactDetailsUrl;
         String getArtifactsUrl = mgtApiUrl.concat(artifactType);
@@ -209,6 +210,7 @@ public class Utils {
                 break;
             case MESSAGE_STORES:
             case MESSAGE_PROCESSORS:
+            case TEMPLATES:
             case LOCAL_ENTRIES:
             case DATA_SOURCES:
                 getArtifactDetailsUrl = getArtifactsUrl.concat("?name=").concat(artifactName);

@@ -29,6 +29,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
@@ -39,6 +40,7 @@ import org.wso2.ei.dashboard.core.rest.model.RegistryArtifacts;
 import org.wso2.ei.dashboard.core.rest.model.RegistryArtifactsInner;
 import org.wso2.ei.dashboard.core.rest.model.RegistryProperty;
 import org.wso2.ei.dashboard.core.rest.model.RegistryResourceResponse;
+import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 import java.io.IOException;
@@ -80,6 +82,7 @@ public class RegistryResourceDelegate {
         if (orderBy == null) {
             orderBy = "name";
         }
+        String resourceType = Constants.REGISTRY_RESOURCES;
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
         RegistryArtifacts searchedList = getSearchedRegistryList(groupId, searchKey, order, orderBy, filePath);
@@ -87,6 +90,7 @@ public class RegistryResourceDelegate {
         RegistryResourceResponse registryResourceResponse = new RegistryResourceResponse();
         registryResourceResponse.setResourceList(paginatedList);
         registryResourceResponse.setCount(searchedList.size());
+        DelegatesUtil.setPrevResourceType(resourceType);
         return registryResourceResponse;
     }
 
