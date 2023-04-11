@@ -2,7 +2,6 @@ window.sso = {
     enable: {{sso.enable}},
     config: {
     	clientID: "{{sso.client_id}}",
-    	serverOrigin: "{{sso.idp_url}}",
     	resourceServerURLs: [{% for url in sso.resource_server_URLs %}"{{url}}"{% if loop.index < sso.resource_server_URLs|length %},{% endif %}{% endfor %}],
     	signInRedirectURL: "{{sso.sign_in_redirect_URL}}",
     	{% if sso.sign_out_redirect_URL is defined %}

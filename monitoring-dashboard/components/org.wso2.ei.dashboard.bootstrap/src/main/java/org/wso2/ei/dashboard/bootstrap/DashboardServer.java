@@ -366,7 +366,7 @@ public class DashboardServer {
                 userInfoEndpoint = idpUrl + parseResult.getString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
             }
             setJavaxSslTruststore(parseResult);
-            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, idpUrl + wellKnownEndpointPath,
+            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, wellKnownEndpointPath,
                                  introspectionEndpoint, userInfoEndpoint);
         }
         return null;
