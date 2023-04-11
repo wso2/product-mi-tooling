@@ -56,7 +56,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources/conf/config-parser</directory>
-            <outputDirectory>conf/config-parser</outputDirectory>
+            <outputDirectory>repository/resources/conf</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources/bin</directory>

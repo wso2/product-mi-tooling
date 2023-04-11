@@ -80,8 +80,9 @@ import javax.servlet.DispatcherType;
  * React application serve in root context and all the war files serve in "/api" context.
  */
 public class DashboardServer {
-    private static final String CONFIG_PARSER_DIR = "config-parser";
     private static final String CONF_DIR = "conf";
+    private static final String MI_REPOSITORY_DIR = "repository";
+    private static final String MI_RESOURCE_DIR = "resources";
     private static final String DEPLOYMENT_TOML = "deployment.toml";
     private static final String SECURITY_DIR = "security";
     private static final String KEYSTORE_FILE = "dashboard.jks";
@@ -322,7 +323,8 @@ public class DashboardServer {
     private Map<String, Object> generateSSOConfigJS(String tomlPath) throws ConfigParserException {
 
         String resourcesDir =
-                DASHBOARD_HOME + File.separator + CONF_DIR + File.separator + CONFIG_PARSER_DIR;
+                DASHBOARD_HOME + File.separator + MI_REPOSITORY_DIR + File.separator + MI_RESOURCE_DIR + File.separator
+                        + CONF_DIR;
 
         String outputDir = DASHBOARD_HOME;
 
