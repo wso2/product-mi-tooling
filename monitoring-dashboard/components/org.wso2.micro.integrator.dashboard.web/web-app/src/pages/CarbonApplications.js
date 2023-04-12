@@ -29,7 +29,7 @@ export default function CarbonApplications() {
             {id: 'name', label: 'Carbon Application'},
             {id: 'nodes', label: 'Nodes'},
             {id: 'version', label: 'Version'},
-            {id: 'capp_status', label: 'Status'}],
+            {id: 'capp_status', label: 'Active / Faulty'}],
         tableOrderBy: 'name'
     });
 
