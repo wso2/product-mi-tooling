@@ -34,14 +34,8 @@ export default function CarbonApplicationsSideDrawer(props) {
     var nodeData = props.nodeData;
     const nodeId = nodeData.nodeId;
     const cappName = nodeData.details.name;
-    const [artifacts, setArtifacts] = React.useState([]);
+    const [artifacts, setArtifacts] = React.useState(nodeData.details.artifacts);
     const classes = useStyles();
-
-    React.useEffect(() => {
-        HTTPClient.getCappArtifacts(globalGroupId, nodeId, cappName).then(response => {
-            setArtifacts(response.data);
-        })
-    }, [])
 
     return (
         <div className={classes.root}>

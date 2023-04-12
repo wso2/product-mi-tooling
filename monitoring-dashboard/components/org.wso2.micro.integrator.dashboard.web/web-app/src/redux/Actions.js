@@ -3,6 +3,7 @@ export const FILTER = "FILTER"
 export const GROUP_CHANGE = "GROUP_CHANGE"
 export const DATA_CHANGE = "DATA_CHANGE"
 export const SET_SUPER_USER = "SET_SUPER_USER"
+export const IS_REFRESHED ="IS_REFRESHED"
 
 // Action creators
 export const filterNodes = (list) => {
@@ -30,5 +31,12 @@ export const setSuperAdmin = (userName) => {
     return {
         type : SET_SUPER_USER,
         payload: userName
+    }
+}
+
+export const setIsRefreshed = (isRefreshed) => {
+    return {
+        type : IS_REFRESHED,
+        payload: isRefreshed
     }
 }

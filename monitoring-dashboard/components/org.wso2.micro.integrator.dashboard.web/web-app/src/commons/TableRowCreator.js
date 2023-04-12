@@ -113,8 +113,12 @@ export default function TableRowCreator(props) {
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.package} />)}</table></TableCell>
             case 'description':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.description} />)}</table></TableCell>
+
             case 'connector_status':
                 return <TableCell><table>{data.nodes.map(node=><ConnectorStatus status={node.details.status} />)}</table></TableCell>
+
+            case 'capp_status':
+                return <TableCell><table>{data.nodes.map(node=><StatusIcon status={node.details.status} />)}</table></TableCell>
 
             //carbon apps
             case 'version':
@@ -183,6 +187,15 @@ function ConnectorStatus(props) {
     return (
         <tr>
             {props.status === 'enabled' ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}
+        </tr>
+    )
+}
+
+function StatusIcon(props) {
+    return (
+        <tr>
+            {props.status === 'enabled' ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}} />}
+            {props.status === 'enabled' ? <td> ACTIVE </td> : <td style={{color:"red"}}> FAULTY </td>}
         </tr>
     )
 }
