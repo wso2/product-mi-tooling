@@ -348,25 +348,24 @@ public class DashboardServer {
             if (parseResult.isArray(SSOConstants.TOML_SSO_ADMIN_GROUPS)) {
                 adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toJson();
             }
-            if (!parseResult.isString(SSOConstants.TOML_SSO_IDP_URL)) {
-                throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_IDP_URL + " in SSO Configs");
+            String baseUrl = "";
+            if (parseResult.isString(SSOConstants.TOML_SSO_BASE_URL)) {
+                baseUrl = parseResult.getString(SSOConstants.TOML_SSO_BASE_URL);
             }
-            String idpUrl = parseResult.getString(SSOConstants.TOML_SSO_IDP_URL);
-            String wellKnownEndpointPath = SSOConstants.DEFAULT_WELL_KNOWN_ENDPOINT;
+            String wellKnownEndpointPath = "";
             if (parseResult.isString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT)) {
                 wellKnownEndpointPath = parseResult.getString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT);
             }
             String introspectionEndpoint = null;
             if (parseResult.isString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT)) {
-                introspectionEndpoint =
-                        idpUrl + parseResult.getString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT);
+                introspectionEndpoint = parseResult.getString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT);
             }
             String userInfoEndpoint = null;
             if (parseResult.isString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT)) {
-                userInfoEndpoint = idpUrl + parseResult.getString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
+                userInfoEndpoint = parseResult.getString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
             }
             setJavaxSslTruststore(parseResult);
-            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, wellKnownEndpointPath,
+            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, wellKnownEndpointPath, baseUrl,
                                  introspectionEndpoint, userInfoEndpoint);
         }
         return null;
@@ -390,6 +389,27 @@ public class DashboardServer {
                                              "Configs", e);
             }
         }
+        if (parseResult.isString(SSOConstants.TOML_SSO_AUTHORIZATION_ENDPOINT)) {
+            URI authorizationEndpoint;
+            try {
+                authorizationEndpoint = new URI(parseResult.getString(SSOConstants.TOML_SSO_AUTHORIZATION_ENDPOINT));
+                oidcAgentConfig.setAuthorizeEndpoint(authorizationEndpoint);
+            } catch (URISyntaxException e) {
+                throw new SSOConfigException("Invalid url for " + SSOConstants.TOML_SSO_AUTHORIZATION_ENDPOINT +
+                        " in SSO " + "Configs", e);
+            }
+        }
+
+        if (parseResult.isString(SSOConstants.TOML_SSO_TOKEN_ENDPOINT)) {
+            try {
+                URI tokenEndpoint = new URI(parseResult.getString(SSOConstants.TOML_SSO_TOKEN_ENDPOINT));
+                oidcAgentConfig.setTokenEndpoint(tokenEndpoint);
+            } catch (URISyntaxException e) {
+                throw new SSOConfigException("Invalid url for " + SSOConstants.TOML_SSO_TOKEN_ENDPOINT +
+                        " in SSO " + "Configs", e);
+            }
+        }
+
         if (!parseResult.isString(SSOConstants.TOML_SSO_CLIENT_ID)) {
             throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_CLIENT_ID + " in SSO Configs");
         }

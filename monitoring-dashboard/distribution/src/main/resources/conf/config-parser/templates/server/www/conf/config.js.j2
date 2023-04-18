@@ -8,6 +8,12 @@ window.sso = {
         signOutRedirectURL: "{{sso.sign_out_redirect_URL}}",
         {% endif %}
     	storage: "{{sso.storage}}",
+    	{% if sso.base_url is defined %}
+        baseURL: "{{sso.base_url}}",
+        {% endif %}
+        {% if sso.client_secret is defined %}
+        clientSecret: "{{sso.client_secret}}",
+        {% endif %}
     	{% if sso.well_known_endpoint is defined %}
         wellKnownEndpoint: "{{sso.well_known_endpoint}}",
         {% endif %}

@@ -28,8 +28,15 @@ public class SSOConstants {
     public static final String TOML_SSO_ADMIN_GROUP_ATTRIBUTE = "sso.admin_group_attribute";
     public static final String TOML_SSO_ADMIN_GROUPS = "sso.admin_groups";
     public static final String TOML_SSO_JWT_ISSUER = "sso.jwt_issuer";
-    public static final String TOML_SSO_IDP_URL = "sso.idp_url";
+    public static final String TOML_SSO_BASE_URL = "sso.base_url";
+
+    // endpoints
+    public static final String TOML_SSO_AUTHORIZATION_ENDPOINT = "sso.authorization_endpoint";
+    public static final String TOML_SSO_END_SESSION_ENDPOINT = "sso.end_session_endpoint";
     public static final String TOML_SSO_JWKS_ENDPOINT = "sso.jwks_endpoint";
+    public static final String TOML_SSO_CHECK_SESSION_IFRAME = "sso.check_session_iframe";
+    public static final String TOML_SSO_REVOCATION_ENDPOINT = "sso.revocation_endpoint";
+    public static final String TOML_SSO_TOKEN_ENDPOINT = "sso.token_endpoint";
     public static final String TOML_SSO_WELL_KNOWN_ENDPOINT = "sso.well_known_endpoint";
     public static final String TOML_SSO_INTROSPECTION_ENDPOINT = "sso.introspection_endpoint";
     public static final String TOML_SSO_USER_INFO_ENDPOINT = "sso.user_info_endpoint";
