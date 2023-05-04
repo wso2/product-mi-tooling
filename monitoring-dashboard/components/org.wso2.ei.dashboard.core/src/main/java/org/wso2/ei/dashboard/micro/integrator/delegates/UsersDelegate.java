@@ -227,7 +227,7 @@ public class UsersDelegate {
 
     private static String urlEncode(String userId) {
         try {
-            return URLEncoder.encode(userId, "UTF-8");
+            return URLEncoder.encode(userId, "UTF-8").replace("+", "%20");
         } catch (UnsupportedEncodingException e) {
             log.error("Error occurred while encoding user id " + userId, e);
             return userId;
