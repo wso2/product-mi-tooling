@@ -25,11 +25,17 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import {makeStyles} from '@material-ui/core/styles';
 import {useSelector} from 'react-redux';
-import Editor from "@monaco-editor/react";
+import Editor, {loader} from "@monaco-editor/react";
 import HTTPClient from '../../../utils/HTTPClient';
 import DownloadIcon from '@material-ui/icons/GetAppRounded';
 import Tooltip from '@material-ui/core/Tooltip';
 const formatXML = require('xml-formatter');
+
+loader.config({
+    paths: {
+      vs: '/monaco-editor/min/vs'
+    }
+ });
 
 export default function RegistrySourceViewSection(props) {
     const {registryPath, designContent, data} = props;
