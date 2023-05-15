@@ -18,7 +18,7 @@
  */
 
 import axios from 'axios';
-import { AuthClient } from "@asgardeo/auth-react";
+import { AsgardeoSPAClient } from "@asgardeo/auth-react";
 import AuthManager from '../auth/AuthManager';
 import {Constants} from './Constants';
 
@@ -36,7 +36,7 @@ export default class HTTPClient {
         };
 
         if (AuthManager.getUser().sso) {
-            return AuthClient.httpRequest(requestConfig);
+            return AsgardeoSPAClient.getInstance().httpRequest(requestConfig);
         } else {
             return axios.request(requestConfig)
         }

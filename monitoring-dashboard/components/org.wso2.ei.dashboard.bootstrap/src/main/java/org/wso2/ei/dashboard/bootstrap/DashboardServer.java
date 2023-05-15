@@ -24,6 +24,7 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import io.asgardeo.java.oidc.sdk.config.model.OIDCAgentConfig;
 import net.consensys.cava.toml.Toml;
+import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,6 +69,7 @@ import java.text.MessageFormat;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -350,25 +352,26 @@ public class DashboardServer {
             if (parseResult.isArray(SSOConstants.TOML_SSO_ADMIN_GROUPS)) {
                 adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toJson();
             }
-            if (!parseResult.isString(SSOConstants.TOML_SSO_IDP_URL)) {
-                throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_IDP_URL + " in SSO Configs");
+            String baseUrl = "";
+            if (parseResult.isString(SSOConstants.TOML_SSO_BASE_URL)) {
+                baseUrl = parseResult.getString(SSOConstants.TOML_SSO_BASE_URL);
             }
-            String idpUrl = parseResult.getString(SSOConstants.TOML_SSO_IDP_URL);
-            String wellKnownEndpointPath = SSOConstants.DEFAULT_WELL_KNOWN_ENDPOINT;
+            String wellKnownEndpointPath = "";
             if (parseResult.isString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT)) {
                 wellKnownEndpointPath = parseResult.getString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT);
+            } else if (baseUrl != null && !baseUrl.isEmpty()) {
+                wellKnownEndpointPath = baseUrl + SSOConstants.DEFAULT_WELL_KNOWN_ENDPOINT_PATH;
             }
             String introspectionEndpoint = null;
             if (parseResult.isString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT)) {
-                introspectionEndpoint =
-                        idpUrl + parseResult.getString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT);
+                introspectionEndpoint = parseResult.getString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT);
             }
             String userInfoEndpoint = null;
             if (parseResult.isString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT)) {
-                userInfoEndpoint = idpUrl + parseResult.getString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
+                userInfoEndpoint = parseResult.getString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
             }
             setJavaxSslTruststore(parseResult);
-            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, idpUrl + wellKnownEndpointPath,
+            return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, wellKnownEndpointPath, baseUrl,
                                  introspectionEndpoint, userInfoEndpoint);
         }
         return null;
@@ -407,6 +410,12 @@ public class DashboardServer {
         }
         Set<String> trustedAudience = new HashSet<>();
         trustedAudience.add(consumerKey.getValue());
+        if (parseResult.isArray(SSOConstants.TOML_SSO_ADDITIONAL_TRUSTED_AUDIENCE)) {
+            TomlArray array = parseResult.getArray(SSOConstants.TOML_SSO_ADDITIONAL_TRUSTED_AUDIENCE);
+            for (int i = 0; i < Objects.requireNonNull(array).size(); i++) {
+                trustedAudience.add(array.getString(i));
+            }
+        }
         oidcAgentConfig.setTrustedAudience(trustedAudience);
         return oidcAgentConfig;
     }

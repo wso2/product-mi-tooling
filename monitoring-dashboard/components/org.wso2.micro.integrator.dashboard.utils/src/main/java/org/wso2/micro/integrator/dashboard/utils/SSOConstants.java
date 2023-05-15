@@ -28,7 +28,10 @@ public class SSOConstants {
     public static final String TOML_SSO_ADMIN_GROUP_ATTRIBUTE = "sso.admin_group_attribute";
     public static final String TOML_SSO_ADMIN_GROUPS = "sso.admin_groups";
     public static final String TOML_SSO_JWT_ISSUER = "sso.jwt_issuer";
-    public static final String TOML_SSO_IDP_URL = "sso.idp_url";
+    public static final String TOML_SSO_BASE_URL = "sso.base_url";
+    public static final String TOML_SSO_ADDITIONAL_TRUSTED_AUDIENCE = "sso.additional_trusted_audience";
+
+    // endpoints
     public static final String TOML_SSO_JWKS_ENDPOINT = "sso.jwks_endpoint";
     public static final String TOML_SSO_WELL_KNOWN_ENDPOINT = "sso.well_known_endpoint";
     public static final String TOML_SSO_INTROSPECTION_ENDPOINT = "sso.introspection_endpoint";
@@ -38,6 +41,6 @@ public class SSOConstants {
     public static final String TOML_SSO_JWKS_ALGORITHM = "sso.jwks_algorithm";
     public static final String DEFAULT_SSO_ADMIN_GROUP_ATTRIBUTE = "groups";
 
-    public static final String DEFAULT_WELL_KNOWN_ENDPOINT = "/oauth2/token/.well-known/openid-configuration";
+    public static final String DEFAULT_WELL_KNOWN_ENDPOINT_PATH = "/oauth2/token/.well-known/openid-configuration";
 
 }
