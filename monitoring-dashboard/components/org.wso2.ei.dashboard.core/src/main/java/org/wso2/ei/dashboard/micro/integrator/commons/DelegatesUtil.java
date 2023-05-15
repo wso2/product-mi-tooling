@@ -205,7 +205,7 @@ public class DelegatesUtil {
         String mgtApiUrl, String accessToken, String searchKey) throws ManagementApiException {
         
         String url = mgtApiUrl.concat(type);
-        JsonObject artifacts = invokeManagementApi(groupId, nodeId, url, 
+        JsonObject artifacts = invokeManagementApi(groupId, nodeId, type, url,
             accessToken, searchKey);
         if (type.equals(Constants.CARBON_APPLICATIONS)) {
             JsonArray activeArray = artifacts.get("activeList").getAsJsonArray();
@@ -225,7 +225,7 @@ public class DelegatesUtil {
         }
     }    
 
-    private static JsonObject invokeManagementApi(String groupId, String nodeId, String url, 
+    private static JsonObject invokeManagementApi(String groupId, String nodeId, String artifactType, String url,
         String accessToken, String searchKey)
             throws ManagementApiException {
         CloseableHttpResponse response;
@@ -233,7 +233,11 @@ public class DelegatesUtil {
             response = Utils.doGet(groupId, nodeId, accessToken, url);
         } else {
             Map<String, String> paramMap = new HashMap<>();
-            paramMap.put("searchKey", searchKey);
+            if (artifactType.equals(Constants.USERS)) {
+                paramMap.put("pattern", "*".concat(searchKey).concat("*"));
+            } else {
+                paramMap.put("searchKey", searchKey);
+            }
             response = Utils.doGet(groupId, nodeId, accessToken, url, paramMap);
         }
         return HttpUtils.getJsonResponse(response);
