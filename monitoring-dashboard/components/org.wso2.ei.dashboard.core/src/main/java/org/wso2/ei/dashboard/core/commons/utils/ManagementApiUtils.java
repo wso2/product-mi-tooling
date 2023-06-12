@@ -26,6 +26,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
+import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
+import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
+import org.wso2.ei.dashboard.core.rest.model.GroupList;
+import org.wso2.ei.dashboard.core.rest.model.NodeList;
 
 import java.util.Base64;
 
@@ -48,6 +52,21 @@ public class ManagementApiUtils {
         String username = System.getProperty("mi_username");
         String password = System.getProperty("mi_password");
         return getToken(mgtApiUrl, username, password);
+    }
+
+    public static void setLoggedInAccessToken(String userName, String password) throws ManagementApiException {
+        GroupDelegate groupDelegate = new GroupDelegate();
+        //GroupList groupList = groupDelegate.getGroupList();
+        GroupList groupList = DATA_MANAGER.fetchGroups();
+        if (groupList.isEmpty()) {
+            throw new ManagementApiException("No groups found.", 500);
+        } else {
+            NodesDelegate nodesDelegate = new NodesDelegate();
+            NodeList nodes = nodesDelegate.getNodes(groupList.get(0));
+            String mgtApiUrl = getMgtApiUrl(groupList.get(0), nodes.get(0).getNodeId());
+            String accessToken = getToken(mgtApiUrl, userName, password);
+            DATA_MANAGER.updateAccessToken(groupList.get(0), nodes.get(0).getNodeId(), accessToken);
+        }
     }
 
     public static String getToken(String mgtApiUrl, String username, String password) throws ManagementApiException {

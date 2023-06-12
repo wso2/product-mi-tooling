@@ -20,6 +20,10 @@
 
 import React from 'react';
 import EnhancedTable from '../commons/EnhancedTable';
+import {useSelector } from 'react-redux';
+import AuthManager from "../auth/AuthManager";
+import { Redirect } from "react-router-dom";
+import Unauthorized from '../commons/Unauthorized';
 
 export default function APIs() {
     const [pageInfo] = React.useState({
@@ -31,6 +35,18 @@ export default function APIs() {
             {id: 'url', label: 'URL'}],
         tableOrderBy: 'name'
     });
+
+    const globalGroupId = useSelector(state => state.groupId);
+    const dataSet = useSelector(state => state.data);
+
+    React.useEffect(() => {
+    }, [globalGroupId, dataSet]);
+
+    if (AuthManager.getUser().scope !== "admin" || AuthManager.getUser().sso) {
+        return (
+            <Unauthorized/>
+        );
+    }
 
     return <EnhancedTable pageInfo={pageInfo}/>
 }

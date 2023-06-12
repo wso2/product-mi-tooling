@@ -54,6 +54,7 @@ public class LoginDelegate {
                                        Constants.NO_SERVER_FOUND_ERROR).build();
             } else {
                 storeTokenInCache(accessToken);
+                ManagementApiUtils.setLoggedInAccessToken(username, password);
                 return Response.ok(getUserInfo(username, accessToken))
                                .header(Constants.COOKIE_HEADER,
                                        getTokenCookieHeader(accessToken, NewCookie.DEFAULT_MAX_AGE)).build();
