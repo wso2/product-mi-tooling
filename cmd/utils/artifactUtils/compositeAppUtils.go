@@ -1,8 +1,11 @@
 package artifactUtils
 
 type CompositeAppList struct {
-	Count         int32                 `json:"count"`
-	CompositeApps []CompositeAppSummary `json:"list"`
+	ActiveCount         int32                 `json:"activeCount"`
+	ActiveCompositeApps []CompositeAppSummary `json:"activeList"`
+	FaultyCount         int32                 `json:"faultyCount"`
+	FaultyCompositeApps []CompositeAppSummary `json:"faultyList"`
+	TotalCount         int32                  `json:"totalCount"`
 }
 
 type CompositeAppSummary struct {
@@ -25,8 +28,11 @@ func (compositeApps *CompositeAppList) GetDataIterator() <-chan []string {
 	ch := make(chan []string)
 
 	go func() {
-		for _, compositeApp := range compositeApps.CompositeApps {
-			ch <- []string{compositeApp.Name, compositeApp.Version}
+		for _, compositeApp := range compositeApps.ActiveCompositeApps {
+			ch <- []string{compositeApp.Name, compositeApp.Version, "Active"}
+		}
+		for _, compositeApp := range compositeApps.FaultyCompositeApps {
+			ch <- []string{compositeApp.Name, compositeApp.Version, "Faulty"}
 		}
 		close(ch)
 	}()
@@ -34,6 +40,8 @@ func (compositeApps *CompositeAppList) GetDataIterator() <-chan []string {
 	return ch
 }
 
+
 func (compositeApps *CompositeAppList) GetCount() int32 {
-	return compositeApps.Count
+	return compositeApps.ActiveCount + compositeApps.ActiveCount;
 }
+
