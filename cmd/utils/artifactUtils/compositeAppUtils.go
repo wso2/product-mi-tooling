@@ -28,11 +28,13 @@ func (compositeApps *CompositeAppList) GetDataIterator() <-chan []string {
 	ch := make(chan []string)
 
 	go func() {
+		ch <- []string{"\n----------------------\nActive Composite Apps:\n----------------------"}
 		for _, compositeApp := range compositeApps.ActiveCompositeApps {
-			ch <- []string{compositeApp.Name, compositeApp.Version, "Active"}
+			ch <- []string{compositeApp.Name, compositeApp.Version}
 		}
+		ch <- []string{"\n----------------------\nFaulty Composite Apps:\n----------------------"}
 		for _, compositeApp := range compositeApps.FaultyCompositeApps {
-			ch <- []string{compositeApp.Name, compositeApp.Version, "Faulty"}
+			ch <- []string{compositeApp.Name, compositeApp.Version}
 		}
 		close(ch)
 	}()
@@ -42,6 +44,6 @@ func (compositeApps *CompositeAppList) GetDataIterator() <-chan []string {
 
 
 func (compositeApps *CompositeAppList) GetCount() int32 {
-	return compositeApps.ActiveCount + compositeApps.ActiveCount;
+	return compositeApps.TotalCount
 }
 
