@@ -18,14 +18,12 @@
 
 package org.wso2.ei.dashboard.bootstrap;
 
+import com.google.gson.Gson;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import io.asgardeo.java.oidc.sdk.config.model.OIDCAgentConfig;
-import net.consensys.cava.toml.Toml;
-import net.consensys.cava.toml.TomlArray;
-import net.consensys.cava.toml.TomlParseResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
@@ -66,8 +64,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -128,24 +128,19 @@ public class DashboardServer {
         String tomlFile = DASHBOARD_HOME + File.separator + CONF_DIR + File.separator + DEPLOYMENT_TOML;
 
         try {
-            TomlParseResult parseResult = Toml.parse(Paths.get(tomlFile));
+            Map<String, Object> parsedConfigs = parseConfigJS(tomlFile);
 
-            Long serverPortConfig = parseResult.getLong(TOML_CONF_PORT);
-            if (serverPortConfig != null) {
-                serverPort = serverPortConfig.intValue();
+            Object serverPortConfig = parsedConfigs.get(TOML_CONF_PORT);
+            if (serverPortConfig instanceof Long) {
+                serverPort = ((Long) serverPortConfig).intValue();
             }
 
-            Map<String, Object> parsedConfigs = generateSSOConfigJS(tomlFile);
-            initSecureVault(parseResult);
+            initSecureVault(parsedConfigs);
             loadConfigurations(parsedConfigs);
-            ssoConfig = generateSSOConfig(parseResult);
+            ssoConfig = generateSSOConfig(parsedConfigs);
         } catch (SSOConfigException e) {
             logger.error("Error reading SSO configs from TOML file", e);
             System.exit(1);
-        } catch (IOException e) {
-            logger.warn(
-                    String.format("Error while reading TOML file in %s. Using default port %d", tomlFile,
-                                  serverPort), e);
         } catch (ConfigParserException e) {
             logger.error("Error while reading TOML file configs", e);
         }
@@ -322,7 +317,7 @@ public class DashboardServer {
         }
     }
 
-    private Map<String, Object> generateSSOConfigJS(String tomlPath) throws ConfigParserException {
+    private Map<String, Object> parseConfigJS(String tomlPath) throws ConfigParserException {
 
         String resourcesDir =
                 DASHBOARD_HOME + File.separator + MI_REPOSITORY_DIR + File.separator + MI_RESOURCE_DIR + File.separator
@@ -339,36 +334,36 @@ public class DashboardServer {
         return ConfigParser.getParsedConfigs();
     }
 
-    private SSOConfig generateSSOConfig(TomlParseResult parseResult) throws SSOConfigException {
+    private SSOConfig generateSSOConfig(Map<String, Object> parseResult) throws SSOConfigException {
 
-        if (parseResult.isBoolean(SSOConstants.TOML_SSO_ENABLE) &&
-            parseResult.getBoolean(SSOConstants.TOML_SSO_ENABLE)) {
+        if (Boolean.parseBoolean(parseResult.get(SSOConstants.TOML_SSO_ENABLE).toString())) {
             OIDCAgentConfig oidcAgentConfig = generateOIDCAgentConfig(parseResult);
             String adminGroupAttribute = SSOConstants.DEFAULT_SSO_ADMIN_GROUP_ATTRIBUTE;
-            if (parseResult.isString(SSOConstants.TOML_SSO_ADMIN_GROUP_ATTRIBUTE)) {
-                adminGroupAttribute = parseResult.getString(SSOConstants.TOML_SSO_ADMIN_GROUP_ATTRIBUTE);
+            if (parseResult.get(SSOConstants.TOML_SSO_ADMIN_GROUP_ATTRIBUTE) instanceof String) {
+                adminGroupAttribute = (String) parseResult.get(SSOConstants.TOML_SSO_ADMIN_GROUP_ATTRIBUTE);
             }
             String adminGroups = "";
-            if (parseResult.isArray(SSOConstants.TOML_SSO_ADMIN_GROUPS)) {
-                adminGroups = parseResult.getArray(SSOConstants.TOML_SSO_ADMIN_GROUPS).toJson();
+            if (parseResult.get(SSOConstants.TOML_SSO_ADMIN_GROUPS) instanceof List) {
+                Gson gson = new Gson();
+                adminGroups = gson.toJson(parseResult.get(SSOConstants.TOML_SSO_ADMIN_GROUPS));
             }
             String baseUrl = "";
-            if (parseResult.isString(SSOConstants.TOML_SSO_BASE_URL)) {
-                baseUrl = parseResult.getString(SSOConstants.TOML_SSO_BASE_URL);
+            if (parseResult.get(SSOConstants.TOML_SSO_BASE_URL) instanceof String) {
+                baseUrl = (String) parseResult.get(SSOConstants.TOML_SSO_BASE_URL);
             }
             String wellKnownEndpointPath = "";
-            if (parseResult.isString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT)) {
-                wellKnownEndpointPath = parseResult.getString(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT);
+            if (parseResult.get(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT) instanceof String) {
+                wellKnownEndpointPath = (String) parseResult.get(SSOConstants.TOML_SSO_WELL_KNOWN_ENDPOINT);
             } else if (baseUrl != null && !baseUrl.isEmpty()) {
                 wellKnownEndpointPath = baseUrl + SSOConstants.DEFAULT_WELL_KNOWN_ENDPOINT_PATH;
             }
             String introspectionEndpoint = null;
-            if (parseResult.isString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT)) {
-                introspectionEndpoint = parseResult.getString(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT);
+            if (parseResult.get(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT) instanceof String) {
+                introspectionEndpoint = (String) parseResult.get(SSOConstants.TOML_SSO_INTROSPECTION_ENDPOINT);
             }
             String userInfoEndpoint = null;
-            if (parseResult.isString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT)) {
-                userInfoEndpoint = parseResult.getString(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
+            if (parseResult.get(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT) instanceof String) {
+                userInfoEndpoint = (String) parseResult.get(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
             }
             setJavaxSslTruststore(parseResult);
             return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, wellKnownEndpointPath, baseUrl,
@@ -377,63 +372,65 @@ public class DashboardServer {
         return null;
     }
 
-    private OIDCAgentConfig generateOIDCAgentConfig(TomlParseResult parseResult) throws SSOConfigException {
+    private OIDCAgentConfig generateOIDCAgentConfig(Map<String, Object> parseResult) throws SSOConfigException {
 
         OIDCAgentConfig oidcAgentConfig = new OIDCAgentConfig();
-        if (!parseResult.isString(SSOConstants.TOML_SSO_JWT_ISSUER)) {
+        if (!(parseResult.get(SSOConstants.TOML_SSO_JWT_ISSUER) instanceof String)) {
             throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_JWT_ISSUER + " in SSO Configs");
         }
-        Issuer issuer = new Issuer(parseResult.getString(SSOConstants.TOML_SSO_JWT_ISSUER));
+        Issuer issuer = new Issuer((String) parseResult.get(SSOConstants.TOML_SSO_JWT_ISSUER));
         oidcAgentConfig.setIssuer(issuer);
-        if (parseResult.isString(SSOConstants.TOML_SSO_JWKS_ENDPOINT)) {
+        if (parseResult.get(SSOConstants.TOML_SSO_JWKS_ENDPOINT) instanceof String) {
             URI jwksEndpoint = null;
             try {
-                jwksEndpoint = new URI(parseResult.getString(SSOConstants.TOML_SSO_JWKS_ENDPOINT));
+                jwksEndpoint = new URI((String) parseResult.get(SSOConstants.TOML_SSO_JWKS_ENDPOINT));
                 oidcAgentConfig.setJwksEndpoint(jwksEndpoint);
             } catch (URISyntaxException e) {
                 throw new SSOConfigException("Invalid url for " + SSOConstants.TOML_SSO_JWKS_ENDPOINT + " in SSO " +
                                              "Configs", e);
             }
         }
-        if (!parseResult.isString(SSOConstants.TOML_SSO_CLIENT_ID)) {
+        if (!(parseResult.get(SSOConstants.TOML_SSO_CLIENT_ID) instanceof String)) {
             throw new SSOConfigException("Missing value for " + SSOConstants.TOML_SSO_CLIENT_ID + " in SSO Configs");
         }
-        ClientID consumerKey = new ClientID(parseResult.getString(SSOConstants.TOML_SSO_CLIENT_ID));
+        ClientID consumerKey = new ClientID((String) parseResult.get(SSOConstants.TOML_SSO_CLIENT_ID));
         oidcAgentConfig.setConsumerKey(consumerKey);
-        if (parseResult.isString(SSOConstants.TOML_SSO_CLIENT_SECRET)) {
-            Secret consumerSecret = new Secret(parseResult.getString(SSOConstants.TOML_SSO_CLIENT_SECRET));
+        if (parseResult.get(SSOConstants.TOML_SSO_CLIENT_SECRET) instanceof String) {
+            Secret consumerSecret = new Secret((String) parseResult.get(SSOConstants.TOML_SSO_CLIENT_SECRET));
             oidcAgentConfig.setConsumerSecret(consumerSecret);
         }
-        if (parseResult.isString(SSOConstants.TOML_SSO_JWKS_ALGORITHM)) {
-            JWSAlgorithm jwsAlgorithm = new JWSAlgorithm(parseResult.getString(SSOConstants.TOML_SSO_JWKS_ALGORITHM));
+        if (parseResult.get(SSOConstants.TOML_SSO_JWKS_ALGORITHM) instanceof String) {
+            JWSAlgorithm jwsAlgorithm = new JWSAlgorithm((String) parseResult.get(
+                    SSOConstants.TOML_SSO_JWKS_ALGORITHM));
             oidcAgentConfig.setSignatureAlgorithm(jwsAlgorithm);
         }
         Set<String> trustedAudience = new HashSet<>();
         trustedAudience.add(consumerKey.getValue());
-        if (parseResult.isArray(SSOConstants.TOML_SSO_ADDITIONAL_TRUSTED_AUDIENCE)) {
-            TomlArray array = parseResult.getArray(SSOConstants.TOML_SSO_ADDITIONAL_TRUSTED_AUDIENCE);
+        if (parseResult.get(SSOConstants.TOML_SSO_ADDITIONAL_TRUSTED_AUDIENCE) instanceof List) {
+            List array = (ArrayList) parseResult.get(SSOConstants.TOML_SSO_ADDITIONAL_TRUSTED_AUDIENCE);
             for (int i = 0; i < Objects.requireNonNull(array).size(); i++) {
-                trustedAudience.add(array.getString(i));
+                trustedAudience.add(array.get(i).toString());
             }
         }
         oidcAgentConfig.setTrustedAudience(trustedAudience);
         return oidcAgentConfig;
     }
 
-    private void setJavaxSslTruststore(TomlParseResult parseResult) throws SSOConfigException {
+    private void setJavaxSslTruststore(Map<String, Object> parseResult) throws SSOConfigException {
 
-        if (!parseResult.isString(TOML_TRUSTSTORE_FILE_LOCATION) || !parseResult.isString(TOML_TRUSTSTORE_PASSWORD)) {
+        if (!(parseResult.get(TOML_TRUSTSTORE_FILE_LOCATION) instanceof String)
+                || !(parseResult.get(TOML_TRUSTSTORE_PASSWORD) instanceof String)) {
             throw new SSOConfigException("Truststore information is missing");
         }
-        String trustStoreLocation = parseResult.getString(TOML_TRUSTSTORE_FILE_LOCATION);
+        String trustStoreLocation = (String) parseResult.get(TOML_TRUSTSTORE_FILE_LOCATION);
         trustStoreLocation = DASHBOARD_HOME + File.separator + trustStoreLocation;
         System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
 
-        String trustStorePassword = parseResult.getString(TOML_TRUSTSTORE_PASSWORD);
+        String trustStorePassword = (String) parseResult.get(TOML_TRUSTSTORE_PASSWORD);
         System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
     }
 
-    private void initSecureVault(TomlParseResult parseResult) {
+    private void initSecureVault(Map<String, Object> parseResult) {
 
         System.setProperty(CARBON_HOME, DASHBOARD_HOME);
         System.setProperty(CARBON_CONFIG_DIR, DASHBOARD_HOME + File.separator + CONF_DIR);
@@ -446,7 +443,7 @@ public class DashboardServer {
         }
     }
 
-    private Properties loadProperties(TomlParseResult parseResult) {
+    private Properties loadProperties(Map<String, Object> parseResult) {
 
         Properties properties = new Properties();
         String carbonHome = System.getProperty(CARBON_HOME);
@@ -472,11 +469,11 @@ public class DashboardServer {
         }
     }
 
-    private void appendTomlProperties(Properties properties, TomlParseResult parseResult) {
+    private void appendTomlProperties(Properties properties, Map<String, Object> parseResult) {
 
-        for (String dottedKey : parseResult.dottedKeySet()) {
-            if (parseResult.isString(dottedKey)) {
-                properties.put(dottedKey, parseResult.getString(dottedKey));
+        for (String dottedKey : parseResult.keySet()) {
+            if (Objects.nonNull(parseResult.get(dottedKey))) {
+                properties.put(dottedKey, parseResult.get(dottedKey));
             }
         }
     }
