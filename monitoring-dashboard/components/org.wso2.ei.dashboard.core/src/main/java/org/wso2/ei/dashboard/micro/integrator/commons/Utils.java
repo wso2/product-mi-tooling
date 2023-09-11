@@ -33,6 +33,10 @@ import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import static org.wso2.ei.dashboard.core.commons.Constants.APIS;
 import static org.wso2.ei.dashboard.core.commons.Constants.CARBON_APPLICATIONS;
 import static org.wso2.ei.dashboard.core.commons.Constants.CONNECTORS;
@@ -48,8 +52,6 @@ import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
 import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
 import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -65,23 +67,38 @@ public class Utils {
         CloseableHttpResponse response = HttpUtils.doGet(accessToken, url);
         int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
+            // Close the initial unauthorized response
+            try {
+                response.close();
+            } catch (IOException e) {
+                logger.error("Error occurred while closing the response ", e);
+            }
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doGet(accessToken, url);
         } else if (isNotSuccessCode(httpSc)) {
-            JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
-            String errorMessage = "Error occurred. Please check server logs.";
-            if (error != null) {
-                String message = error.getAsString();
-                if (null != message && !message.isEmpty()) {
-                    errorMessage = message;
+            try {
+                JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
+                String errorMessage = "Error occurred. Please check server logs.";
+                if (error != null) {
+                    String message = error.getAsString();
+                    if (null != message && !message.isEmpty()) {
+                        errorMessage = message;
+                    }
+                }
+                throw new ManagementApiException(errorMessage, httpSc);
+            } finally {
+                // Close the response in case of error
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logger.error("Error occurred while closing the response ", e);
                 }
             }
-            throw new ManagementApiException(errorMessage, httpSc);
         }
         return response;
     }
 
-    public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken, 
+    public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken,
         String url, Map<String, String> params)
             throws ManagementApiException {
         CloseableHttpResponse response = HttpUtils.doGet(accessToken, url, params);
@@ -107,18 +124,33 @@ public class Utils {
         CloseableHttpResponse response = HttpUtils.doPost(accessToken, url, payload);
         int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
+            // Close the initial unauthorized response
+            try {
+                response.close();
+            } catch (IOException e) {
+                logger.error("Error occurred while closing the response ", e);
+            }
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doPost(accessToken, url, payload);
         } else if (isNotSuccessCode(httpSc)) {
-            JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
-            String errorMessage = "Error occurred. Please check server logs.";
-            if (error != null) {
-                String message = error.getAsString();
-                if (null != message && !message.isEmpty()) {
-                    errorMessage = message;
+            try {
+                JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
+                String errorMessage = "Error occurred. Please check server logs.";
+                if (error != null) {
+                    String message = error.getAsString();
+                    if (null != message && !message.isEmpty()) {
+                        errorMessage = message;
+                    }
+                }
+                throw new ManagementApiException(errorMessage, httpSc);
+            } finally {
+                // Close the response in case of error
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logger.error("Error occurred while closing the response ", e);
                 }
             }
-            throw new ManagementApiException(errorMessage, httpSc);
         }
         return response;
     }
@@ -128,10 +160,25 @@ public class Utils {
         CloseableHttpResponse response = HttpUtils.doPatch(accessToken, url, payload);
         int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
+            // Close the initial unauthorized response
+            try {
+                response.close();
+            } catch (IOException e) {
+                logger.error("Error occurred while closing the response ", e);
+            }
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doPatch(accessToken, url, payload);
         } else if (isNotSuccessCode(httpSc)) {
-            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+            try {
+                throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+            } finally {
+                // Close the response in case of error
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logger.error("Error occurred while closing the response ", e);
+                }
+            }
         }
         return response;
     }
@@ -154,10 +201,25 @@ public class Utils {
         CloseableHttpResponse response = HttpUtils.doDelete(accessToken, url);
         int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
+            // Close the initial unauthorized response
+            try {
+                response.close();
+            } catch (IOException e) {
+                logger.error("Error occurred while closing the response ", e);
+            }
             accessToken = retrieveNewAccessToken(groupId, nodeId);
             response = HttpUtils.doDelete(accessToken, url);
         } else if (isNotSuccessCode(httpSc)) {
-            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+            try {
+                throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+            } finally {
+                // Close the response in case of error
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logger.error("Error occurred while closing the response ", e);
+                }
+            }
         }
         return response;
     }

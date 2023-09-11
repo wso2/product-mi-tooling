@@ -27,6 +27,7 @@ import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
+import java.io.IOException;
 import java.util.Base64;
 
 /**
@@ -58,18 +59,22 @@ public class ManagementApiUtils {
         final HttpGet httpGet = new HttpGet(loginUrl);
         httpGet.setHeader("Accept", "application/json");
         httpGet.setHeader("Authorization", "Basic " + encodedUsernamePassword);
-        CloseableHttpResponse response = HttpUtils.doGet(httpGet);
 
-        int responseCode = response.getStatusLine().getStatusCode();
-        if (responseCode / 100 != 2) {
-            throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), responseCode);
-        }
+        try (CloseableHttpResponse response = HttpUtils.doGet(httpGet)) {
+            int responseCode = response.getStatusLine().getStatusCode();
+            if (responseCode / 100 != 2) {
+                throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), responseCode);
+            }
 
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(response);
+            JsonObject jsonResponse = HttpUtils.getJsonResponse(response);
 
-        if (jsonResponse.has("AccessToken")) {
-            return jsonResponse.get("AccessToken").getAsString();
-        } else {
+            if (jsonResponse.has("AccessToken")) {
+                return jsonResponse.get("AccessToken").getAsString();
+            } else {
+                throw new ManagementApiException
+                        ("Error occurred while retrieving access token from management api.", 500);
+            }
+        } catch (IOException e) {
             throw new ManagementApiException("Error occurred while retrieving access token from management api.", 500);
         }
     }

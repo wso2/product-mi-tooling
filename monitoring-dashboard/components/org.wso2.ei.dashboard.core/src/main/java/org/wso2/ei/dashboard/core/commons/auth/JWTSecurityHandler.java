@@ -35,6 +35,7 @@ import org.wso2.ei.dashboard.core.commons.utils.TokenUtils;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -88,18 +89,22 @@ public class JWTSecurityHandler implements SecurityHandler {
     private URI getJWKSEndpointFromWellKnownEndpoint(String wellKnownEndpointPath) {
 
         HttpGet httpGet = new HttpGet(wellKnownEndpointPath);
-        CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet);
 
-        int httpSc = httpResponse.getStatusLine().getStatusCode();
+        try (CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet)) {
+            int httpSc = httpResponse.getStatusLine().getStatusCode();
 
-        if (httpSc == HttpStatus.SC_OK) {
-            try {
-                return new URI(HttpUtils.getJsonResponse(httpResponse).get(Constants.JWKS_URI).getAsString());
-            } catch (URISyntaxException e) {
-                throw new DashboardServerException("Invalid url for " + Constants.JWKS_URI, e);
+            if (httpSc == HttpStatus.SC_OK) {
+                try {
+                    return new URI(HttpUtils.getJsonResponse(httpResponse).get(Constants.JWKS_URI).getAsString());
+                } catch (URISyntaxException e) {
+                    throw new DashboardServerException("Invalid url for " + Constants.JWKS_URI, e);
+                }
             }
+            throw new DashboardServerException("Cannot find " + Constants.JWKS_URI
+                    + " in well known endpoint response. " + httpResponse.getStatusLine().getReasonPhrase());
+
+        } catch (IOException e) {
+            throw new DashboardServerException("Error while closing the http response", e);
         }
-        throw new DashboardServerException("Cannot find " + Constants.JWKS_URI + " in well known endpoint response. " +
-                httpResponse.getStatusLine().getReasonPhrase());
     }
 }

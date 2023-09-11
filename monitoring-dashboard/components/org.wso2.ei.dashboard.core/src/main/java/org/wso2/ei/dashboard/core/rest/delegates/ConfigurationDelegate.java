@@ -34,6 +34,8 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.ModelConfiguration;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.io.IOException;
+
 /**
  * Delegate class to manage fetch configuration using management api.
  */
@@ -64,13 +66,15 @@ public class ConfigurationDelegate {
         String url = mgtApiUrl.concat(type).concat("?").concat(queryParamName).concat("=").concat(artifactName);
 
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
-
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
-        String configuration = jsonResponse.get("configuration").getAsString();
-        ModelConfiguration modelConfiguration = new ModelConfiguration();
-        modelConfiguration.setConfiguration(configuration);
-        return modelConfiguration;
+        try (CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url)) {
+            JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
+            String configuration = jsonResponse.get("configuration").getAsString();
+            ModelConfiguration modelConfiguration = new ModelConfiguration();
+            modelConfiguration.setConfiguration(configuration);
+            return modelConfiguration;
+        } catch (IOException e) {
+            throw new ManagementApiException("Error occurred while closing the response ", 500);
+        }
     }
 
     private String getQueryParam(String artifactType) {

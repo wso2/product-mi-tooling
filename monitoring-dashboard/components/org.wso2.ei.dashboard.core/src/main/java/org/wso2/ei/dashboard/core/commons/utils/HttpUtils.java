@@ -24,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -42,7 +43,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.wso2.ei.dashboard.core.commons.Constants;
@@ -53,6 +54,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.Response;
@@ -61,6 +65,10 @@ import javax.ws.rs.core.Response;
  * Utilities to execute http requests.
  */
 public class HttpUtils {
+
+    private static volatile CloseableHttpClient httpClientInstance = null;
+    private static PoolingHttpClientConnectionManager clientConnectionManager;
+    private static final Lock lock = new ReentrantLock();
 
     private HttpUtils() {
     }
@@ -89,7 +97,7 @@ public class HttpUtils {
         } catch (URISyntaxException e) {
             throw new DashboardServerException("Error occurred while sending get http request.", e);
         }
-        
+
     }
 
     public static CloseableHttpResponse doGet(HttpGet httpGet) {
@@ -179,6 +187,14 @@ public class HttpUtils {
             return EntityUtils.toString(entity, "UTF-8");
         } catch (IOException e) {
             throw new DashboardServerException("Error occurred while converting Http response to string", e);
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                throw new DashboardServerException("Error occurred while closing Http response", e);
+            }
         }
     }
 
@@ -220,7 +236,12 @@ public class HttpUtils {
 
     private static CloseableHttpClient getHttpClient() {
         TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-        try {
+
+        if (httpClientInstance == null) {
+            lock.lock();
+            try {
+                // Double-checked locking
+                if (httpClientInstance == null) {
             SSLContext sslContext = SSLContexts.custom()
                                                .loadTrustMaterial(null, acceptingTrustStrategy).build();
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
@@ -228,14 +249,59 @@ public class HttpUtils {
             Registry<ConnectionSocketFactory> socketFactoryRegistry =
                     RegistryBuilder.<ConnectionSocketFactory>create()
                             .register("https", socketFactory)
-                            .register("http", new PlainConnectionSocketFactory())
+                            .register("http", new PlainConnectionSocketFactory()).build();
+                    RequestConfig defaultRequestConfig = RequestConfig.custom()
+                            .setSocketTimeout(120000)  // 120 seconds of inactivity before timing out waiting for data
                             .build();
-            BasicHttpClientConnectionManager connectionManager =
-                    new BasicHttpClientConnectionManager(socketFactoryRegistry);
-            return HttpClients.custom().setSSLSocketFactory(socketFactory)
-                              .setConnectionManager(connectionManager).build();
-        } catch (Exception e) {
-            throw new DashboardServerException("Error occurred while creating http client.", e);
+            clientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                    clientConnectionManager.setMaxTotal(800);
+                    clientConnectionManager.setDefaultMaxPerRoute(400);
+                    clientConnectionManager.setValidateAfterInactivity(30000);
+
+                    httpClientInstance =
+                            HttpClients.custom().setDefaultRequestConfig(defaultRequestConfig)
+                                    .setSSLSocketFactory(socketFactory).setConnectionManager(clientConnectionManager)
+                                    .build();
+                    new ConnectionManagerCleanup(clientConnectionManager).start();
+                }
+            } catch (Exception e) {
+                throw new DashboardServerException("Error occurred while creating http client.", e);
+            } finally {
+                lock.unlock();
+            }
+        }
+        return httpClientInstance;
+    }
+
+    /**
+     * This class is used to clean up expired and idle connections.
+     */
+    public static class ConnectionManagerCleanup {
+
+        private final PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
+
+        public ConnectionManagerCleanup(PoolingHttpClientConnectionManager poolingHttpClientConnectionManager) {
+            this.poolingHttpClientConnectionManager = poolingHttpClientConnectionManager;
+        }
+
+        public void start() {
+            Thread cleanupThread = new Thread(() -> {
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        // Close connections that have been idle for 30 seconds
+                        poolingHttpClientConnectionManager.closeIdleConnections(30, TimeUnit.SECONDS);
+                        // Additionally, close expired connections
+                        poolingHttpClientConnectionManager.closeExpiredConnections();
+                        // Sleep for 15 seconds before the next iteration
+                        Thread.sleep(15000);
+                    }
+                } catch (InterruptedException e) {
+                    // Handle the interruption or exit the loop
+                }
+            });
+
+            cleanupThread.setDaemon(true);
+            cleanupThread.start();
         }
     }
 
