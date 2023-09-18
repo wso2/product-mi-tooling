@@ -65,6 +65,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -418,15 +419,21 @@ public class DashboardServer {
 
     private void setJavaxSslTruststore(Map<String, Object> parseResult) throws SSOConfigException {
 
-        if (!(parseResult.get(TOML_TRUSTSTORE_FILE_LOCATION) instanceof String)
-                || !(parseResult.get(TOML_TRUSTSTORE_PASSWORD) instanceof String)) {
+        Object trustStoreFileLocationRes = parseResult.get(TOML_TRUSTSTORE_FILE_LOCATION);
+        Object truststorePasswordRes = parseResult.get(TOML_TRUSTSTORE_PASSWORD);
+        if (!(trustStoreFileLocationRes instanceof String)
+                || !(truststorePasswordRes instanceof String)
+                || ((String) truststorePasswordRes).isEmpty()
+                || ((String) trustStoreFileLocationRes).isEmpty()) {
             throw new SSOConfigException("Truststore information is missing");
         }
-        String trustStoreLocation = (String) parseResult.get(TOML_TRUSTSTORE_FILE_LOCATION);
+        String trustStoreLocation = (String) trustStoreFileLocationRes;
+        trustStoreLocation = resolveSecret(trustStoreLocation);
         trustStoreLocation = DASHBOARD_HOME + File.separator + trustStoreLocation;
         System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
 
-        String trustStorePassword = (String) parseResult.get(TOML_TRUSTSTORE_PASSWORD);
+        String trustStorePassword = (String) truststorePasswordRes;
+        trustStorePassword = resolveSecret(trustStorePassword);
         System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
     }
 
@@ -471,8 +478,11 @@ public class DashboardServer {
 
     private void appendTomlProperties(Properties properties, Map<String, Object> parseResult) {
 
+        Set<String> keysToInclude = new HashSet<>(Arrays.asList(TOML_MI_USERNAME, TOML_MI_PASSWORD,
+                TOML_KEYSTORE_PASSWORD, TOML_KEY_MANAGER_PASSWORD, TOML_JKS_FILE_LOCATION, TOML_TRUSTSTORE_PASSWORD,
+                TOML_TRUSTSTORE_FILE_LOCATION));
         for (String dottedKey : parseResult.keySet()) {
-            if (Objects.nonNull(parseResult.get(dottedKey))) {
+            if (keysToInclude.contains(dottedKey) && Objects.nonNull(parseResult.get(dottedKey))) {
                 properties.put(dottedKey, parseResult.get(dottedKey));
             }
         }
