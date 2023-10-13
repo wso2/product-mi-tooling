@@ -44,11 +44,12 @@ import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 
 /**
  * Delegate class to handle requests from log-configs page.
@@ -85,11 +86,11 @@ public class LogConfigDelegate {
         prevSearchKey = searchKey;
         DelegatesUtil.setPrevResourceType(resourceType);
         return logsResourceResponse;
-    }   
+    }
 
-    public List<LogConfigsInner> getSearchedLogConfigsResultsFromMI(String groupId, List<String> nodeList, 
+    public List<LogConfigsInner> getSearchedLogConfigsResultsFromMI(String groupId, List<String> nodeList,
         String searchKey, String order, String orderBy) throws ManagementApiException {
-        
+
         if (nodeList.contains("all")) {
             NodeList nodes = dataManager.fetchNodes(groupId);
             nodeList = new ArrayList<>();
@@ -99,21 +100,21 @@ public class LogConfigDelegate {
         }
 
         LogConfigs logConfigs = new LogConfigs();
-        
+
         for (String nodeId: nodeList) {
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
             String accessToken = dataManager.getAccessToken(groupId, nodeId);
 
             JsonArray logConfigsArray = DelegatesUtil.getResourceResultList(groupId, nodeId, "logging",
                 mgtApiUrl, accessToken, searchKey);
-            
+
             for (JsonElement element : logConfigsArray) {
                 LogConfigsInner logConfigsInner = createLogConfig(element);
                 logConfigs.add(logConfigsInner);
             }
 
         }
-        //ordering   
+        //ordering
         Comparator<LogConfigsInner> comparatorObject;
         switch (orderBy) {
             case "level":comparatorObject = Comparator.comparing(LogConfigsInner::getLevelIgnoreCase); break;
@@ -146,9 +147,9 @@ public class LogConfigDelegate {
      * @param upperLimit to index of the required range
      * @return the List if no error. Else return null
      */
-    public static LogConfigs getPaginationResults(List<LogConfigsInner> itemsList, 
+    public static LogConfigs getPaginationResults(List<LogConfigsInner> itemsList,
         int lowerLimit, int upperLimit) {
-        
+
         LogConfigs resultList = new LogConfigs();
         try {
             if (itemsList.size() < upperLimit) {
@@ -158,11 +159,11 @@ public class LogConfigDelegate {
                 lowerLimit = upperLimit;
             }
             List<LogConfigsInner> paginatedList = itemsList.subList(lowerLimit, upperLimit);
-        
+
             for (LogConfigsInner artifact : paginatedList) {
                 resultList.add(artifact);
             }
-            
+
             return resultList;
 
         } catch (IndexOutOfBoundsException e) {
@@ -181,13 +182,16 @@ public class LogConfigDelegate {
         NodeList nodeList = dataManager.fetchNodes(groupId);
         for (NodeListInner node : nodeList) {
             String nodeId = node.getNodeId();
-            CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
 
-            if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
-                String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
-                ack.setMessage(message);
-                return ack;
+            try (CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload)) {
+                if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                    logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
+                    String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+                    ack.setMessage(message);
+                    return ack;
+                }
+            } catch (IOException e) {
+                logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId, e);
             }
         }
         ack.setStatus(Constants.SUCCESS_STATUS);
@@ -199,13 +203,17 @@ public class LogConfigDelegate {
         logger.debug("Updating logger " + request.getName() + " in node " + nodeId + " in group " + groupId);
         Ack ack = new Ack(Constants.FAIL_STATUS);
         JsonObject payload = createUpdateLoggerPayload(request);
-        CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload);
-        if (httpResponse.getStatusLine().getStatusCode() != 200) {
-            logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
-            String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
-            ack.setMessage(message);
-        } else {
-            ack.setStatus(Constants.SUCCESS_STATUS);
+
+        try (CloseableHttpResponse httpResponse = updateLogLevelByNodeId(groupId, nodeId, payload)) {
+            if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId);
+                String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+                ack.setMessage(message);
+            } else {
+                ack.setStatus(Constants.SUCCESS_STATUS);
+            }
+        } catch (IOException e) {
+            logger.error("Error occurred while updating logger on node " + nodeId + " in group " + groupId, e);
         }
         return ack;
     }
@@ -223,12 +231,16 @@ public class LogConfigDelegate {
             String accessToken = dataManager.getAccessToken(groupId, nodeId);
             String addLoggerUrl = mgtApiUrl.concat("logging");
             logger.debug("Adding new logger on node " + nodeId);
-            CloseableHttpResponse httpResponse = Utils.doPatch(groupId, nodeId, accessToken, addLoggerUrl, payload);
-            if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                logger.error("Error occurred while adding logger on node " + nodeId + " in group " + groupId);
-                String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
-                ack.setMessage(message);
-                return ack;
+            try (CloseableHttpResponse httpResponse
+                         = Utils.doPatch(groupId, nodeId, accessToken, addLoggerUrl, payload)) {
+                if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                    logger.error("Error occurred while adding logger on node " + nodeId + " in group " + groupId);
+                    String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+                    ack.setMessage(message);
+                    return ack;
+                }
+            } catch (IOException e) {
+                logger.error("Error occurred while adding logger on node " + nodeId + " in group " + groupId, e);
             }
         }
         ack.setStatus(Constants.SUCCESS_STATUS);

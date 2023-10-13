@@ -36,6 +36,7 @@ import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
 import org.wso2.ei.dashboard.core.rest.model.LocalEntryValue;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
+import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,10 +49,10 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
 
     @Override
     public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList,
-        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate)
         throws ManagementApiException {
         DelegatesUtil.logDebugLogs(Constants.LOCAL_ENTRIES, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
-        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.LOCAL_ENTRIES, 
+        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.LOCAL_ENTRIES,
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
 
@@ -61,7 +62,7 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
         return null;
     }
 
-    public LocalEntryValue getValue(String groupId, String nodeId, String localEntry) 
+    public LocalEntryValue getValue(String groupId, String nodeId, String localEntry)
         throws ManagementApiException {
         logger.debug("Fetching value of local entry " + localEntry + " in node " + nodeId + " of group " + groupId);
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
@@ -71,11 +72,14 @@ public class LocalEntriesDelegate implements ArtifactDelegate {
             localEntry = Utils.encode(localEntry);
         }
         String url = mgtApiUrl.concat("local-entries?name=").concat(localEntry);
-        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
-        String value = jsonResponse.get("value").getAsString();
-        LocalEntryValue localEntryValue = new LocalEntryValue();
-        localEntryValue.setValue(value);
-        return localEntryValue;
+        try (CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url)) {
+            JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
+            String value = jsonResponse.get("value").getAsString();
+            LocalEntryValue localEntryValue = new LocalEntryValue();
+            localEntryValue.setValue(value);
+            return localEntryValue;
+        } catch (IOException e) {
+            throw new ManagementApiException("Error while closing the response", 500);
+        }
     }
 }

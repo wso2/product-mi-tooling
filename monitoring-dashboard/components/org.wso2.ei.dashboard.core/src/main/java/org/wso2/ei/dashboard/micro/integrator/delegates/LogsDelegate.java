@@ -58,8 +58,8 @@ public class LogsDelegate {
     private static String prevSearchKey = null;
     private static int count;
 
-    public LogsResourceResponse getPaginatedLogsListResponse(String groupId, List<String> nodeList, String searchKey, 
-        String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+    public LogsResourceResponse getPaginatedLogsListResponse(String groupId, List<String> nodeList, String searchKey,
+        String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate)
         throws ManagementApiException {
 
         String resourceType = Constants.LOGS;
@@ -101,14 +101,14 @@ public class LogsDelegate {
 
     public static List<LogListInner> getSearchedLogsListFromMI(String groupId, List<String> nodeList,
         String searchKey, String order, String orderBy) throws ManagementApiException {
-            
+
 
         logger.debug("Fetching logs via management api.");
         LogList logList = new LogList();
         for (String nodeId : nodeList) {
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
             String accessToken = dataManager.getAccessToken(groupId, nodeId);
-            JsonArray logsArray = DelegatesUtil.getResourceResultList(groupId, nodeId, 
+            JsonArray logsArray = DelegatesUtil.getResourceResultList(groupId, nodeId,
                 Constants.LOGS, mgtApiUrl, accessToken, searchKey);
 
             for (JsonElement jsonElement : logsArray) {
@@ -137,7 +137,7 @@ public class LogsDelegate {
                 }
             }
         }
-        //ordering   
+        //ordering
         Comparator<LogListInner> comparatorObject;
         switch (orderBy) {
             //add if any other parms
@@ -148,11 +148,11 @@ public class LogsDelegate {
         } else {
             Collections.sort(logList, comparatorObject);
         }
-        
+
         return logList;
     }
 
-    
+
          /**
      * Returns the results list items within the given range
      *
@@ -162,7 +162,7 @@ public class LogsDelegate {
      * @return the List if no error. Else return null
      */
     public static LogList getPaginationResults(List<LogListInner> itemsList, int lowerLimit, int upperLimit) {
-        
+
         LogList resultList = new LogList();
         try {
             if (itemsList.size() < upperLimit) {
@@ -172,11 +172,11 @@ public class LogsDelegate {
                 lowerLimit = upperLimit;
             }
             List<LogListInner> paginatedList = itemsList.subList(lowerLimit, upperLimit);
-        
+
             for (LogListInner artifact : paginatedList) {
                 resultList.add(artifact);
             }
-            
+
             return resultList;
 
         } catch (IndexOutOfBoundsException e) {
@@ -191,17 +191,19 @@ public class LogsDelegate {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String url = mgtApiUrl.concat("logs?file=").concat(fileName);
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
-        HttpEntity responseEntity = httpResponse.getEntity();
-        String response = "";
-        if (responseEntity != null) {
-            try {
-                response = EntityUtils.toString(responseEntity);
-            } catch (IOException e) {
-                logger.error(e.getMessage());
+        try (CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url)) {
+            HttpEntity responseEntity = httpResponse.getEntity();
+            String response = "";
+            if (responseEntity != null) {
+                try {
+                    response = EntityUtils.toString(responseEntity);
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
             }
-
+            return response;
+        } catch (IOException e) {
+            throw new ManagementApiException("Error while retrieving logs", 500);
         }
-        return response;
     }
 }

@@ -33,6 +33,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -62,17 +63,19 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
         introspectionRequestBody
                 .put(Constants.CLIENT_SECRET, config.getOidcAgentConfig().getConsumerSecret().getValue());
 
-        CloseableHttpResponse httpResponse =
-                HttpUtils.doPost(config.getIntrospectionEndpoint(), introspectionRequestBody);
+        try (CloseableHttpResponse httpResponse =
+                     HttpUtils.doPost(config.getIntrospectionEndpoint(), introspectionRequestBody)) {
+            int httpSc = httpResponse.getStatusLine().getStatusCode();
 
-        int httpSc = httpResponse.getStatusLine().getStatusCode();
-
-        if (httpSc == HttpStatus.SC_OK) {
-            return HttpUtils.getJsonResponse(httpResponse).get(Constants.ACTIVE).getAsBoolean();
-        }
-        if (logger.isDebugEnabled()) {
-            logger.error("Error validating the token using introspection endpoint. ",
-                    httpResponse.getStatusLine().getReasonPhrase());
+            if (httpSc == HttpStatus.SC_OK) {
+                return HttpUtils.getJsonResponse(httpResponse).get(Constants.ACTIVE).getAsBoolean();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.error("Error validating the token using introspection endpoint. ",
+                        httpResponse.getStatusLine().getReasonPhrase());
+            }
+        } catch (IOException e) {
+            logger.error("Error validating the token using introspection endpoint. ", e);
         }
         return false;
     }
@@ -98,25 +101,26 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
                     getUserInfoEndpointFromWellKnownEndpoint(config.getWellKnownEndpoint()));
         }
 
-        CloseableHttpResponse httpResponse =
-                HttpUtils.doGet(token, config.getUserInfoEndpoint());
-
-        int httpSc = httpResponse.getStatusLine().getStatusCode();
-
-        if (httpSc == HttpStatus.SC_OK) {
-            JsonArray groupElement =
-                    HttpUtils.getJsonResponse(httpResponse).get(config.getAdminGroupAttribute()).getAsJsonArray();
-            for (JsonElement group : groupElement) {
-                if (config.getAllowedAdminGroups().contains(group.getAsString())) {
-                    adminClaimMap.put(token, true);
-                    return true;
+        try (CloseableHttpResponse httpResponse =
+                     HttpUtils.doGet(token, config.getUserInfoEndpoint())) {
+            int httpSc = httpResponse.getStatusLine().getStatusCode();
+            if (httpSc == HttpStatus.SC_OK) {
+                JsonArray groupElement =
+                        HttpUtils.getJsonResponse(httpResponse).get(config.getAdminGroupAttribute()).getAsJsonArray();
+                for (JsonElement group : groupElement) {
+                    if (config.getAllowedAdminGroups().contains(group.getAsString())) {
+                        adminClaimMap.put(token, true);
+                        return true;
+                    }
                 }
+                adminClaimMap.put(token, false);
             }
-            adminClaimMap.put(token, false);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.error("Error validating the token using userInfo endpoint. ",
-                    httpResponse.getStatusLine().getReasonPhrase());
+            if (logger.isDebugEnabled()) {
+                logger.error("Error validating the token using userInfo endpoint. ",
+                        httpResponse.getStatusLine().getReasonPhrase());
+            }
+        } catch (IOException e) {
+            logger.error("Error validating the token using userInfo endpoint. ", e);
         }
         return false;
     }
@@ -124,36 +128,43 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
     private String getUserInfoEndpointFromWellKnownEndpoint(String wellKnownEndpoint) {
 
         HttpGet httpGet = new HttpGet(wellKnownEndpoint);
-        CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet);
-
-        int httpSc = httpResponse.getStatusLine().getStatusCode();
-
-        if (httpSc == HttpStatus.SC_OK) {
-            JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
-            if (jsonResponse.has(Constants.USERINFO_URI)) {
-                return jsonResponse.get(Constants.USERINFO_URI).getAsString();
+        try (CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet)) {
+            int httpSc = httpResponse.getStatusLine().getStatusCode();
+            if (httpSc == HttpStatus.SC_OK) {
+                JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
+                if (jsonResponse.has(Constants.USERINFO_URI)) {
+                    return jsonResponse.get(Constants.USERINFO_URI).getAsString();
+                }
             }
+            throw new DashboardServerException("Cannot find " + Constants.USERINFO_URI + " in well known endpoint " +
+                    "response. " +
+                    httpResponse.getStatusLine().getReasonPhrase());
+        } catch (IOException e) {
+            throw new DashboardServerException("Error while retrieving userinfo endpoint"
+                    + " from well known endpoint. ", e);
         }
-        throw new DashboardServerException("Cannot find " + Constants.USERINFO_URI + " in well known endpoint " +
-                "response. " +
-                httpResponse.getStatusLine().getReasonPhrase());
     }
 
     private String getIntrospectionEndpointFromWellKnownEndpoint(String wellKnownEndpoint) {
 
         HttpGet httpGet = new HttpGet(wellKnownEndpoint);
-        CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet);
+        try (CloseableHttpResponse httpResponse = HttpUtils.doGet(httpGet)) {
+            int httpSc = httpResponse.getStatusLine().getStatusCode();
 
-        int httpSc = httpResponse.getStatusLine().getStatusCode();
-
-        if (httpSc == HttpStatus.SC_OK) {
-            JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
-            if (jsonResponse.has(Constants.INTROSPECTION_URI)) {
-                return jsonResponse.get(Constants.INTROSPECTION_URI).getAsString();
+            if (httpSc == HttpStatus.SC_OK) {
+                JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
+                if (jsonResponse.has(Constants.INTROSPECTION_URI)) {
+                    return jsonResponse.get(Constants.INTROSPECTION_URI).getAsString();
+                }
             }
+            throw new DashboardServerException("Cannot find " + Constants.INTROSPECTION_URI + " in well known endpoint "
+                    + "response. " +
+                    httpResponse.getStatusLine().getReasonPhrase());
+
+        } catch (IOException e) {
+            throw new DashboardServerException("Error while retrieving introspection endpoint"
+                    + " from well known endpoint. ", e);
         }
-        throw new DashboardServerException("Cannot find " + Constants.INTROSPECTION_URI + " in well known endpoint " +
-                "response. " +
-                httpResponse.getStatusLine().getReasonPhrase());
+
     }
 }

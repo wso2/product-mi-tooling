@@ -47,8 +47,11 @@ import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.Collections;
+
 
 /**
  * Delegate class to handle requests from users page.
@@ -61,8 +64,8 @@ public class UsersDelegate {
     private static int count;
 
 
-    public UsersResourceResponse fetchPaginatedUsers(String groupId, String searchKey, 
-        String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+    public UsersResourceResponse fetchPaginatedUsers(String groupId, String searchKey,
+        String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate)
         throws ManagementApiException {
         String resourceType = Constants.USERS;
         DelegatesUtil.logDebugLogs(resourceType, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
@@ -99,8 +102,19 @@ public class UsersDelegate {
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users");
-        Utils.doPost(groupId, nodeId, accessToken, url, payload);
-        ack.setStatus(Constants.SUCCESS_STATUS);
+        CloseableHttpResponse response = null;
+        try {
+            response = Utils.doPost(groupId, nodeId, accessToken, url, payload);
+            ack.setStatus(Constants.SUCCESS_STATUS);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (Exception e) {
+                    log.error("Error closing the http response", e);
+                }
+            }
+        }
         return ack;
     }
 
@@ -120,15 +134,18 @@ public class UsersDelegate {
         if (!StringUtils.isEmpty(domain)) {
             url = url.concat("?domain=").concat(urlEncode(domain));
         }
-        CloseableHttpResponse httpResponse = Utils.doDelete(groupId, nodeId, accessToken, url);
-        if (httpResponse.getStatusLine().getStatusCode() != 200) {
-            log.error("Error occurred while deleting user " + userId + " in group " + groupId);
-            String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
-            ack.setMessage(message);
+        try (CloseableHttpResponse httpResponse = Utils.doDelete(groupId, nodeId, accessToken, url)) {
+            if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                log.error("Error occurred while deleting user " + userId + " in group " + groupId);
+                String message = HttpUtils.getJsonResponse(httpResponse).get("Error").getAsString();
+                ack.setMessage(message);
+                return ack;
+            }
+            ack.setStatus(Constants.SUCCESS_STATUS);
             return ack;
+        } catch (IOException e) {
+            throw new ManagementApiException("Error while deleting user", 500);
         }
-        ack.setStatus(Constants.SUCCESS_STATUS);
-        return ack;
     }
 
     private JsonObject createAddUserPayload(AddUserRequest request) {
@@ -151,7 +168,7 @@ public class UsersDelegate {
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        JsonArray usersList = DelegatesUtil.getResourceResultList(groupId, nodeId, "users", 
+        JsonArray usersList = DelegatesUtil.getResourceResultList(groupId, nodeId, "users",
                 mgtApiUrl, accessToken, searchKey);
         return new Gson().fromJson(usersList, User[].class);
     }
@@ -183,7 +200,7 @@ public class UsersDelegate {
         } catch (IllegalArgumentException e) {
             log.error("Illegal arguments for index values", e);
         }
-        return null;      
+        return null;
     }
 
     /**
@@ -202,13 +219,13 @@ public class UsersDelegate {
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users/");
         for (User user : users) {
-            UsersInner usersInner = getUserDetails(groupId, nodeId, accessToken, url, user.getUserId());
+            UsersInner usersInner = getUserDetails(groupId, nodeId, url, user.getUserId());
             resultList.add(usersInner);
         }
     }
 
-    private static UsersInner getUserDetails(String groupId, String nodeId, String accessToken, String url,
-                                             String userId)throws ManagementApiException {
+    private static UsersInner getUserDetails(String groupId, String nodeId, String url,
+                                             String userId) throws ManagementApiException {
         UsersInner usersInner = new UsersInner();
         usersInner.setUserId(userId);
         String getUsersDetailsUrl;
@@ -219,10 +236,15 @@ public class UsersDelegate {
         } else {
             getUsersDetailsUrl = url.concat(urlEncode(userId));
         }
-        CloseableHttpResponse userDetailResponse = Utils.doGet(groupId, nodeId, accessToken, getUsersDetailsUrl);
-        String userDetail = HttpUtils.getStringResponse(userDetailResponse);
-        usersInner.setDetails(userDetail);
-        return usersInner;
+        String accessToken = dataManager.getAccessToken(groupId, nodeId);
+        try (CloseableHttpResponse userDetailResponse = Utils.doGet(groupId, nodeId, accessToken, getUsersDetailsUrl)) {
+            String userDetail = HttpUtils.getStringResponse(userDetailResponse);
+            usersInner.setDetails(userDetail);
+            return usersInner;
+        } catch (IOException e) {
+            throw new ManagementApiException("Error while retrieving user details", 500);
+        }
+
     }
 
     private static String urlEncode(String userId) {

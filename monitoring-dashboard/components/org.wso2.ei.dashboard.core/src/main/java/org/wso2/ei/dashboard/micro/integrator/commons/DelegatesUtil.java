@@ -19,6 +19,8 @@ import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactsInner;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 
 /**
  * Util class to update artifacts deployed in micro integrator and update the database of the dashboard server.
@@ -61,19 +64,19 @@ public class DelegatesUtil {
         }
         return count;
     }
-    
 
-    public static List<ArtifactsInner> getSearchedArtifactsFromMI(String groupId, List<String> nodeList, 
+
+    public static List<ArtifactsInner> getSearchedArtifactsFromMI(String groupId, List<String> nodeList,
         String artifactType, String searchKey, String order, String orderBy)
             throws ManagementApiException {
-        
+
         Artifacts artifacts = new Artifacts();
-     
+
         for (String nodeId: nodeList) {
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
             String accessToken = DATA_MANAGER.getAccessToken(groupId, nodeId);
-            
-            JsonArray artifactList = getResourceResultList(groupId, nodeId, artifactType, 
+
+            JsonArray artifactList = getResourceResultList(groupId, nodeId, artifactType,
                 mgtApiUrl, accessToken, searchKey);
 
             for (JsonElement jsonElement : artifactList) {
@@ -113,8 +116,8 @@ public class DelegatesUtil {
                 }
             }
         }
-        
-        //ordering   
+
+        //ordering
         Comparator<ArtifactsInner> comparatorObject;
         switch (orderBy.toLowerCase()) {
             //for any other ordering options
@@ -124,12 +127,12 @@ public class DelegatesUtil {
             Collections.sort(artifacts, comparatorObject.reversed());
         } else {
             Collections.sort(artifacts, comparatorObject);
-        }  
+        }
 
         return artifacts;
     }
-    
-    public static ArtifactsResourceResponse getPaginatedArtifactResponse(String groupId, List<String> nodeList, 
+
+    public static ArtifactsResourceResponse getPaginatedArtifactResponse(String groupId, List<String> nodeList,
         String artifactType, String searchKey, String lowerLimit, String upperLimit, String order, String orderBy,
         String isUpdate)
         throws ManagementApiException {
@@ -139,9 +142,9 @@ public class DelegatesUtil {
 
         ArtifactsResourceResponse artifactsResourceResponse = new ArtifactsResourceResponse();
         logger.debug("prevSearchkey :" + prevSearchKey + ", currentSearchkey:" + searchKey);
-        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey)) || 
+        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey)) ||
             !(prevResourceType.equals(artifactType))) {
-                
+
             searchedArtifacts = getSearchedArtifactsFromMI(groupId, nodeList, artifactType,
                     searchKey, order, orderBy);
             count = getArtifactCount(searchedArtifacts);
@@ -153,7 +156,7 @@ public class DelegatesUtil {
         prevResourceType = artifactType;
         return artifactsResourceResponse;
     }
-    
+
      /**
      * Returns the results list items within the given range
      *
@@ -163,7 +166,7 @@ public class DelegatesUtil {
      * @return the List if no error. Else return null
      */
     public static Artifacts getPaginationResults(List<ArtifactsInner> itemsList, int lowerLimit, int upperLimit) {
-        
+
         Artifacts resultList = new Artifacts();
         try {
             if (itemsList.size() < upperLimit) {
@@ -173,11 +176,11 @@ public class DelegatesUtil {
                 lowerLimit = upperLimit;
             }
             List<ArtifactsInner> paginatedList = itemsList.subList(lowerLimit, upperLimit);
-        
+
             for (ArtifactsInner artifact : paginatedList) {
                 resultList.add(artifact);
             }
-            
+
             return resultList;
 
         } catch (IndexOutOfBoundsException e) {
@@ -201,9 +204,9 @@ public class DelegatesUtil {
         return artifactDetails;
     }
 
-    public static JsonArray getResourceResultList(String groupId, String nodeId, String type, 
+    public static JsonArray getResourceResultList(String groupId, String nodeId, String type,
         String mgtApiUrl, String accessToken, String searchKey) throws ManagementApiException {
-        
+
         String url = mgtApiUrl.concat(type);
         JsonObject artifacts = invokeManagementApi(groupId, nodeId, type, url,
             accessToken, searchKey);
@@ -223,7 +226,7 @@ public class DelegatesUtil {
         } else {
             return artifacts.get("list").getAsJsonArray();
         }
-    }    
+    }
 
     private static JsonObject invokeManagementApi(String groupId, String nodeId, String artifactType, String url,
         String accessToken, String searchKey)
@@ -251,9 +254,12 @@ public class DelegatesUtil {
         if (null != mgtApiUrl && !mgtApiUrl.isEmpty()) {
             String accessToken = DATA_MANAGER.getAccessToken(groupId, nodeId);
             String url = mgtApiUrl.concat(artifactType);
-            CloseableHttpResponse response = Utils.doPost(groupId, nodeId, accessToken, url, payload);
-            if (response.getStatusLine().getStatusCode() == 200) {
-                return true;
+            try (CloseableHttpResponse response = Utils.doPost(groupId, nodeId, accessToken, url, payload)) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    return true;
+                }
+            } catch (IOException e) {
+                logger.error("Error while updating artifact: " + request.getArtifactName(), e);
             }
         }
         return false;

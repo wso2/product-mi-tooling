@@ -41,6 +41,7 @@ import org.wso2.ei.dashboard.core.rest.model.CAppArtifactsInner;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -51,8 +52,8 @@ public class CarbonAppsDelegate implements ArtifactDelegate {
     private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     @Override
-    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
-        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate) 
+    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList,
+        String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate)
         throws ManagementApiException {
         DelegatesUtil.logDebugLogs(Constants.CARBON_APPLICATIONS, groupId, lowerLimit, upperLimit, order, orderBy,
                 isUpdate);
@@ -68,18 +69,21 @@ public class CarbonAppsDelegate implements ArtifactDelegate {
         String url = mgtApiUrl.concat("applications").concat("?").concat("carbonAppName").concat("=").concat(cAppName);
 
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
-        CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url);
-        JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
-        JsonArray artifacts = jsonResponse.getAsJsonArray("artifacts");
-        CAppArtifacts cAppArtifacts = new CAppArtifacts();
-        for (JsonElement artifact : artifacts) {
-            JsonObject jsonObject = artifact.getAsJsonObject();
-            CAppArtifactsInner cAppArtifact = new CAppArtifactsInner();
-            cAppArtifact.setName(jsonObject.get("name").getAsString());
-            cAppArtifact.setType(jsonObject.get("type").getAsString());
-            cAppArtifacts.add(cAppArtifact);
+        try (CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url)) {
+            JsonObject jsonResponse = HttpUtils.getJsonResponse(httpResponse);
+            JsonArray artifacts = jsonResponse.getAsJsonArray("artifacts");
+            CAppArtifacts cAppArtifacts = new CAppArtifacts();
+            for (JsonElement artifact : artifacts) {
+                JsonObject jsonObject = artifact.getAsJsonObject();
+                CAppArtifactsInner cAppArtifact = new CAppArtifactsInner();
+                cAppArtifact.setName(jsonObject.get("name").getAsString());
+                cAppArtifact.setType(jsonObject.get("type").getAsString());
+                cAppArtifacts.add(cAppArtifact);
+            }
+            return cAppArtifacts;
+        } catch (IOException e) {
+            throw new ManagementApiException("Error while retrieving artifacts in carbon application", 500);
         }
-        return cAppArtifacts;
     }
 
     @Override

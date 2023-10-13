@@ -39,11 +39,11 @@ public class MessageStoresDelegate implements ArtifactDelegate {
     private static final Log logger = LogFactory.getLog(MessageStoresDelegate.class);
 
     @Override
-    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList, 
+    public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList,
         String searchKey, String lowerLimit, String upperLimit, String order, String orderBy, String isUpdate)
         throws ManagementApiException {
         DelegatesUtil.logDebugLogs(Constants.MESSAGE_STORES, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
-        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.MESSAGE_STORES, 
+        return DelegatesUtil.getPaginatedArtifactResponse(groupId, nodeList, Constants.MESSAGE_STORES,
             searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
     }
 

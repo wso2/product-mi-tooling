@@ -32,6 +32,8 @@ import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 import org.wso2.micro.integrator.dashboard.utils.ExecutorServiceHolder;
 
+import java.io.IOException;
+
 /**
  * Fetch, store, update and delete artifact information of registered micro integrator nodes.
  */
@@ -71,9 +73,15 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     private void fetchAndStoreServers(String accessToken) throws ManagementApiException {
         String url = heartbeat.getMgtApiUrl() + SERVER;
-        CloseableHttpResponse response = Utils.doGet(heartbeat.getGroupId(), heartbeat.getNodeId(), accessToken, url);
-        String stringResponse = HttpUtils.getStringResponse(response);
-        storeServerInfo(stringResponse, heartbeat);
+        try (CloseableHttpResponse response = Utils.doGet(heartbeat.getGroupId(), heartbeat.getNodeId()
+                , accessToken, url)) {
+            String stringResponse = HttpUtils.getStringResponse(response);
+            storeServerInfo(stringResponse, heartbeat);
+        } catch (IOException e) {
+            logger.error("Unable to fetch server information from node: {} of group: {} due to {} "
+                    , heartbeat.getNodeId(),
+                    heartbeat.getGroupId(), e.getMessage(), e);
+        }
     }
 
     private void storeServerInfo(String stringResponse, HeartbeatObject heartbeat) {
