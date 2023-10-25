@@ -232,7 +232,7 @@ public class DelegatesUtil {
         String accessToken, String searchKey)
             throws ManagementApiException {
         CloseableHttpResponse response;
-        if (searchKey == null) {
+        if (searchKey == null || (searchKey.isEmpty() && artifactType.equals(Constants.USERS))) {
             response = Utils.doGet(groupId, nodeId, accessToken, url);
         } else {
             Map<String, String> paramMap = new HashMap<>();
