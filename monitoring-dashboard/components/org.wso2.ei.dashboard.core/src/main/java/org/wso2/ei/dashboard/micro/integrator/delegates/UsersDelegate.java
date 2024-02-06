@@ -45,9 +45,9 @@ import org.wso2.ei.dashboard.core.rest.model.UsersResourceResponse;
 import org.wso2.ei.dashboard.micro.integrator.commons.DelegatesUtil;
 import org.wso2.ei.dashboard.micro.integrator.commons.Utils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.Collections;
