@@ -48,6 +48,7 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -73,13 +74,17 @@ public class HttpUtils {
     private HttpUtils() {
     }
 
-    public static CloseableHttpResponse doGet(String accessToken, String url) {
-        final HttpGet httpGet = new HttpGet(url);
-        String authHeader = "Bearer " + accessToken;
-        httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpGet.setHeader("Authorization", authHeader);
+    public static CloseableHttpResponse doGet(String accessToken, String url) throws ManagementApiException {
+        try {
+            final HttpGet httpGet = new HttpGet(url);
+            String authHeader = "Bearer " + accessToken;
+            httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
+            httpGet.setHeader("Authorization", authHeader);
 
-        return doGet(httpGet);
+            return doGet(httpGet);
+        } catch (IllegalArgumentException e) {
+            throw new ManagementApiException("Error occurred while creating http get request.", 400, e.getCause());
+        }
     }
 
     public static CloseableHttpResponse doGet(String accessToken, String url, Map<String, String> params) {

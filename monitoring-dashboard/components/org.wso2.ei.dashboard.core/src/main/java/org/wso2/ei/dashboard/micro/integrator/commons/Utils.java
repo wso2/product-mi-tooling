@@ -257,9 +257,7 @@ public class Utils {
 
         String getArtifactDetailsUrl;
         String getArtifactsUrl = mgtApiUrl.concat(artifactType);
-        if (artifactName.contains(" ")) {
-            artifactName = encode(artifactName);
-        }
+        artifactName = encode(artifactName);
         switch (artifactType) {
             case PROXY_SERVICES:
                 getArtifactDetailsUrl = getArtifactsUrl.concat("?proxyServiceName=").concat(artifactName);
