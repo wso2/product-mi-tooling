@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.micro.integrator.dashboard.utils.SSOConfig;
 
 import java.io.IOException;
@@ -121,6 +122,8 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
             }
         } catch (IOException e) {
             logger.error("Error validating the token using userInfo endpoint. ", e);
+        } catch (ManagementApiException e) {
+            throw new DashboardServerException("Error occurred while validating the admin. ", e);
         }
         return false;
     }

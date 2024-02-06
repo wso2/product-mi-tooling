@@ -75,10 +75,16 @@ public class LoginDelegate {
             return "";
         } else {
             NodesDelegate nodesDelegate = new NodesDelegate();
-            NodeList nodes = nodesDelegate.getNodes(groupList.get(0));
-            return ManagementApiUtils.getToken(ManagementApiUtils.getMgtApiUrl(
-                    groupList.get(0), nodes.get(0).getNodeId()), username, password);
+            String groupID = groupList.get(0);
+            NodeList nodes = nodesDelegate.getNodes(groupID);
+            if (nodes.isEmpty()) {
+                logger.error("Node list for group " + groupID + " is empty");
+            } else {
+                return ManagementApiUtils.getToken(ManagementApiUtils.getMgtApiUrl(
+                        groupList.get(0), nodes.get(0).getNodeId()), username, password);
+            }
         }
+        return "";
     }
 
     private void storeTokenInCache(String accessToken) {

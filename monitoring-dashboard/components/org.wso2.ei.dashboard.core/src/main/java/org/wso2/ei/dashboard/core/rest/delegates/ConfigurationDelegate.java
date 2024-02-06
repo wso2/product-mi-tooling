@@ -60,10 +60,8 @@ public class ConfigurationDelegate {
         String type = artifactType.split("_")[0];
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
         String queryParamName = getQueryParam(artifactType);
-        if (artifactName.contains(" ")) {
-            artifactName = Utils.encode(artifactName);
-        }
-        String url = mgtApiUrl.concat(type).concat("?").concat(queryParamName).concat("=").concat(artifactName);
+        String url = mgtApiUrl.concat(type).concat("?").concat(queryParamName).concat("=")
+                .concat(Utils.encode(artifactName));
 
         String accessToken = dataManager.getAccessToken(groupId, nodeId);
         try (CloseableHttpResponse httpResponse = Utils.doGet(groupId, nodeId, accessToken, url)) {
