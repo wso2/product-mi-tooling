@@ -4,6 +4,9 @@ window.sso = {
     	clientID: "{{sso.client_id}}",
     	resourceServerURLs: [{% for url in sso.resource_server_URLs %}"{{url}}"{% if loop.index < sso.resource_server_URLs|length %},{% endif %}{% endfor %}],
     	signInRedirectURL: "{{sso.sign_in_redirect_URL}}",
+    	{% if sso.send_cookies_in_requests is defined %}
+        sendCookiesInRequests: {{sso.send_cookies_in_requests}},
+        {% endif %}
     	{% if sso.sign_out_redirect_URL is defined %}
         signOutRedirectURL: "{{sso.sign_out_redirect_URL}}",
         {% endif %}
