@@ -68,6 +68,9 @@
                     <configuration>
                         <workingDirectory>${project.basedir}/web-app</workingDirectory>
                         <executable>npm</executable>
+                        <environmentVariables>
+                            <CI>false</CI>
+                        </environmentVariables>
                         <arguments>
                             <argument>run</argument>
                             <argument>build</argument>
