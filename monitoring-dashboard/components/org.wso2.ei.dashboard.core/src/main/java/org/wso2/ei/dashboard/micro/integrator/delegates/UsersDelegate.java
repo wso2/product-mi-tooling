@@ -38,6 +38,7 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.AddUserRequest;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
+import org.wso2.ei.dashboard.core.rest.model.PasswordRequest;
 import org.wso2.ei.dashboard.core.rest.model.User;
 import org.wso2.ei.dashboard.core.rest.model.Users;
 import org.wso2.ei.dashboard.core.rest.model.UsersInner;
@@ -118,6 +119,39 @@ public class UsersDelegate {
         return ack;
     }
 
+    public Ack updateUserPassword(String groupId, PasswordRequest request, String accessToken)
+            throws ManagementApiException {
+        Ack ack = new Ack(Constants.FAIL_STATUS);
+        JsonObject payload = createUserUpdatePasswordPayload(request);
+
+        NodeList nodeList = dataManager.fetchNodes(groupId);
+        String nodeId = nodeList.get(0).getNodeId();
+        String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
+        String userId = request.getUserId();
+        String url = mgtApiUrl.concat("users/");
+        if (userId.contains(Constants.DOMAIN_SEPARATOR)) {
+            String[] parts = userId.split(Constants.DOMAIN_SEPARATOR);
+            // parts[0] = domain, parts[1] = userId
+            url = url.concat(urlEncode(parts[1])).concat("?domain=").concat(urlEncode(parts[0]));
+        } else {
+            url = url.concat(urlEncode(userId));
+        }
+        CloseableHttpResponse response = null;
+        try {
+            response = Utils.doPatch(groupId, nodeId, accessToken, url, payload);
+            ack.setStatus(Constants.SUCCESS_STATUS);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (Exception e) {
+                    log.error("Error closing the http response. ", e);
+                }
+            }
+        }
+        return ack;
+    }
+
     public Ack deleteUser(String groupId, String userId, String domain) throws ManagementApiException {
         if (StringUtils.isEmpty(domain)) {
             log.debug("Deleting user " + userId + " in group " + groupId);
@@ -157,6 +191,14 @@ public class UsersDelegate {
         }
         payload.addProperty("password", request.getPassword());
         payload.addProperty("isAdmin", request.isIsAdmin().toString());
+        return payload;
+    }
+
+    private JsonObject createUserUpdatePasswordPayload(PasswordRequest request) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("newPassword", request.getNewPassword());
+        payload.addProperty("confirmPassword", request.getConfirmPassword());
+        payload.addProperty("oldPassword", request.getOldPassword());
         return payload;
     }
 

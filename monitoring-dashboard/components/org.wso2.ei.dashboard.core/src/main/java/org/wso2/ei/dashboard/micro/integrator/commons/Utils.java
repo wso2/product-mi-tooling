@@ -170,7 +170,12 @@ public class Utils {
             response = HttpUtils.doPatch(accessToken, url, payload);
         } else if (isNotSuccessCode(httpSc)) {
             try {
-                throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+                JsonElement error = HttpUtils.getJsonResponse(response).get("Error");
+                if (error != null) {
+                    throw new ManagementApiException(error.getAsString(), httpSc);
+                } else {
+                    throw new ManagementApiException(response.getStatusLine().getReasonPhrase(), httpSc);
+                }
             } finally {
                 // Close the response in case of error
                 try {
