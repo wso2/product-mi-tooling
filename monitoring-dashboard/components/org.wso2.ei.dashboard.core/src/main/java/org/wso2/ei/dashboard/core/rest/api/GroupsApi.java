@@ -48,6 +48,7 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigsResourceResponse;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodesResourceResponse;
+import org.wso2.ei.dashboard.core.rest.model.PasswordRequest;
 import org.wso2.ei.dashboard.core.rest.model.RegistryArtifacts;
 import org.wso2.ei.dashboard.core.rest.model.RegistryProperty;
 import org.wso2.ei.dashboard.core.rest.model.RegistryResourceResponse;
@@ -61,6 +62,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
@@ -157,6 +159,28 @@ public class GroupsApi {
             @Valid AddUserRequest request) throws ManagementApiException {
         UsersDelegate usersDelegate = new UsersDelegate();
         Ack ack = usersDelegate.addUser(groupId, request);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @PATCH
+    @Path("/{group-id}/user/password")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @Operation(summary = "Change user password", description = "", tags = { "Password" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password update status",
+                    content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response updatePassword(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid PasswordRequest request, @CookieParam("JWT_TOKEN") String accessToken)
+            throws ManagementApiException {
+        UsersDelegate usersDelegate = new UsersDelegate();
+        Ack ack = usersDelegate.updateUserPassword(groupId, request, accessToken);
         Response.ResponseBuilder responseBuilder = Response.ok().entity(ack);
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();

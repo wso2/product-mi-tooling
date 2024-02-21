@@ -57,18 +57,24 @@ function DataSourceDetailTable(props) {
             <TableCell>Description</TableCell>
             <TableCell>{nodeData.description}</TableCell>
         </TableRow>
-        <TableRow>
-            <TableCell>Driver</TableCell>
-            <TableCell>{nodeData.driverClass}</TableCell>
-        </TableRow>
-        <TableRow>
-            <TableCell>URL</TableCell>
-            <TableCell>{nodeData.url}</TableCell>
-        </TableRow>
-        <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>{nodeData.userName}</TableCell>
-        </TableRow>
+        {nodeData.driverClass != null && (
+            <TableRow>
+                <TableCell>Driver</TableCell>
+                <TableCell>{nodeData.driverClass}</TableCell>
+            </TableRow>
+        )}
+        {nodeData.url != null && (
+            <TableRow>
+                <TableCell>URL</TableCell>
+                <TableCell>{nodeData.url}</TableCell>
+            </TableRow>
+        )}
+        {nodeData.userName != null && (
+            <TableRow>
+                <TableCell>Username</TableCell>
+                <TableCell>{nodeData.userName}</TableCell>
+            </TableRow>
+        )}
     </Table>
 }
 
@@ -83,6 +89,19 @@ function SourceViewSectionForDataSources(props) {
             <Paper className={classes.paper} elevation={0} square>
                 <DataSourceDetailTable nodeData={nodeData.details} />
             </Paper>
+            {(nodeData.details.dataSourceProps != null && Object.keys(nodeData.details.dataSourceProps).length > 0) &&
+                (
+                <Box pl={4}>
+                    <Typography variant="h6" color="inherit" noWrap>
+                        Properties
+                    </Typography>
+                    <Box pr={2}>
+                        <ParametersSection parameters={nodeData.details.dataSourceProps} classes={classes}/>
+                    </Box>
+                    <br/>
+                </Box>
+                )
+            }
             <Box pl={4}>
                 <Typography variant="h6" color="inherit" noWrap>
                     Parameters
@@ -96,10 +115,14 @@ function SourceViewSectionForDataSources(props) {
 }
 
 function ParametersSection(props) {
-    const parameters = props.parameters;
     const classes = props.classes;
+    let parameters = Object.entries(props.parameters);
+    parameters.sort((current, next) => {
+        return current[0].localeCompare(next[0]);
+    });
+
     return <Table size="small" className={classes.parameterTable}>
-        {Object.entries(parameters).map(([key, value], index) =>
+        {parameters.map(([key, value], index) =>
             <TableRow key={index}>
                 <TableCell>{key}</TableCell>
                 <TableCell>{String(value)}</TableCell>

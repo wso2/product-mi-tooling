@@ -55,6 +55,7 @@ import DataSources from '../pages/Datasources';
 import AuthManager from '../auth/AuthManager';
 import { setIsRefreshed } from '../redux/Actions';
 import { useDispatch } from 'react-redux';
+import UpdatePassword from "../pages/UpdatePassword";
 
 const drawerWidth = 256;
 
@@ -155,6 +156,7 @@ function Layout(props) {
                                 <Route exact path='/users/add' component={AddUsers}/>
                                 <Route exact path='/roles/add' component={AddRoles}/>
                                 <Route exact path='/roles' component={Roles}/>
+                                <Route exact path='/update-password' component={UpdatePassword}/>
                             </Switch>
                         </Content>
                     </main>

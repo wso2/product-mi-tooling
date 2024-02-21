@@ -101,6 +101,11 @@ export default class HTTPClient {
         return this.post(path, payload)
     }
 
+    static updateUserPassword(groupId, payload) {
+        const path = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_USER_PASSWORD}`
+        return this.patch(path, payload)
+    }
+
     static getAllRoles(groupId) {
         const resourcePath = `${groupId}/${Constants.PREFIX_ALLROLES}`
         return this.getResource(resourcePath)

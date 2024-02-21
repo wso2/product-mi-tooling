@@ -73,6 +73,10 @@ function Header(props) {
     return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname.startsWith("/roles") || location.pathname === "/");
   };
 
+  const updatePassword = () => {
+    window.location.href = "/update-password";
+  }
+
   const handleLogout = () => {
     if (AuthManager.getUser()?.sso) {
       signOut();
@@ -126,6 +130,7 @@ function Header(props) {
                   keepMounted
                   open={Boolean(anchorEl)}
                   onClose={handlePopOverClose}>
+                  {!AuthManager.getUser()?.sso && <MenuItem onClick={updatePassword}>Change Password</MenuItem>}
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </Popover>

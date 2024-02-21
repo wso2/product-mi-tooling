@@ -52,7 +52,8 @@ export const categories = [
  const nonDisplayItems = [ 
    {id: 'Add Users', to: '/users/add' }, 
    {id: 'Add Roles', to: '/roles/add' }, 
-   {id: 'Add Log Config', to: '/log-configs/add'}
+   {id: 'Add Log Config', to: '/log-configs/add'},
+   {id: 'Update Password', to: '/update-password'},
   ]
 
   export const getIdFromRoute = (route) => {
