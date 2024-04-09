@@ -17,7 +17,7 @@ import LayersIcon from '@material-ui/icons/Layers';
 import DnsIcon from '@material-ui/icons/Dns';
 import RegistryIcon from '@material-ui/icons/Receipt';
 
-export const categories = [
+export const miCategories = [
     {
       id: 'General',
       children: [
@@ -49,6 +49,16 @@ export const categories = [
     },
   ];
 
+export const balCategories = [
+  {
+    id: 'General',
+    children: [
+      { id: 'Services', to: '/services', icon: <ProxyIcon /> },
+      {id: 'Listeners', to: '/listeners', icon: <EndpointIcon /> }
+    ]
+  }
+];
+
  const nonDisplayItems = [ 
    {id: 'Add Users', to: '/users/add' }, 
    {id: 'Add Roles', to: '/roles/add' }, 
@@ -58,7 +68,11 @@ export const categories = [
 
   export const getIdFromRoute = (route) => {
       let allChildren = [];
-      categories.map((cat) => {
+      // todo: should use forEach
+      miCategories.map((cat) => {
+          allChildren = [...allChildren, ...cat.children];
+      })
+      balCategories.map((cat) => {
           allChildren = [...allChildren, ...cat.children];
       })
       let selected = allChildren.find(child => child.to === route);

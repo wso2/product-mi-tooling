@@ -18,22 +18,19 @@
  *
  */
 
-import EnhancedTable from '../../commons/EnhancedTable';
-import { currentGroupSelector } from '../../redux/Actions';
-import { useSelector } from 'react-redux';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
+import EnhancedTable from '../commons/EnhancedTable';
 
-export default function Nodes () {
+export default function Listeners() {
     const [pageInfo] = React.useState({
-        pageId: "nodesPage",
-        title: "Nodes",
+        pageId: "listeners",
+        title: "Listeners",
         headCells: [
-            {id: 'node_type', label: 'Type'},
-            {id: 'node_select', label: 'Select'},
-            {id: 'nodeId', label: 'Node ID'},
-            {id: 'node_status', label: 'Status'},
-            {id: 'role', label: 'Role'}],
-        tableOrderBy: 'service'
+            {id: 'listenerName', label: 'Listener Name'},
+            {id: 'listenerProtocol', label: 'Protocol'},
+            {id: 'listenerProperties', label: 'Properties'},
+        ],
+        tableOrderBy: 'name'
     });
-    return (<EnhancedTable pageInfo={pageInfo}/>);
+    return <EnhancedTable pageInfo={pageInfo}/>
 }
