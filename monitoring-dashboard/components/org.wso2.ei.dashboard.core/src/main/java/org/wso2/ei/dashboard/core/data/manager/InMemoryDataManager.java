@@ -38,6 +38,7 @@ public final class InMemoryDataManager implements DataManager {
     private static final String GROUP_ID = "groupId";
     private static final String NODE_ID = "nodeId";
     private static final String SERVICE_INFO = "serviceInfo";
+    private static final String PRODUCT = "product";
     private static final String ACCESS_TOKEN = "accessToken";
     private static final String TIMESTAMP = "timeStamp";
     private static final String MGT_URL = "mgtUrl";
@@ -82,6 +83,7 @@ public final class InMemoryDataManager implements DataManager {
             map.put(GROUP_ID, heartbeat.getGroupId());
             map.put(NODE_ID, heartbeat.getNodeId());
             map.put(SERVICE_INFO, serverInfo);
+            map.put(PRODUCT, heartbeat.getProduct());
             String keyString = heartbeat.getGroupId() + heartbeat.getNodeId();
             serviceInfoStore.put(keyString, map);
             logger.info("Adding serverInfo of node " + heartbeat.getNodeId() +  " in group " + heartbeat.getGroupId());
@@ -118,6 +120,7 @@ public final class InMemoryDataManager implements DataManager {
                     NodeListInner nodeListInner = new NodeListInner();
                     nodeListInner.setNodeId(entry.get(NODE_ID).toString());
                     nodeListInner.setDetails(entry.get(SERVICE_INFO).toString());
+                    nodeListInner.setType(entry.get(PRODUCT).toString());
                     nodeList.add(nodeListInner);
                 }
             }

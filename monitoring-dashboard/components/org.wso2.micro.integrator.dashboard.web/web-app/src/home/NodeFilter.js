@@ -18,9 +18,8 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -28,74 +27,24 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
-import { filterNodes, setIsRefreshed } from '../redux/Actions';
+import { selectNode, deselectNode, currentGroupSelector } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
-import Divider from "@material-ui/core/Divider";
-import HTTPClient from '../utils/HTTPClient';
+import TypeIcon from '../commons/TypeIcon';
 
 export default function NodeFilter () {
-
-    const [nodeList, setNodeList] = useState([]);
-    const globalGroupId = useSelector(state => state.groupId);
-
-    React.useEffect(()=>{
-        if (globalGroupId !== '') {
-            HTTPClient.getAllNodes(globalGroupId).then(response => {
-                var list = [];
-                response.data.map(data => list.push(data.nodeId))
-                setNodeList(list)
-            })
-        }
-    },[globalGroupId])
-
-    return <MultipleSelect nodeList={nodeList}/>
-}
-
-function MultipleSelect(props) {
-
-    var nodeList = props.nodeList;
-    const classes = useStyles();
-    const [selectedNodeList, setSelectedNodeList] = useState([]);
-    const globalGroupId = useSelector(state => state.groupId);
-    const [selectedAll, setSelectedAll] = useState(false);
     const dispatch = useDispatch();
-
-    useEffect(()=>{
-        setSelectedNodeList([])
-    },[globalGroupId]);
-
-    useEffect(()=>{
-        if (nodeList.length !== 0 && selectedNodeList.length == 0) {
-            setSelectedAll(true)
-            setSelectedNodeList(nodeList);
-            dispatch(filterNodes(nodeList))
-        }
-    },[nodeList]);
-
-    useEffect(()=> {
-        dispatch(filterNodes(selectedNodeList));
-        dispatch(setIsRefreshed(true));
-    },[selectedNodeList])
+    const {selected, beenSelected, nodes, selectedType} = useSelector(currentGroupSelector);
+    const classes = useStyles();
 
     const handleChange = (event) => {
-        const selectAllLabel = "select all";
-        const selectAllValueArray = event.target.value.filter(nodeName => nodeName === selectAllLabel)
-        if (selectAllValueArray.length !== 0) {
-           handleSelectAllChange();
-        } else {
-            setSelectedAll(false);
-            setSelectedNodeList(event.target.value.filter(nodeName => nodeName !== selectAllLabel));
+        const oldValues = selected;
+        const newValues = event.target.value;
+        if (newValues.length > oldValues.length) {
+            dispatch(selectNode(newValues.find(v => !oldValues.includes(v))));
+        } else if (newValues.length < oldValues.length) {
+            dispatch(deselectNode(oldValues.find(v => !newValues.includes(v))));
         }
     };
-
-    const handleSelectAllChange = () => {
-        if (selectedAll) {
-            setSelectedNodeList([]);
-        }else{
-            setSelectedNodeList([...nodeList])
-        }
-        setSelectedAll(!selectedAll);
-    }
 
     return (
         <div>
@@ -103,25 +52,25 @@ function MultipleSelect(props) {
                 <Select
                     classes={{root: classes.selectRoot}}
                     multiple
-                    value={selectedNodeList}
+                    value={selected}
                     onChange={handleChange}
                     renderValue={(selected) => (
-                        <div className={classes.chips}>
-                            {selected.map((value) => (
-                                <Chip key={value} label={value} className={classes.chip} />
-                            ))}
+                        <div>
+                            <TypeIcon type={selectedType} className={classes.icon}></TypeIcon>
+                            {/* get rid of below dev */}
+                            <div className={classes.chips}> 
+                                {selected.map((value) => (
+                                    <Chip key={value} label={value} className={classes.chip} />
+                                ))}
+                            </div>
                         </div>
                     )}
                 >
-                    <MenuItem key={"select-all"} value={"select all"}>
-                        <Checkbox checked={selectedAll} />
-                        <ListItemText primary={"Select All"}  classes={{ primary: classes.selectAllText }}/>
-                    </MenuItem>
-                    <Divider />
-                    {nodeList.map((name) => (
-                        <MenuItem key={name} value={name}>
-                            <Checkbox checked={selectedNodeList.indexOf(name) > -1} />
-                            <ListItemText primary={name} />
+                    {nodes.map((node) => (
+                        <MenuItem key={node.nodeId} value={node.nodeId}>
+                            <TypeIcon type={node.type}></TypeIcon>
+                            <Checkbox checked={selected.indexOf(node.nodeId) > -1} />
+                            <ListItemText primary={node.nodeId} />
                         </MenuItem>
                     ))}
                 </Select>
@@ -138,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
-        maxWidth: 300,
+        maxWidth: 500,
     },
     chips: {
         display: 'flex',
@@ -154,4 +103,8 @@ const useStyles = makeStyles((theme) => ({
     selectAllText: {
         "font-weight": "bold"
     },
+    icon: {
+        "float": "left",
+        "margin-top": "2px",
+    }
 }));

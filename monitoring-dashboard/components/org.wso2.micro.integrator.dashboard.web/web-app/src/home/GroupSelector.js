@@ -4,7 +4,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import { changeGroup } from '../redux/Actions';
+import { changeGroup, selectGroup } from '../redux/Actions';
 import { useDispatch, useSelector } from 'react-redux';
 import HTTPClient from '../utils/HTTPClient';
 
@@ -25,6 +25,7 @@ export default function GroupSelector() {
             })
             setGroupList(groups)
             if (groups.length > 0) {
+                loadNodesForGroup(groups[0].value, dispatch)
                 dispatch(changeGroup(groups[0].value))
             }
         })
@@ -33,6 +34,13 @@ export default function GroupSelector() {
     return (
         <SelectComponent groupList={groupList} />
     );
+}
+
+function loadNodesForGroup(group, dispatch) {
+    HTTPClient.getAllNodes(group).then(response => {
+        response.data = response.data.map(node => ({...node, details: JSON.parse(node.details)}));
+        dispatch(selectGroup(group, response.data));
+    })
 }
 
 function SelectComponent(props) {
@@ -50,6 +58,7 @@ function SelectComponent(props) {
     },[props.groupList]);
 
     const changeSelectedGroupId = (groupId) => {
+        loadNodesForGroup(groupId, dispatch)
         dispatch(changeGroup(groupId))
         setselectedGroupId(groupId)
     }

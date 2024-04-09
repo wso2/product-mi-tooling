@@ -64,64 +64,36 @@ export default function HomePageSideDrawer(props) {
                     </Paper>
                     <Paper className={classes.paper} square elevation={0}>
                         <Table>
-                            <TableRow>
-                                <TableCell>Server Name</TableCell>
-                                <TableCell>{nodeData.details.productName}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Product Version</TableCell>
-                                <TableCell>{nodeData.details.productVersion}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Product Home</TableCell>
-                                <TableCell>{nodeData.details.carbonHome}
-                                    <CopyToClipboard
-                                        text={nodeData.details.carbonHome}
-                                        className={classes.clipboard}
-                                        onCopy={onCopy}
-                                    >
-                                        <Tooltip title={copyMessage}>
-                                            <Button><FileCopyIcon /></Button>
-                                        </Tooltip>
-                                    </CopyToClipboard>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Java Home</TableCell>
-                                <TableCell>{nodeData.details.javaHome}
-                                    <CopyToClipboard
-                                        text={nodeData.details.javaHome}
-                                        className={classes.clipboard}
-                                        onCopy={onCopy}
-                                    >
-                                        <Tooltip title={copyMessage}>
-                                            <Button><FileCopyIcon /></Button>
-                                        </Tooltip>
-                                    </CopyToClipboard>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Java Version</TableCell>
-                                <TableCell>{nodeData.details.javaVersion}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Java Vendor</TableCell>
-                                <TableCell>{nodeData.details.javaVendor}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>OS Name</TableCell>
-                                <TableCell>{nodeData.details.osName}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>OS Version</TableCell>
-                                <TableCell>{nodeData.details.osVersion}</TableCell>
-                            </TableRow>
+                            {/* todo: display order */}
+                            {Object.entries(nodeData.details).map(([key, value]) => {
+                                return (
+                                    <TableRow key={key}>
+                                        <TableCell>{fromCamelCaseToWhiteSpaced(key)}</TableCell>
+                                        <TableCell>{value}
+                                            {/* todo: enable when hovering over prev */}
+                                            <CopyToClipboard
+                                                text={value}
+                                                className={classes.clipboard}
+                                                onCopy={onCopy}
+                                            >
+                                                <Tooltip title={copyMessage}>
+                                                    <Button><FileCopyIcon /></Button>
+                                                </Tooltip>
+                                            </CopyToClipboard>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </Table>
                     </Paper>
                 </Grid>
             </Grid>
         </div>
     );
+}
+
+function fromCamelCaseToWhiteSpaced(camelCase) {
+    return camelCase.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) { return str.toUpperCase(); });
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -145,7 +117,11 @@ const useStyles = makeStyles((theme) => ({
 
 
     clipboard: {
-        color: '#3f51b5'
+        color: '#3f51b5',
+        opacity: 0,
+        '&:hover': {
+            opacity: 1,
+        },
     },
 
 }));

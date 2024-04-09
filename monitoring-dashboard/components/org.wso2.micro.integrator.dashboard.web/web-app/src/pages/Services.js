@@ -18,22 +18,21 @@
  *
  */
 
-import EnhancedTable from '../../commons/EnhancedTable';
-import { currentGroupSelector } from '../../redux/Actions';
-import { useSelector } from 'react-redux';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
+import EnhancedTable from '../commons/EnhancedTable';
 
-export default function Nodes () {
+export default function Services() {
     const [pageInfo] = React.useState({
-        pageId: "nodesPage",
-        title: "Nodes",
+        pageId: "services",
+        title: "Services",
         headCells: [
-            {id: 'node_type', label: 'Type'},
-            {id: 'node_select', label: 'Select'},
-            {id: 'nodeId', label: 'Node ID'},
-            {id: 'node_status', label: 'Status'},
-            {id: 'role', label: 'Role'}],
-        tableOrderBy: 'service'
+            {id: 'serviceName', label: 'Service Name'},
+            {id: 'attachPoint', label: 'Attach Point'},
+            {id: 'listeners', label: 'Listeners'},
+            {id: 'resources', label: 'Resources'}
+        ],
+        tableOrderBy: 'name'
     });
-    return (<EnhancedTable pageInfo={pageInfo}/>);
+    return <EnhancedTable pageInfo={pageInfo}/>
 }
+

@@ -11,8 +11,10 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Link as MUILink } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
-import { categories } from './NavigatorLinks';
+import { miCategories, balCategories } from './NavigatorLinks';
+import { currentGroupSelector } from '../../redux/Actions';
 import AuthManager from "../../auth/AuthManager";
+import { useSelector } from 'react-redux';
 
 
 const styles = (theme) => ({
@@ -76,20 +78,24 @@ function Navigator(props) {
     useEffect(() => {
         setSelected(location.pathname);
     }, [location]);
+    const { selectedType } = useSelector(currentGroupSelector);
 
     const getCategories = () => {
+        if (selectedType === 'bal') {
+            return balCategories;
+        }
         const userScope = AuthManager.getUser().scope;
         if(userScope !== "admin"){
-            return categories.filter(category => category.id ===  "General");
+            return miCategories.filter(category => category.id ===  "General");
         }
         if (AuthManager.getUser()?.sso) {
-            return categories.map(category => ({
+            return miCategories.map(category => ({
                 ...category,
                 children: category.children
                 .filter(child => child.id !== "Users")
             }))
         }
-        return categories;
+        return miCategories;
     }
 
     return (

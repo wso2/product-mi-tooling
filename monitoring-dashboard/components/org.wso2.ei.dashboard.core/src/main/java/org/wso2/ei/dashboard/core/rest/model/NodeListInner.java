@@ -13,7 +13,8 @@ public class NodeListInner   {
   private @Valid String nodeId = null;
   private @Valid String status = null;
   private @Valid String details = null;
-
+  // todo: rename to product
+  private @Valid String type = null;
   /**
    * node id.
    **/
@@ -111,5 +112,13 @@ public class NodeListInner   {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getType() {
+    return type;
   }
 }
