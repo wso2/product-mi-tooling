@@ -3543,9 +3543,6 @@
           },
           "mgtApiUrl" : {
             "type" : "string"
-          },
-          "changeNotification" : {
-            "$ref" : "#/components/schemas/HeartbeatRequest_changeNotification"
           }
         },
         "example" : {
@@ -3560,20 +3557,6 @@
         "type" : "object",
         "properties" : {
           "username" : {
-            "type" : "string"
-          }
-        }
-      },
-      "UpdatedArtifact" : {
-        "type" : "object",
-        "properties" : {
-          "type" : {
-            "type" : "string"
-          },
-          "name" : {
-            "type" : "string"
-          },
-          "version" : {
             "type" : "string"
           }
         }
@@ -3963,29 +3946,6 @@
         "example" : {
           "access_token" : "2YotnFZFEjr1zCsicMWpAA",
           "expires_in" : 3600
-        }
-      },
-      "HeartbeatRequest_changeNotification" : {
-        "type" : "object",
-        "properties" : {
-          "deployedArtifacts" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/UpdatedArtifact"
-            }
-          },
-          "undeployedArtifacts" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/UpdatedArtifact"
-            }
-          },
-          "stateChangedArtifacts" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/UpdatedArtifact"
-            }
-          }
         }
       },
       "NodeList_inner" : {

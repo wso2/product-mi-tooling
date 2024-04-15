@@ -53,7 +53,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         Runnable runnable = () -> {
             String nodeId = heartbeat.getNodeId();
             String groupId = heartbeat.getGroupId();
-            logger.info("Fetching artifacts from node " + nodeId + " in group " + groupId);
+            logger.info("Fetching server details from node " + nodeId + " in group " + groupId);
             String accessToken = dataManager.getAccessToken(groupId, nodeId);
             try {
                 fetchAndStoreServers(accessToken);
@@ -67,7 +67,7 @@ public class MiArtifactsManager implements ArtifactsManager {
 
     @Override
     public void runDeleteAllExecutorService() {
-        Runnable runnable = this::deleteAllArtifacts;
+        Runnable runnable = this::deleteServerDetails;
         ExecutorServiceHolder.getMiArtifactsManagerExecutorService().execute(runnable);
     }
 
@@ -93,7 +93,7 @@ public class MiArtifactsManager implements ArtifactsManager {
         }
     }
 
-    private void deleteAllArtifacts() {
+    private void deleteServerDetails() {
         String groupId = heartbeat.getGroupId();
         String nodeId = heartbeat.getNodeId();
         dataManager.deleteServerInformation(groupId, nodeId);
