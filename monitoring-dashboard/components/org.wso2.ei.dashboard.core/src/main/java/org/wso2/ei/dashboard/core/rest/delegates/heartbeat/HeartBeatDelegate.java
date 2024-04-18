@@ -31,6 +31,7 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.delegates.ArtifactsManager;
 import org.wso2.ei.dashboard.core.rest.model.Ack;
 import org.wso2.ei.dashboard.core.rest.model.HeartbeatRequest;
+import org.wso2.ei.dashboard.micro.integrator.BalArtifactsManager;
 import org.wso2.ei.dashboard.micro.integrator.MiArtifactsManager;
 
 import java.util.concurrent.Executors;
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 public class HeartBeatDelegate {
     private static final Logger logger = LogManager.getLogger(HeartBeatDelegate.class);
     private static final String PRODUCT_MI = "mi";
+    private static final String PRODUCT_BAL = "bal";
     private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws ManagementApiException {
@@ -140,6 +142,8 @@ public class HeartBeatDelegate {
     private ArtifactsManager getArtifactManager(String productName, HeartbeatObject heartbeat) {
         if (productName.equals(PRODUCT_MI)) {
             return new MiArtifactsManager(heartbeat);
+        } else if (productName.equals(PRODUCT_BAL)) {
+            return new BalArtifactsManager(heartbeat);
         } else {
             throw new DashboardServerException("Unsupported product : " + productName);
         }
