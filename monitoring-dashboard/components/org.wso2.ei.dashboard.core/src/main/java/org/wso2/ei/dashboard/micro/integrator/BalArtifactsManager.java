@@ -67,7 +67,6 @@ public class BalArtifactsManager implements ArtifactsManager {
     }
 
     private void fetchAndStoreServers(String accessToken) throws ManagementApiException {
-        // This code need to be changed according to the Ballerina server API
         String url = heartbeat.getMgtApiUrl();
         try (CloseableHttpResponse response = Utils.doGet(heartbeat.getGroupId(), heartbeat.getNodeId(),
                 accessToken, url)) {
