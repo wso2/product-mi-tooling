@@ -79,6 +79,7 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.DataServicesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.DataSourcesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.EndpointsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.InboundEndpointDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.ListenersDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LocalEntriesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LogConfigDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.LogsDelegate;
@@ -88,6 +89,7 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.RegistryResourceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.RolesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.ServicesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.UsersDelegate;
@@ -447,6 +449,75 @@ public class GroupsApi {
         HttpUtils.setHeaders(responseBuilder);
         return responseBuilder.build();
     }
+
+    @GET
+    @Path("/{group-id}/services")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get services by node ids", description = "", tags={ "services" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of services deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getServicesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull  @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull  @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+
+        ServicesDelegate servicesDelegate = new ServicesDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get services");
+        try {
+            ArtifactsResourceResponse serviceList = servicesDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(serviceList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/listeners")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get listeners by node ids", description = "", tags={ "services" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of listeners deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getListenersByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull  @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes")  List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull  @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull  @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+
+            ListenersDelegate listenersDelegate = new ListenersDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get services");
+        try {
+            ArtifactsResourceResponse serviceList = listenersDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(serviceList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
     @GET
     @Path("/{group-id}/inbound-endpoints")
     @Produces({ "application/json" })

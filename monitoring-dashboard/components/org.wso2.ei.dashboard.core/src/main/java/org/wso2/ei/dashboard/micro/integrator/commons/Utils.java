@@ -44,11 +44,13 @@ import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.DATA_SOURCES;
 import static org.wso2.ei.dashboard.core.commons.Constants.ENDPOINTS;
 import static org.wso2.ei.dashboard.core.commons.Constants.INBOUND_ENDPOINTS;
+import static org.wso2.ei.dashboard.core.commons.Constants.LISTENERS;
 import static org.wso2.ei.dashboard.core.commons.Constants.LOCAL_ENTRIES;
 import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_PROCESSORS;
 import static org.wso2.ei.dashboard.core.commons.Constants.MESSAGE_STORES;
 import static org.wso2.ei.dashboard.core.commons.Constants.PROXY_SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.SEQUENCES;
+import static org.wso2.ei.dashboard.core.commons.Constants.SERVICES;
 import static org.wso2.ei.dashboard.core.commons.Constants.TASKS;
 import static org.wso2.ei.dashboard.core.commons.Constants.TEMPLATES;
 
@@ -278,6 +280,8 @@ public class Utils {
             case TEMPLATES:
             case LOCAL_ENTRIES:
             case DATA_SOURCES:
+            case SERVICES:
+            case LISTENERS:
                 getArtifactDetailsUrl = getArtifactsUrl.concat("?name=").concat(artifactName);
                 break;
             case APIS:

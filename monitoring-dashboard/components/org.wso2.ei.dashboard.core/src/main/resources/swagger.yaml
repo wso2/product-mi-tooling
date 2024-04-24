@@ -75,6 +75,10 @@ tags:
     description: "Access roles details"
   - name: "configuration"
     description: "Access configurations"
+  - name: "services"
+    description: "Access services details"
+  - name: "listeners"
+    description: "Access listeners details"
 
 paths:
   /login:
@@ -534,6 +538,148 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ack'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/services:
+    get:
+      tags:
+        - "services"
+      summary: "Get services by node ids"
+      operationId: "getServicesByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Response object containing paginated list of resulting Services and the count of search results, deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /groups/{group-id}/listeners:
+    get:
+      tags:
+        - "listeners"
+      summary: "Get listeners by node ids"
+      operationId: "getListenerssByNodeIds"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "nodes"
+          in: query
+          description: "ID/IDs of the nodes"
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: all
+        - name: "searchKey"
+          in: query
+          description: "Search key"
+          required: false
+          schema:
+            type: string
+        - name: "lowerLimit"
+          in: query
+          description: "Lower Limit"
+          required: true
+          schema:
+            type: string
+        - name: "upperLimit"
+          in: query
+          description: "Upper Limit"
+          required: true
+          schema:
+            type: string
+        - name: "order"
+          in: query
+          description: "Order"
+          required: false
+          schema:
+            type: string
+        - name: "orderBy"
+          in: query
+          description: "Order By"
+          required: false
+          schema:
+            type: string
+        - name: "isUpdate"
+          in: query
+          description: "Whether it is an update"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Response object containing paginated list of resulting Services and the count of search results, deployed in provided nodes"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactsResourceResponse'
         default:
           description: "Unexpected error"
           content:
