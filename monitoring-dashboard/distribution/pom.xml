@@ -143,8 +143,25 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.ei</groupId>
+            <artifactId>org.wso2.micro.integrator.security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.ei</groupId>
+            <artifactId>org.wso2.micro.integrator.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.ei</groupId>
             <artifactId>org.wso2.micro.integrator.dashboard.utils</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.ei</groupId>
+            <artifactId>org.wso2.dashboard.security.user.core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

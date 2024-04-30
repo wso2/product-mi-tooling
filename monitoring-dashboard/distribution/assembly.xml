@@ -172,6 +172,10 @@
                 <include>net.minidev:json-smart:jar</include>
                 <include>net.minidev:accessors-smart:jar</include>
                 <include>org.wso2.ei:org.wso2.micro.integrator.dashboard.utils:jar</include>
+                <include>org.wso2.ei:org.wso2.dashboard.security.user.core:jar</include>
+                <include>org.wso2.ei:org.wso2.micro.integrator.security:jar</include>
+                <include>com.zaxxer:HikariCP:jar</include>
+                <include>org.wso2.ei:org.wso2.micro.integrator.core:jar</include>
                 <include>org.apache.ws.commons.axiom.wso2:axiom:jar</include>
                 <include>org.wso2.securevault:org.wso2.securevault:jar</include>
                 <include>org.wso2.carbon:org.wso2.carbon.securevault:jar</include>

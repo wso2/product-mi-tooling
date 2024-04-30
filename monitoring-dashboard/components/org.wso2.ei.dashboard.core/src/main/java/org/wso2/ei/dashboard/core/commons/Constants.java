@@ -85,6 +85,5 @@ public final class Constants {
     public static final String INTERNAL_EVERYONE = "Internal/everyone";
     public static final String DEFAULT_LIST_KEY = "list";
 
-    public static final String NO_SERVER_FOUND_ERROR =
-            "No running micro integrator instances found. Please start a server and login.";
+    public static final String LOGIN_ERROR = "Error occurred while logging in to the dashboard.";
 }
