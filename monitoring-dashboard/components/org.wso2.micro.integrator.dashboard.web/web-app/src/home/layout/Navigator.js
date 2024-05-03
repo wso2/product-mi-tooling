@@ -52,6 +52,8 @@ const styles = (theme) => ({
     firebase: {
         fontSize: 24,
         color: theme.palette.common.white,
+        display: 'flex',
+        'justify-content': 'center'
     },
     itemActiveItem: {
         color: '#4fc3f7',

@@ -30,7 +30,7 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 export default function HomePageSideDrawer(props) {
     var nodeData = props.nodeData;
-    const [copyMessage, setCopyMessage] = useState('Copy to Clipboard');
+  const [copyMessage, setCopyMessage] = useState('Copy to Clipboard');
 
     const [open, setOpen] = React.useState(false);
 
@@ -46,12 +46,12 @@ export default function HomePageSideDrawer(props) {
 
     const classes = useStyles();
     const onCopy = () => {
-        setCopyMessage('Copied');
+    setCopyMessage('Copied');
         const caller = function () {
-            setCopyMessage('Copy to Clipboard');
+      setCopyMessage('Copy to Clipboard');
         };
         setTimeout(caller, 2000);
-    }
+  }
 
     return (
         <div className={classes.root}>
@@ -69,15 +69,14 @@ export default function HomePageSideDrawer(props) {
                                 return (
                                     <TableRow key={key}>
                                         <TableCell>{fromCamelCaseToWhiteSpaced(key)}</TableCell>
-                                        <TableCell>{value}
-                                            {/* todo: enable when hovering over prev */}
+                                            <TableCell className={classes.value}> {value}
                                             <CopyToClipboard
                                                 text={value}
                                                 className={classes.clipboard}
                                                 onCopy={onCopy}
                                             >
                                                 <Tooltip title={copyMessage}>
-                                                    <Button><FileCopyIcon /></Button>
+                                                <Button><FileCopyIcon /></Button>
                                                 </Tooltip>
                                             </CopyToClipboard>
                                         </TableCell>
@@ -93,7 +92,7 @@ export default function HomePageSideDrawer(props) {
 }
 
 function fromCamelCaseToWhiteSpaced(camelCase) {
-    return camelCase.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) { return str.toUpperCase(); });
+  return camelCase.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) { return str.toUpperCase(); });
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -107,21 +106,21 @@ const useStyles = makeStyles((theme) => ({
     },
     sideDrawerHeading: {
         padding: theme.spacing(1),
-        height: '72px',
+    height: '72px',
         backgroundColor: theme.palette.background.appBar,
-        color: '#ffffff',
-        width: '100%',
+    color: '#ffffff',
+    width: '100%',
         paddingLeft: 40,
         paddingTop: 20,
     },
 
-
-    clipboard: {
-        color: '#3f51b5',
+  value: {
+    "& button": {
         opacity: 0,
-        '&:hover': {
-            opacity: 1,
         },
+    "&:hover button": {
+      opacity: 1,
+    }
     },
 
 }));

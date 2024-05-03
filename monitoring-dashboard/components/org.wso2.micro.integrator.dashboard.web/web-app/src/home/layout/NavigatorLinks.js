@@ -67,8 +67,8 @@ export const balCategories = [
   ]
 
   export const getIdFromRoute = (route) => {
+      // todo: should use forEach, not map.
       let allChildren = [];
-      // todo: should use forEach
       miCategories.map((cat) => {
           allChildren = [...allChildren, ...cat.children];
       })

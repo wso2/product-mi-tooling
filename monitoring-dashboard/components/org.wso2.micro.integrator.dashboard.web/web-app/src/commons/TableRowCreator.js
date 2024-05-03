@@ -51,7 +51,6 @@ export default function TableRowCreator(props) {
     const { groupId, pageInfo, data, headers, retrieveData, retrieveUpdatedArtifact } = props;
     const pageId = pageInfo.pageId
     const classes = useStyles();
-    // const selectedNodeList = useSelector(state => state.nodeList);
     const dispatch = useDispatch();
     const { selected } = useSelector(currentGroupSelector);
     const onSelectNode = (nodeId, event) => {
