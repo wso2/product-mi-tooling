@@ -40,6 +40,7 @@ export default function TableHeaderCreater(props) {
                         key={headCell.id}
                         align='left'
                         sortDirection={orderBy === headCell.id ? order : false}
+                        className={headCell.id === "node_type" || headCell.id === "node_select" ? classes.narrowCell : classes.cell}
                     >
                         {headCell.label}
                         {headCell.id === orderBy &&
@@ -90,4 +91,8 @@ const useStyles = makeStyles((theme) => ({
     divider: {
         height: 0
     },
+    narrowCell: {
+        width: '0.5em'
+    },
+    cell: {}
 }));

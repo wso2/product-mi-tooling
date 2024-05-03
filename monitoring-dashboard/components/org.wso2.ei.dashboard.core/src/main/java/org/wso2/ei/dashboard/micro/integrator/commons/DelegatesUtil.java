@@ -39,7 +39,6 @@ public class DelegatesUtil {
     private static final Logger logger = LogManager.getLogger(DelegatesUtil.class);
 
     private static List<ArtifactsInner> searchedArtifacts;
-    private static String prevSearchKey = null;
     private static String prevResourceType = null;
     private static int count;
 
@@ -141,18 +140,11 @@ public class DelegatesUtil {
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
 
         ArtifactsResourceResponse artifactsResourceResponse = new ArtifactsResourceResponse();
-        logger.debug("prevSearchkey :" + prevSearchKey + ", currentSearchkey:" + searchKey);
-        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey)) ||
-            !(prevResourceType.equals(artifactType))) {
-
-            searchedArtifacts = getSearchedArtifactsFromMI(groupId, nodeList, artifactType,
-                    searchKey, order, orderBy);
-            count = getArtifactCount(searchedArtifacts);
-        }
+        searchedArtifacts = getSearchedArtifactsFromMI(groupId, nodeList, artifactType, searchKey, order, orderBy);
+        count = getArtifactCount(searchedArtifacts);
         Artifacts paginatedList = getPaginationResults(searchedArtifacts, fromIndex, toIndex);
         artifactsResourceResponse.setResourceList(paginatedList);
         artifactsResourceResponse.setCount(count);
-        prevSearchKey = searchKey;
         prevResourceType = artifactType;
         return artifactsResourceResponse;
     }

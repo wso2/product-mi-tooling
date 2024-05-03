@@ -52,10 +52,12 @@ import AddUsers from '../pages/AddUsers'
 import AddRoles from '../pages/AddRoles';
 import AddLogConfig from '../pages/AddLogConfig'
 import DataSources from '../pages/Datasources';
+import Services from '../pages/Services';
 import AuthManager from '../auth/AuthManager';
 import { setIsRefreshed } from '../redux/Actions';
 import { useDispatch } from 'react-redux';
 import UpdatePassword from "../pages/UpdatePassword";
+import Listeners from '../pages/Listener';
 
 const drawerWidth = 256;
 
@@ -157,6 +159,8 @@ function Layout(props) {
                                 <Route exact path='/roles/add' component={AddRoles}/>
                                 <Route exact path='/roles' component={Roles}/>
                                 <Route exact path='/update-password' component={UpdatePassword}/>
+                                <Route exact path='/services' component={Services}/>
+                                <Route exact path='/listeners' component={Listeners}/>
                             </Switch>
                         </Content>
                     </main>

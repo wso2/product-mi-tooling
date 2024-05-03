@@ -31,13 +31,14 @@ import SearchBox from '../commons/SearchBox';
 import { useSelector } from 'react-redux';
 import HTTPClient from '../utils/HTTPClient';
 import Progress from '../commons/Progress';
+import { currentGroupSelector } from '../redux/Actions';
 
 export default function EnhancedTableRegistry(props) {
     const { pageInfo, registryPath, handleDoubleClick, } = props;
     const [queryString, setQueryString] = React.useState('');
     const [registryList, setRegistryList] = React.useState([]);
     const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
+    const selectedNodeList = useSelector(currentGroupSelector).selected;
 
     const newDataSet = registryList.map(data => ({...data, fileIcon: addIconType(data)}));
     const dataSetFiles = newDataSet.filter(data => data.mediaType !== 'directory');

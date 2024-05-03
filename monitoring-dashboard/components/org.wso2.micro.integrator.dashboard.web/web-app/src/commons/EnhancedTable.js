@@ -34,7 +34,7 @@ import Progress from '../commons/Progress';
 import Error from '../commons/Error';
 import { Link } from "react-router-dom";
 import { Button } from "@material-ui/core";
-import { setIsRefreshed } from '../redux/Actions';
+import { setIsRefreshed, currentGroupSelector } from '../redux/Actions';
 import { useDispatch } from 'react-redux';
 
 export default function EnhancedTable(props) {
@@ -48,10 +48,12 @@ export default function EnhancedTable(props) {
     const [page, setPage] = React.useState(0);
     const [rowCount, setRowCount] = React.useState(0);
     const globalGroupId = useSelector(state => state.groupId);
-    const selectedNodeList = useSelector(state => state.nodeList);
     const isRefreshed = useSelector(state => state.isRefreshed);
 
     var selectedNodeId = pageInfo.additionalParams?.selectedNodeId;
+
+    const { nodes, selected } = useSelector(currentGroupSelector);
+    const selectedNodeList = selected;
 
     const [data, setData] = React.useState(null);
     const [error, setError] = React.useState(null);
@@ -69,13 +71,19 @@ export default function EnhancedTable(props) {
             isUpdate = true;
         }
         if(pageId === 'nodesPage') {
-            HTTPClient.getNodes(globalGroupId,page * rowsPerPage, page * rowsPerPage + rowsPerPage ).then(response => {
-                response.data.resourceList.map(data => data.details = JSON.parse(data.details))
-                setData(response.data.resourceList)
-                setRowCount(response.data.count)
-            }).catch(error => {
-                console.log(error.response.data.message);
-            });
+            setData(nodes);
+            setRowCount(nodes.length)
+        }else if(pageId === 'services') {
+            // Dummy data for now
+            setData([
+                {serviceName:"my_org:service_1", attachPoint: "/path/to", listeners: "listener1", resources: "res1, res2"},
+                {serviceName:"my_org:service_2", attachPoint: "/other/path/to", listeners: "listener1", resources: "res3, res4"}
+            ]);
+            setRowCount(2)
+        }else if(pageId === 'listeners') {
+            // Dummy data for now
+            setData([{listenerName:"listener1", listenerProtocol: "http", listenerProperties: "port: 8080"}]);
+            setRowCount(1)
         } else if(pageId === 'users' || pageId === 'roles') {
             HTTPClient.getPaginatedUsersAndRoles(query, page * rowsPerPage, page * rowsPerPage + rowsPerPage, 
                 pageId, order, orderBy, globalGroupId, isUpdate).then(response => {

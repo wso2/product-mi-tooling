@@ -35,7 +35,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Button } from '@material-ui/core';
+import { Button, Checkbox, SvgIcon } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import NodesCell from './NodesCell';
 import UserRoleCell from './UserRoleCell';
@@ -44,11 +44,22 @@ import StatusCell from './statusCell/StatusCell';
 import AuthManager from '../auth/AuthManager';
 import HTTPClient from '../utils/HTTPClient';
 import IconCell from './IconCell';
+import { currentGroupSelector, deselectNode, selectNode } from '../redux/Actions';
+import TypeIcon from './TypeIcon';
 
 export default function TableRowCreator(props) {
     const { groupId, pageInfo, data, headers, retrieveData, retrieveUpdatedArtifact } = props;
     const pageId = pageInfo.pageId
     const classes = useStyles();
+    const dispatch = useDispatch();
+    const { selected } = useSelector(currentGroupSelector);
+    const onSelectNode = (nodeId, event) => {
+        if (event.target.checked) {
+            dispatch(selectNode(nodeId));
+        } else {
+            dispatch(deselectNode(nodeId));
+        }
+    }
     return <TableRow>
         {headers.map(header => {switch(header.id) {
             // common
@@ -160,14 +171,18 @@ export default function TableRowCreator(props) {
                 return <TableCell>{data.status == "healthy" ? <table>Healthy</table> : <table className={classes.unhealthyNodeCell}>Unhealthy</table>}</TableCell>
             case 'role':
                 return <TableCell>Member</TableCell>
-
+            case 'node_type':
+                return <TableCell><TypeIcon type={data.type} className={classes.icon}></TypeIcon></TableCell>
+            case 'node_select':
+                return <TableCell><Checkbox checked={selected.indexOf(data.nodeId) > -1} onChange={onSelectNode.bind(null, data.nodeId)}/></TableCell>
             // Log Files Page
             case 'nodes_logs':
                 return <TableCell><table>{data.nodes.map(node=><LogsNodeCell nodeId={node.nodeId} fileName={data.name} />)}</table></TableCell>
             case 'log_size':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.logSize} />)}</table></TableCell>
             default:
-                <TableCell>Table data not available</TableCell>
+                const cellData = data[header.id];
+                return cellData != undefined ? <TableCell>{cellData}</TableCell> : <TableCell>Table data not available</TableCell>
         }})}
     </TableRow>
 }
@@ -654,5 +669,8 @@ const useStyles = makeStyles((theme) => ({
     disabledButton: {
         color: '#000000',
         opacity: '0.26'
+    },
+    icon: {
+        "margin-top": "4px"
     }
 }));
