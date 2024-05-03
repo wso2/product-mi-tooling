@@ -72,3 +72,7 @@ window.sso = {
      }
     {% endif %}
 };
+
+window.userStore = {
+    type : "{{user_store.type | default('file_based') }}"
+};

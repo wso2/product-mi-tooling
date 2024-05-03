@@ -240,7 +240,8 @@ public final class InMemoryDataManager implements DataManager {
         String keyString = groupId + nodeId;
         try  {
             serviceInfoStore.remove(keyString);
-            logger.info("Server info  deleted of node " + nodeId + " in group " + groupId);
+            logger.info("Successfully deleted server information of node " + nodeId + " in group " + groupId);
+
             return !serviceInfoStore.containsKey(keyString);
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while deleting server information.", e);

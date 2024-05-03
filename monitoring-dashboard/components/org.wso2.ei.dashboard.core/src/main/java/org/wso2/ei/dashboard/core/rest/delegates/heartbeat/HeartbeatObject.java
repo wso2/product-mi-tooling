@@ -20,9 +20,6 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 
-import org.wso2.ei.dashboard.core.rest.model.UpdatedArtifact;
-import java.util.List;
-
 /**
  * Heartbeat object class.
  */
@@ -33,14 +30,9 @@ public class HeartbeatObject {
     private Integer interval;
     private String mgtApiUrl;
     private long timestamp;
-    private List<UpdatedArtifact> deployedArtifacts;
-    private List<UpdatedArtifact> undeployedArtifacts;
-    private List<UpdatedArtifact> stateChangedArtifacts;
 
     public HeartbeatObject(
-            String product, String groupId, String nodeId, Integer interval, String mgtApiUrl, long timestamp,
-            List<UpdatedArtifact> deployedArtifacts, List<UpdatedArtifact> undeployedArtifacts,
-            List<UpdatedArtifact> stateChangedArtifacts) {
+            String product, String groupId, String nodeId, Integer interval, String mgtApiUrl, long timestamp) {
 
         this.product = product;
         this.groupId = groupId;
@@ -48,9 +40,6 @@ public class HeartbeatObject {
         this.interval = interval;
         this.mgtApiUrl = mgtApiUrl;
         this.timestamp = timestamp;
-        this.deployedArtifacts = deployedArtifacts;
-        this.undeployedArtifacts = undeployedArtifacts;
-        this.stateChangedArtifacts = stateChangedArtifacts;
     }
 
     public String getProduct() {
@@ -111,35 +100,5 @@ public class HeartbeatObject {
     public void setTimestamp(long timestamp) {
 
         this.timestamp = timestamp;
-    }
-
-    public List<UpdatedArtifact> getDeployedArtifacts() {
-
-        return deployedArtifacts;
-    }
-
-    public void setDeployedArtifacts(List<UpdatedArtifact> deployedArtifacts) {
-
-        this.deployedArtifacts = deployedArtifacts;
-    }
-
-    public List<UpdatedArtifact> getUndeployedArtifacts() {
-
-        return undeployedArtifacts;
-    }
-
-    public void setUndeployedArtifacts(List<UpdatedArtifact> undeployedArtifacts) {
-
-        this.undeployedArtifacts = undeployedArtifacts;
-    }
-
-    public List<UpdatedArtifact> getStateChangedArtifacts() {
-
-        return stateChangedArtifacts;
-    }
-
-    public void setStateChangedArtifacts(List<UpdatedArtifact> stateChangedArtifacts) {
-
-        this.stateChangedArtifacts = stateChangedArtifacts;
     }
 }

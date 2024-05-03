@@ -1,5 +1,28 @@
 {
 	"sso.enable": false,
 	"sso.storage": "webWorker",
-	"sso.user_name_attribute" : "sub"
+	"sso.user_name_attribute" : "sub",
+	"file_user_store.enable": true,
+	"file.users": [
+		{
+			"user.name": "admin",
+			"user.password": "admin",
+			"user.is_admin": true
+		}
+	],
+	"mi_super_admin.username": "admin",
+	"mi_super_admin.password": "admin",
+	"bal_service_account.username": "bal_admin",
+	"bal_service_account.password": "bal_secret",
+	"user_store.base_dn": "dc=wso2,dc=org",
+	"super_admin.create_admin_account": true,
+	"super_admin.admin_role": "admin",
+	"super_admin.username": "admin",
+	"super_admin.password": "admin",
+	"realm_manager": {
+		"data_source": "WSO2CarbonDB",
+		"properties": {
+			"isCascadeDeleteEnabled": true
+		}
+	}
 }

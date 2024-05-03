@@ -4,11 +4,31 @@ port = 9743
 [heartbeat_config]
 pool_size = 15
 
-[mi_user_store]
-username = "admin"
-password = "admin"
-
 [keystore]
 file_name = "conf/security/dashboard.jks"
 password = "wso2carbon"
 key_password = "wso2carbon"
+
+[mi_super_admin]
+username = "admin"
+password = "admin"
+
+[bal_service_account]
+username = "bal_admin"
+password = "bal_secret"
+
+#by default file based user store is enabled
+#[file_user_store]
+#enable = true
+
+#[user_store]
+#type = "read_only_ldap"
+
+#[[file.users]]
+#user.name = "admin"
+#user.password = "admin"
+#user.is_admin = true
+
+[truststore]
+file_name = "conf/security/client-truststore.jks"
+password = "wso2carbon"

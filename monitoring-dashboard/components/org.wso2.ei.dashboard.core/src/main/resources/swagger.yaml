@@ -2263,37 +2263,12 @@ components:
           type: integer
         mgtApiUrl:
           type: string
-        changeNotification:
-          type: object
-          properties:
-            deployedArtifacts:
-              type: array
-              items:
-                $ref: '#/components/schemas/UpdatedArtifact'
-            undeployedArtifacts:
-              type: array
-              items:
-                $ref: '#/components/schemas/UpdatedArtifact'
-            stateChangedArtifacts:
-              type: array
-              items:
-                $ref: '#/components/schemas/UpdatedArtifact'
       example: {type: mi, groupId: mi_dev, nodeId: node_01, interval: 30, mgtApiUrl: https://10.100.0.64:9164/management/}
 
     SuperAdminUser:
       type: object
       properties:
         username:
-          type: string
-
-    UpdatedArtifact:
-      type: object
-      properties:
-        type:
-          type: string
-        name:
-          type: string
-        version:
           type: string
     Ack:
       type: object

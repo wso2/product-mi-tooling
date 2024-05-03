@@ -64,15 +64,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -90,10 +82,15 @@ public class DashboardServer {
     private static final String SECURITY_DIR = "security";
     private static final String KEYSTORE_FILE = "dashboard.jks";
     private static final String TOML_CONF_PORT = "server_config.port";
-    private static final String TOML_MI_USERNAME = "mi_user_store.username";
-    private static final String TOML_MI_PASSWORD = "mi_user_store.password";
+    private static final String TOML_MI_USERNAME = "mi_super_admin.username";
+    private static final String TOML_MI_PASSWORD = "mi_super_admin.password";
     private static final String MI_USERNAME = "mi_username";
     private static final String MI_PASSWORD = "mi_password";
+    private static final String TOML_BAL_SERVICE_USERNAME = "bal_service_account.username";
+    private static final String TOML_BAL_SERVICE_PASSWORD = "bal_service_account.password";
+    private static final String BAL_USERNAME = "bal_username";
+    private static final String BAL_PASSWORD = "bal_password";
+//    private static final String TOML_USER_STORE_TYPE = "user_store.type";
     private static final String TOML_CONF_HEARTBEAT_POOL_SIZE = "heartbeat_config.pool_size";
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
@@ -112,6 +109,9 @@ public class DashboardServer {
     private static final String CARBON_HOME = "carbon.home";
     private static final String SECRET_CONF = "secret-conf.properties";
     private static final String CARBON_CONFIG_DIR = "carbon.config.dir.path";
+//    private static final String USER_STORE_TYPE = "user_store_type";
+    private static final String FILE_BASED_USER_STORE_ENABLE = "file_user_store.enable";
+    private static final String IS_USER_STORE_FILE_BASED = "is.user.store.file.based";
     private static final int EXECUTOR_SERVICE_TERMINATION_TIMEOUT = 5000;
     private static final int DEFAULT_HEARTBEAT_POOL_SIZE = 10;
     private static String keyStorePassword;
@@ -277,6 +277,18 @@ public class DashboardServer {
             properties.put(MI_PASSWORD, resolveSecret(miPassword));
         }
 
+        String balUsername = System.getProperty(BAL_USERNAME);
+        if (StringUtils.isEmpty(balUsername)) {
+            balUsername = (String) parsedConfigs.get(TOML_BAL_SERVICE_USERNAME);
+            properties.put(BAL_USERNAME, resolveSecret(balUsername));
+        }
+
+        String balPassword = System.getProperty(BAL_PASSWORD);
+        if (StringUtils.isEmpty(balPassword)) {
+            balPassword = (String) parsedConfigs.get(TOML_BAL_SERVICE_PASSWORD);
+            properties.put(BAL_PASSWORD, resolveSecret(balPassword));
+        }
+
         keyStorePassword = System.getProperty(KEYSTORE_PASSWORD);
         if (StringUtils.isEmpty(keyStorePassword)) {
             keyStorePassword = resolveSecret((String) parsedConfigs.get(TOML_KEYSTORE_PASSWORD));
@@ -290,6 +302,14 @@ public class DashboardServer {
         jksFileLocation = System.getProperty(JKS_FILE_LOCATION);
         if (StringUtils.isEmpty(jksFileLocation)) {
             jksFileLocation = resolveSecret((String) parsedConfigs.get(TOML_JKS_FILE_LOCATION));
+        }
+
+        if (StringUtils.isEmpty(System.getProperty(FILE_BASED_USER_STORE_ENABLE))) {
+            boolean isFileBased = Boolean.parseBoolean(parsedConfigs.get(FILE_BASED_USER_STORE_ENABLE).toString());
+            if (!isFileBased) {
+                logger.info("File based user store has been disabled.");
+            }
+            properties.put(IS_USER_STORE_FILE_BASED, String.valueOf(isFileBased));
         }
 
         System.setProperties(properties);
@@ -479,8 +499,8 @@ public class DashboardServer {
     private void appendTomlProperties(Properties properties, Map<String, Object> parseResult) {
 
         Set<String> keysToInclude = new HashSet<>(Arrays.asList(TOML_MI_USERNAME, TOML_MI_PASSWORD,
-                TOML_KEYSTORE_PASSWORD, TOML_KEY_MANAGER_PASSWORD, TOML_JKS_FILE_LOCATION, TOML_TRUSTSTORE_PASSWORD,
-                TOML_TRUSTSTORE_FILE_LOCATION));
+                TOML_BAL_SERVICE_USERNAME, TOML_BAL_SERVICE_PASSWORD, TOML_KEYSTORE_PASSWORD, TOML_KEY_MANAGER_PASSWORD,
+                TOML_JKS_FILE_LOCATION, TOML_TRUSTSTORE_PASSWORD, TOML_TRUSTSTORE_FILE_LOCATION));
         for (String dottedKey : parseResult.keySet()) {
             if (keysToInclude.contains(dottedKey) && Objects.nonNull(parseResult.get(dottedKey))) {
                 properties.put(dottedKey, parseResult.get(dottedKey));

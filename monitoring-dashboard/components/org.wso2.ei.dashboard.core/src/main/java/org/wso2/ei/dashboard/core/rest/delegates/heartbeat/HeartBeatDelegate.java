@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 public class HeartBeatDelegate {
     private static final Logger logger = LogManager.getLogger(HeartBeatDelegate.class);
     private static final String PRODUCT_MI = "mi";
-    private static final String PRODUCT_SI = "si";
     private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws ManagementApiException {
@@ -51,10 +50,7 @@ public class HeartBeatDelegate {
         Ack ack = new Ack(Constants.FAIL_STATUS);
         HeartbeatObject heartbeat = new HeartbeatObject(
                 heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
-                heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp,
-                heartbeatRequest.getChangeNotification().getDeployedArtifacts(),
-                heartbeatRequest.getChangeNotification().getUndeployedArtifacts(),
-                heartbeatRequest.getChangeNotification().getStateChangedArtifacts());
+                heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp);
         if (logger.isDebugEnabled()) {
             logger.debug("Management API URL received is: " + heartbeat.getMgtApiUrl());
         }
@@ -135,7 +131,7 @@ public class HeartBeatDelegate {
     }
 
     private void deleteAllNodeData(String productName, HeartbeatObject heartbeat) {
-        logger.info("Deleting all artifacts and server information in node : " + heartbeat.getNodeId() + " in group: "
+        logger.info("Deleting all information in node : " + heartbeat.getNodeId() + " in group: "
                  + heartbeat.getGroupId());
         ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
         artifactsManager.runDeleteAllExecutorService();
