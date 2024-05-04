@@ -92,8 +92,10 @@ export default function TableRowCreator(props) {
 
             // Inbound Endpoints
             case 'protocol':
-                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.protocol} />)}</table></TableCell>
-
+                if (pageId === 'inbound-endpoints') { // skip the case Ballerina Listener's protocol
+                    return <TableCell><table>{data.nodes.map(node=><StringCell data={node.details.protocol} />)}</table></TableCell>
+                }
+                break;
             // Message Stores
             case 'message_count':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.details.size === '-1' ? "Not Supported" : node.details.size}/>)}</TableCell>
@@ -141,7 +143,10 @@ export default function TableRowCreator(props) {
             case 'data_source_status':
                 return <TableCell><table>{data.nodes.map(node=><StatusCell data={node.data_source_status} />)}</table></TableCell>
             case 'port':
-                return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
+                if (pageId === 'carbonapps') { // skip the case Ballerina Listener's port
+                    return <TableCell>{data.nodes.map(node=><StringCell data={node.port}/>)}</TableCell>
+                }
+                break;
 
             // log-configs page
             case 'componentName':
@@ -181,9 +186,18 @@ export default function TableRowCreator(props) {
             case 'log_size':
                 return <TableCell><table>{data.nodes.map(node=><StringCell data={node.logSize} />)}</table></TableCell>
             default:
-                const cellData = data[header.id];
-                return cellData != undefined ? <TableCell>{cellData}</TableCell> : <TableCell>Table data not available</TableCell>
-        }})}
+        };
+        const cellData = data[header.id];
+        if (cellData != undefined) {
+            return <TableCell>{cellData}</TableCell>;
+        }
+        const cellDataArray = data.nodes.filter(node => node.details[header.id] != undefined)
+                                        .map(node => <StringCell data={node.details[header.id]}/>);
+        if (cellDataArray.length > 0) {
+            return <TableCell><table>{cellDataArray}</table></TableCell>;
+        }
+        return <TableCell>Table data not available</TableCell>
+        })}
     </TableRow>
 }
 

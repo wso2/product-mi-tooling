@@ -26,9 +26,10 @@ export default function Listeners() {
         pageId: "listeners",
         title: "Listeners",
         headCells: [
-            {id: 'listenerName', label: 'Listener Name'},
-            {id: 'listenerProtocol', label: 'Protocol'},
-            {id: 'listenerProperties', label: 'Properties'},
+            {id: 'name', label: 'Listener Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'protocol', label: 'Protocol'},
+            {id: 'port', label: 'Port'},
         ],
         tableOrderBy: 'name'
     });

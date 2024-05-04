@@ -37,6 +37,7 @@ import LocalEntriesSideDrawer from './sideDrawers/LocalEntriesSideDrawer';
 import CarbonApplicationsSideDrawer from './sideDrawers/CarbonApplicationsSideDrawer';
 import DataServicesSideDrawer from './sideDrawers/DataServicesSideDrawer';
 import DataSourcesSideDrawer from './sideDrawers/DataSourcesSideDrawer';
+import GenericDrawer from './sideDrawers/GenericDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -90,8 +91,10 @@ function SideDrawer(props) {
             return <DataServicesSideDrawer nodeData={nodeData} />
         case 'data-sources':
             return <DataSourcesSideDrawer nodeData={nodeData} />
-        default :
+        case 'nodesPage':
             return <HomePageSideDrawer nodeData={nodeData} />
+        default :
+            return <GenericDrawer nodeData={nodeData} />
     }
 }
 

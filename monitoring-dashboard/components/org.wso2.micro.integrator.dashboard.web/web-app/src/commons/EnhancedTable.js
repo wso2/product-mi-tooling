@@ -73,17 +73,6 @@ export default function EnhancedTable(props) {
         if(pageId === 'nodesPage') {
             setData(nodes);
             setRowCount(nodes.length)
-        }else if(pageId === 'services') {
-            // Dummy data for now
-            setData([
-                {serviceName:"my_org:service_1", attachPoint: "/path/to", listeners: "listener1", resources: "res1, res2"},
-                {serviceName:"my_org:service_2", attachPoint: "/other/path/to", listeners: "listener1", resources: "res3, res4"}
-            ]);
-            setRowCount(2)
-        }else if(pageId === 'listeners') {
-            // Dummy data for now
-            setData([{listenerName:"listener1", listenerProtocol: "http", listenerProperties: "port: 8080"}]);
-            setRowCount(1)
         } else if(pageId === 'users' || pageId === 'roles') {
             HTTPClient.getPaginatedUsersAndRoles(query, page * rowsPerPage, page * rowsPerPage + rowsPerPage, 
                 pageId, order, orderBy, globalGroupId, isUpdate).then(response => {
