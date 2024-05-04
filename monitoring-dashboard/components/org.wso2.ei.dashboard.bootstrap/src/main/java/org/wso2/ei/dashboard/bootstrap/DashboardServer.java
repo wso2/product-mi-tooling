@@ -509,8 +509,7 @@ public class DashboardServer {
     }
 
     private String resolveSecret(String text) {
-
-        String alias = org.wso2.securevault.commons.MiscellaneousUtil.getProtectedToken(text);
+        String alias = MiscellaneousUtil.getProtectedToken(text);
         if (!StringUtils.isEmpty(alias)) {
             return MiscellaneousUtil.resolve(alias, secretResolver);
         }
