@@ -16,6 +16,9 @@ const NodeStateReducer = (state = {
     switch (action.type) {
         case DESELECT_NODE:
             const { nodeId } = action.payload;
+            if (group.selected.length === 1) {
+                return state;
+            }
             return {
                 ...state,
                 groupStates: {

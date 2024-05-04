@@ -26,10 +26,9 @@ export default function Services() {
         pageId: "services",
         title: "Services",
         headCells: [
-            {id: 'serviceName', label: 'Service Name'},
-            {id: 'attachPoint', label: 'Attach Point'},
-            {id: 'listeners', label: 'Listeners'},
-            {id: 'resources', label: 'Resources'}
+            {id: 'name', label: 'Service Name'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'basePath', label: 'Base Path'},
         ],
         tableOrderBy: 'name'
     });

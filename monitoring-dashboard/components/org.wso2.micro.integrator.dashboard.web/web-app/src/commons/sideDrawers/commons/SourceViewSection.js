@@ -38,7 +38,8 @@ loader.config({
 export default function SourceViewSection(props) {
     const {artifactType, artifactName, nodeId, designContent} = props;
     const globalGroupId = useSelector(state => state.groupId);
-    const [source, setSource] = React.useState("");
+    const [source, setSource] = React.useState(null);
+    const hasSource = source !== null;
     const [selectedTab, setSelectedTab] = React.useState(0);
 
     const params = {
@@ -74,7 +75,7 @@ export default function SourceViewSection(props) {
         return (<><AppBar position="static" classes={{root: classes.tabsAppBar}}>
             <Tabs value={selectedTab} onChange={changeTab} aria-label="design source selection">
                 <Tab label="Overview"/>
-                <Tab label="Source"/>
+                {hasSource && <Tab label="Source"/>}
             </Tabs>
         </AppBar>
             {selectedTab === 0 && (<>{designContent}</>)}
@@ -82,7 +83,7 @@ export default function SourceViewSection(props) {
                 <Editor
                     height="70vh"
                     defaultLanguage="xml"
-                    defaultValue={format(source)}
+                    defaultValue={format(source || "")}
                     options={{
                         readOnly: true
                     }}
