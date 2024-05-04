@@ -20,6 +20,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
@@ -64,6 +65,12 @@ public class BalArtifactsManager implements ArtifactsManager {
     public void runDeleteAllExecutorService() {
         Runnable runnable = this::deleteAllArtifacts;
         ExecutorServiceHolder.getBalArtifactsManagerExecutorService().execute(runnable);
+    }
+
+    @Override
+    public String getAccessToken(String mgtApiUrl) throws ManagementApiException {
+        return ManagementApiUtils.getToken(mgtApiUrl, System.getProperty("bal_username"),
+                System.getProperty("bal_password"));
     }
 
     private void fetchAndStoreServers(String accessToken) throws ManagementApiException {

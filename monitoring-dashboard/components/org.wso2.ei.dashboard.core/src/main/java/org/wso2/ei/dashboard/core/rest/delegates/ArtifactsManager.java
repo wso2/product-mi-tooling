@@ -20,6 +20,9 @@
 
 package org.wso2.ei.dashboard.core.rest.delegates;
 
+import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
+import org.wso2.ei.dashboard.core.exception.ManagementApiException;
+
 /**
  * This interface should be implemented by all products to store, update and delete node data.
  */
@@ -29,4 +32,7 @@ public interface ArtifactsManager {
 
     void runDeleteAllExecutorService();
 
+    default String getAccessToken(String mgtApiUrl) throws ManagementApiException {
+        return ManagementApiUtils.getAccessToken(mgtApiUrl);
+    }
 }

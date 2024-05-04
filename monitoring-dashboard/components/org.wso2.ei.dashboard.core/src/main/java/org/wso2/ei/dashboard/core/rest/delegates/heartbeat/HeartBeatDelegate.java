@@ -63,7 +63,7 @@ public class HeartBeatDelegate {
         if (isNodeRegistered(heartbeat)) {
             isSuccess = updateHeartbeat(heartbeat);
         } else {
-            isSuccess = registerNode(heartbeat);
+            isSuccess = registerNode(heartbeat, artifactsManager);
             if (isSuccess) {
                 artifactsManager.runFetchAllExecutorService();
             }
@@ -88,10 +88,10 @@ public class HeartBeatDelegate {
         return dataManager.updateHeartbeat(heartbeat);
     }
 
-    private boolean registerNode(HeartbeatObject heartbeat) throws ManagementApiException {
+    private boolean registerNode(HeartbeatObject heartbeat, ArtifactsManager artifactsManager) throws ManagementApiException {
         logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
                  " Inserting heartbeat information");
-        String accessToken = ManagementApiUtils.getAccessToken(heartbeat.getMgtApiUrl());
+        String accessToken = artifactsManager.getAccessToken(heartbeat.getMgtApiUrl());
         ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         long heartbeatInterval = heartbeat.getInterval();
         String productName = heartbeat.getProduct();
