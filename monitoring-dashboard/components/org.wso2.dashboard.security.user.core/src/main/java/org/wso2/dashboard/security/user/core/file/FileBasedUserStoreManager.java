@@ -20,12 +20,16 @@ package org.wso2.dashboard.security.user.core.file;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.dashboard.security.user.core.UserInfo;
 import org.wso2.dashboard.security.user.core.common.AbstractUserStoreManager;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
+import org.wso2.securevault.SecretResolver;
+import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -47,6 +51,7 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
     private static final String PASSWORD = "password";
     private static final String IS_ADMIN = "isAdmin";
     private static Map<String, UserInfo> userMap;
+    private static SecretResolver secretResolver;
 
     private FileBasedUserStoreManager() {
         initializeUserStore();
@@ -71,6 +76,7 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
             return;
         }
 
+        secretResolver = SecretResolverFactory.create(documentElement, true);
         OMElement realmElement = (OMElement) documentElement.getFirstChildWithName(new QName(REALM));
         if (Objects.nonNull(realmElement)) {
             OMElement fileUserStore = (OMElement) realmElement.getFirstChildWithName(new QName(FILE_USER_STORE));
@@ -105,7 +111,8 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
                         if (isAdminElement != null) {
                             isAdmin = Boolean.parseBoolean(isAdminElement.getText().trim());
                         }
-                        userMap.put(userName, new UserInfo(passwordElement.getText().toCharArray(), isAdmin));
+                        userMap.put(userName,
+                                new UserInfo(resolveSecret(passwordElement.getText()).toCharArray(), isAdmin));
                     }
                 }
             }
@@ -143,6 +150,22 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
 
     public boolean isAdmin(String username) throws UserStoreException {
         return userMap.get(username).isAdmin();
+    }
+
+    /**
+     * Checks if the text is protected and returns decrypted text if protected, else returns the plain text
+     *
+     * @param text text to be resolved
+     * @return Decrypted text if protected else plain text
+     */
+    private static String resolveSecret(String text) {
+        String alias = MiscellaneousUtil.getProtectedToken(text);
+        if (!StringUtils.isEmpty(alias)) {
+            if (secretResolver.isInitialized()) {
+                return MiscellaneousUtil.resolve(alias, secretResolver);
+            }
+        }
+        return text;
     }
 
     @Override
