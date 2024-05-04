@@ -194,7 +194,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>wso2mi-dashboard-${version}</finalName>
+                            <finalName>wso2-integration-control-plane-${version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <filters>
                                 <filter>filter.properties</filter>
