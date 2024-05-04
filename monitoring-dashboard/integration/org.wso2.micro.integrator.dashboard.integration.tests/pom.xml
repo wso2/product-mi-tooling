@@ -70,7 +70,7 @@
                         </property>
                         <maven.test.haltafterfailure>false</maven.test.haltafterfailure>
                         <carbon.zip>
-                            ${basedir}/../../distribution/target/wso2mi-dashboard-${project.version}.zip
+                            ${basedir}/../../distribution/target/wso2-integration-control-plane-${project.version}.zip
                         </carbon.zip>
                     </systemProperties>
                     <workingDirectory>${basedir}/target</workingDirectory>

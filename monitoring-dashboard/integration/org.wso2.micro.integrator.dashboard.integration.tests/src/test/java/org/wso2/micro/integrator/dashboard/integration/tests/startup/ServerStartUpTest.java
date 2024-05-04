@@ -33,7 +33,7 @@ public class ServerStartUpTest {
 
     private CarbonTestServerManager node;
     private CarbonLogReader logReader;
-    private static final String STARTUP_MSG = "WSO2 Micro Integration Monitoring Dashboard started.";
+    private static final String STARTUP_MSG = "WSO2 Integration Control Plane started.";
     private static final int TIMEOUT = 60;
 
     @BeforeClass
