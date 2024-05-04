@@ -253,8 +253,8 @@ public class DashboardServer {
             hostName = "127.0.0.1";
         }
         String loginUrl = "https://" + hostName + ":" + serverPort + "/login";
-        logger.info("WSO2 Micro Integration Monitoring Dashboard started.");
-        logger.info("Login to Micro Integrator Dashboard : '" + loginUrl + "'");
+        logger.info("WSO2 Integration Control Plane started.");
+        logger.info("Login to Integration Control Plane Dashboard : '" + loginUrl + "'");
     }
 
     private void loadConfigurations(Map<String, Object> parsedConfigs) {
