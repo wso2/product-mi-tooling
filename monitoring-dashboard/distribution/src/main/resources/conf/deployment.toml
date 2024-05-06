@@ -17,18 +17,15 @@ password = "admin"
 username = "bal_admin"
 password = "bal_secret"
 
+[truststore]
+file_name = "conf/security/client-truststore.jks"
+password = "wso2carbon"
+
 #by default file based user store is enabled
 #[file_user_store]
 #enable = true
-
-#[user_store]
-#type = "read_only_ldap"
 
 #[[file.users]]
 #user.name = "admin"
 #user.password = "admin"
 #user.is_admin = true
-
-[truststore]
-file_name = "conf/security/client-truststore.jks"
-password = "wso2carbon"
