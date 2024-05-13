@@ -24,7 +24,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.dashboard.security.user.core.*;
 import org.wso2.dashboard.security.user.core.common.AbstractUserStoreManager;
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
+import org.wso2.dashboard.security.user.core.common.Secret;
+import org.wso2.dashboard.security.user.core.common.UnsupportedSecretTypeException;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
+import org.wso2.micro.integrator.security.user.core.UserCoreConstants;
 import org.wso2.micro.integrator.security.user.core.UserRealm;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
 import org.wso2.micro.integrator.security.user.core.claim.ClaimManager;
@@ -51,7 +55,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
 
     public JDBCUserStoreManager(RealmConfiguration realmConfig, Map<String, Object> properties,
                                  ClaimManager claimManager, ProfileConfigurationManager profileManager, UserRealm realm,
-                                 Integer tenantId, boolean skipInitData) throws UserStoreException {
+                                 Integer tenantId, boolean skipInitData) throws DashboardUserStoreException {
         this(realmConfig, tenantId);
         if (log.isDebugEnabled()) {
             log.debug("Started " + System.currentTimeMillis());
@@ -78,7 +82,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
             dataSource = DatabaseUtil.getRealmDataSource(realmConfig);
         }
         if (dataSource == null) {
-            throw new UserStoreException("User Management Data Source is null");
+            throw new DashboardUserStoreException("User Management Data Source is null");
         }
 
         realmConfig.setUserStoreProperties(JDBCRealmUtil.getSQL(realmConfig
@@ -89,7 +93,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
         }
     }
 
-    public JDBCUserStoreManager(RealmConfiguration realmConfig, int tenantId) throws UserStoreException {
+    public JDBCUserStoreManager(RealmConfiguration realmConfig, int tenantId) throws DashboardUserStoreException {
         this.realmConfig = realmConfig;
         this.tenantId = tenantId;
         realmConfig.setUserStoreProperties(JDBCRealmUtil.getSQL(realmConfig
@@ -156,7 +160,101 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
         }
     }
 
-    public boolean doConnectAndAuthenticate(String userName, Object credential) throws UserStoreException {
+    @Override
+    protected boolean doAuthenticate(String userName, Object credential) throws DashboardUserStoreException {
+        if (!checkUserNameValid(userName)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Username validation failed");
+            }
+            return false;
+        }
+
+        if (!checkUserPasswordValid(credential)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Password validation failed");
+            }
+            return false;
+        }
+
+        if (UserStoreConstants.REGISTRY_SYSTEM_USERNAME.equals(userName)) {
+            log.error("Anonymous user trying to login");
+            return false;
+        }
+
+        Connection dbConnection = null;
+        ResultSet rs = null;
+        PreparedStatement prepStmt = null;
+        String sqlstmt = null;
+        String password = null;
+        boolean isAuthed = false;
+
+        try {
+            dbConnection = getDBConnection();
+            dbConnection.setAutoCommit(false);
+
+            if (isCaseSensitiveUsername()) {
+                sqlstmt = realmConfig.getUserStoreProperty(JDBCRealmConstants.SELECT_USER);
+            } else {
+                sqlstmt = realmConfig.getUserStoreProperty(JDBCCaseInsensitiveConstants.SELECT_USER_CASE_INSENSITIVE);
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug(sqlstmt);
+            }
+
+            prepStmt = dbConnection.prepareStatement(sqlstmt);
+            prepStmt.setString(1, userName);
+            if (sqlstmt.contains(UserCoreConstants.UM_TENANT_COLUMN)) {
+                prepStmt.setInt(2, tenantId);
+            }
+
+            rs = prepStmt.executeQuery();
+
+            if (rs.next() == true) {
+                String storedPassword = rs.getString(3);
+                String saltValue = null;
+                if ("true".equalsIgnoreCase(realmConfig
+                        .getUserStoreProperty(JDBCRealmConstants.STORE_SALTED_PASSWORDS))) {
+                    saltValue = rs.getString(4);
+                }
+
+                boolean requireChange = rs.getBoolean(5);
+                Timestamp changedTime = rs.getTimestamp(6);
+
+                GregorianCalendar gc = new GregorianCalendar();
+                gc.add(GregorianCalendar.HOUR, -24);
+                Date date = gc.getTime();
+
+                if (requireChange == true && changedTime.before(date)) {
+                    isAuthed = false;
+                } else {
+                    password = this.preparePassword(credential, saltValue);
+                    if ((storedPassword != null) && (storedPassword.equals(password))) {
+                        isAuthed = true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            String msg = "Error occurred while retrieving user authentication info for user : " + userName;
+            if (log.isDebugEnabled()) {
+                log.debug(msg, e);
+            }
+            throw new DashboardUserStoreException("Authentication Failure", e);
+        } finally {
+            DatabaseUtil.closeAllConnections(dbConnection, rs, prepStmt);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("User " + userName + " login attempt. Login success :: " + isAuthed);
+        }
+
+        return isAuthed;
+    }
+
+    private void checkMandatoryParams(String userName, Object credential) {
+    }
+
+    public boolean doConnectAndAuthenticate(String userName, Object credential) throws DashboardUserStoreException {
         Connection dbConnection = null;
         ResultSet rs = null;
         PreparedStatement prepStmt = null;
@@ -215,7 +313,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
             if (log.isDebugEnabled()) {
                 log.debug(msg, e);
             }
-            throw new UserStoreException("Authentication Failure", e);
+            throw new DashboardUserStoreException("Authentication Failure", e);
         } finally {
             DatabaseUtil.closeAllConnections(dbConnection, rs, prepStmt);
         }
@@ -234,7 +332,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
      * @throws UserStoreException
      */
     private String[] getStringValuesFromDatabase(String sqlStmt, Object... params)
-            throws UserStoreException {
+            throws DashboardUserStoreException {
 
         if (log.isDebugEnabled()) {
             log.debug("Executing Query: " + sqlStmt);
@@ -256,7 +354,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
             if (log.isDebugEnabled()) {
                 log.debug(msg, e);
             }
-            throw new UserStoreException(msg, e);
+            throw new DashboardUserStoreException(msg, e);
         } finally {
             DatabaseUtil.closeAllConnections(dbConnection, rs, prepStmt);
         }
@@ -272,7 +370,8 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
      * @throws UserStoreException
      */
     private String getExternalRoleListSqlStatement(String caseSensitiveUsernameQuery,
-                                                   String nonCaseSensitiveUsernameQuery) throws UserStoreException {
+                                                   String nonCaseSensitiveUsernameQuery)
+            throws DashboardUserStoreException {
         String sqlStmt;
         if (isCaseSensitiveUsername()) {
             sqlStmt = caseSensitiveUsernameQuery;
@@ -280,37 +379,47 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
             sqlStmt = nonCaseSensitiveUsernameQuery;
         }
         if (sqlStmt == null) {
-            throw new UserStoreException("The sql statement for retrieving user roles is null");
+            throw new DashboardUserStoreException("The sql statement for retrieving user roles is null");
         }
         return sqlStmt;
     }
 
-    private String preparePassword(String password, String saltValue) throws UserStoreException {
+    private String preparePassword(Object password, String saltValue) throws DashboardUserStoreException {
+        Secret credentialObj;
         try {
-            String digestInput = password;
+            credentialObj = Secret.getSecret(password);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new DashboardUserStoreException("Unsupported credential type", e);
+        }
+        try {
+            String passwordString;
             if (saltValue != null) {
-                digestInput = password + saltValue;
+                credentialObj.addChars(saltValue.toCharArray());
             }
-            String digsestFunction = realmConfig.getUserStoreProperties().get(
-                    JDBCRealmConstants.DIGEST_FUNCTION);
-            if (digsestFunction != null) {
 
-                if (digsestFunction
-                        .equals(UserStoreConstants.RealmConfig.PASSWORD_HASH_METHOD_PLAIN_TEXT)) {
-                    return password;
+            String digestFunction = realmConfig.getUserStoreProperties().get(JDBCRealmConstants.DIGEST_FUNCTION);
+            if (digestFunction != null) {
+                if (digestFunction.equals(UserCoreConstants.RealmConfig.PASSWORD_HASH_METHOD_PLAIN_TEXT)) {
+                    passwordString = new String(credentialObj.getChars());
+                    return passwordString;
                 }
 
-                MessageDigest dgst = MessageDigest.getInstance(digsestFunction);
-                byte[] byteValue = dgst.digest(digestInput.getBytes());
-                password = Base64.encode(byteValue);
+                MessageDigest digest = MessageDigest.getInstance(digestFunction);
+                byte[] byteValue = digest.digest(credentialObj.getBytes());
+                passwordString = Base64.encode(byteValue);
+            } else {
+                passwordString = new String(credentialObj.getChars());
             }
-            return password;
+
+            return passwordString;
         } catch (NoSuchAlgorithmException e) {
             String msg = "Error occurred while preparing password.";
             if (log.isDebugEnabled()) {
                 log.debug(msg, e);
             }
-            throw new UserStoreException(msg, e);
+            throw new DashboardUserStoreException(msg, e);
+        } finally {
+            credentialObj.clear();
         }
     }
 
@@ -319,7 +428,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
         return !Boolean.parseBoolean(isUsernameCaseInsensitiveString);
     }
 
-    protected Connection getDBConnection() throws SQLException, UserStoreException {
+    protected Connection getDBConnection() throws SQLException {
         Connection dbConnection = getJDBCDataSource().getConnection();
         dbConnection.setAutoCommit(false);
         if (dbConnection.getTransactionIsolation() != Connection.TRANSACTION_READ_COMMITTED) {
@@ -328,7 +437,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
         return dbConnection;
     }
 
-    private DataSource getJDBCDataSource() throws UserStoreException {
+    private DataSource getJDBCDataSource() {
         if (jdbcds == null) {
             jdbcds = loadUserStoreSpacificDataSoruce();
         }
@@ -336,14 +445,14 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
     }
 
     @Override
-    public boolean isReadOnly() throws UserStoreException {
+    public boolean isReadOnly() throws DashboardUserStoreException {
         return false;
     }
 
     /**
      *
      */
-    public int getTenantId() throws UserStoreException {
+    public int getTenantId() throws DashboardUserStoreException {
         return this.tenantId;
     }
 
@@ -353,7 +462,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
     }
 
     @Override
-    protected String[] doGetExternalRoleListOfUser(String userName, String filter) throws UserStoreException {
+    protected String[] doGetExternalRoleListOfUser(String userName, String filter) throws DashboardUserStoreException {
         if (log.isDebugEnabled()) {
             log.debug("Getting roles of user: " + userName + " with filter: " + filter);
         }
@@ -399,7 +508,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
     }
 
     @Override
-    protected String[] doGetSharedRoleListOfUser(String s, String s1, String s2) throws UserStoreException {
+    protected String[] doGetSharedRoleListOfUser(String s, String s1, String s2) {
         return new String[0];
     }
 }

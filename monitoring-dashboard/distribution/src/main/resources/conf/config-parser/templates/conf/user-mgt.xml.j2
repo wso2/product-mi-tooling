@@ -52,6 +52,11 @@
             {% for property_name,property_value in user_store.properties.items() %}
             <Property name="{{property_name}}">{{property_value}}</Property>
             {% endfor %}
+            {% if user_store.class == 'org.wso2.dashboard.security.user.core.jdbc.JDBCUserStoreManager' %}
+            {% for property_name, property_value in user_store.pool_options.items() %}
+            <Property name="{{property_name}}">{{property_value}}</Property>
+            {% endfor %}
+            {% endif %}
         </UserStoreManager>
         {% endif %}
 

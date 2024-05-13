@@ -21,6 +21,7 @@ package org.wso2.dashboard.security.user.core.ldap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.dashboard.security.user.core.UserStoreManager;
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
 import org.wso2.micro.integrator.security.user.core.UserCoreConstants;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
@@ -35,7 +36,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager implements UserStoreManager {
+public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager {
     private static Log log = LogFactory.getLog(ReadWriteLDAPUserStoreManager.class);
     public ReadWriteLDAPUserStoreManager() {
 
@@ -52,28 +53,6 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
     public ReadWriteLDAPUserStoreManager(RealmConfiguration realmConfig, ClaimManager claimManager,
                                           ProfileConfigurationManager profileManager) throws UserStoreException {
         super(realmConfig, claimManager, profileManager);
-    }
-
-    public boolean doAuthenticate(String userName, String credential) {
-        try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
-                @Override
-                public Boolean run() throws Exception {
-                    int index = userName.indexOf("/");
-                    boolean domainProvided = index > 0;
-                    return authenticate(userName, credential, domainProvided);
-                }
-            });
-        } catch (PrivilegedActionException e) {
-            if (!(e.getException() instanceof UserStoreException)) {
-                log.error("Error while authenticating user: " + e.getMessage());
-            }
-            try {
-                throw (UserStoreException) e.getException();
-            } catch (UserStoreException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
     }
 
     /**
@@ -136,7 +115,7 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
     }
 
     protected boolean authenticate(final String userName, final Object credential, final boolean domainProvided)
-            throws UserStoreException {
+            throws DashboardUserStoreException {
 
         try {
             return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
@@ -146,7 +125,7 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
                 }
             });
         } catch (PrivilegedActionException e) {
-            throw (UserStoreException) e.getException();
+            throw new DashboardUserStoreException("Error while authenticating user: " + e.getMessage(), e);
         }
 
     }

@@ -21,8 +21,10 @@ package org.wso2.dashboard.security.user.core.ldap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
+import org.wso2.dashboard.security.user.core.common.Secret;
+import org.wso2.dashboard.security.user.core.common.UnsupportedSecretTypeException;
 import org.wso2.micro.integrator.core.util.MicroIntegratorBaseUtils;
-import org.wso2.micro.integrator.security.UnsupportedSecretTypeException;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
 import org.wso2.micro.integrator.security.user.core.UserCoreConstants;
 import org.wso2.micro.integrator.security.user.core.UserStoreConfigConstants;
@@ -31,7 +33,6 @@ import org.wso2.micro.integrator.security.user.core.dto.CorrelationLogDTO;
 import org.wso2.micro.integrator.security.user.core.ldap.LDAPConstants;
 import org.wso2.micro.integrator.security.user.core.ldap.LdapContextWrapper;
 import org.wso2.micro.integrator.security.user.core.ldap.SRVRecord;
-import org.wso2.micro.integrator.security.util.Secret;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -220,7 +221,7 @@ public class LDAPConnectionContext {
         thresholdStartTime = 0;
     }
 
-    public DirContext getContext() throws UserStoreException {
+    public DirContext getContext() throws DashboardUserStoreException {
 
         DirContext context = null;
 
@@ -247,10 +248,10 @@ public class LDAPConnectionContext {
                     if (log.isDebugEnabled()) {
                         log.debug("LDAP connection circuit breaker state set to: " + ldapConnectionCircuitBreakerState);
                     }
-                    throw new UserStoreException("Error occurred while obtaining LDAP connection.", e);
+                    throw new DashboardUserStoreException("Error occurred while obtaining LDAP connection.", e);
                 }
             } else {
-                throw new UserStoreException(
+                throw new DashboardUserStoreException(
                         "LDAP connection circuit breaker is in open state for " + circuitOpenDuration
                                 + "ms and has not reach the threshold timeout: " + thresholdTimeoutInMilliseconds
                                 + "ms, hence avoid establishing the LDAP connection.");
@@ -275,12 +276,12 @@ public class LDAPConnectionContext {
                     log.error("Error occurred while obtaining connection for the second time.", e1);
                     ldapConnectionCircuitBreakerState = CIRCUIT_STATE_OPEN;
                     thresholdStartTime = System.currentTimeMillis();
-                    throw new UserStoreException("Error occurred while obtaining LDAP connection, LDAP connection "
+                    throw new DashboardUserStoreException("Error occurred while obtaining LDAP connection, LDAP connection "
                             + "circuit breaker state set to: " + ldapConnectionCircuitBreakerState, e1);
                 }
             }
         default:
-            throw new UserStoreException("Unknown LDAP connection circuit breaker state.");
+            throw new DashboardUserStoreException("Unknown LDAP connection circuit breaker state.");
         }
         return context;
     }
@@ -353,7 +354,7 @@ public class LDAPConnectionContext {
      *
      * @param connectionPassword
      */
-    public void updateCredential(Object connectionPassword) throws UserStoreException {
+    public void updateCredential(Object connectionPassword) throws DashboardUserStoreException {
 
         /*
          * update the password otherwise it is not possible to connect again if admin password
@@ -363,7 +364,7 @@ public class LDAPConnectionContext {
         try {
             connectionPasswordObj = Secret.getSecret(connectionPassword);
         } catch (UnsupportedSecretTypeException e) {
-            throw new UserStoreException("Unsupported credential type", e);
+            throw new DashboardUserStoreException("Unsupported credential type", e);
         }
 
         byte[] passwordBytes = connectionPasswordObj.getBytes();
@@ -542,18 +543,29 @@ public class LDAPConnectionContext {
      * @throws NamingException
      */
     public LdapContext getContextWithCredentials(String userDN, Object password)
-            throws UserStoreException, NamingException {
+            throws UserStoreException, DashboardUserStoreException, NamingException {
 
-        //create a temp env for this particular authentication session by copying the original env
-        Hashtable<String, Object> tempEnv = new Hashtable<>();
-        for (Object key : environment.keySet()) {
-            tempEnv.put((String) key, environment.get(key));
+        Secret credentialObj;
+        try {
+            credentialObj = Secret.getSecret(password);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new DashboardUserStoreException("Unsupported credential type", e);
         }
-        //replace connection name and password with the passed credentials to this method
-        tempEnv.put(Context.SECURITY_PRINCIPAL, userDN);
-        tempEnv.put(Context.SECURITY_CREDENTIALS, password.toString().getBytes());
+        try {
+            //create a temp env for this particular authentication session by copying the original env
+            Hashtable<String, Object> tempEnv = new Hashtable<>();
+            for (Object key : environment.keySet()) {
+                tempEnv.put((String) key, environment.get(key));
+            }
+            //replace connection name and password with the passed credentials to this method
+            tempEnv.put(Context.SECURITY_PRINCIPAL, userDN);
+            tempEnv.put(Context.SECURITY_CREDENTIALS, credentialObj.getBytes());
 
-        return getContextForEnvironmentVariables(tempEnv);
+            return getContextForEnvironmentVariables(tempEnv);
+        } finally {
+            credentialObj.clear();
+        }
+
     }
 
     private LdapContext getContextForEnvironmentVariables(Hashtable<?, ?> environment)

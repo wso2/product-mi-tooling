@@ -23,6 +23,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.dashboard.security.user.core.UserStoreManagerUtils;
+import org.wso2.dashboard.security.user.core.common.Secret;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.auth.TokenCache;
 import org.wso2.ei.dashboard.core.commons.auth.TokenGenerator;
@@ -64,6 +65,7 @@ public class LoginDelegate {
         userInfoJSON.put("username", username);
         userInfoJSON.put("scope", scope);
         userInfoJSON.put("sso", false);
+        userInfoJSON.put("isFileBasedUserStoreEnabled", UserStoreManagerUtils.isFileBasedUserStoreEnabled());
         return userInfoJSON;
     }
 
