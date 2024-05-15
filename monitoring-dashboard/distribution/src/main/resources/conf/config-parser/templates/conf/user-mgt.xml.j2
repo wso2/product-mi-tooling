@@ -33,10 +33,10 @@
             <Property name="dataSource">jdbc/{{realm_manager.data_source}}</Property>
         </Configuration>
 
-        {% if file_user_store.enable %}
+        {% if internal_apis.file_user_store.enable %}
         <FileUserStore enabled="true">
             <users>
-                {% for user in file.users %}
+                {% for user in internal_apis.users %}
                 <user>
                     <username>{{user.user.name}}</username>
                     <password>{{user.user.password}}</password>

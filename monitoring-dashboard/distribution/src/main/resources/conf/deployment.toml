@@ -22,10 +22,10 @@ file_name = "conf/security/client-truststore.jks"
 password = "wso2carbon"
 
 #by default file based user store is enabled
-#[file_user_store]
+#[internal_apis.file_user_store]
 #enable = true
 
-#[[file.users]]
+#[[internal_apis.users]]
 #user.name = "admin"
 #user.password = "admin"
 #user.is_admin = true
