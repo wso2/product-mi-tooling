@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
 import org.wso2.micro.integrator.security.user.core.jdbc.JDBCRealmConstants;
@@ -85,20 +86,8 @@ public class DatabaseUtil {
         config.setUsername(realmConfig.getRealmProperty(JDBCRealmConstants.USER_NAME));
         config.setPassword(realmConfig.getRealmProperty(JDBCRealmConstants.PASSWORD));
 
-        if (realmConfig.getRealmProperty(JDBCRealmConstants.MAX_ACTIVE) != null &&
-                !realmConfig.getRealmProperty(JDBCRealmConstants.MAX_ACTIVE).trim().equals("")) {
-            config.setMaximumPoolSize(Integer.parseInt(realmConfig.getRealmProperty(
-                    JDBCRealmConstants.MAX_ACTIVE)));
-        } else {
-            config.setMaximumPoolSize(DEFAULT_MAX_ACTIVE);
-        }
-
         HikariDataSource dataSource = new HikariDataSource(config);
         return dataSource;
-    }
-
-    private static void configureAdvancedProperties(HikariConfig config, RealmConfiguration realmConfig) {
-
     }
 
     /**
@@ -138,10 +127,42 @@ public class DatabaseUtil {
         config.setUsername(realmConfig.getUserStoreProperty(JDBCRealmConstants.USER_NAME));
         config.setPassword(realmConfig.getUserStoreProperty(JDBCRealmConstants.PASSWORD));
 
+        configureAdvancedProperties(config, realmConfig);
+
         return new HikariDataSource(config);
     }
+
+    private static void configureAdvancedProperties(HikariConfig config, RealmConfiguration realmConfig) {
+        // Set maximum pool size
+        if (realmConfig.getUserStoreProperty(JDBCRealmConstants.MAX_ACTIVE) != null &&
+                !realmConfig.getUserStoreProperty(JDBCRealmConstants.MAX_ACTIVE).trim().equals("")) {
+            config.setMaximumPoolSize(Integer.parseInt(realmConfig.getUserStoreProperty(
+                    JDBCRealmConstants.MAX_ACTIVE)));
+        } else {
+            config.setMaximumPoolSize(DEFAULT_MAX_ACTIVE);
+        }
+
+        // Set minimum idle connections in the pool
+        if (realmConfig.getUserStoreProperty(JDBCRealmConstants.MIN_IDLE) != null &&
+                !realmConfig.getUserStoreProperty(JDBCRealmConstants.MIN_IDLE).trim().equals("")) {
+            config.setMinimumIdle(Integer.parseInt(realmConfig.getUserStoreProperty(
+                    JDBCRealmConstants.MIN_IDLE)));
+        } else {
+            config.setMinimumIdle(DEFAULT_MIN_IDLE);
+        }
+
+        // Set max wait time for connections from the pool
+        if (realmConfig.getUserStoreProperty(JDBCRealmConstants.MAX_WAIT) != null &&
+                !realmConfig.getUserStoreProperty(JDBCRealmConstants.MAX_WAIT).trim().equals("")) {
+            config.setConnectionTimeout(Integer.parseInt(realmConfig.getUserStoreProperty(
+                    JDBCRealmConstants.MAX_WAIT)));
+        } else {
+            config.setConnectionTimeout(DEFAULT_MAX_WAIT);
+        }
+    }
+
     public static String[] getStringValuesFromDatabase(Connection dbConnection, String sqlStmt, Object... params)
-            throws UserStoreException {
+            throws DashboardUserStoreException {
         String[] values = new String[0];
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -176,7 +197,7 @@ public class DatabaseUtil {
             if (log.isDebugEnabled()) {
                 log.debug(errorMessage, e);
             }
-            throw new UserStoreException(errorMessage, e);
+            throw new DashboardUserStoreException(errorMessage, e);
         } finally {
             closeAllConnections(null, rs, prepStmt);
         }

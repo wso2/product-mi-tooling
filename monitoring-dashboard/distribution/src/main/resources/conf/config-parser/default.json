@@ -2,8 +2,8 @@
 	"sso.enable": false,
 	"sso.storage": "webWorker",
 	"sso.user_name_attribute" : "sub",
-	"file_user_store.enable": true,
-	"file.users": [
+	"internal_apis.file_user_store.enable": true,
+	"internal_apis.users": [
 		{
 			"user.name": "admin",
 			"user.password": "admin",

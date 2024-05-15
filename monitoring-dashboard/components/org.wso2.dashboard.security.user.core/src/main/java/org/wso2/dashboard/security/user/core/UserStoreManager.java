@@ -18,6 +18,7 @@
 
 package org.wso2.dashboard.security.user.core;
 
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
 
@@ -30,7 +31,7 @@ public interface UserStoreManager {
      * @param password The password of the user.
      * @return true if authentication is successful, false otherwise.
      */
-    boolean authenticate(String username, String password) throws UserStoreException;
+    boolean authenticate(String username, Object password) throws DashboardUserStoreException;
 
     /**
      * Get roles of a user.
@@ -39,13 +40,13 @@ public interface UserStoreManager {
      * @return An array of role names that user belongs.
      * @throws UserStoreException
      */
-    String[] getRoleListOfUser(String userName) throws UserStoreException;
+    String[] getRoleListOfUser(String userName) throws DashboardUserStoreException;
 
     /**
      * @return
      * @throws UserStoreException
      */
-    boolean isReadOnly() throws UserStoreException;
+    boolean isReadOnly() throws DashboardUserStoreException;
 
     /**
      * this will get the tenant id associated with the user store manager
@@ -53,7 +54,7 @@ public interface UserStoreManager {
      * @return the tenant id of the authorization manager
      * @throws UserStoreException if the operation failed
      */
-    int getTenantId() throws UserStoreException;
+    int getTenantId() throws DashboardUserStoreException;
 
     /**
      * Get the RealmConfiguration belonging to this user store

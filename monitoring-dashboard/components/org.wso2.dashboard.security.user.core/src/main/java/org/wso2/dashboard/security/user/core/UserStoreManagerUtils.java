@@ -20,6 +20,7 @@ package org.wso2.dashboard.security.user.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
 import org.wso2.dashboard.security.user.core.common.DataHolder;
 import org.wso2.dashboard.security.user.core.file.FileBasedUserStoreManager;
 import org.wso2.dashboard.security.user.core.jdbc.JDBCUserStoreManager;
@@ -49,7 +50,7 @@ public class UserStoreManagerUtils {
         return isValid;
     }
 
-    public static UserStoreManager getUserStoreManager() throws UserStoreException {
+    public static UserStoreManager getUserStoreManager() throws UserStoreException, DashboardUserStoreException {
         DataHolder dataHolder = DataHolder.getInstance();
         if (dataHolder.getUserStoreManager() == null) {
             initializeUserStore();
@@ -57,7 +58,7 @@ public class UserStoreManagerUtils {
         return dataHolder.getUserStoreManager();
     }
 
-    public static void initializeUserStore() throws UserStoreException {
+    public static void initializeUserStore() throws UserStoreException, DashboardUserStoreException {
         DataHolder dataHolder = DataHolder.getInstance();
         if (isFileBasedUserStoreEnabled()) {
             dataHolder.setUserStoreManager(FileBasedUserStoreManager.getUserStoreManager());
@@ -140,7 +141,7 @@ public class UserStoreManagerUtils {
         }
     }
 
-    public static boolean isAdmin(String user) throws UserStoreException {
+    public static boolean isAdmin(String user) throws UserStoreException, DashboardUserStoreException {
         if (isFileBasedUserStoreEnabled()) {
             return FileBasedUserStoreManager.getUserStoreManager().isAdmin(user);
         }

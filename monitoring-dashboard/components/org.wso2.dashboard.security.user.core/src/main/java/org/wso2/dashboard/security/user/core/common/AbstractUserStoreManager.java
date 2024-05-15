@@ -18,27 +18,29 @@
 
 package org.wso2.dashboard.security.user.core.common;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.dashboard.security.user.core.UserStoreConstants;
 import org.wso2.dashboard.security.user.core.UserStoreManager;
 import org.wso2.dashboard.security.user.core.UserStoreManagerUtils;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
-import org.wso2.micro.integrator.security.user.core.UserCoreConstants;
 import org.wso2.micro.integrator.security.user.core.UserRealm;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
 import org.wso2.micro.integrator.security.user.core.claim.ClaimManager;
 import org.wso2.micro.integrator.security.user.core.common.UserRolesCache;
+import org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants;
 import org.wso2.micro.integrator.security.user.core.hybrid.HybridRoleManager;
-import org.wso2.micro.integrator.security.user.core.listener.UserStoreManagerConfigurationListener;
 import org.wso2.micro.integrator.security.user.core.system.SystemUserRoleManager;
-import org.wso2.micro.integrator.security.user.core.util.UserCoreUtil;
 
 import javax.sql.DataSource;
+import java.nio.CharBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractUserStoreManager implements UserStoreManager {
     private static final Log log = LogFactory.getLog(AbstractUserStoreManager.class);
@@ -75,16 +77,99 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
     private boolean userRolesCacheEnabled = true;
     private String cacheIdentifier;
     private boolean replaceEscapeCharactersAtUserLogin = true;
-    private Map<String, org.wso2.micro.integrator.security.user.core.UserStoreManager> userStoreManagerHolder = new HashMap<String, org.wso2.micro.integrator.security.user.core.UserStoreManager>();
     private Map<String, Integer> maxUserListCount = null;
     private Map<String, Integer> maxRoleListCount = null;
-    private List<UserStoreManagerConfigurationListener> listener = new ArrayList<UserStoreManagerConfigurationListener>();
-    private static final ThreadLocal<Boolean> isSecureCall = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
+
+    public boolean authenticate(final String userName, final Object credential)
+            throws DashboardUserStoreException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+                @Override
+                public Boolean run() throws Exception {
+                    if (!validateUserNameAndCredential(userName, credential)) {
+                        return false;
+                    }
+                    int index = userName.indexOf(UserStoreConstants.DOMAIN_SEPARATOR);
+                    boolean domainProvided = index > 0;
+                    return authenticate(userName, credential, domainProvided);
+                }
+            });
+        } catch (PrivilegedActionException e) {
+            throw (DashboardUserStoreException) e.getException();
         }
-    };
+    }
+
+    protected boolean authenticate(final String userName, final Object credential, final boolean domainProvided)
+            throws DashboardUserStoreException {
+
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+                @Override
+                public Boolean run() throws Exception {
+                    return authenticateInternal(userName, credential, domainProvided);
+                }
+            });
+        } catch (PrivilegedActionException e) {
+            throw new DashboardUserStoreException("Error occurred while authenticating user", e);
+        }
+
+    }
+
+    /**
+     * @param userName
+     * @param credential
+     * @param domainProvided
+     * @return
+     * @throws UserStoreException
+     */
+    private boolean authenticateInternal(String userName, Object credential, boolean domainProvided)
+            throws UserStoreException, DashboardUserStoreException {
+        AbstractUserStoreManager abstractUserStoreManager = this;
+        boolean authenticated = false;
+
+        UserStore userStore = abstractUserStoreManager.getUserStore(userName);
+        if (userStore.isRecurssive() && userStore.getUserStoreManager() instanceof AbstractUserStoreManager) {
+            return ((AbstractUserStoreManager) userStore.getUserStoreManager()).
+                    authenticate(userStore.getDomainFreeName(), credential, domainProvided);
+        }
+
+        Secret credentialObj;
+        try {
+            credentialObj = Secret.getSecret(credential);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new DashboardUserStoreException(
+                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.getMessage(),
+                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.getCode(), e);
+        }
+        try {
+            authenticated = abstractUserStoreManager.doAuthenticate(userName, credentialObj);
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error occurred while authenticating user: " + userName, e);
+            } else {
+                log.error(e);
+            }
+            throw new UserStoreException(
+                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getMessage(),
+                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getCode(), e);
+        } finally {
+            credentialObj.clear();
+        }
+
+        if (!authenticated) {
+            throw new DashboardUserStoreException(
+                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getMessage(),
+                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getCode());
+        }
+
+        if (log.isDebugEnabled()) {
+            if (!authenticated) {
+                log.debug("Authentication failure. Wrong username or password is provided.");
+            }
+        }
+
+        return authenticated;
+    }
 
     public boolean authenticate(String username, String credential) throws UserStoreException {
         try {
@@ -115,7 +200,7 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
      * @throws UserStoreException
      */
     private boolean authenticateInternal(String userName, String credential, boolean domainProvided)
-            throws UserStoreException {
+            throws UserStoreException, DashboardUserStoreException {
 
         AbstractUserStoreManager abstractUserStoreManager = this;
 
@@ -143,9 +228,8 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
      * @param userName   Name of the user.
      * @param credential Credential of the user.
      * @return false if the validation fails.
-     * @throws UserStoreException UserStore Exception.
      */
-    private boolean validateUserNameAndCredential(String userName, String credential) throws UserStoreException {
+    private boolean validateUserNameAndCredential(String userName, String credential) {
 
         boolean isValid = true;
         if (userName == null || credential == null) {
@@ -156,25 +240,44 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
         return isValid;
     }
 
+    /**
+     * To validate username and credential that is given for authentication.
+     *
+     * @param userName   Name of the user.
+     * @param credential Credential of the user.
+     * @return false if the validation fails.
+     * @throws UserStoreException UserStore Exception.
+     */
+    private boolean validateUserNameAndCredential(String userName, Object credential)
+            throws DashboardUserStoreException {
+
+        if (userName == null || credential == null) {
+            String message = String.format(UserCoreErrorConstants.ErrorMessages.
+                            ERROR_CODE_ERROR_WHILE_PRE_AUTHENTICATION.getMessage(),
+                    "Authentication failure. Either Username or Password is null");
+            log.error(message);
+            throw new DashboardUserStoreException(message,
+                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_PRE_AUTHENTICATION.getCode());
+        }
+        return true;
+    }
+
     @Override
-    public String[] getRoleListOfUser(String userName) throws UserStoreException {
+    public String[] getRoleListOfUser(String userName) throws DashboardUserStoreException {
         String[] roleNames = null;
 
-//        // Check whether roles exist in cache
-//        roleNames = getRoleListOfUserFromCache(this.tenantId, usernameWithDomain);
-//        if (roleNames != null && roleNames.length > 0) {
-//            return roleNames;
-//        }
         UserStore userStore = getUserStore(userName);
         if (userStore.isRecurssive()) {
             return userStore.getUserStoreManager().getRoleListOfUser(userStore.getDomainFreeName());
         }
 
         if (userStore.isSystemStore()) {
-            return systemUserRoleManager.getSystemRoleListOfUser(userStore.getDomainFreeName());
+            try {
+                return systemUserRoleManager.getSystemRoleListOfUser(userStore.getDomainFreeName());
+            } catch (UserStoreException e) {
+                throw new DashboardUserStoreException(e.getMessage(), e);
+            }
         }
-
-        // #################### Domain Name Free Zone Starts Here ################################
 
         roleNames = doGetRoleListOfUser(userName, "*");
 
@@ -188,7 +291,7 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
      * @throws UserStoreException
      */
     public final String[] doGetRoleListOfUser(String userName, String filter)
-            throws UserStoreException {
+            throws DashboardUserStoreException {
 
         String[] modifiedExternalRoleList = new String[0];
 
@@ -214,16 +317,134 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
      * @return
      */
     public boolean isSharedGroupEnabled() {
-        String value = realmConfig.getUserStoreProperty(UserCoreConstants.RealmConfig.SHARED_GROUPS_ENABLED);
+        String value = realmConfig.getUserStoreProperty(UserStoreConstants.RealmConfig.SHARED_GROUPS_ENABLED);
         try {
             return realmConfig.isPrimary() && !isReadOnly() && TRUE_VALUE.equalsIgnoreCase(value);
-        } catch (UserStoreException e) {
+        } catch (DashboardUserStoreException e) {
             log.error(e);
         }
         return false;
     }
 
-    private UserStore getUserStore(final String user) throws UserStoreException {
+    /**
+     * @param userName
+     * @return
+     * @throws UserStoreException
+     */
+    protected boolean checkUserNameValid(String userName) {
+
+        if (userName == null || UserStoreConstants.REGISTRY_SYSTEM_USERNAME.equals(userName)) {
+            return false;
+        }
+
+        String leadingOrTrailingSpaceAllowedInUserName = realmConfig.getUserStoreProperty(UserStoreConstants
+                .RealmConfig.LEADING_OR_TRAILING_SPACE_ALLOWED_IN_USERNAME);
+        if (StringUtils.isEmpty(leadingOrTrailingSpaceAllowedInUserName)) {
+            // Keeping old behavior for backward-compatibility.
+            userName = userName.trim();
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("'LeadingOrTrailingSpaceAllowedInUserName' property is set to : " +
+                        leadingOrTrailingSpaceAllowedInUserName + ". Hence username trimming will be skipped during " +
+                        "validation for the username: " + userName);
+            }
+        }
+
+        if (userName.length() < 1) {
+            return false;
+        }
+
+        String regularExpression = realmConfig
+                .getUserStoreProperty(UserStoreConstants.RealmConfig.PROPERTY_USER_NAME_JAVA_REG_EX);
+        //Inorder to support both UsernameJavaRegEx and UserNameJavaRegEx.
+        if (StringUtils.isEmpty(regularExpression) || StringUtils.isEmpty(regularExpression.trim())) {
+            regularExpression = realmConfig.getUserStoreProperty(
+                    UserStoreConstants.RealmConfig.PROPERTY_USER_NAME_JAVA_REG);
+        }
+
+        if (regularExpression != null) {
+            regularExpression = regularExpression.trim();
+        }
+
+        if (StringUtils.isNotEmpty(regularExpression)) {
+            if (isFormatCorrect(regularExpression, userName)) {
+                return true;
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Username " + userName + " does not match with the regex "
+                            + regularExpression);
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param credential
+     * @return
+     * @throws UserStoreException
+     */
+    protected boolean checkUserPasswordValid(Object credential) throws DashboardUserStoreException {
+
+        if (credential == null) {
+            return false;
+        }
+
+        Secret credentialObj;
+        try {
+            credentialObj = Secret.getSecret(credential);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new DashboardUserStoreException("Unsupported credential type", e);
+        }
+
+        try {
+            if (credentialObj.getChars().length < 1) {
+                return false;
+            }
+
+            String regularExpression =
+                    realmConfig.getUserStoreProperty(UserStoreConstants.RealmConfig.PROPERTY_JAVA_REG_EX);
+            if (regularExpression != null) {
+                if (isFormatCorrect(regularExpression, credentialObj.getChars())) {
+                    return true;
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Submitted password does not match with the regex " + regularExpression);
+                    }
+                    return false;
+                }
+            }
+            return true;
+        } finally {
+            credentialObj.clear();
+        }
+
+    }
+
+    /**
+     * @param regularExpression
+     * @param attribute
+     * @return
+     */
+    private boolean isFormatCorrect(String regularExpression, String attribute) {
+        Pattern p2 = Pattern.compile(regularExpression);
+        Matcher m2 = p2.matcher(attribute);
+        return m2.matches();
+    }
+
+    private boolean isFormatCorrect(String regularExpression, char[] attribute) {
+        boolean matches;
+        CharBuffer charBuffer = CharBuffer.wrap(attribute);
+
+        Pattern p2 = Pattern.compile(regularExpression);
+        Matcher m2 = p2.matcher(charBuffer);
+        matches = m2.matches();
+
+        return matches;
+    }
+
+    private UserStore getUserStore(final String user) throws DashboardUserStoreException {
         try {
             return AccessController.doPrivileged(new PrivilegedExceptionAction<UserStore>() {
                 @Override
@@ -232,7 +453,7 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
                 }
             });
         } catch (PrivilegedActionException e) {
-            throw (UserStoreException) e.getException();
+            throw (DashboardUserStoreException) e.getException();
         }
     }
 
@@ -276,7 +497,7 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
      * @throws UserStoreException
      */
     protected abstract String[] doGetExternalRoleListOfUser(String userName, String filter)
-            throws UserStoreException;
+            throws DashboardUserStoreException;
 
     /**
      * Returns the shared roles list of the user
@@ -285,8 +506,8 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
      * @return
      * @throws UserStoreException
      */
-    protected abstract String[] doGetSharedRoleListOfUser(String userName,
-                                                          String tenantDomain, String filter) throws UserStoreException;
+    protected abstract String[] doGetSharedRoleListOfUser(String userName, String tenantDomain, String filter)
+            throws DashboardUserStoreException;
 
     /**
      * Given the user name and a credential object, the implementation code must validate whether
@@ -299,7 +520,7 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
      * user name.
      * @throws UserStoreException An unexpected exception has occurred
      */
-    protected abstract boolean doAuthenticate(String userName, String credential)
-            throws UserStoreException;
+    protected abstract boolean doAuthenticate(String userName, Object credential)
+            throws DashboardUserStoreException;
 
 }

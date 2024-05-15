@@ -18,11 +18,7 @@
 
 package org.wso2.dashboard.security.user.core;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,8 +26,10 @@ import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
 import org.wso2.micro.integrator.security.user.core.UserCoreConstants;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
 
-import org.wso2.micro.integrator.security.user.core.util.UserCoreUtil;
+import org.wso2.micro.integrator.security.vault.SecureVaultException;
 import org.wso2.securevault.SecretResolver;
+import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -39,10 +37,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import static org.wso2.micro.core.util.CarbonUtils.resolveSystemProperty;
 
 /**
  * This class is responsible for loading the realm configuration from the user-mgt.xml file.
@@ -55,77 +51,6 @@ public class RealmConfigXMLProcessor {
     private SecretResolver secretResolver;
 
     public RealmConfigXMLProcessor() {
-
-    }
-
-    public static OMElement serialize(RealmConfiguration realmConfig) {
-        OMFactory factory = OMAbstractFactory.getOMFactory();
-        OMElement rootElement = factory.createOMElement(new QName("UserManager"));
-        OMElement realmElement = factory.createOMElement(new QName("Realm"));
-        String realmName = realmConfig.getRealmClassName();
-        OMAttribute propAttr = factory.createOMAttribute("name", (OMNamespace) null, realmName);
-        realmElement.addAttribute(propAttr);
-        rootElement.addChild(realmElement);
-        OMElement mainConfig = factory.createOMElement(new QName("Configuration"));
-        realmElement.addChild(mainConfig);
-        OMElement addAdmin = factory.createOMElement(new QName("AddAdmin"));
-        OMElement adminUser = factory.createOMElement(new QName("AdminUser"));
-        OMElement adminUserNameElem = factory.createOMElement(new QName("UserName"));
-        adminUserNameElem.setText(realmConfig.getAdminUserName());
-        OMElement adminPasswordElem = factory.createOMElement(new QName("Password"));
-        addAdmin.setText(UserCoreUtil.removeDomainFromName(realmConfig.getAddAdmin()));
-        adminPasswordElem.setText(realmConfig.getAdminPassword());
-        adminUser.addChild(adminUserNameElem);
-        adminUser.addChild(adminPasswordElem);
-        mainConfig.addChild(addAdmin);
-        mainConfig.addChild(adminUser);
-        OMElement adminRoleNameElem = factory.createOMElement(new QName("AdminRole"));
-        adminRoleNameElem.setText(UserCoreUtil.removeDomainFromName(realmConfig.getAdminRoleName()));
-        mainConfig.addChild(adminRoleNameElem);
-        OMElement systemUserNameElem = factory.createOMElement(new QName("SystemUserName"));
-        mainConfig.addChild(systemUserNameElem);
-        OMElement anonymousUserEle = factory.createOMElement(new QName("AnonymousUser"));
-        OMElement anonymousUserNameElem = factory.createOMElement(new QName("UserName"));
-        OMElement anonymousPasswordElem = factory.createOMElement(new QName("Password"));
-        anonymousUserEle.addChild(anonymousUserNameElem);
-        anonymousUserEle.addChild(anonymousPasswordElem);
-        mainConfig.addChild(anonymousUserEle);
-        OMElement everyoneRoleNameElem = factory.createOMElement(new QName("EveryOneRoleName"));
-        everyoneRoleNameElem.setText(UserCoreUtil.removeDomainFromName(realmConfig.getEveryOneRoleName()));
-        mainConfig.addChild(everyoneRoleNameElem);
-        addPropertyElements(factory, mainConfig, (String) null, realmConfig.getDescription(), realmConfig.getRealmProperties());
-        OMElement userStoreManagerElement = factory.createOMElement(new QName("UserStoreManager"));
-        realmElement.addChild(userStoreManagerElement);
-        addPropertyElements(factory, userStoreManagerElement, realmConfig.getUserStoreClass(), realmConfig.getDescription(), realmConfig.getUserStoreProperties());
-
-        return rootElement;
-    }
-
-    private static void addPropertyElements(OMFactory factory, OMElement parent, String className, String description,
-                                            Map<String, String> properties) {
-        if (className != null) {
-            parent.addAttribute("class", className, (OMNamespace) null);
-        }
-
-        if (description != null) {
-            parent.addAttribute("Description", description, (OMNamespace) null);
-        }
-
-        Iterator ite = properties.entrySet().iterator();
-
-        while (ite.hasNext()) {
-            Entry<String, String> entry = (Entry) ite.next();
-            String name = (String) entry.getKey();
-            String value = (String) entry.getValue();
-            if (value != null) {
-                value = resolveSystemProperty(value);
-            }
-            OMElement propElem = factory.createOMElement(new QName("Property"));
-            OMAttribute propAttr = factory.createOMAttribute("name", (OMNamespace) null, name);
-            propElem.addAttribute(propAttr);
-            propElem.setText(value);
-            parent.addChild(propElem);
-        }
 
     }
 
@@ -144,7 +69,6 @@ public class RealmConfigXMLProcessor {
     }
 
     private OMElement preProcessRealmConfig(InputStream inStream) throws XMLStreamException {
-//        inStream = MicroIntegratorBaseUtils.replaceSystemVariablesInXml(inStream);
         StAXOMBuilder builder = new StAXOMBuilder(inStream);
         OMElement documentElement = builder.getDocumentElement();
         OMElement realmElement = documentElement.getFirstChildWithName(new QName("Realm"));
@@ -380,10 +304,18 @@ public class RealmConfigXMLProcessor {
         Map<String, String> map = new HashMap();
         String propName;
         String propValue;
-        for (Iterator ite = omElement.getChildrenWithName(new QName("Property")); ite.hasNext(); map.put(propName.trim(), propValue.trim())) {
+        for (Iterator ite = omElement.getChildrenWithName(new QName("Property")); ite.hasNext();
+             map.put(propName.trim(), propValue.trim())) {
             OMElement propElem = (OMElement) ite.next();
             propName = propElem.getAttributeValue(new QName("name"));
             propValue = propElem.getText();
+            if (secretResolver == null) {
+                throw new SecureVaultException("Cannot resolve secret password because secret resolver " +
+                        "is null or not initialized");
+            }
+            if (secretResolver.isInitialized()) {
+                propValue = MiscellaneousUtil.resolve(propValue, this.secretResolver);
+            }
         }
 
         return map;
@@ -417,7 +349,8 @@ public class RealmConfigXMLProcessor {
             if (userMgtConfigXml.exists()) {
                 this.inStream = new FileInputStream(userMgtConfigXml);
             } else {
-                throw new FileNotFoundException(REALM_CONFIG_FILE + " not found at " + "MicroIntegratorBaseUtils.getCarbonConfigDirPath()");
+                throw new FileNotFoundException(REALM_CONFIG_FILE + " not found at " +
+                        "MicroIntegratorBaseUtils.getCarbonConfigDirPath()");
             }
         } else {
             log.error("Carbon Home not defined");
@@ -433,9 +366,14 @@ public class RealmConfigXMLProcessor {
         } else {
             builder = new StAXOMBuilder(this.inStream);
             OMElement documentElement = builder.getDocumentElement();
+            this.setSecretResolver(documentElement);
             OMElement realmElement = documentElement.getFirstChildWithName(new QName("Realm"));
             return realmElement;
         }
+    }
+
+    public void setSecretResolver(OMElement rootElement) {
+        this.secretResolver = SecretResolverFactory.create(rootElement, true);
     }
 
     public static RealmConfiguration createRealmConfig() throws org.wso2.micro.integrator.security.user.api.UserStoreException {

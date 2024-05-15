@@ -25,6 +25,9 @@ import org.wso2.dashboard.security.user.core.UserStoreManagerUtils;
 import org.wso2.dashboard.security.user.core.common.AbstractUserStoreManager;
 import org.wso2.dashboard.security.user.core.DatabaseUtil;
 import org.wso2.dashboard.security.user.core.UserStoreManager;
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
+import org.wso2.dashboard.security.user.core.common.Secret;
+import org.wso2.dashboard.security.user.core.common.UnsupportedSecretTypeException;
 import org.wso2.micro.core.Constants;
 import org.wso2.micro.integrator.security.user.api.Property;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
@@ -55,7 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager implements UserStoreManager {
+public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager {
     public static final String MEMBER_UID = "memberUid";
     private static final String OBJECT_GUID = "objectGUID";
     protected static final String MEMBERSHIP_ATTRIBUTE_RANGE = "MembershipAttributeRange";
@@ -269,9 +272,8 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
         }
     }
 
-    protected boolean doAuthenticate(String userName, Object credential) throws UserStoreException {
+    public boolean doAuthenticate(String userName, Object credential) throws DashboardUserStoreException {
         boolean debug = log.isDebugEnabled();
-
 
         String failedUserDN = null;
 
@@ -298,7 +300,16 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
             userName = userName.trim();
         }
 
-        Object credentialObj = credential;
+        Secret credentialObj;
+        try {
+            credentialObj = Secret.getSecret(credential);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new DashboardUserStoreException("Unsupported credential type", e);
+        }
+
+        if (userName.equals("") || credentialObj.isEmpty()) {
+            return false;
+        }
 
         if (debug) {
             log.debug("Authenticating user " + userName);
@@ -316,12 +327,12 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
                     bValue = this.bindAsUser(userName, name, credentialObj);
                 }
             }
-        } catch (NamingException e) {
+        } catch (NamingException | UserStoreException e) {
             String errorMessage = "Cannot bind user : " + userName;
             if (log.isDebugEnabled()) {
                 log.debug(errorMessage, e);
             }
-            throw new UserStoreException(errorMessage, e);
+            throw new DashboardUserStoreException(errorMessage, e);
         }
         return bValue;
 
@@ -331,9 +342,9 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
      * This is to search user and retrieve ldap name directly from ldap
      * @param userName
      * @return
-     * @throws UserStoreException
+     * @throws DashboardUserStoreException
      */
-    protected String getNameInSpaceForUsernameFromLDAP(String userName) throws UserStoreException {
+    protected String getNameInSpaceForUsernameFromLDAP(String userName) throws DashboardUserStoreException {
 
         String searchBase = null;
         String userSearchFilter = realmConfig.getUserStoreProperty(LDAPConstants.USER_NAME_SEARCH_FILTER);
@@ -343,7 +354,12 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
             String[] patterns = userDNPattern.split("#");
             for (String pattern : patterns) {
                 searchBase = MessageFormat.format(pattern, escapeSpecialCharactersForDN(userName));
-                String userDN = getNameInSpaceForUserName(userName, searchBase, userSearchFilter);
+                String userDN = null;
+                try {
+                    userDN = getNameInSpaceForUserName(userName, searchBase, userSearchFilter);
+                } catch (UserStoreException e) {
+                    throw new DashboardUserStoreException(e.getMessage(), e);
+                }
                 // check in another DN pattern
                 if (userDN != null) {
                     return userDN;
@@ -352,7 +368,11 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
         }
 
         searchBase = realmConfig.getUserStoreProperty(LDAPConstants.USER_SEARCH_BASE);
-        return getNameInSpaceForUserName(userName, searchBase, userSearchFilter);
+        try {
+            return getNameInSpaceForUserName(userName, searchBase, userSearchFilter);
+        } catch (UserStoreException e) {
+            throw new DashboardUserStoreException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -484,11 +504,12 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
      * @return
      * @throws UserStoreException
      */
-    protected String getNameInSpaceForUserName(String userName, String searchBase, String searchFilter) throws UserStoreException {
+    protected String getNameInSpaceForUserName(String userName, String searchBase, String searchFilter)
+            throws UserStoreException, DashboardUserStoreException {
         boolean debug = log.isDebugEnabled();
 
         if (userName == null) {
-            throw new UserStoreException("userName value is null.");
+            throw new DashboardUserStoreException("userName value is null.");
         }
 
         String userDN = null;
@@ -526,8 +547,7 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
         } finally {
-            JNDIUtil.closeNamingEnumeration(answer);
-            JNDIUtil.closeContext(dirContext);
+            closeContextAndNamingEnumeration(dirContext, answer);
         }
         return userDN;
     }
@@ -542,7 +562,7 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
      * @throws UserStoreException
      */
     private boolean bindAsUser(String userName, String dn, Object credentials) throws NamingException,
-            UserStoreException {
+            UserStoreException, DashboardUserStoreException {
         boolean isAuthed = false;
         boolean debug = log.isDebugEnabled();
 
@@ -613,15 +633,15 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
     }
 
     @Override
-    protected String[] doGetExternalRoleListOfUser(String userName, String filter) throws UserStoreException {
+    protected String[] doGetExternalRoleListOfUser(String userName, String filter) throws DashboardUserStoreException {
         // Get the effective search base
         String searchBase = this.getEffectiveSearchBase(false);
         return getLDAPRoleListOfUser(userName, filter, searchBase, false);
     }
 
     @Override
-    protected String[] doGetSharedRoleListOfUser(String userName,
-                                                 String tenantDomain, String filter) throws UserStoreException {
+    protected String[] doGetSharedRoleListOfUser(String userName, String tenantDomain, String filter)
+            throws DashboardUserStoreException {
         // Get the effective search base
         String searchBase = this.getEffectiveSearchBase(true);
         if (tenantDomain != null && tenantDomain.trim().length() > 0) {
@@ -671,9 +691,9 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
     }
 
     protected String[] getLDAPRoleListOfUser(String userName, String filter, String searchBase,
-                                             boolean shared) throws UserStoreException {
+                                             boolean shared) throws DashboardUserStoreException {
         if (userName == null) {
-            throw new UserStoreException("userName value is null.");
+            throw new DashboardUserStoreException("userName value is null.");
         }
         boolean debug = log.isDebugEnabled();
         List<String> list = new ArrayList<String>();
@@ -740,7 +760,7 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
                 // read the roles with this membership property
 
                 if (membershipProperty == null || membershipProperty.length() < 1) {
-                    throw new UserStoreException(
+                    throw new DashboardUserStoreException(
                             "Please set member of attribute or membership attribute");
                 }
 
@@ -757,7 +777,7 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
                         }
                     } catch (InvalidNameException e) {
                         log.error("Error while creating LDAP name from: " + nameInSpace);
-                        throw new UserStoreException("Invalid naming exception for : " + nameInSpace, e);
+                        throw new DashboardUserStoreException("Invalid naming exception for : " + nameInSpace, e);
                     }
                 } else {
                     return new String[0];
@@ -796,7 +816,7 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
      */
     private List<String> getListOfNames(String searchBases, String searchFilter,
                                         SearchControls searchCtls, String property, boolean appendDn)
-            throws UserStoreException {
+            throws DashboardUserStoreException {
         boolean debug = log.isDebugEnabled();
         List<String> names = new ArrayList<String>();
         DirContext dirContext = null;
@@ -853,11 +873,20 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
 
             return names;
         } finally {
-            JNDIUtil.closeNamingEnumeration(answer);
-            JNDIUtil.closeContext(dirContext);
+            closeContextAndNamingEnumeration(dirContext, answer);
         }
     }
 
+    private static void closeContextAndNamingEnumeration(DirContext dirContext, NamingEnumeration<SearchResult> answer)
+            throws DashboardUserStoreException {
+        JNDIUtil.closeNamingEnumeration(answer);
+        try {
+            JNDIUtil.closeContext(dirContext);
+        } catch (UserStoreException e) {
+            throw new DashboardUserStoreException("Error occurred while closing the context", e);
+        }
+    }
+    
     /**
      *
      */
@@ -968,14 +997,14 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
      * @return
      * @throws UserStoreException
      */
-    protected String getNameInSpaceForUserName(String userName) throws UserStoreException {
+    protected String getNameInSpaceForUserName(String userName) throws DashboardUserStoreException {
 
         // check the cache first
         LdapName ldn = null;
         if (userName != null) {
             ldn = getFromUserCache(userName);
         } else {
-            throw new UserStoreException("userName value is null.");
+            throw new DashboardUserStoreException("userName value is null.");
         }
         if (ldn != null) {
             return ldn.toString();
@@ -1052,22 +1081,17 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager imple
         return new CompositeName().add(dn);
     }
 
-    @Override
-    public boolean doAuthenticate(String username, String password) {
-        return false;
-    }
-
     /**
      * {@inheritDoc}
      */
-    public boolean isReadOnly() throws UserStoreException {
+    public boolean isReadOnly() throws DashboardUserStoreException {
         return true;
     }
 
     /**
      *
      */
-    public int getTenantId() throws UserStoreException {
+    public int getTenantId() throws DashboardUserStoreException {
         return this.tenantId;
     }
 }

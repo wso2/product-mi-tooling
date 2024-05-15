@@ -130,7 +130,6 @@ function Header(props) {
                   keepMounted
                   open={Boolean(anchorEl)}
                   onClose={handlePopOverClose}>
-                  {!AuthManager.getUser()?.sso && <MenuItem onClick={updatePassword}>Change Password</MenuItem>}
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
               </Popover>

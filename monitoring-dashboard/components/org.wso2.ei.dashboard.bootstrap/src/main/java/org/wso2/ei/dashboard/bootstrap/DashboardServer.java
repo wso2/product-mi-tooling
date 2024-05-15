@@ -110,7 +110,7 @@ public class DashboardServer {
     private static final String SECRET_CONF = "secret-conf.properties";
     private static final String CARBON_CONFIG_DIR = "carbon.config.dir.path";
 //    private static final String USER_STORE_TYPE = "user_store_type";
-    private static final String FILE_BASED_USER_STORE_ENABLE = "file_user_store.enable";
+    private static final String FILE_BASED_USER_STORE_ENABLE = "internal_apis.file_user_store.enable";
     private static final String IS_USER_STORE_FILE_BASED = "is.user.store.file.based";
     private static final int EXECUTOR_SERVICE_TERMINATION_TIMEOUT = 5000;
     private static final int DEFAULT_HEARTBEAT_POOL_SIZE = 10;

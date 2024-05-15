@@ -23,6 +23,8 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.dashboard.security.user.core.UserStoreConstants;
+import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
 import org.wso2.dashboard.security.user.core.UserInfo;
 import org.wso2.dashboard.security.user.core.common.AbstractUserStoreManager;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
@@ -37,6 +39,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.*;
 
 public class FileBasedUserStoreManager extends AbstractUserStoreManager {
@@ -65,7 +70,6 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
         File userMgtConfigXml = new File(System.getProperty("carbon.config.dir.path"), USER_MGT_CONFIG_FILE);
 
         try (InputStream fileInputStream = Files.newInputStream(userMgtConfigXml.toPath())) {
-//            InputStream inputStream = MicroIntegratorBaseUtils.replaceSystemVariablesInXml(fileInputStream);
             StAXOMBuilder builder = new StAXOMBuilder(fileInputStream);
             documentElement = builder.getDocumentElement();
         } catch (IOException | XMLStreamException e) {
@@ -130,22 +134,21 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
     }
 
     @Override
-    protected boolean doAuthenticate(String username, String password) {
-        if (password != null && username != null) {
-            UserInfo userInfo = userMap.get(username);
-            if (userInfo != null) {
-                return new String(userInfo.getPassword()).equals(password);
-            }
+    protected boolean doAuthenticate(String userName, Object credential) {
+
+        UserInfo userInfo = userMap.get(userName);
+        if (userInfo != null) {
+            return new String(userInfo.getPassword()).equals(credential);
         }
         return false;
     }
 
-    public boolean authenticate(String username, String password) {
-        UserInfo userInfo = userMap.get(username);
-        if (userInfo != null) {
-            return new String(userInfo.getPassword()).equals(password);
+    @Override
+    public boolean authenticate(final String userName, final Object credential) {
+        if (userName == null || credential == null) {
+            return false;
         }
-        return false;
+        return doAuthenticate(userName, credential);
     }
 
     public boolean isAdmin(String username) throws UserStoreException {
@@ -169,12 +172,12 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
     }
 
     @Override
-    public boolean isReadOnly() throws UserStoreException {
+    public boolean isReadOnly() throws DashboardUserStoreException {
         return false;
     }
 
     @Override
-    public int getTenantId() throws UserStoreException {
+    public int getTenantId() throws DashboardUserStoreException {
         return 0;
     }
 
@@ -184,12 +187,12 @@ public class FileBasedUserStoreManager extends AbstractUserStoreManager {
     }
 
     @Override
-    protected String[] doGetExternalRoleListOfUser(String s, String s1) throws UserStoreException {
+    protected String[] doGetExternalRoleListOfUser(String s, String s1) throws DashboardUserStoreException {
         return new String[0];
     }
 
     @Override
-    protected String[] doGetSharedRoleListOfUser(String s, String s1, String s2) throws UserStoreException {
+    protected String[] doGetSharedRoleListOfUser(String s, String s1, String s2) throws DashboardUserStoreException {
         return new String[0];
     }
 }

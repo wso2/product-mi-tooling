@@ -15,23 +15,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.dashboard.security.user.core;
 
-public class DashboardUserStoreException extends Exception {
+package org.wso2.dashboard.security.user.core.common;
 
-    public DashboardUserStoreException() {
-        super();
+/**
+ * Exception defined to denote that provided secret type is not supported.
+ */
+public class UnsupportedSecretTypeException extends Exception{
+
+    public UnsupportedSecretTypeException() {
     }
 
-    public DashboardUserStoreException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public DashboardUserStoreException(String message) {
+    public UnsupportedSecretTypeException(String message) {
         super(message);
     }
 
-    public DashboardUserStoreException(Throwable cause) {
+    public UnsupportedSecretTypeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public UnsupportedSecretTypeException(Throwable cause) {
         super(cause);
     }
 }

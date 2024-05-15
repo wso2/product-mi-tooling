@@ -23,6 +23,7 @@ public class UserStoreConstants {
             "org.wso2.dashboard.security.user.core.ldap.ReadOnlyLDAPUserStoreManager";
     public static final String DEFAULT_JDBC_USERSTORE_MANAGER =
             "org.wso2.dashboard.security.user.core.jdbc.JDBCUserStoreManager";
+    public static final String REGISTRY_SYSTEM_USERNAME = "wso2.system.user";
     public static String DOMAIN_SEPARATOR = "/";
     public static final String PRIMARY_DEFAULT_DOMAIN_NAME = "PRIMARY";
     public static final int SUPER_TENANT_ID = -1234;
