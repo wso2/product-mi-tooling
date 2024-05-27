@@ -109,7 +109,7 @@ goto end
 
 :stopServer
 set /p processId= < %DASHBOARD_HOME%\runtime.pid
-echo Stopping the Micro Integrator Dashboard Server
+echo Stopping the Integration Control Plane
 taskkill /F /PID %processId%
 goto end
 
