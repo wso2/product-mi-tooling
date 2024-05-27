@@ -249,6 +249,16 @@
                 <version>${cipher.tool.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbusds.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>oauth2-oidc-sdk</artifactId>
+                <version>${nimbusds.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.ei</groupId>
                 <artifactId>org.wso2.micro.integrator.security</artifactId>
                 <version>${mi.user.core.version}</version>
@@ -331,8 +341,9 @@
         <config.mapper.version>1.0.20</config.mapper.version>
         <asgardeo.java.oidc.sdk.version>0.1.13</asgardeo.java.oidc.sdk.version>
         <net.minidev.asm.version>2.4.8</net.minidev.asm.version>
-        <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
-        <guava.version>31.1-jre</guava.version>
+        <net.minidev.json-smart.version>2.5.1</net.minidev.json-smart.version>
+        <guava.version>33.2.0-jre</guava.version>
+        <nimbusds.version>9.39.1</nimbusds.version>
         <axiom.version>1.2.11-wso2v17</axiom.version>
         <cipher.tool.version>1.1.24</cipher.tool.version>
         <maven.war.plugin.version>3.3.2</maven.war.plugin.version>
