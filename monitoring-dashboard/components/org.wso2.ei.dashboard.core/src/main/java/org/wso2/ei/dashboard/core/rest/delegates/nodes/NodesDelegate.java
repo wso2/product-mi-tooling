@@ -23,6 +23,7 @@ package org.wso2.ei.dashboard.core.rest.delegates.nodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.wso2.ei.dashboard.core.commons.Constants.Product;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
@@ -54,6 +55,12 @@ public class NodesDelegate {
             }
         }
         return nodeList;
+    }
+
+    public NodeList getNodesByProductID(String groupId, String productId) {
+        logger.debug("Fetching node list in " + groupId + " in product " + productId);
+        //productId can be either "mi" or "bal"
+        return dataManager.fetchNodes(groupId, Product.valueOf(productId.toUpperCase()));
     }
 
     public NodeList getPaginatedNodesList(String groupId, int lowerLimit, int upperLimit) {  

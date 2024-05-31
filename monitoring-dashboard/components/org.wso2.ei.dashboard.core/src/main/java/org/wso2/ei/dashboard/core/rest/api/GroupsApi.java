@@ -1149,6 +1149,27 @@ public class GroupsApi {
     }
 
     @GET
+    @Path("/{group-id}/nodes/{product-id}")
+    @Produces({ "application/json" })
+    @Operation(summary = "Get all nodes in the group based on product", description = "", tags={ "nodes" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The list of nodes in group based on product",
+                    content = @Content(schema = @Schema(implementation = NodeList.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response retrieveAllNodesByGroupIdByProductId(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @PathParam("product-id") @Parameter(description = "Product ID") String productId) {
+        logger.debug("Retrieving All nodes of product: " + productId + " in group: " + groupId);
+        NodesDelegate nodesDeligate = new NodesDelegate();
+        NodeList nodesResponse = nodesDeligate.getNodesByProductID(groupId, productId);
+        Response.ResponseBuilder responseBuilder = Response.ok().entity(nodesResponse);
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
     @Path("/{group-id}/nodes")
     @Produces({ "application/json" })
     @Operation(summary = "Get set of nodes in the group", description = "", tags={ "nodes" })

@@ -25,6 +25,9 @@ import javax.validation.Valid;
 
 
 import io.swagger.annotations.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LogConfigsInner   {
   private @Valid String name = null;
   private @Valid String componentName = null;
-  private @Valid String level = null;
+  private @Valid List<LogConfigDetail> nodes = new ArrayList<LogConfigDetail>();
 
   /**
    **/
@@ -78,23 +81,26 @@ public class LogConfigsInner   {
 
   /**
    **/
-  public LogConfigsInner level(String level) {
-    this.level = level;
+  public LogConfigsInner nodes(List<LogConfigDetail> nodes) {
+    this.nodes = nodes;
     return this;
   }
 
-  
   @ApiModelProperty(value = "")
-  @JsonProperty("level")
+  @JsonProperty("nodes")
 
-  public String getLevel() {
-    return level;
+  public List<LogConfigDetail> getNodes() {
+    return nodes;
   }
-  public String getLevelIgnoreCase() {
-    return level.toLowerCase();
+  public void setNodes(List<LogConfigDetail> nodes) {
+    this.nodes = new ArrayList<>(nodes);
   }
-  public void setLevel(String level) {
-    this.level = level;
+
+  public void addNode(LogConfigDetail node) {
+    if (this.nodes == null) {
+      this.nodes = new ArrayList<>(); // Initialize if null
+    }
+    this.nodes.add(node);
   }
 
 
@@ -109,12 +115,12 @@ public class LogConfigsInner   {
     LogConfigsInner logConfigsInner = (LogConfigsInner) o;
     return Objects.equals(name, logConfigsInner.name) &&
         Objects.equals(componentName, logConfigsInner.componentName) &&
-        Objects.equals(level, logConfigsInner.level);
+            Objects.equals(nodes, logConfigsInner.nodes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, componentName, level);
+    return Objects.hash(name, componentName, nodes);
   }
 
   @Override
@@ -124,7 +130,7 @@ public class LogConfigsInner   {
     
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    level: ").append(toIndentedString(level)).append("\n");
+    sb.append("    nodes: ").append(toIndentedString(nodes)).append("\n");
     sb.append("}");
     return sb.toString();
   }

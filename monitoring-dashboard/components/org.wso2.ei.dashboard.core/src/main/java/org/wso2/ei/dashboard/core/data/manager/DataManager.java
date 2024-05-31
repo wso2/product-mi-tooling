@@ -20,6 +20,7 @@
 
 package org.wso2.ei.dashboard.core.data.manager;
 
+import org.wso2.ei.dashboard.core.commons.Constants.Product;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
@@ -36,6 +37,8 @@ public interface DataManager {
     GroupList fetchGroups();
 
     NodeList fetchNodes(String groupId);
+
+    NodeList fetchNodes(String groupId, Product product);
 
     String getMgtApiUrl(String groupId, String nodeId);
 

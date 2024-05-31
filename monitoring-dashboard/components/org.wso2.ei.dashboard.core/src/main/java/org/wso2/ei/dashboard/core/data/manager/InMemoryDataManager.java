@@ -22,6 +22,7 @@ package org.wso2.ei.dashboard.core.data.manager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.wso2.ei.dashboard.core.commons.Constants.Product;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.rest.delegates.heartbeat.HeartbeatObject;
 import org.wso2.ei.dashboard.core.rest.model.GroupList;
@@ -117,6 +118,26 @@ public final class InMemoryDataManager implements DataManager {
             NodeList nodeList = new NodeList();
             for (HashMap entry: serviceInfoStore.values()) {
                 if (entry.get(GROUP_ID).toString().equals(groupId)) {
+                    NodeListInner nodeListInner = new NodeListInner();
+                    nodeListInner.setNodeId(entry.get(NODE_ID).toString());
+                    nodeListInner.setDetails(entry.get(SERVICE_INFO).toString());
+                    nodeListInner.setType(entry.get(PRODUCT).toString());
+                    nodeList.add(nodeListInner);
+                }
+            }
+            return nodeList;
+        } catch (DashboardServerException e) {
+            throw new DashboardServerException("Error occurred fetching servers.", e);
+        }
+    }
+
+    @Override
+    public NodeList fetchNodes(String groupId, Product productId) {
+        try {
+            NodeList nodeList = new NodeList();
+            for (HashMap entry: serviceInfoStore.values()) {
+                if (entry.get(GROUP_ID).toString().equals(groupId) &&
+                        entry.get(PRODUCT).toString().equalsIgnoreCase(productId.toString())) {
                     NodeListInner nodeListInner = new NodeListInner();
                     nodeListInner.setNodeId(entry.get(NODE_ID).toString());
                     nodeListInner.setDetails(entry.get(SERVICE_INFO).toString());

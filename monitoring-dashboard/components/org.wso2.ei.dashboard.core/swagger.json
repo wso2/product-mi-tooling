@@ -91,6 +91,12 @@
   }, {
     "name" : "configuration",
     "description" : "Access configurations"
+  }, {
+    "name" : "services",
+    "description" : "Access services details"
+  }, {
+    "name" : "listeners",
+    "description" : "Access listeners details"
   } ],
   "paths" : {
     "/login" : {
@@ -300,6 +306,56 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/NodesResourceResponse"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups/{group-id}/nodes/{product-id}" : {
+      "get" : {
+        "tags" : [ "nodes" ],
+        "summary" : "Get all nodes in the group based on product",
+        "operationId" : "retrieveAllNodesByGroupIdByProductId",
+        "parameters" : [ {
+          "name" : "group-id",
+          "in" : "path",
+          "description" : "Group ID of the node",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "product-id",
+          "in" : "path",
+          "description" : "Product ID",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The list of nodes in group based on product",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NodeList"
                 }
               }
             }
@@ -3949,6 +4005,17 @@
           }
         }
       },
+      "LogConfigDetail" : {
+        "type" : "object",
+        "properties" : {
+          "nodeId" : {
+            "type" : "string"
+          },
+          "level" : {
+            "type" : "string"
+          }
+        }
+      },
       "LogConfigs" : {
         "type" : "array",
         "items" : {
@@ -4290,8 +4357,11 @@
           "componentName" : {
             "type" : "string"
           },
-          "level" : {
-            "type" : "string"
+          "nodes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LogConfigDetail"
+            }
           }
         }
       },

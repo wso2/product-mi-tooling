@@ -38,6 +38,7 @@ import org.wso2.ei.dashboard.core.rest.model.LogConfigAddRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigs;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigsInner;
+import org.wso2.ei.dashboard.core.rest.model.LogConfigDetail;
 import org.wso2.ei.dashboard.core.rest.model.LogConfigsResourceResponse;
 import org.wso2.ei.dashboard.core.rest.model.NodeList;
 import org.wso2.ei.dashboard.core.rest.model.NodeListInner;
@@ -70,7 +71,6 @@ public class LogConfigDelegate {
         int toIndex = Integer.parseInt(upperLimit);
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
         String prevResourceType = DelegatesUtil.getPrevResourceType();
-
         LogConfigsResourceResponse logsResourceResponse = new LogConfigsResourceResponse();
         logger.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
 
@@ -92,7 +92,8 @@ public class LogConfigDelegate {
         String searchKey, String order, String orderBy) throws ManagementApiException {
 
         if (nodeList.contains("all")) {
-            NodeList nodes = dataManager.fetchNodes(groupId);
+            // only MI nodes contains log-configs resource
+            NodeList nodes = dataManager.fetchNodes(groupId, Constants.Product.MI);
             nodeList = new ArrayList<>();
             for (NodeListInner nodeListInner : nodes) {
                 nodeList.add(nodeListInner.getNodeId());
@@ -101,23 +102,35 @@ public class LogConfigDelegate {
 
         LogConfigs logConfigs = new LogConfigs();
 
+        ArrayList<String> logConfigsList = new ArrayList<>();
         for (String nodeId: nodeList) {
             String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
             String accessToken = dataManager.getAccessToken(groupId, nodeId);
 
             JsonArray logConfigsArray = DelegatesUtil.getResourceResultList(groupId, nodeId, "logging",
-                mgtApiUrl, accessToken, searchKey);
+                    mgtApiUrl, accessToken, searchKey);
 
             for (JsonElement element : logConfigsArray) {
-                LogConfigsInner logConfigsInner = createLogConfig(element);
-                logConfigs.add(logConfigsInner);
+                JsonObject logConfig = element.getAsJsonObject();
+                String loggerName = logConfig.get("loggerName").getAsString();
+                if (logConfigsList.contains(loggerName)) {
+                    logConfigs.get(logConfigsList.indexOf(loggerName)).
+                            addNode(new LogConfigDetail(nodeId, logConfig.get("level").getAsString()));
+                } else {
+                    logConfigsList.add(loggerName);
+                    LogConfigsInner logConfigsInner = new LogConfigsInner();
+                    logConfigsInner.setName(logConfig.get("loggerName").getAsString());
+                    logConfigsInner.setComponentName(logConfig.get("componentName").getAsString());
+                    logConfigsInner.setNodes(Collections.singletonList(new LogConfigDetail(nodeId,
+                            logConfig.get("level").getAsString())));
+                    logConfigs.add(logConfigsInner);
+                }
             }
-
         }
+
         //ordering
         Comparator<LogConfigsInner> comparatorObject;
         switch (orderBy) {
-            case "level":comparatorObject = Comparator.comparing(LogConfigsInner::getLevelIgnoreCase); break;
             case "componentName":comparatorObject = Comparator.comparing
                 (LogConfigsInner::getComponentNameIgnoreCase); break;
             default: comparatorObject = Comparator.comparing(LogConfigsInner::getNameIgnoreCase); break;
@@ -128,15 +141,6 @@ public class LogConfigDelegate {
             Collections.sort(logConfigs, comparatorObject);
         }
         return logConfigs;
-    }
-
-    private LogConfigsInner createLogConfig(JsonElement element) {
-        JsonObject logConfig = element.getAsJsonObject();
-        LogConfigsInner logConfigsInner = new LogConfigsInner();
-        logConfigsInner.setName(logConfig.get("loggerName").getAsString());
-        logConfigsInner.setComponentName(logConfig.get("componentName").getAsString());
-        logConfigsInner.setLevel(logConfig.get("level").getAsString());
-        return logConfigsInner;
     }
 
      /**
