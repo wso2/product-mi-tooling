@@ -38,34 +38,34 @@ function PrivacyPolicy(props) {
 
     return (
         <Paper className={classes.policyContent}>
-            <Typography variant="h3">WSO2 Micro Integrator Dashboard - Privacy Policy</Typography>
+            <Typography variant="h3">WSO2 Integration Control Plane - Privacy Policy</Typography>
             <Link variant="h4"
                   href="https://apim.docs.wso2.com/en/latest/observe/mi-observe/working-with-monitoring-dashboard/"
-                  style={{color: "#ff5000"}}>WSO2 Micro Integrator Dashboard</Link>
+                  style={{color: "#ff5000"}}>WSO2 Integration Control Plane</Link>
 
             <Typography>
-                WSO2 Micro Integrator Dashboard monitors running Micro Integrator instances (Single or Cluster
+                WSO2 Integration Control Plane monitors running Micro Integrator instances (Single or Cluster
                 Mode) and facilitates
                 performing various management and administration tasks related to deployed artifacts.
             </Typography>
 
             <h2 id="privacy-policy">Privacy Policy</h2>
-            <Typography>This policy describes how WSO2 Micro Integrator Dashboard captures your personal information,
+            <Typography>This policy describes how WSO2 Integration Control Plane captures your personal information,
                 the purposes of
                 collection, and information about the retention of your personal information.</Typography>
             <Typography>Please note that this policy is for reference only, and is applicable for the software
-                as a product. WSO2 Inc. and its developers have no access to the information held within WSO2 Micro
-                Integrator Dashboard.
+                as a product. WSO2 Inc. and its developers have no access to the information held within WSO2
+                Integration Control Plane.
                 Please see the Disclaimer section for more information
             </Typography>
-            <Typography>Entities, organizations or individuals controlling the use and administration of WSO2 Micro
-                Integrator Dashboard
+            <Typography>Entities, organizations or individuals controlling the use and administration of WSO2
+                Integration Control Plane
                 should
                 create their own privacy policies setting out the manner in which data is controlled or
                 processed by the respective entity, organization or individual.</Typography>
 
             <h2 id="what-is-personal-information">What is personal information?</h2>
-            <Typography>WSO2 Micro Integrator Dashboard considers anything related to you, and by which you may be
+            <Typography>WSO2 Integration Control Plane considers anything related to you, and by which you may be
                 identified, as your
                 personal information. This includes, but is not limited to:
             </Typography>
@@ -80,7 +80,7 @@ function PrivacyPolicy(props) {
                 <li><Typography>Your device ID if you use a device (e.g., phone or tablet) to log
                     in</Typography></li>
             </ul>
-            <Typography>However, WSO2 Micro Integrator Dashboard also collects the following information that is not
+            <Typography>However, WSO2 Integration Control Plane also collects the following information that is not
                 considered personal
                 information, but is used only for <strong>statistical</strong> purposes. The reason for this is
                 that this information can not be used to track you.</Typography>
@@ -93,22 +93,22 @@ function PrivacyPolicy(props) {
             </ul>
 
             <h2 id="collection-of-personal-information">Collection of personal information</h2>
-            <Typography>WSO2 Micro Integrator Dashboard collects your information only to serve your access
+            <Typography>WSO2 Integration Control Plane collects your information only to serve your access
                 requirements. For example:
                 <ul>
-                    <li><Typography>WSO2 Micro Integrator Dashboard uses your IP address to detect any suspicious login
+                    <li><Typography>WSO2 Integration Control Plane uses your IP address to detect any suspicious login
                         attempts to your
                         account.</Typography></li>
-                    <li><Typography>WSO2 Micro Integrator Dashboard uses attributes like your first name, last name,
+                    <li><Typography>WSO2 Integration Control Plane uses attributes like your first name, last name,
                         etc., to provide a
                         rich and personalized user experience.</Typography></li>
-                    <li><Typography>WSO2 Micro Integrator Dashboard uses your security questions and answers only to
+                    <li><Typography>WSO2 Integration Control Plane uses your security questions and answers only to
                         allow account
                         recovery.</Typography></li>
                 </ul>
             </Typography>
             <h3 id="tracking-technologies">Tracking Technologies</h3>
-            <Typography>WSO2 Micro Integrator Dashboard collects your information by:</Typography>
+            <Typography>WSO2 Integration Control Plane collects your information by:</Typography>
             <Typography>
                 <ul>
                     <li>Collecting information from the user profile page where you enter your personal data.
@@ -123,19 +123,19 @@ function PrivacyPolicy(props) {
             </Typography>
 
             <h2 id="user-of-personal-information">Use of personal information</h2>
-            <Typography>WSO2 Micro Integrator Dashboard will only use your personal information for the purposes for
+            <Typography>WSO2 Integration Control Plane will only use your personal information for the purposes for
                 which it was
                 collected (or for a use identified as consistent with that purpose).</Typography>
-            <Typography>WSO2 Micro Integrator Dashboard uses your personal information only for the following
+            <Typography>WSO2 Integration Control Plane uses your personal information only for the following
                 purposes.</Typography>
             <Typography>
                 <ul>
-                    <li>To provide you with a personalized user experience. WSO2 Micro Integrator Dashboard uses your
+                    <li>To provide you with a personalized user experience. WSO2 Integration Control Plane uses your
                         name and uploaded
                         profile pictures for this purpose.
                     </li>
-                    <li>To protect your account from unauthorized access or potential hacking attempts. WSO2 Micro
-                        Integrator Dashboard
+                    <li>To protect your account from unauthorized access or potential hacking attempts. WSO2 Integration
+                        Control Plane
                         uses HTTP or TCP/IP Headers for this purpose.
                     </li>
                     <ul>
@@ -151,7 +151,7 @@ function PrivacyPolicy(props) {
                         statistical report has no means of identifying an individual person.
                     </li>
                     <ul>
-                        <li>WSO2 Micro Integrator Dashboard may use:</li>
+                        <li>WSO2 Integration Control Plane may use:</li>
                         <ul>
                             <li>IP Address to derive geographic information</li>
                             <li>Browser fingerprinting to determine the browser technology or/and version</li>
@@ -161,9 +161,9 @@ function PrivacyPolicy(props) {
             </Typography>
 
             <h2 id="disclosure-of-personal-information">Disclosure of personal information</h2>
-            <Typography>WSO2 Micro Integrator Dashboard only discloses personal information to the relevant applications
+            <Typography>WSO2 Integration Control Plane only discloses personal information to the relevant applications
                 (also known as
-                “Service Providers”) that are registered with WSO2 Micro Integrator Dashboard. These applications are
+                “Service Providers”) that are registered with WSO2 Integration Control Plane. These applications are
                 registered by the
                 identity administrator of your entity or organization. Personal information is disclosed only
                 for the purposes for which it was collected (or for a use identified as consistent with that
@@ -171,7 +171,7 @@ function PrivacyPolicy(props) {
                 it is required by law.</Typography>
 
             <h3 id="legal-process">Legal process</h3>
-            <Typography>Please note that the organization, entity or individual running WSO2 Micro Integrator Dashboard
+            <Typography>Please note that the organization, entity or individual running WSO2 Integration Control Plane
                 may be compelled
                 to disclose your personal information with or without your consent when it is required by law
                 following due and lawful process.</Typography>
@@ -179,23 +179,23 @@ function PrivacyPolicy(props) {
             <h2 id="storage-of-personal-information">Storage of personal information</h2>
 
             <h3 id="where-your-personal-information-stored">Where your personal information is stored</h3>
-            <Typography>WSO2 Micro Integrator Dashboard stores your personal information in secured databases. WSO2
-                Micro Integrator Dashboard exercises proper
+            <Typography>WSO2 Integration Control Plane stores your personal information in secured databases. WSO2
+                Integration Control Plane exercises proper
                 industry accepted security measures to protect the database where your personal information is
-                held. WSO2 Micro Integrator Dashboard as a product does not transfer or share your data with any third
+                held. WSO2 Integration Control Plane as a product does not transfer or share your data with any third
                 parties or
                 locations. </Typography>
             <Typography>
-                WSO2 Micro Integrator Dashboard may use encryption to keep your personal data with an added level of
+                WSO2 Integration Control Plane may use encryption to keep your personal data with an added level of
                 security.
             </Typography>
 
             <h3 id="how-long-does-is-5.5-keep-your-personal-information">How long your personal information is
                 retained</h3>
-            <Typography>WSO2 Micro Integrator Dashboard retains your personal data as long as you are an active user of
+            <Typography>WSO2 Integration Control Plane retains your personal data as long as you are an active user of
                 our system. You
                 can update your personal data at any time using the given self-care user portals.</Typography>
-            <Typography>WSO2 Micro Integrator Dashboard may keep hashed secrets to provide you with an added level of
+            <Typography>WSO2 Integration Control Plane may keep hashed secrets to provide you with an added level of
                 security. This
                 includes:</Typography>
             <ul>
@@ -208,28 +208,28 @@ function PrivacyPolicy(props) {
             <Typography>You can request the administrator to delete your account. The administrator is the
                 administrator of the organization you are registered under, or the super-administrator if
                 you do not use the organization feature.</Typography>
-            <Typography>Additionally, you can request to anonymize all traces of your activities that WSO2 Micro
-                Integrator Dashboard
+            <Typography>Additionally, you can request to anonymize all traces of your activities that WSO2 Integration
+                Control Plane
                 may have retained in logs, databases or analytical storage.</Typography>
 
             <h2 id="more-information">More information</h2>
 
             <h3 id="changes-to-this-policy">Changes to this policy</h3>
-            <Typography>Upgraded versions of WSO2 Micro Integrator Dashboard may contain changes to this policy and
+            <Typography>Upgraded versions of WSO2 Integration Control Plane may contain changes to this policy and
                 revisions to this
                 policy will
                 be packaged within such upgrades. Such changes would only apply to users who choose to use
                 upgraded versions.</Typography>
-            <Typography>The organization running WSO2 Micro Integrator Dashboard may revise the Privacy Policy from time
+            <Typography>The organization running WSO2 Integration Control Plane may revise the Privacy Policy from time
                 to time. You
                 can find
                 the most recent governing policy with the respective link provided by the organization running
-                WSO2 Micro Integrator Dashboard. The organization will notify any changes to the privacy policy over our
+                WSO2 Integration Control Plane. The organization will notify any changes to the privacy policy over our
                 official public
                 channels.</Typography>
 
             <h3 id="your-choices">Your choices</h3>
-            <Typography>If you already have a user account within WSO2 Micro Integrator Dashboard, you have the
+            <Typography>If you already have a user account within WSO2 Integration Control Plane, you have the
                 right to deactivate your account if you find that this privacy policy is unacceptable to you.</Typography>
             <Typography>If you do not have an account and you do not agree with our privacy policy, you can choose not to
                 create one.</Typography>
@@ -243,27 +243,27 @@ function PrivacyPolicy(props) {
             <ol>
                 <li><Typography>WSO2, its employees, partners, and affiliates do not have access to and do not
                     require,
-                    store, process or control any of the data, including personal data contained in WSO2 Micro
-                    Integrator Dashboard. All
+                    store, process or control any of the data, including personal data contained in WSO2 Integration
+                    Control Plane. All
                     data, including personal data is controlled and processed by the entity or individual
-                    running WSO2 Micro Integrator Dashboard. WSO2, its employees partners and affiliates are not a data
+                    running WSO2 Integration Control Plane. WSO2, its employees partners and affiliates are not a data
                     processor or a
                     data controller within the meaning of any data privacy regulations. WSO2 does not provide
                     any warranties or undertake any responsibility or liability in connection with the
-                    lawfulness or the manner and purposes for which WSO2 Micro Integrator Dashboard is used by such
+                    lawfulness or the manner and purposes for which WSO2 Integration Control Plane is used by such
                     entities or persons.
                 </Typography>
                 </li>
 
                 <li><Typography>This privacy policy is for the informational purposes of the entity or persons
                     running WSO2
-                    IS and sets out the processes and functionality contained within WSO2 Micro Integrator Dashboard
+                    IS and sets out the processes and functionality contained within WSO2 Integration Control Plane
                     regarding personal
-                    data protection. It is the responsibility of entities and persons running WSO2 Micro Integrator
-                    Dashboard to create
+                    data protection. It is the responsibility of entities and persons running WSO2 Integration Control
+                    Plane to create
                     and administer its own rules and processes governing users’ personal data, and such rules
                     and processes may change the use, storage and disclosure policies contained herein.
-                    Therefore users should consult the entity or persons running WSO2 Micro Integrator Dashboard for its
+                    Therefore users should consult the entity or persons running WSO2 Integration Control Plane for its
                     own privacy
                     policy for details governing users’ personal data.
                 </Typography>
