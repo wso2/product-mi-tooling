@@ -138,7 +138,7 @@ function Login(props){
         return (
             <Container component="main" maxWidth="xs">
                 <Helmet>
-                    <title>Login - Micro Integrator Dashboard</title>
+                    <title>Login - Integration Control Plane</title>
                 </Helmet>
                 <CssBaseline />
                 <div className={classes.paper}>

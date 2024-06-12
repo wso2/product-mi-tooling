@@ -89,7 +89,7 @@ function Header(props) {
   return (
     <>
       <Helmet>
-        <title>{selected ? `${selected.id} - ` : 'Nodes - '}Micro Integrator Dashboard</title>
+        <title>{selected ? `${selected.id} - ` : 'Nodes - '}Integration Control Plane</title>
       </Helmet>
       <AppBar color="default" position="sticky" elevation={0}>
         <Toolbar>
