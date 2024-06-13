@@ -85,6 +85,11 @@ export default class HTTPClient {
         return this.getResource(resourcePath)
     }
 
+    static getAllMINodes(groupId) {
+        const resourcePath = `${groupId}/nodes/mi`;
+        return this.getResource(resourcePath)
+    }
+
     static deleteUser(groupId, userId) {
         var resourcePath = `/${Constants.PREFIX_GROUPS}/${groupId}/${Constants.PREFIX_USERS}/`
         const parts = userId.split("/")

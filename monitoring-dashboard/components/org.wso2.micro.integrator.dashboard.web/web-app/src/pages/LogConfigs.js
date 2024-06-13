@@ -30,6 +30,8 @@ import {useSelector} from 'react-redux';
 import {Link, Redirect} from "react-router-dom";
 import {Button} from "@material-ui/core";
 import HTTPClient from '../utils/HTTPClient';
+import { setIsRefreshed } from '../redux/Actions';
+import { useDispatch } from 'react-redux';
 
 export default function LogConfigs() {
     const [pageInfo, setPageInfo] = React.useState({
@@ -38,6 +40,7 @@ export default function LogConfigs() {
         headCells: [
             {id: 'name', label: 'Logger Name'},
             {id: 'componentName', label: 'Component Name'},
+            {id: 'nodes_log_config', label: 'Nodes'},
             {id: 'level', label: 'Level'}],
         tableOrderBy: 'name',
         additionalParams: {
@@ -48,6 +51,7 @@ export default function LogConfigs() {
     const [nodeList, setNodeList] = React.useState([]);
     const [selectedNodeId, setSelectedNodeId] = React.useState('All');
     const globalGroupId = useSelector(state => state.groupId);
+    const dispatch = useDispatch();
 
     const classes = useStyles();
 
@@ -57,7 +61,7 @@ export default function LogConfigs() {
             value: 'All'
         }]
         if (globalGroupId !== '') {
-            HTTPClient.getAllNodes(globalGroupId).then(response => {
+            HTTPClient.getAllMINodes(globalGroupId).then(response => {
                 response.data.filter(node => {
                     var node = {
                         label: node.nodeId,
@@ -98,7 +102,10 @@ export default function LogConfigs() {
                 value={selectedNodeId}
                 labelId="node-id-select-label"
                 id="node-id-select"
-                onChange={(e) => getLogConfigByNodeId(e.target.value)}
+                onChange={(e) => {
+                    dispatch(setIsRefreshed(true));
+                    getLogConfigByNodeId(e.target.value);
+                }}
             >
                 {nodeList.map((option) => (
                     <MenuItem value={option.value}>{option.label}</MenuItem>

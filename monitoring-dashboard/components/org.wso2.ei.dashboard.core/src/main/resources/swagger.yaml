@@ -227,6 +227,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /groups/{group-id}/nodes/{product-id}:
+    get:
+      tags:
+        - "nodes"
+      summary: "Get all nodes in the group based on product"
+      operationId: "retrieveAllNodesByGroupIdByProductId"
+      parameters:
+        - name: "group-id"
+          in: path
+          description: "Group ID of the node"
+          required: true
+          schema:
+            type: string
+        - name: "product-id"
+          in: path
+          description: "Product ID"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "The list of nodes in group based on product"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeList'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /groups/{group-id}/all-nodes:
     get:
       tags:
@@ -620,7 +652,7 @@ paths:
       tags:
         - "listeners"
       summary: "Get listeners by node ids"
-      operationId: "getListenerssByNodeIds"
+      operationId: "getListenersByNodeIds"
       parameters:
         - name: "group-id"
           in: path
@@ -2583,17 +2615,26 @@ components:
           type: string
         logSize:
           type: string
+    LogConfigDetail:
+      type: object
+      properties:
+        nodeId:
+          type: string
+        level:
+          type: string
     LogConfigs:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-              componentName:
-                type: string
-              level:
-                type: string
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          componentName:
+            type: string
+          nodes:
+            type: array
+            items:
+              $ref: '#/components/schemas/LogConfigDetail'
     LogConfigsResourceResponse:
       type: object
       properties:

@@ -151,9 +151,10 @@ export default function TableRowCreator(props) {
             // log-configs page
             case 'componentName':
                 return <TableCell><StringCell data={data.componentName}/></TableCell>
-            
+            case 'nodes_log_config':
+                return <TableCell><table>{data.nodes.map(node=><StringCell data={node.nodeId} />)}</table></TableCell>
             case 'level':
-                return <TableCell><LogConfigLevelDropDown selectedNode={pageInfo.additionalParams.selectedNodeId} name={data.name} level={data.level} retrieveData={retrieveData}/></TableCell>
+                return <TableCell>{data.nodes.map(node=><LogConfigLevelDropDown selectedNode={pageInfo.additionalParams.selectedNodeId} name={data.name} level={node.level} retrieveData={retrieveData} />)}</TableCell>
 
             // users page
             case 'userId':

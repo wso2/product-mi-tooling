@@ -88,4 +88,8 @@ public final class Constants {
     public static final String DEFAULT_LIST_KEY = "list";
 
     public static final String LOGIN_ERROR = "Error occurred while logging in to the dashboard.";
+
+    public enum Product {
+        MI, BAL
+    }
 }
