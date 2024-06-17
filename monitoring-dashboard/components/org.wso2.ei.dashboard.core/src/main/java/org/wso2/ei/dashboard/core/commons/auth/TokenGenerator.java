@@ -2,6 +2,7 @@ package org.wso2.ei.dashboard.core.commons.auth;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Random;
@@ -49,7 +50,7 @@ public class TokenGenerator {
 
     private static String generateSecret() {
         byte[] bytes = new byte[20];
-        new Random().nextBytes(bytes);
+        new SecureRandom().nextBytes(bytes);
 
         return new String(bytes);
     }
