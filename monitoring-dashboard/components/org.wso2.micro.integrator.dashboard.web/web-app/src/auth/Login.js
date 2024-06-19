@@ -75,6 +75,7 @@ function Login(props){
     const history = useHistory();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [csrfToken, csrfToken] = useState('');
     const [authenticated, setAuthenticated] = useState(false);
     const [loginErrorMessage, setLoginErrorMessage] = useState('')
     const [loginError, setLoginError] = useState(false)
@@ -82,6 +83,7 @@ function Login(props){
     const dispatch = useDispatch();
 
     useEffect(() => {
+        fetchCsrfToken();
         initAuthenticationFlow();
     }, [])
 
@@ -102,11 +104,21 @@ function Login(props){
         });
     }
 
+    // Function to fetch CSRF token
+    const fetchCsrfToken = async () => {
+       try {
+          const response = await axios.get('/login');
+          setCsrfToken(response.data.token);
+       } catch (error) {
+          console.error('Error fetching CSRF token', error);
+       }
+    };
+
     const authenticate = (e)  => {
 
         e.preventDefault();
 
-        AuthManager.authenticate(userName, password, true)
+        AuthManager.authenticate(userName, password, true, csrfToken)
             .then(() => { setAuthenticated(true)})
             .catch((error) => {
                 console.log("Authentication failed with error :: " + error);

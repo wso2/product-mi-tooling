@@ -29,7 +29,7 @@ export default class AuthManager {
      * @param {string } password Password
      * @returns {Promise} Promise
      */
-    static authenticate(username, password, isSecure = true) {
+    static authenticate(username, password, isSecure = true, csrfToken) {
 
         return new Promise((resolve, reject) => {
             axios({
@@ -37,7 +37,8 @@ export default class AuthManager {
                 url: AuthManager.getBasePath().concat('/login'),
                 data: qs.stringify({
                   username: username,
-                  password: password
+                  password: password,
+                  CSRF_TOKEN: csrfToken
                 }),
                 headers: {
                   'content-type': 'application/x-www-form-urlencoded;charset=utf-8'
