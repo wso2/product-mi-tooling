@@ -27,7 +27,7 @@ public class CSRFFilter implements Filter {
         HttpSession session = httpRequest.getSession();
 
         if ("GET".equalsIgnoreCase(httpRequest.getMethod())) {
-            String csrfToken = new BigInteger(130, RANDOM).toString(32);
+            String csrfToken = new BigInteger(130, new SecureRandom()).toString(32);
             session.setAttribute(CSRF_TOKEN, csrfToken);
             httpResponse.setHeader("X-CSRF-Token", csrfToken);
         } else {

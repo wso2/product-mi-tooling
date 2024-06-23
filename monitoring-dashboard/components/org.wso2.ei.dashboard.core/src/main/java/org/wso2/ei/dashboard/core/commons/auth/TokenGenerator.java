@@ -5,7 +5,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Random;
 import com.google.gson.JsonObject;
 
 public class TokenGenerator {
