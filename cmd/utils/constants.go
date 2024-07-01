@@ -143,6 +143,7 @@ const MainConfigFileName = "main_config.yaml"
 const MIConfigDirName = ".wso2mi"
 const CertificatesDirName = "certs"
 const DefaultExportDirName = "exported"
+const EnvKeysAllFileName = "env_keys_all.yaml"
 
 // Mi Management Resource paths
 const MiManagementCarbonAppResource = "applications"
@@ -175,6 +176,7 @@ const MiManagementRoleResource = "roles"
 var MainConfigFilePath = filepath.Join(GetConfigDirPath(), MainConfigFileName)
 var DefaultCertDirPath = filepath.Join(ConfigDirPath, CertificatesDirName)
 var DefaultExportDirPath = filepath.Join(GetConfigDirPath(), DefaultExportDirName)
+var EnvKeysAllFilePath = filepath.Join(LocalCredentialsDirectoryPath, EnvKeysAllFileName)
 
 func GetConfigDirPath() string {
 	return filepath.Join(HomeDirectory, MIConfigDirName)
