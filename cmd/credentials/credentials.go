@@ -28,7 +28,7 @@ import (
 // DefaultConfigFile name
 var DefaultConfigFile = "keys.json"
 
-// Credential for storing apim user details
+// Credential for storing user details
 type Credential struct {
 	// Username of user
 	Username string `json:"username"`
@@ -44,7 +44,7 @@ type Credentials struct {
 	CredStore string `json:"credStore,omitempty"`
 }
 
-// Environment containing credentials of apim and mi
+// Environment containing credentials of mi
 type Environment struct {
 	MI MiCredential `json:"mi"`
 }
