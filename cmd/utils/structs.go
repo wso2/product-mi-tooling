@@ -78,3 +78,40 @@ type KeyStore struct {
 	Alias    string
 	Password string
 }
+
+// For env_keys_all.yaml
+// Not to be manually edited
+type EnvKeysAll struct {
+	Environments map[string]EnvKeys `yaml:"environments"`
+}
+
+// For main_config.yaml
+// To be manually edited by the user
+type MainConfig struct {
+	Config       Config                  `yaml:"config"`
+	Environments map[string]EnvEndpoints `yaml:"environments"`
+}
+
+type Config struct {
+	HttpRequestTimeout    int    `yaml:"http_request_timeout"`
+	ExportDirectory       string `yaml:"export_directory"`
+	KubernetesMode        bool   `yaml:"kubernetes_mode"`
+	TokenType             string `yaml:"token_type"`
+	VCSDeletionEnabled    bool   `yaml:"vcs_deletion_enabled"`
+	VCSConfigFilePath     string `yaml:"vcs_config_file_path"`
+	VCSSourceRepoPath     string `yaml:"vcs_source_repo_path"`
+	VCSDeploymentRepoPath string `yaml:"vcs_deployment_repo_path"`
+	TLSRenegotiationMode  string `yaml:"tls-renegotiation-mode"`
+	AIThreadCount         int    `yaml:"ai_thread_count"`
+	AIToken               string `yaml:"ai_token"`
+}
+
+type EnvKeys struct {
+	ClientID     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"` // encrypted (with the user's password) and stored
+	Username     string `yaml:"username"`
+}
+
+type EnvEndpoints struct {
+	MiManagementEndpoint string `yaml:"mi"`
+}

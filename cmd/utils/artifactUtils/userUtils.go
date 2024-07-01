@@ -1,7 +1,7 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
 *
-* WSO2 Inc. licenses this file to you under the Apache License,
+* WSO2 LLC. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
 * in compliance with the License.
 * You may obtain a copy of the License at
@@ -18,33 +18,33 @@
 package artifactUtils
 
 type UserList struct {
-    Count     int32       `json:"count"`
-    Users     []User      `json:"list"`
+	Count int32  `json:"count"`
+	Users []User `json:"list"`
 }
 
 type UserSummary struct {
-    Roles    []string   `json:"roles"`
-    IsAdmin  bool       `json:"isAdmin"`
-    UserId   string     `json:"userId"`
+	Roles   []string `json:"roles"`
+	IsAdmin bool     `json:"isAdmin"`
+	UserId  string   `json:"userId"`
 }
 
 type User struct {
-    UserId   string `json:"userId"`
+	UserId string `json:"userId"`
 }
 
 func (users *UserList) GetDataIterator() <-chan []string {
-    ch := make(chan []string)
+	ch := make(chan []string)
 
-    go func() {
-        for _, user := range users.Users {
-            ch <- []string{user.UserId}
-        }
-        close(ch)
-    }()
+	go func() {
+		for _, user := range users.Users {
+			ch <- []string{user.UserId}
+		}
+		close(ch)
+	}()
 
-    return ch
+	return ch
 }
 
 func (userList *UserList) GetCount() int32 {
-    return userList.Count
+	return userList.Count
 }

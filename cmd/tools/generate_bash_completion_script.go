@@ -19,10 +19,11 @@
 package main
 
 import (
-	"github.com/wso2/product-mi-tooling/cmd/cmd"
 	"log"
 	"os"
 	"path/filepath"
+
+	cmd "github.com/wso2/product-mi-tooling/cmd/cmd"
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 	}
 
 	log.Println("Generating bash completions...")
-	err = cmd.RootCmd.GenBashCompletionFile(filepath.FromSlash("./shell-completions/mi_bash_completion.sh"))
+	err = cmd.MICmd.GenBashCompletionFile(filepath.FromSlash("./shell-completions/mi_bash_completion.sh"))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -19,13 +19,14 @@
 package utils
 
 import (
-	"github.com/lithammer/dedent"
-	"github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/lithammer/dedent"
+	artifactUtils "github.com/wso2/product-mi-tooling/cmd/utils/artifactUtils"
 )
 
 func createServer(t *testing.T, param string, body string) *httptest.Server {

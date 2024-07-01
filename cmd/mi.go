@@ -18,7 +18,7 @@
 
 package main
 
-import "github.com/wso2/product-mi-tooling/cmd/cmd"
+import cmd "github.com/wso2/product-mi-tooling/cmd/cmd"
 
 func main() {
 	cmd.Execute()

@@ -19,9 +19,13 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Check whether the file exists.
@@ -67,3 +71,68 @@ func GetConfigFilePath(configFileName string) string {
 	return configFilePath
 }
 
+// WriteConfigFile
+// @param c : data
+// @param envConfigFilePath : Path to file where env endpoints are stored
+func WriteConfigFile(c interface{}, configFilePath string) {
+	data, err := yaml.Marshal(&c)
+	if err != nil {
+		HandleErrorAndExit("Unable to write configuration to file.", err)
+	}
+
+	err = ioutil.WriteFile(configFilePath, data, 0644)
+	if err != nil {
+		HandleErrorAndExit("Unable to write configuration to file.", err)
+	}
+}
+
+// Read and return EnvKeysAll
+func GetEnvKeysAllFromFile(envKeysAllFilePath string) *EnvKeysAll {
+	data, err := ioutil.ReadFile(envKeysAllFilePath)
+	if err != nil {
+		fmt.Println("Error reading " + envKeysAllFilePath)
+		os.Create(envKeysAllFilePath)
+		data, err = ioutil.ReadFile(envKeysAllFilePath)
+	}
+
+	var envKeysAll EnvKeysAll
+	if err := envKeysAll.ParseEnvKeysFromFile(data); err != nil {
+		fmt.Println(LogPrefixError + "parsing " + envKeysAllFilePath)
+		return nil
+	}
+
+	return &envKeysAll
+}
+
+// Read and validate contents of env_keys_all.yaml
+// will throw errors if the any of the lines is blank
+func (envKeysAll *EnvKeysAll) ParseEnvKeysFromFile(data []byte) error {
+	if err := yaml.Unmarshal(data, envKeysAll); err != nil {
+		return err
+	}
+	for name, keys := range envKeysAll.Environments {
+		if keys.ClientID == "" {
+			return errors.New("Blank ClientID for " + name)
+		}
+		if keys.ClientSecret == "" {
+			return errors.New("Blank ClientSecret for " + name)
+		}
+	}
+	return nil
+}
+
+func CreateDirIfNotExist(path string) (err error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, os.ModePerm)
+	}
+	return err
+}
+
+// Read and validate contents of main_config.yaml
+// will throw errors if the any of the lines is blank
+func (mainConfig *MainConfig) ParseMainConfigFromFile(data []byte) error {
+	if err := yaml.Unmarshal(data, mainConfig); err != nil {
+		return err
+	}
+	return nil
+}
