@@ -34,67 +34,287 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
+	"path"
+
+	"github.com/magiconair/properties"
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
-	"github.com/magiconair/properties"
 	"gopkg.in/resty.v1"
-	"path"
 )
 
 // Invoke http-post request using go-resty
-func InvokePOSTRequest(url string, headers map[string]string, body map[string]string) (*resty.Response, error) {
+func InvokePOSTRequest(url string, headers map[string]string, body interface{}) (*resty.Response, error) {
+	client := resty.New()
 
-    if headers == nil {
-        headers =  make(map[string]string)
-    }
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
 
-    if headers[HeaderAuthorization] == "" {
-        headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
-        RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
-    }
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetBody(body).Post(url)
+}
 
-	AllowInsecureSSLConnection()
-	resp, err := resty.R().SetHeaders(headers).SetBody(body).Post(url)
+// Invoke http-post request without body using go-resty
+func InvokePOSTRequestWithoutBody(url string, headers map[string]string) (*resty.Response, error) {
+	client := resty.New()
 
-	return resp, err
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).Post(url)
+}
+
+// Invoke http-post request with query parameters using go-resty
+func InvokePOSTRequestWithQueryParam(queryParam map[string]string, url string, headers map[string]string,
+	body string) (*resty.Response, error) {
+
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetQueryParams(queryParam).SetBody(body).Post(url)
+}
+
+// Invoke http-post request with file & query parameters using go-resty
+func InvokePOSTRequestWithFileAndQueryParams(queryParam map[string]string, url string, headers map[string]string,
+	fileParamName, filePath string) (*resty.Response, error) {
+
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetQueryParams(queryParam).
+		SetFile(fileParamName, filePath).Post(url)
+}
+
+// Invoke http-post request with file using go-resty
+func InvokePOSTRequestWithFile(url string, headers map[string]string,
+	fileParamName, filePath string) (*resty.Response, error) {
+
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).
+		SetFile(fileParamName, filePath).Post(url)
 }
 
 // Invoke http-get request using go-resty
 func InvokeGETRequest(url string, headers map[string]string, params map[string]string) (*resty.Response, error) {
 
-	AllowInsecureSSLConnection()
-	Logln(LogPrefixInfo + "InvokeGETRequest(): URL: " + url)
-	resp, err := resty.R().SetQueryParams(params).SetHeaders(headers).Get(url)
+	client := resty.New()
 
-	return resp, err
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetQueryParams(params).SetHeaders(headers).Get(url)
 }
 
 // Invoke http-put request using go-resty
 func InvokeUPDATERequest(url string, headers map[string]string, body map[string]string) (*resty.Response, error) {
+	client := resty.New()
 
-	AllowInsecureSSLConnection()
-	resp, err := resty.R().SetHeaders(headers).SetBody(body).Patch(url)
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
 
-	return resp, err
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetBody(body).Patch(url)
+}
+
+// Invoke http-get request using go-resty
+func InvokeGETRequestWithoutParams(url string, headers map[string]string) (*resty.Response, error) {
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).Get(url)
+}
+
+// Invoke http-get request with query param
+func InvokeGETRequestWithQueryParam(queryParam string, paramValue string, url string, headers map[string]string) (
+	*resty.Response, error) {
+
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetQueryParam(queryParam, paramValue).Get(url)
+}
+
+// Invoke http-get request with multiple query params
+func InvokeGETRequestWithMultipleQueryParams(queryParam map[string]string, url string, headers map[string]string) (
+	*resty.Response, error) {
+
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetQueryParams(queryParam).Get(url)
+}
+
+// Invoke http-get request with query params as string
+func InvokeGETRequestWithQueryParamsString(url, queryParams string, headers map[string]string) (
+	*resty.Response, error) {
+
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetQueryString(queryParams).Get(url)
+}
+
+// Invoke http-put request with multiple query params
+func InvokePutRequest(queryParam map[string]string, url string, headers map[string]string, body string) (
+	*resty.Response, error) {
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetQueryParams(queryParam).SetBody(body).Put(url)
+}
+
+func InvokePUTRequestWithoutQueryParams(url string, headers map[string]string, body interface{}) (*resty.Response, error) {
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetBody(body).Put(url)
 }
 
 // Invoke http-delete request using go-resty
 func InvokeDELETERequest(url string, headers map[string]string) (*resty.Response, error) {
+	client := resty.New()
 
-    if headers == nil {
-	    headers =  make(map[string]string)
-    }
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
 
-    if headers[HeaderAuthorization] == "" {
-	    headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
-	    RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
-    }
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).Delete(url)
+}
 
-	AllowInsecureSSLConnection()
-	resp, err := resty.R().SetHeaders(headers).Delete(url)
+// Invoke http-delete request with multiple query params
+func InvokeDELETERequestWithParams(url string, params map[string]string, headers map[string]string) (
+	*resty.Response, error) {
 
-	return resp, err
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetQueryParams(params).Delete(url)
+}
+
+// Invoke http-patch request using go-resty
+func InvokePATCHRequest(url string, headers map[string]string, body map[string]string) (*resty.Response, error) {
+	client := resty.New()
+
+	if Insecure {
+		client.SetTLSClientConfig(
+			&tls.Config{InsecureSkipVerify: true, // To bypass errors in SSL certificates
+				Renegotiation: TLSRenegotiationMode})
+	} else {
+		client.SetTLSClientConfig(GetTlsConfigWithCertificate())
+	}
+
+	client.SetTimeout(time.Duration(HttpRequestTimeout) * time.Millisecond)
+	return client.R().SetHeaders(headers).SetBody(body).Patch(url)
 }
 
 func PromptForUsername() string {
@@ -186,7 +406,7 @@ func UnmarshalData(url string, headers map[string]string, params map[string]stri
 		if resp.StatusCode() == http.StatusUnauthorized {
 			// not logged in to MI
 			fmt.Println("User not logged in or session timed out. Please login to the current Micro Integrator instance")
-			HandleErrorAndExit("Execute '" + ProjectName + " remote login --help' for more information", nil)
+			HandleErrorAndExit("Execute '"+ProjectName+" remote login --help' for more information", nil)
 		}
 		if len(resp.Body()) == 0 {
 			return nil, errors.New(resp.Status())
@@ -198,33 +418,33 @@ func UnmarshalData(url string, headers map[string]string, params map[string]stri
 }
 
 func UnmarshalLogFileData(url string, headers map[string]string, params map[string]string, filename string) {
-    if headers == nil {
-        headers = make(map[string]string)
-    }
+	if headers == nil {
+		headers = make(map[string]string)
+	}
 
-    if headers[HeaderAuthorization] == "" {
-        headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
-            RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
-    }
+	if headers[HeaderAuthorization] == "" {
+		headers[HeaderAuthorization] = HeaderValueAuthPrefixBearer + " " +
+			RemoteConfigData.Remotes[RemoteConfigData.CurrentRemote].AccessToken
+	}
 
-    resp, err := InvokeGETRequest(url, headers, params)
+	resp, err := InvokeGETRequest(url, headers, params)
 
 	if resp.StatusCode() == http.StatusUnauthorized {
 		// not logged in to MI
-		HandleErrorAndExit("User not logged in or session timed out. Please login to the current Micro " +
+		HandleErrorAndExit("User not logged in or session timed out. Please login to the current Micro "+
 			"Integrator instance", nil)
 	}
 
-    if err != nil {
-        HandleErrorAndExit("Unable to connect to "+url, nil)
-    }
+	if err != nil {
+		HandleErrorAndExit("Unable to connect to "+url, nil)
+	}
 
-    ioutil.WriteFile(filename, resp.Body(), 0644)
-    fmt.Println("Log file downloaded to " + filename)
-    Logln(LogPrefixInfo+"Response:", resp.Status())
+	ioutil.WriteFile(filename, resp.Body(), 0644)
+	fmt.Println("Log file downloaded to " + filename)
+	Logln(LogPrefixInfo+"Response:", resp.Status())
 }
 
-func UpdateMILogger(loggerName, loggingLevel , logClass string) (interface{}, error) {
+func UpdateMILogger(loggerName, loggingLevel, logClass string) (interface{}, error) {
 
 	url := GetRESTAPIBase() + PrefixLogging
 	Logln(LogPrefixInfo+"URL:", url)
@@ -243,7 +463,7 @@ func UpdateMILogger(loggerName, loggingLevel , logClass string) (interface{}, er
 	resp, err := InvokeUPDATERequest(url, headers, body)
 
 	if err != nil {
-		HandleErrorAndExit("Unable to connect to " + url, err)
+		HandleErrorAndExit("Unable to connect to "+url, err)
 	}
 
 	Logln(LogPrefixInfo+"Response:", resp.Status())
@@ -298,13 +518,13 @@ func GetCmdUsage(program, cmd, subcmd, arg string) string {
 }
 
 func GetCmdUsageMultipleArgs(program, cmd, subcmd string, args []string) string {
-    var showCmdUsage = "Usage:\n" +
-	    "  " + program + " " + cmd + " " + subcmd + "\n"
-    for _, arg := range args {
-	    showCmdUsage += "  " + program + " " + cmd + " " + subcmd + " " + arg + "\n"
-    }
+	var showCmdUsage = "Usage:\n" +
+		"  " + program + " " + cmd + " " + subcmd + "\n"
+	for _, arg := range args {
+		showCmdUsage += "  " + program + " " + cmd + " " + subcmd + " " + arg + "\n"
+	}
 	showCmdUsage += "\n"
-    return showCmdUsage
+	return showCmdUsage
 }
 
 // Create a usage command for a command that always get invoked with its arguments.
@@ -407,7 +627,7 @@ func CreateKeyValuePairs(mapData map[string]string) string {
 func UpdateMIMessageProcessor(messageProcessorName, messageProcessorStateValue string) (interface{}, error) {
 
 	url := GetRESTAPIBase() + PrefixMessageProcessors
-	Logln(LogPrefixInfo + "URL:", url)
+	Logln(LogPrefixInfo+"URL:", url)
 	headers := make(map[string]string)
 	body := make(map[string]string)
 	body["name"] = messageProcessorName
@@ -421,10 +641,10 @@ func UpdateMIMessageProcessor(messageProcessorName, messageProcessorStateValue s
 	resp, err := InvokePOSTRequest(url, headers, body)
 
 	if err != nil {
-		HandleErrorAndExit("Unable to connect to " + url, err)
+		HandleErrorAndExit("Unable to connect to "+url, err)
 	}
 
-	Logln(LogPrefixInfo + "Response:", resp.Status())
+	Logln(LogPrefixInfo+"Response:", resp.Status())
 
 	if resp.StatusCode() == http.StatusUnauthorized {
 		// not logged in to MI
@@ -446,7 +666,7 @@ func UpdateMIMessageProcessor(messageProcessorName, messageProcessorStateValue s
 
 func handleResponse(resp *resty.Response, err error, url string) (interface{}, error) {
 	if err != nil {
-		HandleErrorAndExit("Unable to connect to " + url, err)
+		HandleErrorAndExit("Unable to connect to "+url, err)
 	}
 
 	Logln(LogPrefixInfo+"Response:", resp.Status())
@@ -471,7 +691,7 @@ func handleResponse(resp *resty.Response, err error, url string) (interface{}, e
 
 func UpdateMIProxySerice(proxyServiceName string, intendedState string) (interface{}, error) {
 	url := GetRESTAPIBase() + PrefixProxyServices
-	Logln(LogPrefixInfo + "URL:", url)
+	Logln(LogPrefixInfo+"URL:", url)
 	headers := make(map[string]string)
 	body := make(map[string]string)
 	body["name"] = proxyServiceName
@@ -487,7 +707,7 @@ func UpdateMIProxySerice(proxyServiceName string, intendedState string) (interfa
 
 func UpdateMIEndpoint(endpointName string, intendedState string) (interface{}, error) {
 	url := GetRESTAPIBase() + PrefixEndpoints
-	Logln(LogPrefixInfo + "URL:", url)
+	Logln(LogPrefixInfo+"URL:", url)
 	headers := make(map[string]string)
 	body := make(map[string]string)
 	body["name"] = endpointName
@@ -501,7 +721,7 @@ func UpdateMIEndpoint(endpointName string, intendedState string) (interface{}, e
 	return handleResponse(resp, err, url)
 }
 
-func IsValidConsoleInput(inputs map[string]string) (bool) {
+func IsValidConsoleInput(inputs map[string]string) bool {
 	for key, input := range inputs {
 		if len(strings.TrimSpace(input)) == 0 {
 			fmt.Println("Invalid input for " + key)
@@ -511,7 +731,7 @@ func IsValidConsoleInput(inputs map[string]string) (bool) {
 	return true
 }
 
-func SetProperties(variables map[string]string, fileName string)  {
+func SetProperties(variables map[string]string, fileName string) {
 	props := properties.LoadMap(variables)
 	writer, _ := os.Create(fileName)
 	props.Write(writer, properties.UTF8)
@@ -524,16 +744,16 @@ func GetSecurityDirectoryPath() string {
 	if err != nil {
 		HandleErrorAndExit("Error getting user home directory: ", err)
 	}
-	return filepath.Join(userHomeDir, ConfigDirName , "security")
+	return filepath.Join(userHomeDir, ConfigDirName, "security")
 }
 
 func GetkeyStoreInfoFileLocation() string {
-	return path.Join(GetSecurityDirectoryPath(),  "keystore-info.properties")
+	return path.Join(GetSecurityDirectoryPath(), "keystore-info.properties")
 }
 
 // ContainsString returns true iff slice contains element
 func ContainsString(slice []string, element string) bool {
-	for _ , elem := range slice {
+	for _, elem := range slice {
 		// case in-sensitive comparison
 		if strings.EqualFold(elem, element) {
 			return true
@@ -551,14 +771,16 @@ func NormalizeFilePath(path string) string {
 }
 
 // Given an 2-D string array and a target filePath, write the content of the array as csv values to the file.
-func WriteLinesToCSVFile(lines [][]string, targetPath string) {
+func WriteLinesToCSVFile(lines [][]string, targetPath string) error {
 	if _, err := os.Stat(filepath.Dir(targetPath)); os.IsNotExist(err) {
 		log.Fatal(err)
+		return err
 	}
 
 	file, err := os.Create(targetPath)
 	if err != nil {
-		log.Fatal("Could not create the file " + targetPath + ". ", err)
+		log.Fatal("Could not create the file "+targetPath+". ", err)
+		return err
 	}
 	defer CloseFile(file)
 
@@ -568,11 +790,12 @@ func WriteLinesToCSVFile(lines [][]string, targetPath string) {
 	for _, line := range lines {
 		err := csvWriter.Write(line)
 		if err != nil {
-			log.Fatal("Could not write to file " + targetPath, err)
+			log.Fatal("Could not write to file "+targetPath, err)
+			return err
 		}
 	}
+	return nil
 }
-
 
 func CloseFile(f *os.File) {
 	err := f.Close()
@@ -587,4 +810,25 @@ func MakeDirectoryIfNotExists(path string) error {
 		return os.Mkdir(path, os.ModeDir|0755)
 	}
 	return nil
+}
+
+// GetTrimmedCmdLiteral returns the command without the arguments
+func GetTrimmedCmdLiteral(cmd string) string {
+	cmdParts := strings.Fields(cmd)
+	return cmdParts[0]
+}
+
+// Read and return MainConfig
+func GetMainConfigFromFile(filePath string) *MainConfig {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		HandleErrorAndExit("MainConfig: File Not Found: "+filePath, err)
+	}
+
+	var mainConfig MainConfig
+	if err := mainConfig.ParseMainConfigFromFile(data); err != nil {
+		HandleErrorAndExit("MainConfig: Error parsing "+filePath, err)
+	}
+
+	return &mainConfig
 }

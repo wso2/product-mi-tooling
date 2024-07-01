@@ -19,8 +19,8 @@
 package artifactUtils
 
 type TransactionCount struct {
-	Year int `json:"Year"`
-	Month int `json:"Month"`
+	Year             int   `json:"Year"`
+	Month            int   `json:"Month"`
 	TransactionCount int64 `json:"TransactionCount"`
 }
 

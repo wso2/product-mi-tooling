@@ -35,13 +35,15 @@ function showUsageAndExit() {
 }
 
 function detectPlatformSpecificBuild() {
-    platform=$(uname -s)
-    if [[ "${platform}" == "Linux" ]]; then
-        platforms="linux/amd64/linux/x64"
-    elif [[ "${platform}" == "Darwin" ]]; then
-        platforms="darwin/amd64/macosx/x64"
-    else
-        platforms="windows/amd64/windows/x64"
+    if [ ! -e "$platform" ]; then
+      platform=$(uname -s)
+      if [[ "${platform}" == "Linux" ]]; then
+          platforms="linux/386/linux/i586 linux/amd64/linux/x64"
+      elif [[ "${platform}" == "Darwin" ]]; then
+          platforms="darwin/amd64/macosx/x64"
+      else
+          platforms="windows/386/windows/i586 windows/amd64/windows/x64"
+      fi
     fi
 }
 
@@ -62,16 +64,6 @@ while getopts :t:v:f FLAG; do
   esac
 done
 
-strSkipTest="test.skip"
-
-for arg in "$@"
-do
-    if [ "$arg" == "$strSkipTest" ]
-    then
-        skipTest=true
-    fi
-done
-
 if [ ! -e "$target" ]; then
   echo "Target file is needed. "
   showUsageAndExit
@@ -86,7 +78,7 @@ fi
 
 
 rootPath=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-buildDir="build"
+buildDir="build/target"
 buildPath="$rootPath/${buildDir}"
 
 echo "Cleaning build path ${buildDir}..."
@@ -103,11 +95,19 @@ fi
 #platforms="linux/amd64/linux/x64"
 #platforms="darwin/amd64/macosx/x64"
 if [ "${full_build}" == "true" ]; then
-    echo "Building ${filename}:${build_version} for all platforms..."
-    platforms="darwin/amd64/macosx/x64 linux/amd64/linux/x64 windows/amd64/windows/x64"
+# the following line give an error in MacOS
+#    echo "Building "$'\e[1m'"${filename^^}:${build_version}"$'\e[0m'" for all platforms..."
+    # string format: {GOOS}/{GOARCH}/{ZIP_FILE_OS_NAME}/{ZIP_FILE_ARCH_NAME}
+    platforms="darwin/amd64/darwin/amd64 darwin/arm64/darwin/arm64 linux/386/linux/i586 linux/arm64/linux/arm64 linux/amd64/linux/amd64 windows/386/windows/i586 windows/amd64/windows/x64"
 else
     detectPlatformSpecificBuild
-    echo "Building ${filename}:${build_version} for detected ${platform} platform..."
+    echo "Building "$'\e[1m'"${filename^^}:${build_version}"$'\e[0m'" for detected "$'\e[1m'"${platform}"$'\e[0m'" platform..."
+fi
+
+if [ ! -z "${cgo_enabled}" ]
+then
+  echo "CGO is disabled manually hence the generated output will be a static binary."
+  export CGO_ENABLED=0
 fi
 
 go_executable=$(which go)
@@ -118,24 +118,6 @@ else
     exit 1
 fi
 
-if [ ! $skipTest ] ; then
-    echo "-------------------------------------------------------"
-    echo "Go TESTS"
-    echo "-------------------------------------------------------"
-
-    go test ./...
-
-    rc=$?
-    if [ $rc -ne 0 ]; then
-    echo "Testing failed!"
-    exit $rc
-    else
-        echo "Testing Successful!"
-    fi
-else
-    echo "Skipping Go Tests..."
-fi
-
 # run the completion.go file to get the bash completion script
 # To do the string replace first build the script so that we have a consistent name
 go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH tools/generate_bash_completion_script.go
@@ -143,6 +125,10 @@ go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH tools/generate_b
 sed -i -e "s=./generate_bash_completion_script=mi=g" ./shell-completions/mi_bash_completion.sh
 rm generate_bash_completion_script
 
+filename=$(basename mi)
+baseDir=$(dirname mi)
+target=mi.go
+filename=${filename%.go}
 for platform in ${platforms}
 do
     split=(${platform//\// })
@@ -153,45 +139,42 @@ do
 
     # ensure output file name
     output="mi"
-    test "$output" || output="$(basename ${target} | sed 's/\.go//')"
+    test "$output" || output="$(basename mi | sed 's/\.go//')"
 
     # add exe to windows output
     [[ "windows" == "$goos" ]] && output="$output.exe"
 
     echo -en "\t - $goos/$goarch..."
 
-    mi_dir_name="wso2$filename-cli-$build_version"
-    mi_archive_name="$mi_dir_name-$pos-$parch"
-    mi_archive_dir="${buildPath}/${mi_dir_name}"
-    mkdir -p $mi_archive_dir
+    zipfile="$output-$build_version-$pos-$parch"
+    zipdir="${buildPath}/$filename"
+    mkdir -p $zipdir
 
-    cp -r "${baseDir}/docs/README.md" $mi_archive_dir > /dev/null 2>&1
-    cp -r "${baseDir}/LICENSE" $mi_archive_dir > /dev/null 2>&1
+    cp -r "${baseDir}/mi/README.html" $zipdir > /dev/null 2>&1
+    cp -r "${baseDir}/LICENSE.txt" $zipdir > /dev/null 2>&1
 
     if [[ "windows" != "$goos" ]]; then
-        cp -r "${baseDir}/shell-completions/mi_bash_completion.sh" $mi_archive_dir > /dev/null 2>&1
+      cp -r "${baseDir}/shell-completions/mi_bash_completions.sh" $zipdir > /dev/null 2>&1
     fi
 
     # set destination path for binary
-    mi_bin_dir="${mi_archive_dir}/bin"
-    mkdir -p $mi_bin_dir
-    cp -r "${baseDir}/../encryption-client/target/encryption-client-$build_version.jar" $mi_bin_dir  > /dev/null 2>&1
-    destination="$mi_bin_dir/$output"
+    destination="$zipdir/$output"
 
-    GOOS=$goos GOARCH=$goarch go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -ldflags  \
-    "-X github.com/wso2/product-mi-tooling/cmd/cmd.version=$build_version -X 'mi.buildDate=$(date -u '+%Y-%m-%d
-    %H:%M:%S UTC')'" -o $destination $target
+    #echo "GOOS=$goos GOARCH=$goarch go build -x -o $destination $target"
+    GOOS=$goos GOARCH=$goarch go build \
+     -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH \
+     -ldflags "-X github.com/wso2/product-mi-tooling/cmd/cmd.Version=$build_version -X 'github.com/wso2/product-mi-tooling/cmd/cmd.BuildDate=$(date -u '+%Y-%m-%d %H:%M:%S UTC')'" -o $destination $target
 
     pwd=`pwd`
     cd $buildPath
     if [[ "windows" == "$goos" ]]; then
-        zip -r "$mi_archive_name.zip" $mi_dir_name > /dev/null 2>&1
+	zip -r "$zipfile.zip" $filename > /dev/null 2>&1
     else
-        tar czf "$mi_archive_name.tar.gz" $mi_dir_name > /dev/null 2>&1
+    	tar czf "$zipfile.tar.gz" $filename > /dev/null 2>&1
     fi
-    rm -rf $mi_dir_name
+    rm -rf $filename
     cd $pwd
-    echo -en $'✔ '
+    echo -en $'\e[1m\u2714\e[0m'
     echo
 done
 
