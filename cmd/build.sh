@@ -179,8 +179,7 @@ do
     destination="$mi_bin_dir/$output"
 
     GOOS=$goos GOARCH=$goarch go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -ldflags  \
-    "-X github.com/wso2/product-mi-tooling/cmd/cmd.version=$build_version -X 'mi.buildDate=$(date -u '+%Y-%m-%d
-    %H:%M:%S UTC')'" -o $destination $target
+    "-X github.com/wso2/product-mi-tooling/cmd/cmd.Version=$build_version -X 'github.com/wso2/product-mi-tooling/cmd/cmd.BuildDate=$(date -u '+%Y-%m-%d %H:%M:%S UTC')'" -o $destination $target
 
     pwd=`pwd`
     cd $buildPath
