@@ -19,54 +19,114 @@
 package cmd
 
 import (
-	"github.com/lithammer/dedent"
-	"github.com/spf13/cobra"
-	"github.com/wso2/product-mi-tooling/cmd/utils"
+	"fmt"
 	"os"
 	"time"
+
+	"github.com/spf13/cobra"
+	miActivateCmd "github.com/wso2/product-mi-tooling/cmd/cmd/activate"
+	miAddCmd "github.com/wso2/product-mi-tooling/cmd/cmd/add"
+	miDeactivateCmd "github.com/wso2/product-mi-tooling/cmd/cmd/deactivate"
+	miDeleteCmd "github.com/wso2/product-mi-tooling/cmd/cmd/delete"
+	miGetCmd "github.com/wso2/product-mi-tooling/cmd/cmd/get"
+	miUpdateCmd "github.com/wso2/product-mi-tooling/cmd/cmd/update"
+	"github.com/wso2/product-mi-tooling/cmd/utils"
 )
 
-var cfgFile string
 var verbose bool
+var cfgFile string
+var insecure bool
 
-var programName = os.Args[0]
+const miCmdShortDesc = "Micro Integrator commands"
 
-var rootCmdShortDesc = "CLI for Micro Integrator"
+var miCmdLongDesc = getMiCmdLongDesc()
 
-var rootCmdLongDesc = dedent.Dedent(`
-        ` + programName + ` is a Command Line Tool for Management of WSO2 Micro Integrator
-        `)
+func getMiCmdLongDesc() string {
 
-// RootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
-	Use:   programName,
-	Short: rootCmdShortDesc,
-	Long:  rootCmdLongDesc,
+	return utils.MiCmdLiteral + " is a Command Line Tool for Managing WSO2 Micro Integrator"
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the RootCmd.
-func Execute() {
-	if err := RootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+// MICmd represents the mi command
+var MICmd = &cobra.Command{
+	Use:   utils.MiCmdLiteral,
+	Short: miCmdShortDesc,
+	Long:  miCmdLongDesc,
+	// Example: miCmdExamples,
+	Run: func(cmd *cobra.Command, args []string) {
+		utils.Logln(utils.LogPrefixInfo + utils.MiCmdLiteral + " called")
+		cmd.Help()
+	},
 }
 
 func init() {
+	createConfigFiles()
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose mode")
+	cobra.EnableCommandSorting = false
+	// Init ConfigVars
+	err := utils.SetConfigVars(utils.MainConfigFilePath)
+	if err != nil {
+		utils.HandleErrorAndExit("Error reading "+utils.MainConfigFilePath+".", err)
+	}
+	MICmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Enable verbose mode")
+	MICmd.PersistentFlags().BoolVarP(&insecure, "insecure", "k", false,
+		"Allow connections to SSL endpoints without certs")
+	MICmd.AddCommand(miGetCmd.GetCmd)
+	MICmd.AddCommand(miAddCmd.AddCmd)
+	MICmd.AddCommand(miDeleteCmd.DeleteCmd)
+	MICmd.AddCommand(miUpdateCmd.UpdateCmd)
+	MICmd.AddCommand(miActivateCmd.ActivateCmd)
+	MICmd.AddCommand(miDeactivateCmd.DeactivateCmd)
+}
+
+func createConfigFiles() {
+	err := utils.CreateDirIfNotExist(utils.ConfigDirPath)
+	if err != nil {
+		utils.HandleErrorAndExit("Error creating config directory: "+utils.ConfigDirPath, err)
+	}
+
+	err = utils.CreateDirIfNotExist(utils.DefaultExportDirPath)
+	if err != nil {
+		utils.HandleErrorAndExit("Error creating config directory: "+utils.DefaultExportDirPath, err)
+	}
+
+	utils.CreateDirIfNotExist(utils.DefaultCertDirPath)
+
+	if !utils.IsFileExist(utils.MainConfigFilePath) {
+		var mainConfig = new(utils.MainConfig)
+		mainConfig.Config = utils.Config{HttpRequestTimeout: utils.DefaultHttpRequestTimeout,
+			TLSRenegotiationMode: utils.TLSRenegotiationNever}
+
+		utils.WriteConfigFile(mainConfig, utils.MainConfigFilePath)
+	}
+	err = utils.CreateDirIfNotExist(utils.LocalCredentialsDirectoryPath)
+	if err != nil {
+		utils.HandleErrorAndExit("Error creating local directory: "+utils.LocalCredentialsDirectoryName, err)
+	}
+
+	if !utils.IsFileExist(utils.EnvKeysAllFilePath) {
+		os.Create(utils.EnvKeysAllFilePath)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-
 	if verbose {
-		utils.IsVerbose = true
 		utils.EnableVerboseMode()
 		t := time.Now()
-		utils.Logf(utils.LogPrefixInfo+"Executed ManagementCLI (%s) on %v\n", programName, t.Format(time.RFC1123))
-	} else {
-		utils.IsVerbose = false
+		utils.Logf("Executed MI CLI (%s) on %v\n", utils.MiCmdLiteral, t.Format(time.RFC1123))
+	}
+	utils.Logln(utils.LogPrefixInfo+"Insecure:", insecure)
+	if insecure {
+		utils.Insecure = true
+	}
+}
+
+// Execute adds all child commands to the root command sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	if err := MICmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
 	}
 }

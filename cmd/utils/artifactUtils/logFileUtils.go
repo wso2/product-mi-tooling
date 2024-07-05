@@ -18,28 +18,28 @@
 package artifactUtils
 
 type LogFileList struct {
-    Count    int32     `json:"count"`
-    LogFiles []LogFile `json:"list"`
+	Count    int32     `json:"count"`
+	LogFiles []LogFile `json:"list"`
 }
 
 type LogFile struct {
-    FileName string `json:"FileName"`
-    Size string `json:"size"`
+	FileName string `json:"FileName"`
+	Size     string `json:"size"`
 }
 
 func (fileList *LogFileList) GetDataIterator() <-chan []string {
-    ch := make(chan []string)
+	ch := make(chan []string)
 
-    go func() {
-        for _, logFile := range fileList.LogFiles {
-            ch <- []string{logFile.FileName, logFile.Size}
-        }
-        close(ch)
-    }()
+	go func() {
+		for _, logFile := range fileList.LogFiles {
+			ch <- []string{logFile.FileName, logFile.Size}
+		}
+		close(ch)
+	}()
 
-    return ch
+	return ch
 }
 
 func (fileList *LogFileList) GetCount() int32 {
-    return fileList.Count
+	return fileList.Count
 }

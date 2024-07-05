@@ -18,8 +18,6 @@ type MessageStoreData struct {
 	FileName   string            `json:"file"`
 	Container  string            `json:"container"`
 	Properties map[string]string `json:"properties"`
-	Producer   string            `json:"producer"`
-	Consumer   string            `json:"consumer"`
 	Size       int               `json:"size"`
 }
 

@@ -78,3 +78,31 @@ type KeyStore struct {
 	Alias    string
 	Password string
 }
+
+// For env_keys_all.yaml
+// Not to be manually edited
+type EnvKeysAll struct {
+	Environments map[string]EnvKeys `yaml:"environments"`
+}
+
+// For main_config.yaml
+// To be manually edited by the user
+type MainConfig struct {
+	Config       Config                  `yaml:"config"`
+	Environments map[string]EnvEndpoints `yaml:"environments"`
+}
+
+type Config struct {
+	HttpRequestTimeout   int    `yaml:"http_request_timeout"`
+	TLSRenegotiationMode string `yaml:"tls-renegotiation-mode"`
+}
+
+type EnvKeys struct {
+	ClientID     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"` // encrypted (with the user's password) and stored
+	Username     string `yaml:"username"`
+}
+
+type EnvEndpoints struct {
+	MiManagementEndpoint string `yaml:"mi"`
+}

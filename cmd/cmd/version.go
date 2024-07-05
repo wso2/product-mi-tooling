@@ -20,21 +20,38 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
+	"github.com/wso2/product-mi-tooling/cmd/utils"
 )
 
-var version string
+// Version of the latest release of MI CLI
+var Version = "v1.0.0"
 
-// versionCmd represents the version command
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Version of the CLI",
-	Long:  `Display the version of the Command line tool`,
+// BuildDate of the latest release of MI CLI
+var BuildDate = ""
+
+const versionCmdLiteral = "version"
+
+var versionCmdShortDesc = "Display Version on current " + utils.MiCmdLiteral
+
+const versionCmdLongDesc = "Display the current version of this command line tool"
+
+var versionCmdExamples = utils.MiCmdLiteral + " " + versionCmdLiteral
+
+// VersionCmd represents the version command
+var VersionCmd = &cobra.Command{
+	Use:     versionCmdLiteral,
+	Short:   versionCmdShortDesc,
+	Long:    versionCmdLongDesc,
+	Example: versionCmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(programName + " version: " + version)
+		fmt.Println("Version:", Version)
+		fmt.Println("Build Date:", BuildDate)
 	},
 }
 
+// init using Cobra
 func init() {
-	RootCmd.AddCommand(versionCmd)
+	MICmd.AddCommand(VersionCmd)
 }

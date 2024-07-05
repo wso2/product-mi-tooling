@@ -5,7 +5,7 @@ type CompositeAppList struct {
 	ActiveCompositeApps []CompositeAppSummary `json:"activeList"`
 	FaultyCount         int32                 `json:"faultyCount"`
 	FaultyCompositeApps []CompositeAppSummary `json:"faultyList"`
-	TotalCount         int32                  `json:"totalCount"`
+	TotalCount          int32                 `json:"totalCount"`
 }
 
 type CompositeAppSummary struct {
@@ -42,8 +42,6 @@ func (compositeApps *CompositeAppList) GetDataIterator() <-chan []string {
 	return ch
 }
 
-
 func (compositeApps *CompositeAppList) GetCount() int32 {
 	return compositeApps.TotalCount
 }
-
