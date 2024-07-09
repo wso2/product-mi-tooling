@@ -237,7 +237,7 @@ public class DashboardServer {
         wwwApp.setContextPath("/");
         wwwApp.setResourceBase(dashboardHome + File.separator + SERVER_DIR + File.separator + WWW_DIR);
         wwwApp.setParentLoaderPriority(true);
-        wwwApp.addFilter(CSRFFilter.class, "/dashboard/api/login", EnumSet.of(DispatcherType.REQUEST));
+        wwwApp.addFilter(CSRFFilter.class, "/login", EnumSet.of(DispatcherType.REQUEST));
         wwwApp.addFilter(SecurityHeaderFilter.class, "/*", EnumSet.of(DispatcherType.INCLUDE, DispatcherType.REQUEST));
         wwwApp.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         handlers.addHandler(wwwApp);

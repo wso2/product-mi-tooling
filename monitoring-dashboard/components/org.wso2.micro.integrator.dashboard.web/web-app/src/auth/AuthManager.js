@@ -32,7 +32,6 @@ export default class AuthManager {
     static authenticate(username, password, isSecure = true, csrfToken) {
 
         return new Promise((resolve, reject) => {
-            console.log('[AUTHMANAGER] csrfToken : ', csrfToken);
             axios({
                 method: 'post',
                 url: AuthManager.getBasePath().concat('/login'),

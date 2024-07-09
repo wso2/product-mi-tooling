@@ -15,7 +15,6 @@ import java.security.SecureRandom;
 
 public class CSRFFilter implements Filter {
     private static final String CSRF_TOKEN = "CSRF_TOKEN";
-    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {}
