@@ -16,6 +16,7 @@
  * under the License.
  */
 import React, {useEffect, useState} from 'react';
+import axios from 'axios'
 import {Helmet} from "react-helmet";
 import {withStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -75,6 +76,7 @@ function Login(props){
     const history = useHistory();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [csrfToken, setCsrfToken] = useState('');
     const [authenticated, setAuthenticated] = useState(false);
     const [loginErrorMessage, setLoginErrorMessage] = useState('')
     const [loginError, setLoginError] = useState(false)
@@ -82,6 +84,7 @@ function Login(props){
     const dispatch = useDispatch();
 
     useEffect(() => {
+        fetchCsrfToken();
         initAuthenticationFlow();
     }, [])
 
@@ -102,11 +105,20 @@ function Login(props){
         });
     }
 
+    // Function to fetch CSRF token
+    const fetchCsrfToken = async () => {
+       try {
+          const response = await axios.get(AuthManager.getBasePath().concat('/login'));
+          setCsrfToken(response.data.csrfToken);
+       } catch (error) {
+          console.error('Error fetching CSRF token', error);
+       }
+    };
+
     const authenticate = (e)  => {
 
         e.preventDefault();
-
-        AuthManager.authenticate(userName, password, true)
+        AuthManager.authenticate(userName, password, true, csrfToken)
             .then(() => { setAuthenticated(true)})
             .catch((error) => {
                 console.log("Authentication failed with error :: " + error);
@@ -180,6 +192,7 @@ function Login(props){
                             autoComplete="off"
                             onChange={(e) => {setPassword(e.target.value)}}
                         />
+                        <input type="hidden" name="csrfToken" value={csrfToken} />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
