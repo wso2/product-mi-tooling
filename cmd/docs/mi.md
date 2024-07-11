@@ -27,6 +27,7 @@ mi [flags]
 * [mi get](mi_get.md)	 - Get information about artifacts deployed in a Micro Integrator instance
 * [mi login](mi_login.md)	 - Login to a Micro Integrator
 * [mi logout](mi_logout.md)	 - Logout from a Micro Integrator
+* [mi secret](mi_secret.md)	 - Manage sensitive information
 * [mi update](mi_update.md)	 - Update log level of Loggers in a Micro Integrator instance
 * [mi version](mi_version.md)	 - Display Version on current mi
 
