@@ -29,6 +29,7 @@ import (
 	miDeactivateCmd "github.com/wso2/product-mi-tooling/cmd/cmd/deactivate"
 	miDeleteCmd "github.com/wso2/product-mi-tooling/cmd/cmd/delete"
 	miGetCmd "github.com/wso2/product-mi-tooling/cmd/cmd/get"
+	miSecretCmd "github.com/wso2/product-mi-tooling/cmd/cmd/secret"
 	miUpdateCmd "github.com/wso2/product-mi-tooling/cmd/cmd/update"
 	"github.com/wso2/product-mi-tooling/cmd/utils"
 )
@@ -77,6 +78,7 @@ func init() {
 	MICmd.AddCommand(miUpdateCmd.UpdateCmd)
 	MICmd.AddCommand(miActivateCmd.ActivateCmd)
 	MICmd.AddCommand(miDeactivateCmd.DeactivateCmd)
+	MICmd.AddCommand(miSecretCmd.SecretCmd)
 }
 
 func createConfigFiles() {
