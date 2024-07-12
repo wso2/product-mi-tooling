@@ -1,8 +1,8 @@
-Monitoring Dashboard for WSO2 Micro Integrator
+WSO2 Integration Control Plane
 ======================================================================
 
-Welcome to the Monitoring Dashboard ${project.version} for WSO2 Micro Integrator ${mi.version}.
-This is a lightweight UI server that hosts a React application which is used to monitor the Micro Integrator runtime.
+Welcome to the Integration Control plane ${project.version} for WSO2 Micro Integrator ${mi.version}.
+This is a lightweight UI server that hosts a React application which is used to monitor the Micro Integrator runtime & ballerina services.
 
 Configure the MI servers
 ======================================================================
@@ -12,7 +12,7 @@ To connect the MI servers with the dashboard, add the following configuration to
 dashboard_url = "https://{hostname/ip}:{9743}/dashboard/api/"
 
 More information regarding the dashboard configurations can be found at
-(https://apim.docs.wso2.com/en/latest/observe/mi-observe/working-with-monitoring-dashboard/)
+(https://mi.docs.wso2.com/en/latest/observe-and-manage/working-with-monitoring-dashboard/)
 
 Running the Monitoring Dashboard
 ======================================================================
