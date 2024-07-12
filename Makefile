@@ -15,16 +15,11 @@
 # -----------------------------------------------------------------------
 
 # do not indent (Makefile syntax, not bash)
-ifdef MVN_RELEASE_VERSION
+ifdef CLI_RELEASE_VERSION
 # maven release
-$(info MVN_RELEASE_VERSION is $(MVN_RELEASE_VERSION))
-VERSION=$(MVN_RELEASE_VERSION)
+$(info MVN_RELEASE_VERSION is $(CLI_RELEASE_VERSION))
+VERSION=$(CLI_RELEASE_VERSION)
 else
-# not a maven release
-ifdef POM_VERSION
-VERSION=$(POM_VERSION)
-$(info POM_VERSION is $(POM_VERSION))
-endif
 endif
 # one of these will be set to VERSION in Jenkins Production Environment
 
