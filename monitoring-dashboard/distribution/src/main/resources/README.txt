@@ -14,9 +14,9 @@ dashboard_url = "https://{hostname/ip}:{9743}/dashboard/api/"
 More information regarding the dashboard configurations can be found at
 (https://mi.docs.wso2.com/en/latest/observe-and-manage/working-with-monitoring-dashboard/)
 
-Running the Monitoring Dashboard
+Running the Integration Control Plane
 ======================================================================
-1. Go to the DASHBOARD_HOME/bin directory and run the dashboard.sh file for Linux and Unix or the dashboard.bat file for Windows.
+1. Go to the ICP_HOME/bin directory and run the dashboard.sh file for Linux and Unix or the dashboard.bat file for Windows.
 2. Access the dashboard login page found at https://localhost:9743/login
 
 Known issues of WSO2 Micro Integrator ${mi.version}
