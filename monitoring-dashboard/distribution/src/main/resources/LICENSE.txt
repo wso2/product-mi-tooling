@@ -28,14 +28,12 @@ jetty-util-9.4.54.v20240208.jar                                                 
 axiom-1.2.11-wso2v17.jar                                                                            bundle         apache2             
 jinjava-2.6.0.jar                                                                                   jar            apache2             
 io.asgardeo.java.oidc.sdk-0.1.13.jar                                                                jar            apache2             
-org.wso2.ei.dashboard.bootstrap-1.0.0-beta.jar                                                      bundle         apache2             
 slf4j-api-1.7.36.jar                                                                                bundle         mit                 
+org.wso2.ei.dashboard.bootstrap-1.0.0.jar                                                           bundle         apache2             
 jetty-servlet-9.4.54.v20240208.jar                                                                  bundle         apache2             
-org.wso2.dashboard.security.user.core-1.0.0-beta.jar                                                bundle         apache2             
 jackson-annotations-2.13.5.jar                                                                      bundle         apache2             
 gson-2.9.1.jar                                                                                      bundle         apache2             
 commons-logging-1.2.jar                                                                             bundle         apache2             
-org.wso2.micro.integrator.core-4.3.0-beta.jar                                                       bundle         apache2             
 re2j-1.2.jar                                                                                        jar            golang              
 commons-lang3-3.1.jar                                                                               bundle         apache2             
 json-smart-2.5.1.jar                                                                                bundle         apache2             
@@ -45,22 +43,24 @@ jackson-databind-2.13.5.jar                                                     
 accessors-smart-2.4.8.jar                                                                           bundle         apache2             
 jsoup-1.15.3.jar                                                                                    bundle         mit                 
 log4j-slf4j-impl-2.17.2.jar                                                                         bundle         apache2             
+org.wso2.micro.integrator.security-4.2.0.jar                                                        bundle         apache2             
 config-mapper-1.0.20.jar                                                                            jar            apache2             
+org.wso2.dashboard.security.user.core-1.0.0.jar                                                     bundle         apache2             
 org.wso2.ciphertool-1.1.24.jar                                                                      bundle         apache2             
 commons-lang-2.6.0.wso2v1.jar                                                                       bundle         apache2             
 oauth2-oidc-sdk-9.39.1.jar                                                                          bundle         apache2             
+org.wso2.micro.integrator.core-4.2.0.jar                                                            bundle         apache2             
 nimbus-jose-jwt-9.39.1.jar                                                                          bundle         apache2             
 jetty-xml-9.4.54.v20240208.jar                                                                      bundle         apache2             
-org.wso2.micro.integrator.dashboard.utils-1.0.0-beta.jar                                            bundle         apache2             
 jaxb-api-2.3.0.jar                                                                                  bundle         cddl1               
 jackson-dataformat-yaml-2.13.5.jar                                                                  bundle         apache2             
 org.wso2.securevault-1.1.2.jar                                                                      bundle         apache2             
 HikariCP-3.4.5.jar                                                                                  bundle         apache2             
+org.wso2.micro.integrator.dashboard.utils-1.0.0.jar                                                 bundle         apache2             
 jackson-core-2.13.5.jar                                                                             bundle         apache2             
 jetty-http-9.4.54.v20240208.jar                                                                     bundle         apache2             
 commons-codec-1.15.jar                                                                              bundle         apache2             
 log4j-jcl-2.17.2.jar                                                                                bundle         apache2             
-org.wso2.micro.integrator.security-4.3.0-beta.jar                                                   bundle         apache2             
 
 
 The license types used by the above libraries and their information is given below:
