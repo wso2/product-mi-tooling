@@ -22,14 +22,14 @@
     <parent>
         <artifactId>components</artifactId>
         <groupId>org.wso2.ei</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.ei.dashboard.core</artifactId>
     <packaging>war</packaging>
     <name>Monitoring dashboard backend</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <dependencies>
         <dependency>
             <groupId>org.wso2.securevault</groupId>
