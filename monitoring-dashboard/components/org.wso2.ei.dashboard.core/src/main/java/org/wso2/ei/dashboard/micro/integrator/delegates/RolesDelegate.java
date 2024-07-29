@@ -69,14 +69,9 @@ public class RolesDelegate {
         DelegatesUtil.logDebugLogs(resourceType, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
-        boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
-        String prevResourceType = DelegatesUtil.getPrevResourceType();
         log.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
-        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))
-                || !(prevResourceType.equals(resourceType))) {
-            searchedList = getSearchedRoles(groupId, searchKey, order, orderBy);
-            count = searchedList.size();
-        }
+        searchedList = getSearchedRoles(groupId, searchKey, order, orderBy);
+        count = searchedList.size();
         RoleList paginatedList = getPaginatedRolesResultsFromMI(searchedList, fromIndex, toIndex);
         RolesResourceResponse rolesResourceResponse = new RolesResourceResponse();
         rolesResourceResponse.setResourceList(paginatedList);
