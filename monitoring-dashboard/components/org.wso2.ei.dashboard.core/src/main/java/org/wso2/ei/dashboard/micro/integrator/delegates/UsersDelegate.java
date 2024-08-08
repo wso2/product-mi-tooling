@@ -72,17 +72,12 @@ public class UsersDelegate {
         DelegatesUtil.logDebugLogs(resourceType, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
-        boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
-        String prevResourceType = DelegatesUtil.getPrevResourceType();
 
         log.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
 
-        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))
-                || !(prevResourceType.equals(resourceType))) {
-            allUserIds = getSearchedUsers(groupId, searchKey);
-            Arrays.sort(allUserIds);
-            count = allUserIds.length;
-        }
+        allUserIds = getSearchedUsers(groupId, searchKey);
+        Arrays.sort(allUserIds);
+        count = allUserIds.length;
         Users paginatedUsers = getPaginatedUsersResultsFromMI(allUserIds, fromIndex, toIndex, groupId, order, orderBy);
         UsersResourceResponse usersResourceResponse = new UsersResourceResponse();
         usersResourceResponse.setResourceList(paginatedUsers);

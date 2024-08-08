@@ -69,17 +69,12 @@ public class LogConfigDelegate {
         DelegatesUtil.logDebugLogs(Constants.LOG_CONFIGS, groupId, lowerLimit, upperLimit, order, orderBy, isUpdate);
         int fromIndex = Integer.parseInt(lowerLimit);
         int toIndex = Integer.parseInt(upperLimit);
-        boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
-        String prevResourceType = DelegatesUtil.getPrevResourceType();
         LogConfigsResourceResponse logsResourceResponse = new LogConfigsResourceResponse();
         logger.debug("prevSearch key :" + prevSearchKey + ", currentSearch key:" + searchKey);
 
-        if (isUpdatedContent || prevSearchKey == null || !(prevSearchKey.equals(searchKey))
-                || !(prevResourceType.equals(resourceType))) {
-            searchedList = getSearchedLogConfigsResultsFromMI(groupId,
-                    nodeList, searchKey, order, orderBy);
-            count = searchedList.size();
-        }
+        searchedList = getSearchedLogConfigsResultsFromMI(groupId,
+                nodeList, searchKey, order, orderBy);
+        count = searchedList.size();
         LogConfigs paginatedList = getPaginationResults(searchedList, fromIndex, toIndex);
         logsResourceResponse.setResourceList(paginatedList);
         logsResourceResponse.setCount(count);
