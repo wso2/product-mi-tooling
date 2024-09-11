@@ -55,8 +55,8 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12.4</version>
-                <inherited>false</inherited>
+                <version>2.22.2</version>
+<!--                <inherited>false</inherited>-->
                 <configuration>
                     <argLine>${argLine}</argLine>
                     <disableXmlReport>false</disableXmlReport>
