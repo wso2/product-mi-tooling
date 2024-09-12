@@ -49,12 +49,15 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.4</version>
+            </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12.4</version>
-                <inherited>false</inherited>
+                <version>2.22.2</version>
                 <configuration>
-
-                    <argLine>-Xms512m -Xmx1024m</argLine>
+                    <argLine>${argLine}</argLine>
                     <disableXmlReport>false</disableXmlReport>
                     <parallel>false</parallel>
                     <systemProperties>
