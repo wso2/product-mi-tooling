@@ -2,7 +2,8 @@ name: CI - Pull request - Ubuntu
 
 on:
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - master
 
 jobs:
   build:
@@ -19,3 +20,8 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn clean install
+    - name: Upload test coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        flags: unit_tests
+        files: monitoring-dashboard/integration/org.wso2.micro.integrator.dashboard.integration.tests/target/site/jacoco/jacoco.xml
