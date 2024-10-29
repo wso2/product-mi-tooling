@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2024, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,13 +18,13 @@
  *
  */
 import React from 'react';
-import { TableCell } from '@material-ui/core';
+import { TableRow } from '@material-ui/core';
 import CopyToClipBoardWithTooltip from './CopyToClipBoardWithTooltip'
 
-export default function CopyToClipboardCell(props) {
+export default function CopyToClipboardRow(props) {
     const text = props.text;
 
-    return <TableCell>{text}
+    return <TableRow>{text}
         <CopyToClipBoardWithTooltip text={text} />
-    </TableCell>
+    </TableRow>
 }

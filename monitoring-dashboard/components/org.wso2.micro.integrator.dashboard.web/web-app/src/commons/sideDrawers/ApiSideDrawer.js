@@ -26,7 +26,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { Table, TableCell, TableBody, TableRow } from '@material-ui/core';
 import HeadingSection from './commons/HeadingSection'
-import CopyToClipboardCell from './commons/CopyToClipBoardCell'
+import CopyToClipboardRow from './commons/CopyToClipboardRow'
 import TracingRow from './commons/TracingRow'
 import SourceViewSection from './commons/SourceViewSection'
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
@@ -74,6 +74,7 @@ function ApiDetailTable(props) {
     const { nodeData, retrieveUpdatedArtifact } = props;
     const artifactName = nodeData.details.name
     const pageId = "apis";
+    const urls = nodeData.details.urlList;
 
     return <Table>
         <TableRow>
@@ -86,7 +87,13 @@ function ApiDetailTable(props) {
         </TableRow>
         <TableRow>
             <TableCell>URL</TableCell>
-            <CopyToClipboardCell text={nodeData.details.url} />
+            <TableCell>
+                <Table>
+                    {urls.map(url =>
+                        <CopyToClipboardRow text={url} />
+                    )}
+                </Table>
+            </TableCell>
         </TableRow>
         <TableRow>
             <TableCell>Statistics</TableCell>
