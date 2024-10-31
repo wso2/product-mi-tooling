@@ -49,6 +49,7 @@ public class SecurityHeaderFilter implements Filter {
         httpResponse.addHeader("Referrer-Policy", "same-origin");
         httpResponse.addHeader("X-XSS-Protection", "1; mode=block");
         httpResponse.addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        httpResponse.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         filterChain.doFilter(servletRequest, servletResponse);
 
     }
