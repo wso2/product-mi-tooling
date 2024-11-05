@@ -234,6 +234,7 @@ function SwitchStatusCell(props) {
     const { pageId, artifactName, nodeId, status, retrieveData} = props;
     var isActive = status;
     const globalGroupId = useSelector(state => state.groupId);
+    const hasEditPermission = AuthManager.hasEditPermission();
 
     const changeState = () => {
         isActive = !isActive
@@ -254,7 +255,7 @@ function SwitchStatusCell(props) {
         });
     }
 
-    return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} /></td></tr>
+    return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} disabled={!hasEditPermission}/></td></tr>
 }
 
 function LogConfigLevelDropDown(props) {
