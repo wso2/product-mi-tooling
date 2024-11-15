@@ -29,3 +29,6 @@ password = "wso2carbon"
 #user.name = "admin"
 #user.password = "admin"
 #user.is_admin = true
+
+[user_access]
+make_non_admin_users_read_only = false

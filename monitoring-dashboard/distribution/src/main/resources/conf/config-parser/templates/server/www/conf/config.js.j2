@@ -76,3 +76,8 @@ window.sso = {
 window.userStore = {
     type : "{{user_store.type | default('file_based') }}"
 };
+
+window.userAccess = {
+    makeNonAdminUsersReadOnly: {{ user_access.make_non_admin_users_read_only | default(false) }}
+};
+

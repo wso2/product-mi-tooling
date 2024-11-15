@@ -24,6 +24,7 @@ import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import io.asgardeo.java.oidc.sdk.config.model.OIDCAgentConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
@@ -120,6 +121,9 @@ public class DashboardServer {
     private static SSOConfig ssoConfig;
     private static Thread shutdownHook;
     private static SecretResolver secretResolver = new SecretResolver();
+    private static boolean makeNonAdminUsersReadOnly;
+    private static final String TOML_MAKE_NON_ADMIN_USERS_READ_ONLY = "user_access.make_non_admin_users_read_only";
+    private static final String MAKE_NON_ADMIN_USERS_READ_ONLY = "make_non_admin_users_read_only";
 
     private static final Logger logger = LogManager.getLogger(DashboardServer.class);
 
@@ -312,6 +316,15 @@ public class DashboardServer {
             }
             properties.put(IS_USER_STORE_FILE_BASED, String.valueOf(isFileBased));
         }
+
+        String makeNonAdminUsersReadOnlySystemValue = System.getProperty(MAKE_NON_ADMIN_USERS_READ_ONLY);
+        if (StringUtils.isNotEmpty(makeNonAdminUsersReadOnlySystemValue)) {
+            makeNonAdminUsersReadOnly = Boolean.parseBoolean(makeNonAdminUsersReadOnlySystemValue);
+        } else {
+            makeNonAdminUsersReadOnly = Boolean.parseBoolean(
+                    String.valueOf(parsedConfigs.get(TOML_MAKE_NON_ADMIN_USERS_READ_ONLY)));
+        }
+        properties.put(MAKE_NON_ADMIN_USERS_READ_ONLY, String.valueOf(makeNonAdminUsersReadOnly));
 
         System.setProperties(properties);
     }
