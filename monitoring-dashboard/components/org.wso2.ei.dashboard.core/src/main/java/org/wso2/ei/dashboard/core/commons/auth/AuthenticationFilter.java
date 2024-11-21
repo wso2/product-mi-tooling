@@ -52,6 +52,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private static final String AUTHENTICATION_SCHEME = "Bearer";
     private static final List<String> adminOnlyPaths = Arrays.asList("/log-configs",
                                                                      "/users");
+    private static final String MAKE_NON_ADMIN_USERS_READ_ONLY = "make_non_admin_users_read_only";
 
     @Context
     private HttpServletRequest servletRequest;
@@ -63,6 +64,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         Map<String, Cookie> cookies = requestContext.getCookies();
         String token;
         SecurityHandler securityHandler;
+        Boolean makeNonAdminUsersReadOnly = Boolean.valueOf(System.getProperty(MAKE_NON_ADMIN_USERS_READ_ONLY));
+        String httpMethod = requestContext.getMethod();
 
         if (isTokenBasedAuthentication(authorizationHeader)) {
             token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
@@ -86,6 +89,11 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         }
 
         if (isAdminResource(requestContext) && !securityHandler.isAuthorized(config, token)) {
+            abortWithUnauthorized(requestContext);
+        } else if (!"GET".equalsIgnoreCase(httpMethod) && makeNonAdminUsersReadOnly &&
+                !securityHandler.isAuthorized(config, token)) {
+            // For non-admin resources, request except GET are blocked
+            // if the 'makeNonAdminUsersReadOnly' is set to 'true'
             abortWithUnauthorized(requestContext);
         }
     }

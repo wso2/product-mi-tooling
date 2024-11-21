@@ -172,4 +172,33 @@ export default class AuthManager {
     static getBasePath() {
         return window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '') + "/dashboard/api";
     }
+    
+    /**
+     * Check whether the user is an admin user.
+     * @returns {boolean} true if the user is an admin user
+     */
+    static isAdminUser() {
+        const userName = AuthManager.getUser();
+        return userName?.scope === "admin";
+    }
+
+    /**
+     * Check if non-admin users are read-only based on a config.
+     * @returns {boolean} true if non-admin users are read-only
+     */
+    static isNonAdminUserReadOnly() {
+        const makeNonAdminUsersReadOnly = window.userAccess.makeNonAdminUsersReadOnly;
+        return makeNonAdminUsersReadOnly === true;
+    }
+
+    /**
+     * Check if the current user has edit permissions.
+     * All the admin users can edit and if the 'isNonAdminUserReadOnly' is false,
+     * non-admin users also can edit
+     * @returns {boolean} true if the user has edit permissions
+     */
+    static hasEditPermission() {
+        return AuthManager.isAdminUser() || !AuthManager.isNonAdminUserReadOnly();
+    }
+
 }

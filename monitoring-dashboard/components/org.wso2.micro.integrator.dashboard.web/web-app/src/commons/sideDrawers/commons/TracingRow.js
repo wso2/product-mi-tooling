@@ -23,10 +23,12 @@ import { TableCell, TableRow } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import Switch from "react-switch";
 import HTTPClient from '../../../utils/HTTPClient';
+import AuthManager from "../../../auth/AuthManager";
 
 export default function TracingRow(props) {
     const {pageId, artifactName, nodeId, tracing, retrieveUpdatedArtifact} = props;
     var isTracingEnabled = false;
+    const hasEditPermission = AuthManager.hasEditPermission();
 
     if(tracing === 'enabled') {
         isTracingEnabled = true;
@@ -63,7 +65,7 @@ export default function TracingRow(props) {
                 <TableCell>Tracing</TableCell>
                 <TableCell>
                     <label>
-                        <Switch checked={tracingState} onChange={changeTracingStatus} height={16} width={36} />
+                        <Switch checked={tracingState} onChange={changeTracingStatus} height={16} width={36} disabled={!hasEditPermission} />
                     </label>
                 </TableCell>
             </TableRow>
