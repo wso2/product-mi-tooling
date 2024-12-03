@@ -67,6 +67,10 @@ public class InboundEndpointDelegate implements ArtifactDelegate {
             String trace = request.isValue() ? "enable" : "disable";
             payload.addProperty("trace", trace);
         }
+        if (request.getType().equals("status")) {
+            String status = request.isValue() ? "active" : "inactive";
+            payload.addProperty("status", status);
+        }
 
         return DelegatesUtil.updateArtifact(Constants.INBOUND_ENDPOINTS, groupId, request, payload);
     }

@@ -28,7 +28,8 @@ export default function InboundEndpoints() {
         headCells: [
             {id: 'name', label: 'Inbound Endpoint Name'},
             {id: 'nodes', label: 'Nodes'},
-            {id: 'protocol', label: 'Protocol'}],
+            {id: 'protocol', label: 'Protocol'},
+            {id: 'status', label: 'Status'}],
         tableOrderBy: 'name'
     });
 
