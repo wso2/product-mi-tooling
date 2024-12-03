@@ -1470,6 +1470,35 @@ _mi_activate_endpoint()
     noun_aliases=()
 }
 
+_mi_activate_inbound-endpoint()
+{
+    last_command="mi_activate_inbound-endpoint"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--environment=")
+    two_word_flags+=("--environment")
+    two_word_flags+=("-e")
+    local_nonpersistent_flags+=("--environment=")
+    flags+=("--insecure")
+    flags+=("-k")
+    flags+=("--verbose")
+
+    must_have_one_flag=()
+    must_have_one_flag+=("--environment=")
+    must_have_one_flag+=("-e")
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
 _mi_activate_message-processor()
 {
     last_command="mi_activate_message-processor"
@@ -1536,6 +1565,7 @@ _mi_activate()
 
     commands=()
     commands+=("endpoint")
+    commands+=("inbound-endpoint")
     commands+=("message-processor")
     commands+=("proxy-service")
 
@@ -1557,6 +1587,35 @@ _mi_activate()
 _mi_deactivate_endpoint()
 {
     last_command="mi_deactivate_endpoint"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--environment=")
+    two_word_flags+=("--environment")
+    two_word_flags+=("-e")
+    local_nonpersistent_flags+=("--environment=")
+    flags+=("--insecure")
+    flags+=("-k")
+    flags+=("--verbose")
+
+    must_have_one_flag=()
+    must_have_one_flag+=("--environment=")
+    must_have_one_flag+=("-e")
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
+_mi_deactivate_inbound-endpoint()
+{
+    last_command="mi_deactivate_inbound-endpoint"
 
     command_aliases=()
 
@@ -1649,6 +1708,7 @@ _mi_deactivate()
 
     commands=()
     commands+=("endpoint")
+    commands+=("inbound-endpoint")
     commands+=("message-processor")
     commands+=("proxy-service")
 

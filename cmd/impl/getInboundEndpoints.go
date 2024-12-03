@@ -31,11 +31,12 @@ import (
 )
 
 const (
-	defaultInboundEndpointListTableFormat = "table {{.Name}}\t{{.Type}}"
+	defaultInboundEndpointListTableFormat = "table {{.Name}}\t{{.Type}}\t{{.Status}}"
 	defaultInboundEndpointDetailedFormat  = "detail Name - {{.Name}}\n" +
 		"Type - {{.Type}}\n" +
 		"Stats - {{.Stats}}\n" +
 		"Tracing - {{.Tracing}}\n" +
+		"Status - {{.Status}}\n" +
 		"Parameters :\n" +
 		"NAME\tVALUE\n" +
 		"{{range .Parameters}}{{.Name}}\t{{.Value}}\n{{end}}"
@@ -68,6 +69,7 @@ func PrintInboundEndpointList(inboundEPList *artifactUtils.InboundEndpointList, 
 		inboundEPListTableHeaders := map[string]string{
 			"Name": nameHeader,
 			"Type": typeHeader,
+			"Status": statusHeader,
 		}
 		if err := inboundEPListContext.Write(renderer, inboundEPListTableHeaders); err != nil {
 			fmt.Println("Error executing template:", err.Error())
