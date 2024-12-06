@@ -90,7 +90,7 @@ function Navigator(props) {
         if(userScope !== "admin"){
             return miCategories.filter(category => category.id ===  "General");
         }
-        if (AuthManager.getUser()?.sso || AuthManager.getUser()?.isFileBasedUserStoreEnabled) {
+        if (AuthManager.getUser()?.sso) {
             return miCategories.map(category => ({
                 ...category,
                 children: category.children
