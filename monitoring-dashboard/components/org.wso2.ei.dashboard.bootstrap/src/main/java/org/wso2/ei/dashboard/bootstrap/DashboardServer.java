@@ -145,8 +145,6 @@ public class DashboardServer {
             System.exit(1);
         } catch (ConfigParserException e) {
             logger.error("Error while reading TOML file configs", e);
-        } catch (IllegalArgumentException e) {
-            logger.error(e.getMessage(), e);
             System.exit(1);
         }
 
@@ -168,7 +166,10 @@ public class DashboardServer {
         return defaultPort;
     }
 
-    private String getServerProtocol(Map<String, Object> parsedConfigs) {
+    private String getServerProtocol(Map<String, Object> parsedConfigs) throws ConfigParserException {
+        if (!parsedConfigs.containsKey(TOML_CONF_PROTOCOL)) {
+            return HTTPS_PROTOCOL; // Default to HTTPS
+        }
         Object serverProtocolConfig = parsedConfigs.get(TOML_CONF_PROTOCOL);
         if (serverProtocolConfig instanceof String) {
             String protocol = (String) serverProtocolConfig;
@@ -178,10 +179,9 @@ public class DashboardServer {
             if (HTTP_PROTOCOL.equalsIgnoreCase(protocol)) {
                 return HTTP_PROTOCOL;
             }
-            throw new IllegalArgumentException("Invalid value provided for "
-                    + TOML_CONF_PROTOCOL + ": expected either \"http\" or \"https\"");
         }
-        return HTTPS_PROTOCOL; // Default to HTTPS
+        throw new ConfigParserException("Invalid value provided for " + TOML_CONF_PROTOCOL
+                + ": expected either \"http\" or \"https\"");
     }
 
     private void configureServer(Server server, int serverPort, String serverProtocol) {
