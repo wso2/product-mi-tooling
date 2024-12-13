@@ -253,7 +253,6 @@ public class UsersDelegate {
         NodeList nodeList = dataManager.fetchNodes(groupId);
         String nodeId = nodeList.get(0).getNodeId();
         String mgtApiUrl = ManagementApiUtils.getMgtApiUrl(groupId, nodeId);
-        String accessToken = dataManager.getAccessToken(groupId, nodeId);
         String url = mgtApiUrl.concat("users/");
         for (User user : users) {
             UsersInner usersInner = getUserDetails(groupId, nodeId, url, user.getUserId());
