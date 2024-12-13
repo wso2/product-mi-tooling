@@ -2,7 +2,7 @@ WSO2 Integration Control Plane
 ======================================================================
 
 Welcome to the Integration Control plane ${project.version} for WSO2 Micro Integrator ${mi.version}.
-This is a lightweight UI server that hosts a React application which is used to monitor the Micro Integrator runtime & ballerina services.
+This is a lightweight UI server that hosts a React application which is used to monitor the Micro Integrator runtime & Ballerina services.
 
 Configure the MI servers
 ======================================================================
