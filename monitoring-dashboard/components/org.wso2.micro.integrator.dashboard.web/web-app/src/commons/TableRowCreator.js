@@ -103,7 +103,7 @@ export default function TableRowCreator(props) {
             // Message Processors
             case 'status':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
-                        nodeId={node.nodeId} status={node.details.status === 'active' ? true : false} retrieveData={retrieveData}/>)}</TableCell>
+                        nodeId={node.nodeId} status={node.details.status === 'active' ? true : false} retrieveData={retrieveData} isDisabled={pageId === 'inbound-endpoints' ? (node.details.protocol === 'file'? false: true) : false}/>)}</TableCell>
 
             // Apis
             case 'url':
@@ -231,10 +231,10 @@ function StatusIcon(props) {
 }
 
 function SwitchStatusCell(props) {
-    const { pageId, artifactName, nodeId, status, retrieveData} = props;
+    const { pageId, artifactName, nodeId, status, retrieveData, isDisabled} = props;
     var isActive = status;
     const globalGroupId = useSelector(state => state.groupId);
-    const hasEditPermission = AuthManager.hasEditPermission();
+    const shouldBeDisabled = !AuthManager.hasEditPermission() || isDisabled;
 
     const changeState = () => {
         isActive = !isActive
@@ -255,7 +255,7 @@ function SwitchStatusCell(props) {
         });
     }
 
-    return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} disabled={!hasEditPermission}/></td></tr>
+    return <tr><td><Switch checked={isActive} onChange={changeState} height={16} width={36} disabled={shouldBeDisabled}/></td></tr>
 }
 
 function LogConfigLevelDropDown(props) {

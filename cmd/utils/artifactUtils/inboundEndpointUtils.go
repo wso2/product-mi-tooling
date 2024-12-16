@@ -8,6 +8,7 @@ type InboundEndpointList struct {
 type InboundEndpointSummary struct {
 	Name string `json:"name"`
 	Type string `json:"protocol"`
+	Status string `json:"status"`
 }
 
 type InboundEndpoint struct {
@@ -16,6 +17,7 @@ type InboundEndpoint struct {
 	Stats      string      `json:"stats"`
 	Tracing    string      `json:"tracing"`
 	Parameters []Parameter `json:"parameters"`
+	Status     string      `json:"status"`
 }
 
 type Parameter struct {
