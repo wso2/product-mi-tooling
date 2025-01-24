@@ -82,7 +82,7 @@ public class HttpUtils {
             httpGet.setHeader("Authorization", authHeader);
 
             return doGet(httpGet);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | DashboardServerException e) {
             throw new ManagementApiException("Error occurred while creating http get request.", 400, e.getCause());
         }
     }
@@ -99,17 +99,17 @@ public class HttpUtils {
             httpGet.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
             httpGet.setHeader("Authorization", authHeader);
             return doGet(httpGet);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | DashboardServerException e) {
             throw new DashboardServerException("Error occurred while sending get http request.", e);
         }
 
     }
 
-    public static CloseableHttpResponse doGet(HttpGet httpGet) {
-        CloseableHttpClient httpClient = getHttpClient();
+    public static CloseableHttpResponse doGet(HttpGet httpGet) throws DashboardServerException {
         try {
+            CloseableHttpClient httpClient = getHttpClient();
             return httpClient.execute(httpGet);
-        } catch (IOException e) {
+        } catch (IOException | DashboardServerException e) {
             throw new DashboardServerException("Error occurred while sending get http request.", e);
         }
     }
@@ -123,7 +123,7 @@ public class HttpUtils {
             StringEntity entity = new StringEntity(payload.toString());
             httpPost.setEntity(entity);
             return doPost(httpPost);
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | DashboardServerException e) {
             throw new DashboardServerException("Error occurred while creating http post request.", e);
         }
     }
@@ -139,12 +139,13 @@ public class HttpUtils {
             StringEntity entity = new StringEntity(payload.toString());
             httpPost.setEntity(entity);
             return doPost(httpPost);
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | DashboardServerException e) {
             throw new DashboardServerException("Error occurred while creating http post request.", e);
         }
     }
 
-    public static CloseableHttpResponse doPatch(String accessToken, String url, JsonObject payload) {
+    public static CloseableHttpResponse doPatch(String accessToken, String url, JsonObject payload)
+            throws DashboardServerException {
         final HttpPatch httpPatch = new HttpPatch(url);
         String authHeader = "Bearer " + accessToken;
         httpPatch.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
@@ -155,7 +156,8 @@ public class HttpUtils {
         return doPatch(httpPatch);
     }
 
-    public static CloseableHttpResponse doPut(String accessToken, String url, JsonObject payload) {
+    public static CloseableHttpResponse doPut(String accessToken, String url, JsonObject payload)
+            throws DashboardServerException {
         final HttpPut httpPut = new HttpPut(url);
 
         String authHeader = "Bearer " + accessToken;
@@ -167,7 +169,7 @@ public class HttpUtils {
         return doPut(httpPut);
     }
 
-    public static CloseableHttpResponse doDelete(String accessToken, String url) {
+    public static CloseableHttpResponse doDelete(String accessToken, String url) throws DashboardServerException {
         String authHeader = "Bearer " + accessToken;
         final HttpDelete httpDelete = new HttpDelete(url);
         httpDelete.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
@@ -204,37 +206,37 @@ public class HttpUtils {
     }
 
     private static CloseableHttpResponse doPost(HttpPost httpPost) {
-        CloseableHttpClient httpClient = getHttpClient();
         try {
+            CloseableHttpClient httpClient = getHttpClient();
             return httpClient.execute(httpPost);
-        } catch (IOException e) {
+        } catch (IOException | DashboardServerException e) {
             throw new DashboardServerException("Error occurred while sending http post request.", e);
         }
     }
 
     private static CloseableHttpResponse doPatch(HttpPatch httpPatch) {
-        CloseableHttpClient httpClient = getHttpClient();
         try {
+            CloseableHttpClient httpClient = getHttpClient();
             return httpClient.execute(httpPatch);
-        } catch (IOException e) {
+        } catch (IOException | DashboardServerException e) {
             throw new DashboardServerException("Error occurred while sending http patch request.", e);
         }
     }
 
     private static CloseableHttpResponse doPut(HttpPut httpPut) {
-        CloseableHttpClient httpClient = getHttpClient();
         try {
+            CloseableHttpClient httpClient = getHttpClient();
             return httpClient.execute(httpPut);
-        } catch (IOException e) {
+        } catch (IOException| DashboardServerException e) {
             throw new DashboardServerException("Error occurred while sending http put request.", e);
         }
     }
 
     private static CloseableHttpResponse doDelete(HttpDelete httpDelete) {
-        CloseableHttpClient httpClient = getHttpClient();
         try {
+            CloseableHttpClient httpClient = getHttpClient();
             return httpClient.execute(httpDelete);
-        } catch (IOException e) {
+        } catch (IOException| DashboardServerException e) {
             throw new DashboardServerException("Error occurred while sending delete http request.", e);
         }
     }

@@ -12,6 +12,7 @@ import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
+import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactDetails;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
@@ -222,7 +223,7 @@ public class DelegatesUtil {
 
     private static JsonObject invokeManagementApi(String groupId, String nodeId, String artifactType, String url,
         String accessToken, String searchKey)
-            throws ManagementApiException {
+            throws ManagementApiException, DashboardServerException {
         CloseableHttpResponse response;
         if (searchKey == null || (searchKey.isEmpty() && artifactType.equals(Constants.USERS))) {
             response = Utils.doGet(groupId, nodeId, accessToken, url);
