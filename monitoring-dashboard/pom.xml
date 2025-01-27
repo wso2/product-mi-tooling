@@ -339,7 +339,7 @@
         <httpcomponents.version>4.5.13</httpcomponents.version>
         <code.gson.version>2.11.0</code.gson.version>
         <config.mapper.version>1.0.20</config.mapper.version>
-        <asgardeo.java.oidc.sdk.version>0.1.13</asgardeo.java.oidc.sdk.version>
+        <asgardeo.java.oidc.sdk.version>0.1.27</asgardeo.java.oidc.sdk.version>
         <net.minidev.asm.version>2.4.8</net.minidev.asm.version>
         <net.minidev.json-smart.version>2.5.1</net.minidev.json-smart.version>
         <guava.version>33.2.0-jre</guava.version>

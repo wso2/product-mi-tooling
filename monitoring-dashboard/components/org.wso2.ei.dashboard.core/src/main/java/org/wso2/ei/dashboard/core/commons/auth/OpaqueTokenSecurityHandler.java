@@ -75,7 +75,7 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
                 logger.error("Error validating the token using introspection endpoint. ",
                         httpResponse.getStatusLine().getReasonPhrase());
             }
-        } catch (IOException e) {
+        } catch (IOException | DashboardServerException e) {
             logger.error("Error validating the token using introspection endpoint. ", e);
         }
         return false;
