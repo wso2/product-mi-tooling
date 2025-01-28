@@ -54,8 +54,6 @@ public class ManagementApiUtils {
 
     public static String getToken(String mgtApiUrl, String username, String password) throws ManagementApiException {
         String usernamePassword = username + ":" + password;
-        System.out.println(username);
-        System.out.println(password);
         String encodedUsernamePassword = Base64.getEncoder().encodeToString(usernamePassword.getBytes());
         String loginUrl = mgtApiUrl + "login";
 
