@@ -63,6 +63,11 @@ export default function EnhancedTable(props) {
     var pageId=pageInfo.pageId;
 
     const retrieveResources = (query = '', isUpdate = false) => {
+
+        if (!query) {
+            query = queryString;
+        }
+
         if(query !== queryString) {
             setPage(0);
         }
