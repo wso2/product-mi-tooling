@@ -221,7 +221,7 @@ public class LDAPConnectionContext {
         thresholdStartTime = 0;
     }
 
-    public DirContext getContext() throws DashboardUserStoreException {
+    public DirContext getContext() throws UserStoreException {
 
         DirContext context = null;
 
@@ -543,7 +543,7 @@ public class LDAPConnectionContext {
      * @throws NamingException
      */
     public LdapContext getContextWithCredentials(String userDN, Object password)
-            throws UserStoreException, DashboardUserStoreException, NamingException {
+            throws UserStoreException, NamingException {
 
         Secret credentialObj;
         try {
