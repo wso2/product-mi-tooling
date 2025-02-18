@@ -17,7 +17,6 @@
  */
 
 import React from 'react';
-import { useSelector } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
@@ -34,7 +33,6 @@ import HTTPClient from '../utils/HTTPClient';
 import AuthManager from "../auth/AuthManager";
 
 export default function UpdatePassword() {
-    const globalGroupId = useSelector(state => state.groupId);
     const [password, setPassword] = React.useState({
         currentPassword: "",
         newPassword: "",
@@ -101,7 +99,7 @@ export default function UpdatePassword() {
                 "confirmPassword": password.confirmPassword,
                 "userId": user
             }
-            HTTPClient.updateUserPassword(globalGroupId, payload).then(response => {
+            HTTPClient.updateUserPassword(window.icp.name, payload).then(response => {
                 setDialog({
                     open: true,
                     title: 'Success',

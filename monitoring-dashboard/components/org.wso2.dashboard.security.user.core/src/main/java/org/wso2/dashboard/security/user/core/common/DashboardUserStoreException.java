@@ -15,14 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.dashboard.security.user.core.common;
 
-public class DashboardUserStoreException extends Exception {
-    private String errorCode;
+import org.wso2.micro.integrator.security.user.core.UserStoreException;
 
-    public DashboardUserStoreException() {
-        super();
-    }
+public class DashboardUserStoreException extends UserStoreException {
+    private String errorCode;
 
     public DashboardUserStoreException(String message, Throwable cause) {
         super(message, cause);
@@ -40,10 +39,6 @@ public class DashboardUserStoreException extends Exception {
 
     public DashboardUserStoreException(String message) {
         super(message);
-    }
-
-    public DashboardUserStoreException(Throwable cause) {
-        super(cause);
     }
 
     public String getErrorCode() {

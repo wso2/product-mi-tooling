@@ -20,24 +20,21 @@ package org.wso2.dashboard.security.user.core.ldap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.dashboard.security.user.core.UserStoreManager;
 import org.wso2.dashboard.security.user.core.common.DashboardUserStoreException;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
 import org.wso2.micro.integrator.security.user.core.UserCoreConstants;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
 import org.wso2.micro.integrator.security.user.core.claim.ClaimManager;
-import org.wso2.micro.integrator.security.user.core.common.UserStore;
 import org.wso2.micro.integrator.security.user.core.ldap.LDAPConstants;
 import org.wso2.micro.integrator.security.user.core.profile.ProfileConfigurationManager;
 
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager {
-    private static Log log = LogFactory.getLog(ReadWriteLDAPUserStoreManager.class);
+    private static final Log log = LogFactory.getLog(ReadWriteLDAPUserStoreManager.class);
+
     public ReadWriteLDAPUserStoreManager() {
 
     }
@@ -68,7 +65,7 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
 
         String userObjectClass = realmConfig
                 .getUserStoreProperty(LDAPConstants.USER_ENTRY_OBJECT_CLASS);
-        if (userObjectClass == null || userObjectClass.equals("")) {
+        if (userObjectClass == null || userObjectClass.isEmpty()) {
             throw new UserStoreException(
                     "Required UserEntryObjectClass property is not set at the LDAP configurations");
         }
@@ -81,9 +78,9 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
 
         if (log.isDebugEnabled()) {
             if (writeGroupsEnabled) {
-                log.debug("WriteGroups is enabled for " + getMyDomainName());
+                log.debug("WriteGroups is enabled");
             } else {
-                log.debug("WriteGroups is disabled for " + getMyDomainName());
+                log.debug("WriteGroups is disabled");
             }
         }
 
@@ -104,7 +101,7 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
 
         String groupEntryObjectClass = realmConfig
                 .getUserStoreProperty(LDAPConstants.GROUP_ENTRY_OBJECT_CLASS);
-        if (groupEntryObjectClass == null || groupEntryObjectClass.equals("")) {
+        if (groupEntryObjectClass == null || groupEntryObjectClass.isEmpty()) {
             throw new UserStoreException(
                     "Required GroupEntryObjectClass property is not set at the LDAP configurations");
         }
@@ -118,20 +115,14 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
             throws DashboardUserStoreException {
 
         try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
-                @Override
-                public Boolean run() throws Exception {
-                    return authenticateInternalIteration(userName, credential, domainProvided);
-                }
-            });
+            return AccessController.doPrivileged((PrivilegedExceptionAction<Boolean>) () -> authenticateInternalIteration(userName, credential, domainProvided));
         } catch (PrivilegedActionException e) {
             throw new DashboardUserStoreException("Error while authenticating user: " + e.getMessage(), e);
         }
 
     }
 
-    private boolean authenticateInternalIteration(String userName, Object credential, boolean domainProvided)
-            throws UserStoreException {
+    private boolean authenticateInternalIteration(String userName, Object credential, boolean domainProvided) {
         return authenticateInternal(userName, credential, domainProvided);
     }
 
@@ -140,13 +131,11 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
      * @param credential
      * @param domainProvided
      * @return
-     * @throws UserStoreException
      */
-    private boolean authenticateInternal(String userName, Object credential, boolean domainProvided)
-            throws UserStoreException {
+    private boolean authenticateInternal(String userName, Object credential, boolean domainProvided) {
         ReadWriteLDAPUserStoreManager readWriteLDAPUserStoreManager = this;
         boolean authenticated = false;
-        UserStore userStore = readWriteLDAPUserStoreManager.getUserStore(userName);
+
             try {
                 // Let's authenticate with the primary UserStoreManager.
                 authenticated = readWriteLDAPUserStoreManager.doAuthenticate(userName, credential);
@@ -158,7 +147,6 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
                 } else {
                     log.error(e);
                 }
-                authenticated = false;
             }
 
         if (log.isDebugEnabled()) {
@@ -168,67 +156,6 @@ public class ReadWriteLDAPUserStoreManager extends ReadOnlyLDAPUserStoreManager 
         }
 
         return authenticated;
-    }
-
-    private UserStore getUserStore(final String user) throws UserStoreException {
-        try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<UserStore>() {
-                @Override
-                public UserStore run() throws Exception {
-                    return getUserStoreInternal(user);
-                }
-            });
-        } catch (PrivilegedActionException e) {
-            throw (UserStoreException) e.getException();
-        }
-    }
-
-    /**
-     * @return
-     * @throws UserStoreException
-     */
-    private UserStore getUserStoreInternal(String user) throws UserStoreException {
-
-        int index;
-        index = user.indexOf("/");
-        UserStore userStore = new UserStore();
-        String domainFreeName = null;
-
-        // Check whether we have a secondary UserStoreManager setup.
-        if (index > 0) {
-            // Using the short-circuit. User name comes with the domain name.
-            String domain = user.substring(0, index);
-            org.wso2.micro.integrator.security.user.core.UserStoreManager secManager = null;
-            domainFreeName = user.substring(index + 1);
-
-            if (secManager != null) {
-                userStore.setUserStoreManager(secManager);
-                userStore.setDomainAwareName(user);
-                userStore.setDomainFreeName(domainFreeName);
-                userStore.setDomainName(domain);
-                userStore.setRecurssive(true);
-                return userStore;
-            } else {
-                userStore.setDomainAwareName(user);
-                userStore.setDomainFreeName(domainFreeName);
-                userStore.setDomainName(domain);
-                userStore.setRecurssive(false);
-                return userStore;
-            }
-        }
-
-        String domain = getMyDomainName();
-        if (index > 0) {
-            userStore.setDomainAwareName(user);
-            userStore.setDomainFreeName(domainFreeName);
-        } else {
-            userStore.setDomainAwareName(domain + "/" + user);
-            userStore.setDomainFreeName(user);
-        }
-        userStore.setRecurssive(false);
-        userStore.setDomainName(domain);
-
-        return userStore;
     }
 
     @Override

@@ -81,3 +81,6 @@ window.userAccess = {
     makeNonAdminUsersReadOnly: {{ user_access.make_non_admin_users_read_only | default(false) }}
 };
 
+window.icp = {
+    name: "{{server_config.name | default('Integration Control Plane')}}"
+}

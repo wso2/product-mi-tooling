@@ -22,6 +22,7 @@ package org.wso2.ei.dashboard.core.rest.delegates.configs;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.config.mapper.ConfigParser;
 import org.wso2.ei.dashboard.core.rest.model.SuperAdminUser;
 
 /**
@@ -33,7 +34,8 @@ public class ConfigsDelegate {
     public SuperAdminUser getSuperUser() {
         log.debug("Retrieving super user from system properties.");
         SuperAdminUser superAdminUser = new SuperAdminUser();
-        superAdminUser.setUsername(System.getProperty("mi_username"));
+        String superAdminUserName = (String) ConfigParser.getParsedConfigs().get("super_admin.username");
+        superAdminUser.setUsername(superAdminUserName);
         return superAdminUser;
     }
 }

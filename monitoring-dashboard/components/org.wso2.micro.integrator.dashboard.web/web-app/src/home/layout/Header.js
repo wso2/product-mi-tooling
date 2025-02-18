@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from "react-helmet";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
@@ -10,7 +10,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import { Menu, MenuItem, Popover } from '@material-ui/core';
+import { Menu, MenuItem, Popover, Tooltip } from '@material-ui/core';
 import NodeFilter from '../NodeFilter';
 import GroupSelector from '../GroupSelector';
 import { categories, getIdFromRoute } from './NavigatorLinks';
@@ -18,6 +18,7 @@ import AuthManager from '../../auth/AuthManager';
 import Chip from '@material-ui/core/Chip';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { useAuthContext } from "@asgardeo/auth-react";
+import { useSelector } from 'react-redux';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -44,11 +45,13 @@ const styles = (theme) => ({
 });
 
 function Header(props) {
+  const history = useHistory();
   const { classes, onDrawerToggle } = props;
   const location = useLocation();
   const [selected, setSelected] = useState(null);
   const [user, setUser] = useState(null);
   const { signOut } = useAuthContext();
+  const superAdminUserName = useSelector((state) => state.superAdmin);
 
   useEffect(() => {
     if (!user) {
@@ -61,6 +64,10 @@ function Header(props) {
     }
   }, [location]);
 
+  useEffect(() => {
+    handlePopOverClose();
+  }, [user]);
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handlePopOverClick = event => {
     setAnchorEl(event.currentTarget);
@@ -70,12 +77,8 @@ function Header(props) {
   };
 
   const showNodeSelector = () => {
-    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/users") || location.pathname.startsWith("/roles") || location.pathname === "/");
+    return !(location.pathname.startsWith("/log-configs") || location.pathname.startsWith("/update-password") || location.pathname.startsWith("/users") || location.pathname.startsWith("/roles") || location.pathname === "/");
   };
-
-  const updatePassword = () => {
-    window.location.href = "/update-password";
-  }
 
   const handleLogout = () => {
     if (AuthManager.getUser()?.sso) {
@@ -89,7 +92,9 @@ function Header(props) {
   return (
     <>
       <Helmet>
-        <title>{selected ? `${selected.id} - ` : 'Nodes - '}Integration Control Plane</title>
+        <title>
+          {selected ? `${selected.id} - ` : "Nodes - "}Integration Control Plane
+        </title>
       </Helmet>
       <AppBar color="default" position="sticky" elevation={0}>
         <Toolbar>
@@ -106,33 +111,51 @@ function Header(props) {
                 </IconButton>
               </Grid>
             </Hidden>
-            <GroupSelector />
-            {showNodeSelector() && <NodeFilter /> }
-            {!showNodeSelector() && <div style={{height:"74px"}}></div> }
+            {!location.pathname.startsWith("/update-password") && (
+              <GroupSelector />
+            )}
+            {showNodeSelector() && <NodeFilter />}
+            {!showNodeSelector() && <div style={{ height: "74px" }}></div>}
             <Grid item xs />
             <Grid item>
-                <Chip
-                    icon={<AccountCircle />}
-                    label={user ? user.username.toUpperCase() : 'Anonymous'}
-                    onClick={handlePopOverClick}
-                    variant="outlined"
-                />
-
-                <Popover
-                open={anchorEl}
+              <Chip
+                icon={<AccountCircle />}
+                label={user ? user.username.toUpperCase() : "Anonymous"}
+                onClick={handlePopOverClick}
+                variant="outlined"
+              />
+              <Menu
                 anchorEl={anchorEl}
+                key={user ? user.username : "anonymous"}
+                open={Boolean(anchorEl)}
                 onClose={handlePopOverClose}
-                anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
-                targetOrigin={{ horizontal: 'right', vertical: 'top' }}
               >
-                <Menu
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handlePopOverClose}>
-                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                </Menu>
-              </Popover>
+                {user && user.username === superAdminUserName ? (
+                  <Tooltip title="Super admin is not allowed to update credentials">
+                    <span>
+                      <MenuItem
+                        className="Mui-disabled"
+                        onClick={() => {
+                          history.push("/update-password");
+                          handlePopOverClose();
+                        }}
+                      >
+                        Change Password
+                      </MenuItem>
+                    </span>
+                  </Tooltip>
+                ) : (
+                  <MenuItem
+                    onClick={() => {
+                      history.push("/update-password");
+                      handlePopOverClose();
+                    }}
+                  >
+                    Change Password
+                  </MenuItem>
+                )}
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
             </Grid>
           </Grid>
         </Toolbar>
@@ -148,7 +171,7 @@ function Header(props) {
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography color="inherit" variant="h5" component="h1">
-                {selected ? selected.id : 'Nodes'}
+                {selected ? selected.id : "Nodes"}
               </Typography>
             </Grid>
           </Grid>

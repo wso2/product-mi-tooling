@@ -258,8 +258,7 @@ public class RealmConfigXMLProcessor {
                         throw new UserStoreException("Admin User domain does not match primary user store domain.");
                     }
                 } else {
-                    primaryConfig.setAdminUserName
-                            (UserStoreManagerUtils.addDomainToName(adminUserName, primaryDomainName));
+                    primaryConfig.setAdminUserName(adminUserName);
                 }
 
                 if (adminRoleName.indexOf(UserStoreConstants.DOMAIN_SEPARATOR) > 0) {
@@ -270,7 +269,7 @@ public class RealmConfigXMLProcessor {
                 }
             }
 
-            primaryConfig.setAdminRoleName(UserStoreManagerUtils.addDomainToName(adminRoleName, primaryDomainName));
+            primaryConfig.setAdminRoleName(adminRoleName);
         }
 
         return primaryConfig;

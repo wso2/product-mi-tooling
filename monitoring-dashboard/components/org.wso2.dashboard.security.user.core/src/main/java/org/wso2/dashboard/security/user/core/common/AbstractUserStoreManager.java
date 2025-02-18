@@ -21,506 +21,692 @@ package org.wso2.dashboard.security.user.core.common;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.dashboard.security.user.core.UserStoreConstants;
-import org.wso2.dashboard.security.user.core.UserStoreManager;
-import org.wso2.dashboard.security.user.core.UserStoreManagerUtils;
+import org.wso2.micro.integrator.security.user.api.Permission;
 import org.wso2.micro.integrator.security.user.api.RealmConfiguration;
-import org.wso2.micro.integrator.security.user.core.UserRealm;
+import org.wso2.micro.integrator.security.user.core.UserCoreConstants.RealmConfig;
 import org.wso2.micro.integrator.security.user.core.UserStoreException;
+import org.wso2.micro.integrator.security.user.core.UserStoreManager;
 import org.wso2.micro.integrator.security.user.core.claim.ClaimManager;
-import org.wso2.micro.integrator.security.user.core.common.UserRolesCache;
-import org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants;
-import org.wso2.micro.integrator.security.user.core.hybrid.HybridRoleManager;
-import org.wso2.micro.integrator.security.user.core.system.SystemUserRoleManager;
+import org.wso2.micro.integrator.security.user.core.claim.ClaimMapping;
+import org.wso2.micro.integrator.security.user.core.common.RoleContext;
+import org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants.ErrorMessages;
+import org.wso2.micro.integrator.security.user.core.multiplecredentials.UserAlreadyExistsException;
 
 import javax.sql.DataSource;
-import java.nio.CharBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static org.wso2.dashboard.security.user.core.UserStoreConstants.RealmConfig.LEADING_OR_TRAILING_SPACE_ALLOWED_IN_USERNAME;
+import static org.wso2.dashboard.security.user.core.UserStoreConstants.RealmConfig.PROPERTY_JAVA_REG_EX;
+import static org.wso2.micro.integrator.security.user.core.UserCoreConstants.RealmConfig.READ_GROUPS_ENABLED;
+import static org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants.ErrorMessages.*;
+import static org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants.ErrorMessages.ERROR_CODE_CANNOT_REMOVE_ADMIN_ROLE_FROM_ADMIN;
+import static org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION;
+import static org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_PRE_AUTHENTICATION;
+import static org.wso2.micro.integrator.security.user.core.constants.UserCoreErrorConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE;
 
 public abstract class AbstractUserStoreManager implements UserStoreManager {
     private static final Log log = LogFactory.getLog(AbstractUserStoreManager.class);
-    protected static final String TRUE_VALUE = "true";
-    protected static final String FALSE_VALUE = "false";
-    private static final String MAX_LIST_LENGTH = "100";
     private static final int MAX_ITEM_LIMIT_UNLIMITED = -1;
-    private static final String MULIPLE_ATTRIBUTE_ENABLE = "MultipleAttributeEnable";
-    private static final String DISAPLAY_NAME_CLAIM = "http://wso2.org/claims/displayName";
-    private static final String SCIM_USERNAME_CLAIM_URI = "urn:scim:schemas:core:1.0:userName";
-    private static final String SCIM2_USERNAME_CLAIM_URI = "urn:ietf:params:scim:schemas:core:2.0:User:userName";
-    private static final String USERNAME_CLAIM_URI = "http://wso2.org/claims/username";
-    private static final String APPLICATION_DOMAIN = "Application";
-    private static final String WORKFLOW_DOMAIN = "Workflow";
-    private static final String INVALID_CLAIM_URL = "InvalidClaimUrl";
-    private static final String INVALID_USER_NAME = "InvalidUserName";
-    private static final String READ_ONLY_STORE = "ReadOnlyUserStoreManager";
-    private static final String READ_ONLY_PRIMARY_STORE = "ReadOnlyPrimaryUserStoreManager";
-    private static final String ADMIN_USER = "AdminUser";
     private static final String PROPERTY_PASSWORD_ERROR_MSG = "PasswordJavaRegExViolationErrorMsg";
-    private static final String MULTI_ATTRIBUTE_SEPARATOR = "MultiAttributeSeparator";
     protected int tenantId;
     protected DataSource dataSource = null;
     protected RealmConfiguration realmConfig = null;
     protected ClaimManager claimManager = null;
-    protected UserRealm userRealm = null;
-    protected HybridRoleManager hybridRoleManager = null;
-    // User roles cache
-    protected UserRolesCache userRolesCache = null;
-    protected SystemUserRoleManager systemUserRoleManager = null;
     protected boolean readGroupsEnabled = false;
     protected boolean writeGroupsEnabled = false;
-    private org.wso2.micro.integrator.security.user.core.UserStoreManager secondaryUserStoreManager;
-    private boolean userRolesCacheEnabled = true;
-    private String cacheIdentifier;
-    private boolean replaceEscapeCharactersAtUserLogin = true;
-    private Map<String, Integer> maxUserListCount = null;
-    private Map<String, Integer> maxRoleListCount = null;
 
-    public boolean authenticate(final String userName, final Object credential)
-            throws DashboardUserStoreException {
+    @Override
+    public boolean authenticate(final String username, final Object credential) throws UserStoreException {
         try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
-                @Override
-                public Boolean run() throws Exception {
-                    if (!validateUserNameAndCredential(userName, credential)) {
-                        return false;
-                    }
-                    int index = userName.indexOf(UserStoreConstants.DOMAIN_SEPARATOR);
-                    boolean domainProvided = index > 0;
-                    return authenticate(userName, credential, domainProvided);
-                }
+            return AccessController.doPrivileged((PrivilegedExceptionAction<Boolean>) () -> {
+                validateUsernameAndCredentialPresence(username, credential);
+                return authenticateInternal(username, credential);
             });
         } catch (PrivilegedActionException e) {
-            throw (DashboardUserStoreException) e.getException();
+            handlePrivilegedActionException(e);
+            return false;
         }
     }
 
-    protected boolean authenticate(final String userName, final Object credential, final boolean domainProvided)
-            throws DashboardUserStoreException {
-
-        try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
-                @Override
-                public Boolean run() throws Exception {
-                    return authenticateInternal(userName, credential, domainProvided);
-                }
-            });
-        } catch (PrivilegedActionException e) {
-            throw new DashboardUserStoreException("Error occurred while authenticating user", e);
+    private boolean authenticateInternal(String username, Object credential) throws UserStoreException {
+        try (Secret credentialObj = Secret.getSecret(credential)) {
+            if (doAuthenticate(username, credentialObj)) {
+                return true;
+            }
+        } catch (UnsupportedSecretTypeException e) {
+            log.error("Error occurred while authenticating user: " + username, e);
+            throw new DashboardUserStoreException(ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.getMessage(),
+                    ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.getCode(), e);
+        } catch (Exception e) {
+            log.error("Error occurred while authenticating user: " + username, e);
+            throw new UserStoreException(ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getMessage(),
+                    ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getCode(), e);
         }
-
+        logDebug("Authentication failure. Wrong username or password is provided.");
+        throw new DashboardUserStoreException(ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getMessage(),
+                ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getCode());
     }
 
     /**
-     * @param userName
-     * @param credential
-     * @param domainProvided
-     * @return
-     * @throws UserStoreException
+     * Validates the user's authentication by verifying the provided credentials.
+     *
+     * @param username   the username to authenticate
+     * @param credential the user's credentials to validate
+     * @return {@code true} if the credentials match the username; {@code false} if the credentials are invalid,
+     * the username is invalid, or the credentials do not match the username
+     * @throws UserStoreException if an unexpected error occurs during authentication
      */
-    private boolean authenticateInternal(String userName, Object credential, boolean domainProvided)
-            throws UserStoreException, DashboardUserStoreException {
-        AbstractUserStoreManager abstractUserStoreManager = this;
-        boolean authenticated = false;
+    protected abstract boolean doAuthenticate(String username, Object credential) throws UserStoreException;
 
-        UserStore userStore = abstractUserStoreManager.getUserStore(userName);
-        if (userStore.isRecurssive() && userStore.getUserStoreManager() instanceof AbstractUserStoreManager) {
-            return ((AbstractUserStoreManager) userStore.getUserStoreManager()).
-                    authenticate(userStore.getDomainFreeName(), credential, domainProvided);
-        }
-
-        Secret credentialObj;
-        try {
-            credentialObj = Secret.getSecret(credential);
-        } catch (UnsupportedSecretTypeException e) {
-            throw new DashboardUserStoreException(
-                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.getMessage(),
-                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.getCode(), e);
-        }
-        try {
-            authenticated = abstractUserStoreManager.doAuthenticate(userName, credentialObj);
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error occurred while authenticating user: " + userName, e);
-            } else {
-                log.error(e);
-            }
-            throw new UserStoreException(
-                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getMessage(),
-                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getCode(), e);
-        } finally {
-            credentialObj.clear();
-        }
-
-        if (!authenticated) {
-            throw new DashboardUserStoreException(
-                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getMessage(),
-                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getCode());
-        }
-
+    private static void logDebug(String message) {
         if (log.isDebugEnabled()) {
-            if (!authenticated) {
-                log.debug("Authentication failure. Wrong username or password is provided.");
-            }
+            log.debug(message);
         }
-
-        return authenticated;
     }
 
-    public boolean authenticate(String username, String credential) throws UserStoreException {
+    /**
+     * Validates the provided username and credential for authentication.
+     *
+     * @param username   the name of the user
+     * @param credential the user's credential
+     * @throws UserStoreException if authentication validation fails
+     */
+    private void validateUsernameAndCredentialPresence(String username, Object credential) throws UserStoreException {
+        if (username == null || credential == null) {
+            String message = String.format(ERROR_CODE_ERROR_WHILE_PRE_AUTHENTICATION.getMessage(),
+                    "Authentication failure. Either Username or Password is null");
+            log.error(message);
+            throw new DashboardUserStoreException(message, ERROR_CODE_ERROR_WHILE_PRE_AUTHENTICATION.getCode());
+        }
+    }
+
+    public final String[] listUsers(String filter, int maxItemLimit) throws UserStoreException {
+        return doListUsers(filter, maxItemLimit);
+    }
+
+    protected abstract String[] doListUsers(String filter, int maxItemLimit) throws UserStoreException;
+
+    @Override
+    public boolean isExistingUser(String username) throws UserStoreException {
+        return this.doCheckExistingUser(username);
+    }
+
+    @Override
+    public boolean isExistingRole(String roleName) throws UserStoreException {
+        return doCheckExistingRole(roleName);
+    }
+
+    @Override
+    public final String[] getRoleNames() throws UserStoreException {
+        return getRoleNames("*", MAX_ITEM_LIMIT_UNLIMITED);
+    }
+
+    @Override
+    public final String[] getRoleNames(boolean noHybridRoles) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String[] getRoleListOfUser(String username) throws UserStoreException {
+        return doGetRoleListOfUser(username, "*");
+    }
+
+    public final String[] doGetRoleListOfUser(String username, String filter) throws UserStoreException {
+        if (!readGroupsEnabled) {
+            return new String[0];
+        }
+        String[] externalRoles = doGetExternalRoleListOfUser(username, filter);
+        return externalRoles != null ? externalRoles : new String[0];
+    }
+
+    /**
+     * Retrieves only the external roles associated with the specified user.
+     *
+     * @param username the name of the user whose roles are to be retrieved
+     * @param filter   an optional filter to refine the role list
+     * @return an array of external roles associated with the user
+     * @throws UserStoreException if an error occurs while fetching the external roles
+     */
+    protected abstract String[] doGetExternalRoleListOfUser(String username, String filter) throws UserStoreException;
+
+    public final String[] getUserListOfRole(String roleName) throws UserStoreException {
+        if (!isExistingRole(roleName)) {
+            return new String[0];
+        }
+        return readGroupsEnabled ? doGetUserListOfRole(roleName) : new String[0];
+    }
+
+    protected abstract String[] doGetUserListOfRole(String roleName) throws UserStoreException;
+
+    @Override
+    public void addUser(String username, Object credential, String[] roles, Map<String, String> claims,
+                        String profileName, boolean requirePasswordChange) throws UserStoreException {
+        if (isReadOnly()) {
+            throw new UserStoreException(ERROR_CODE_READONLY_USER_STORE.toString());
+        }
+
+        validateUsername(username);
+        validateForExistingUsername(username);
+
+        try (Secret secret = Secret.getSecret(credential)) {
+            validatePassword(secret);
+
+            if (roles == null) {
+                roles = new String[0];
+            }
+            List<String> filteredRoles = Arrays.stream(roles).filter(role -> role != null && !role.trim().isEmpty())
+                    .collect(Collectors.toList());
+            validateExistingRoles(filteredRoles);
+
+            if (claims == null) {
+                claims = new HashMap<>();
+            }
+            validateClaims(claims);
+
+            doAddUser(username, secret, filteredRoles.toArray(new String[0]), claims, profileName, requirePasswordChange);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new UserStoreException(ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.toString(), e);
+        }
+    }
+
+    private void validateClaims(Map<String, String> claims) throws UserStoreException {
+        for (String claimUri : claims.keySet()) {
+            validateClaim(claimUri);
+        }
+    }
+
+    private void validateClaim(String claimUri) throws UserStoreException {
         try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
-                @Override
-                public Boolean run() throws Exception {
-                    if (!validateUserNameAndCredential(username, credential)) {
-                        return  false;
-                    }
-                    int index = username.indexOf(UserStoreConstants.DOMAIN_SEPARATOR);
-                    boolean domainProvided = index > 0;
-                    return authenticateInternal(username, credential, domainProvided);
-                }
+            ClaimMapping claimMapping = (ClaimMapping) claimManager.getClaimMapping(claimUri);
+            if (claimMapping != null) {
+                return;
+            }
+        } catch (org.wso2.micro.integrator.security.user.api.UserStoreException e) {
+            String errorMessage = String.format(ERROR_CODE_UNABLE_TO_FETCH_CLAIM_MAPPING.getMessage(), "persisting user attributes.");
+            String errorCode = ERROR_CODE_UNABLE_TO_FETCH_CLAIM_MAPPING.getCode();
+            throw new UserStoreException(errorCode + " - " + errorMessage, e);
+        }
+        String errorMessage = String.format(ERROR_CODE_INVALID_CLAIM_URI.getMessage(), claimUri);
+        String errorCode = ERROR_CODE_INVALID_CLAIM_URI.getCode();
+        throw new UserStoreException(errorCode + " - " + errorMessage);
+    }
+
+    private void validateExistingRoles(List<String> roles) throws UserStoreException {
+        for (String role : roles) {
+            validateExistingRole(role);
+        }
+    }
+
+    private void validateExistingRole(String role) throws UserStoreException {
+        if (!doCheckExistingRole(role)) {
+            String errorMessage = String.format(ERROR_CODE_EXTERNAL_ROLE_NOT_EXISTS.getMessage(), role);
+            String errorCode = ERROR_CODE_EXTERNAL_ROLE_NOT_EXISTS.getCode();
+            throw new UserStoreException(errorCode + " - " + errorMessage);
+        }
+    }
+
+    private void validatePassword(Secret secret) throws UserStoreException {
+        if (!isValidPasswordFormat(secret)) {
+            String passwordRegex = realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_JAVA_REG_EX);
+            String message = String.format(ERROR_CODE_INVALID_PASSWORD.getMessage(), passwordRegex);
+            String errorCode = ERROR_CODE_INVALID_PASSWORD.getCode();
+            throw new UserStoreException(errorCode + " - " + message);
+        }
+    }
+
+    protected boolean isValidPasswordFormat(Object credential) throws UserStoreException {
+        if (credential == null) {
+            return false;
+        }
+        try (Secret secret = Secret.getSecret(credential)) {
+            char[] passwordChars = secret.getChars();
+            if (passwordChars.length <= 1) {
+                return false;
+            }
+            String passwordRegex = realmConfig.getUserStoreProperty(PROPERTY_JAVA_REG_EX);
+            if (passwordRegex == null) {
+                return true;
+            }
+            boolean isValid = hasValidFormat(passwordRegex, passwordChars);
+            if (!isValid) {
+                logDebug("Submitted password does not match the regex: " + passwordRegex);
+            }
+            return isValid;
+        } catch (UnsupportedSecretTypeException e) {
+            throw new DashboardUserStoreException("Unsupported credential type", e);
+        }
+    }
+
+    private boolean hasValidFormat(String regex, char[] attribute) {
+        return hasValidFormat(regex, String.valueOf(attribute));
+    }
+
+    private void validateUsername(String username) throws UserStoreException {
+        if (!isValidUsername(username)) {
+            String usernameRegex = getEffectiveUsernameRegex();
+            String errorMessage = String.format(ERROR_CODE_INVALID_USER_NAME.getMessage(), null, usernameRegex);
+            String errorCode = ERROR_CODE_INVALID_USER_NAME.getCode();
+            throw new UserStoreException(errorCode + " - " + errorMessage);
+        }
+    }
+
+    protected boolean isValidUsername(String username) {
+        if (StringUtils.isEmpty(username)) {
+            return false;
+        }
+
+        String allowLeadingOrTrailingSpace = realmConfig.getUserStoreProperty(LEADING_OR_TRAILING_SPACE_ALLOWED_IN_USERNAME);
+        if (StringUtils.isEmpty(allowLeadingOrTrailingSpace)) {
+            // Keeping old behavior for backward-compatibility.
+            username = username.trim();
+        } else {
+            logDebug("'LeadingOrTrailingSpaceAllowedInUserName' property is set to : "
+                    + allowLeadingOrTrailingSpace + ". Hence username trimming will be skipped during "
+                    + "validation for the username: " + username);
+        }
+
+        if (username.isEmpty()) {
+            return false;
+        }
+
+        String usernameRegex = getEffectiveUsernameRegex();
+        if (StringUtils.isNotEmpty(usernameRegex)) {
+            if (hasValidFormat(usernameRegex.trim(), username)) {
+                return true;
+            }
+            logDebug("Username " + username + " does not match with the regex " + usernameRegex);
+            return false;
+        }
+        return true;
+    }
+
+    private String getEffectiveUsernameRegex() {
+        String regex = realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_USER_NAME_JAVA_REG_EX);
+        if (StringUtils.isEmpty(regex) || StringUtils.isEmpty(regex.trim())) {
+            regex = realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_USER_NAME_JAVA_REG);
+        }
+        return regex;
+    }
+
+    private boolean hasValidFormat(String regularExpression, String attribute) {
+        Pattern pattern = Pattern.compile(regularExpression);
+        Matcher matcher = pattern.matcher(attribute);
+        return matcher.matches();
+    }
+
+    private void validateForExistingUsername(String username) throws UserStoreException {
+        if (doCheckExistingUser(username)) {
+            String message = String.format(ERROR_CODE_USER_ALREADY_EXISTS.getMessage(), username);
+            String errorCode = ERROR_CODE_USER_ALREADY_EXISTS.getCode();
+            throw new UserAlreadyExistsException(errorCode + " - " + message);
+        }
+    }
+
+    /**
+     * Adds a user to the user store.
+     *
+     * @param username              the username of the user
+     * @param credential            the user's credential or password
+     * @param roleList              the list of roles the user belongs to
+     * @param claims                user properties or attributes
+     * @param profileName           the profile name; if {@code null}, the default profile is used
+     * @param requirePasswordChange indicates whether the user is required to change the password
+     * @throws UserStoreException if an unexpected error occurs during user addition
+     */
+    protected abstract void doAddUser(String username, Object credential, String[] roleList, Map<String, String> claims,
+                                      String profileName, boolean requirePasswordChange) throws UserStoreException;
+
+    public final void updateCredential(String username, Object newCredential, Object oldCredential) throws UserStoreException {
+        if (isReadOnly()) {
+            throw new DashboardUserStoreException(ERROR_CODE_READONLY_USER_STORE.toString(), ERROR_CODE_READONLY_USER_STORE.getCode());
+        }
+
+        try (Secret newSecret = Secret.getSecret(newCredential); Secret oldSecret = Secret.getSecret(oldCredential)) {
+            boolean authenticated = this.doAuthenticate(username, oldSecret);
+            if (!authenticated) {
+                throw new DashboardUserStoreException(ERROR_CODE_OLD_CREDENTIAL_DOES_NOT_MATCH.getMessage(), ERROR_CODE_OLD_CREDENTIAL_DOES_NOT_MATCH.getCode());
+            }
+            validateNewCredential(newCredential, false);
+            doUpdateCredential(username, newSecret, oldSecret);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new DashboardUserStoreException(ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.toString(), ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.getCode());
+        }
+    }
+
+    private void validateNewCredential(Object credential, boolean byAdmin) throws UserStoreException {
+        if (!isValidPasswordFormat(credential)) {
+            String errorMsg = realmConfig.getUserStoreProperty(PROPERTY_PASSWORD_ERROR_MSG);
+            if (errorMsg != null) {
+                ErrorMessages error = byAdmin ? ERROR_CODE_ERROR_DURING_PRE_UPDATE_CREDENTIAL_BY_ADMIN
+                        : ERROR_CODE_ERROR_DURING_PRE_UPDATE_CREDENTIAL;
+                String message = String.format(error.getMessage(), errorMsg);
+                throw new UserStoreException(error.getCode() + " - " + message);
+            }
+            String errorMessage = String.format(ERROR_CODE_INVALID_PASSWORD.getMessage(), realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_JAVA_REG_EX));
+            String errorCode = ERROR_CODE_INVALID_PASSWORD.getCode();
+            throw new UserStoreException(errorCode + " - " + errorMessage);
+        }
+    }
+
+    public final void updateCredentialByAdmin(String username, Object newCredential) throws UserStoreException {
+        if (isReadOnly()) {
+            throw new UserStoreException(ERROR_CODE_READONLY_USER_STORE.toString());
+        }
+        validateNewCredential(newCredential, true);
+        try (Secret secret = Secret.getSecret(newCredential)) {
+            if (!doCheckExistingUser(username)) {
+                String errorMessage = String.format(ERROR_CODE_NON_EXISTING_USER.getMessage(), username,
+                        realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_DOMAIN_NAME));
+                String errorCode = ERROR_CODE_NON_EXISTING_USER.getCode();
+                throw new UserStoreException(errorCode + "-" + errorMessage);
+            }
+            doUpdateCredentialByAdmin(username, secret);
+        } catch (UnsupportedSecretTypeException e) {
+            throw new UserStoreException(ERROR_CODE_UNSUPPORTED_CREDENTIAL_TYPE.toString(), e);
+        }
+    }
+
+    public final void deleteUser(String username) throws UserStoreException {
+        if (isReadOnly()) {
+            throw new UserStoreException(ERROR_CODE_READONLY_USER_STORE.toString());
+        }
+        if (realmConfig.getAdminUserName().equals(username)) {
+            throw new UserStoreException(ERROR_CODE_DELETE_ADMIN_USER.toString());
+        }
+        if (!doCheckExistingUser(username)) {
+            String errorMessage = String.format(ERROR_CODE_NON_EXISTING_USER.getMessage(), username,
+                    realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_DOMAIN_NAME));
+            String errorCode = ERROR_CODE_NON_EXISTING_USER.getCode();
+            throw new UserStoreException(errorCode + " - " + errorMessage);
+        }
+        doDeleteUser(username);
+    }
+
+    /**
+     * Delete the user with the given username
+     *
+     * @param username The username
+     * @throws UserStoreException An unexpected exception has occurred
+     */
+    protected abstract void doDeleteUser(String username) throws UserStoreException;
+
+    /**
+     * Delete the role with the given role name.
+     *
+     * @param roleName The role name to delete.
+     * @throws UserStoreException If an error occurs while deleting the role.
+     */
+    public final void deleteRole(String roleName) throws UserStoreException {
+        if (isReadOnly()) {
+            throw new UserStoreException(ERROR_CODE_READONLY_USER_STORE.toString());
+        }
+        if (realmConfig.getAdminRoleName().equalsIgnoreCase(roleName)) {
+            throw new UserStoreException(ERROR_CODE_CANNOT_DELETE_ADMIN_ROLE.toString());
+        }
+        if (!doCheckExistingRole(roleName)) {
+            throw new UserStoreException(ERROR_CODE_CANNOT_DELETE_NON_EXISTING_ROLE.toString());
+        }
+        if (!writeGroupsEnabled) {
+            throw new UserStoreException(ERROR_CODE_WRITE_GROUPS_NOT_ENABLED.toString());
+        }
+        doDeleteRole(roleName);
+    }
+
+    public final void updateRoleListOfUser(final String username, final String[] deletedRoles, final String[] newRoles)
+            throws UserStoreException {
+        try {
+            AccessController.doPrivileged((PrivilegedExceptionAction<String>) () -> {
+                updateRoleListOfUserInternal(username, deletedRoles, newRoles);
+                return null;
             });
         } catch (PrivilegedActionException e) {
-            if (!(e.getException() instanceof UserStoreException)) {
-                log.error("Error occurred while authenticating user", e);
-            }
             throw (UserStoreException) e.getException();
         }
     }
 
-    /**
-     * @param userName
-     * @param credential
-     * @param domainProvided
-     * @return
-     * @throws UserStoreException
-     */
-    private boolean authenticateInternal(String userName, String credential, boolean domainProvided)
-            throws UserStoreException, DashboardUserStoreException {
+    private void updateRoleListOfUserInternal(String username, String[] deletedRoles, String[] newRoles)
+            throws UserStoreException {
+        if (deletedRoles == null) {
+            deletedRoles = new String[0];
+        }
+        if (deletedRoles.length > 0) {
+            Arrays.sort(deletedRoles);
+            validateRemovalOfAdminRoleFromSuperAdmin(username, deletedRoles);
+        }
 
-        AbstractUserStoreManager abstractUserStoreManager = this;
-
-        boolean authenticated = false;
-
-        UserStore userStore = abstractUserStoreManager.getUserStore(userName);
-        int tenantId = abstractUserStoreManager.getTenantId();
-        try {
-            // Let's authenticate with the primary UserStoreManager.
-            authenticated = abstractUserStoreManager.doAuthenticate(userName, credential);
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error occurred while authenticating user: " + userName, e);
-            } else {
-                log.error(e);
+        if (newRoles == null) {
+            newRoles = new String[0];
+        }
+        if (deletedRoles.length > 0 || newRoles.length > 0) {
+            if (!isReadOnly() && writeGroupsEnabled) {
+                doUpdateRoleListOfUser(username, deletedRoles, newRoles);
+                return;
             }
-            authenticated = false;
+            throw new UserStoreException(ERROR_CODE_READONLY_USER_STORE.toString());
         }
-        return authenticated;
+    }
+
+    private void validateRemovalOfAdminRoleFromSuperAdmin(String username, String[] deletedRoles) throws UserStoreException {
+        if (!realmConfig.getAdminUserName().equals(username)) {
+            return;
+        }
+        // Check if the admin role is being deleted from the admin user
+        for (String deletedRole : deletedRoles) {
+            if (deletedRole.equalsIgnoreCase(realmConfig.getAdminRoleName())) {
+                String errorMessage = String.format("Attempt to remove admin role from the admin user: %s", username);
+                log.error(errorMessage);  // Log the error
+                throw new UserStoreException(ERROR_CODE_CANNOT_REMOVE_ADMIN_ROLE_FROM_ADMIN.toString());
+            }
+        }
     }
 
     /**
-     * To validate username and credential that is given for authentication.
+     * Update role list of a particular user
      *
-     * @param userName   Name of the user.
-     * @param credential Credential of the user.
-     * @return false if the validation fails.
+     * @param username     The username
+     * @param deletedRoles Array of role names, that is going to be removed from the user
+     * @param newRoles     Array of role names, that is going to be added to the user
+     * @throws UserStoreException An unexpected exception has occurred
      */
-    private boolean validateUserNameAndCredential(String userName, String credential) {
+    protected abstract void doUpdateRoleListOfUser(String username, String[] deletedRoles,
+                                                   String[] newRoles) throws UserStoreException;
 
-        boolean isValid = true;
-        if (userName == null || credential == null) {
-            String message = "Authentication failure. Either Username or Password is null";
-            log.error(message);
-            isValid = false;
-        }
-        return isValid;
+    @Override
+    public final String[] getHybridRoles() {
+        throw new UnsupportedOperationException();
+    }
+
+    protected abstract void doDeleteRole(String roleName) throws UserStoreException;
+
+    /**
+     * Update credential/password by the admin of another user
+     *
+     * @param username      The username
+     * @param newCredential The new credential
+     * @throws UserStoreException An unexpected exception has occurred
+     */
+    protected abstract void doUpdateCredentialByAdmin(String username, Object newCredential) throws UserStoreException;
+
+    /**
+     * Update the credential/password of the user
+     *
+     * @param username      The username
+     * @param newCredential The new credential/password
+     * @param oldCredential The old credential/password
+     * @throws UserStoreException An unexpected exception has occurred
+     */
+    protected abstract void doUpdateCredential(String username, Object newCredential, Object oldCredential)
+            throws UserStoreException;
+
+    public final String[] getRoleNames(String filter, int maxItemLimit) throws UserStoreException {
+        return readGroupsEnabled ? doGetRoleNames(filter, maxItemLimit) : new String[0];
     }
 
     /**
-     * To validate username and credential that is given for authentication.
+     * Retrieves the role names based on the given filter and maximum item limit.
      *
-     * @param userName   Name of the user.
-     * @param credential Credential of the user.
-     * @return false if the validation fails.
-     * @throws UserStoreException UserStore Exception.
+     * @param filter       the filter to apply when retrieving role names
+     * @param maxItemLimit the maximum number of role names to return
+     * @return an array of role names matching the filter
+     * @throws UserStoreException if an error occurs while retrieving the role names
      */
-    private boolean validateUserNameAndCredential(String userName, Object credential)
-            throws DashboardUserStoreException {
+    protected abstract String[] doGetRoleNames(String filter, int maxItemLimit) throws UserStoreException;
 
-        if (userName == null || credential == null) {
-            String message = String.format(UserCoreErrorConstants.ErrorMessages.
-                            ERROR_CODE_ERROR_WHILE_PRE_AUTHENTICATION.getMessage(),
-                    "Authentication failure. Either Username or Password is null");
-            log.error(message);
-            throw new DashboardUserStoreException(message,
-                    UserCoreErrorConstants.ErrorMessages.ERROR_CODE_ERROR_WHILE_PRE_AUTHENTICATION.getCode());
+    protected abstract boolean doCheckExistingRole(String roleName) throws UserStoreException;
+
+    protected abstract boolean doCheckExistingUser(String username) throws UserStoreException;
+
+    private void handlePrivilegedActionException(PrivilegedActionException exception) throws UserStoreException {
+        throw new UserStoreException(ERROR_CODE_ERROR_WHILE_AUTHENTICATION.getMessage(), exception.getCause());
+    }
+
+    protected abstract RoleContext createRoleContext(String roleName) throws UserStoreException;
+
+    @Override
+    public void addRole(String roleName, String[] userList, Permission[] permissions, boolean isSharedRole) throws UserStoreException {
+        if (isReadOnly()) {
+            throw new UserStoreException(ERROR_CODE_READONLY_USER_STORE.toString());
+        }
+        if (StringUtils.isEmpty(roleName)) {
+            throw new UserStoreException(ERROR_CODE_CANNOT_ADD_EMPTY_ROLE.toString());
+        }
+        if (userList == null) {
+            userList = new String[0];
+        }
+        validateRoleName(roleName);
+        validateExistingRoleName(roleName);
+        if (!writeGroupsEnabled) {
+            throw new UserStoreException(ERROR_CODE_WRITE_GROUPS_NOT_ENABLED.toString());
+        }
+        doAddRole(roleName, userList);
+    }
+
+    private void validateExistingRoleName(String roleName) throws UserStoreException {
+        if (doCheckExistingRole(roleName)) {
+            String errorCode = ERROR_CODE_ROLE_ALREADY_EXISTS.getCode();
+            String errorMessage = String.format(ERROR_CODE_ROLE_ALREADY_EXISTS.getMessage(), roleName);
+            throw new UserStoreException(errorCode + " - " + errorMessage);
+        }
+    }
+
+    private void validateRoleName(String roleName) throws UserStoreException {
+        if (!isRoleNameValid(roleName)) {
+            String regEx = realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_ROLE_NAME_JAVA_REG_EX);
+            String errorMessage = String.format(ERROR_CODE_INVALID_ROLE_NAME.getMessage(), roleName, regEx);
+            String errorCode = ERROR_CODE_INVALID_ROLE_NAME.getCode();
+            throw new UserStoreException(errorCode + " - " + errorMessage);
+        }
+    }
+
+    protected boolean isRoleNameValid(String roleName) {
+        if (roleName == null || roleName.isEmpty()) {
+            return false;
+        }
+        String regularExpression = realmConfig.getUserStoreProperty(RealmConfig.PROPERTY_ROLE_NAME_JAVA_REG_EX);
+        if (regularExpression != null) {
+            return hasValidFormat(regularExpression, roleName);
         }
         return true;
     }
 
-    @Override
-    public String[] getRoleListOfUser(String userName) throws DashboardUserStoreException {
-        String[] roleNames = null;
+    protected abstract void doAddRole(String roleName, String[] userList) throws UserStoreException;
 
-        UserStore userStore = getUserStore(userName);
-        if (userStore.isRecurssive()) {
-            return userStore.getUserStoreManager().getRoleListOfUser(userStore.getDomainFreeName());
+    public boolean isUserInRole(String username, String roleName) throws UserStoreException {
+        if (roleName == null || roleName.trim().isEmpty() || username == null || username.trim().isEmpty()) {
+            return false;
         }
-
-        if (userStore.isSystemStore()) {
-            try {
-                return systemUserRoleManager.getSystemRoleListOfUser(userStore.getDomainFreeName());
-            } catch (UserStoreException e) {
-                throw new DashboardUserStoreException(e.getMessage(), e);
-            }
-        }
-
-        roleNames = doGetRoleListOfUser(userName, "*");
-
-        return roleNames;
+        return readGroupsEnabled && doCheckIsUserInRole(username, roleName);
     }
 
-    /**
-     * @param userName
-     * @param filter
-     * @return
-     * @throws UserStoreException
-     */
-    public final String[] doGetRoleListOfUser(String userName, String filter)
-            throws DashboardUserStoreException {
+    public abstract boolean doCheckIsUserInRole(String username, String roleName) throws UserStoreException;
 
-        String[] modifiedExternalRoleList = new String[0];
-
-        if (readGroupsEnabled) {
-            List<String> roles = new ArrayList<String>();
-            String[] externalRoles = doGetExternalRoleListOfUser(userName, "*");
-            roles.addAll(Arrays.asList(externalRoles));
-            if (isSharedGroupEnabled()) {
-                String[] sharedRoles = doGetSharedRoleListOfUser(userName, null, "*");
-                if (sharedRoles != null) {
-                    roles.addAll(Arrays.asList(sharedRoles));
-                }
-            }
-            modifiedExternalRoleList =
-                    UserStoreManagerUtils.addDomainToNames(roles.toArray(new String[roles.size()]),
-                            getMyDomainName());
+    protected void addInitialAdminData(boolean addAdmin) throws UserStoreException {
+        String adminUsername = realmConfig.getAdminUserName();
+        String adminRoleName = realmConfig.getAdminRoleName();
+        if (adminUsername == null || adminRoleName == null) {
+            String message = "Admin user name or role name is not valid. Please provide valid values.";
+            log.error(message);
+            throw new UserStoreException(message);
         }
-        return modifiedExternalRoleList;
+        if (!checkUserExistence(adminRoleName)) {
+            handleAdminUserCreation(adminUsername, addAdmin);
+        }
+        if (!checkRoleExistence(adminUsername)) {
+            handleAdminRoleCreation(adminRoleName, adminUsername, addAdmin);
+        }
+        assignUserToRole(adminUsername, adminRoleName, addAdmin);
     }
 
-    /**
-     *
-     * @return
-     */
-    public boolean isSharedGroupEnabled() {
-        String value = realmConfig.getUserStoreProperty(UserStoreConstants.RealmConfig.SHARED_GROUPS_ENABLED);
+    private boolean checkRoleExistence(String roleName) {
         try {
-            return realmConfig.isPrimary() && !isReadOnly() && TRUE_VALUE.equalsIgnoreCase(value);
-        } catch (DashboardUserStoreException e) {
-            log.error(e);
+            if (Boolean.parseBoolean(this.getRealmConfiguration().getUserStoreProperty(READ_GROUPS_ENABLED))) {
+                return doCheckExistingRole(roleName);
+            }
+        } catch (Exception e) {
+            log.error("Error while checking role existence: " + e.getMessage(), e);
         }
         return false;
     }
 
-    /**
-     * @param userName
-     * @return
-     * @throws UserStoreException
-     */
-    protected boolean checkUserNameValid(String userName) {
-
-        if (userName == null || UserStoreConstants.REGISTRY_SYSTEM_USERNAME.equals(userName)) {
+    private boolean checkUserExistence(String username) {
+        try {
+            return doCheckExistingUser(username);
+        } catch (Exception e) {
+            log.debug("Error while checking user existence: " + e.getMessage(), e);
             return false;
         }
-
-        String leadingOrTrailingSpaceAllowedInUserName = realmConfig.getUserStoreProperty(UserStoreConstants
-                .RealmConfig.LEADING_OR_TRAILING_SPACE_ALLOWED_IN_USERNAME);
-        if (StringUtils.isEmpty(leadingOrTrailingSpaceAllowedInUserName)) {
-            // Keeping old behavior for backward-compatibility.
-            userName = userName.trim();
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("'LeadingOrTrailingSpaceAllowedInUserName' property is set to : " +
-                        leadingOrTrailingSpaceAllowedInUserName + ". Hence username trimming will be skipped during " +
-                        "validation for the username: " + userName);
-            }
-        }
-
-        if (userName.length() < 1) {
-            return false;
-        }
-
-        String regularExpression = realmConfig
-                .getUserStoreProperty(UserStoreConstants.RealmConfig.PROPERTY_USER_NAME_JAVA_REG_EX);
-        //Inorder to support both UsernameJavaRegEx and UserNameJavaRegEx.
-        if (StringUtils.isEmpty(regularExpression) || StringUtils.isEmpty(regularExpression.trim())) {
-            regularExpression = realmConfig.getUserStoreProperty(
-                    UserStoreConstants.RealmConfig.PROPERTY_USER_NAME_JAVA_REG);
-        }
-
-        if (regularExpression != null) {
-            regularExpression = regularExpression.trim();
-        }
-
-        if (StringUtils.isNotEmpty(regularExpression)) {
-            if (isFormatCorrect(regularExpression, userName)) {
-                return true;
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Username " + userName + " does not match with the regex "
-                            + regularExpression);
-                }
-                return false;
-            }
-        }
-        return true;
     }
 
-    /**
-     * @param credential
-     * @return
-     * @throws UserStoreException
-     */
-    protected boolean checkUserPasswordValid(Object credential) throws DashboardUserStoreException {
-
-        if (credential == null) {
-            return false;
-        }
-
-        Secret credentialObj;
-        try {
-            credentialObj = Secret.getSecret(credential);
-        } catch (UnsupportedSecretTypeException e) {
-            throw new DashboardUserStoreException("Unsupported credential type", e);
+    private void handleAdminUserCreation(String adminUsername, boolean addAdmin) throws UserStoreException {
+        if (isReadOnly() || !addAdmin) {
+            return;
         }
 
         try {
-            if (credentialObj.getChars().length < 1) {
-                return false;
-            }
+            doAddUser(adminUsername, realmConfig.getAdminPassword(), null, null, null, false);
+        } catch (Exception e) {
+            log.error("Admin user has not been created. Error occurred while creating admin user.", e);
+        }
+    }
 
-            String regularExpression =
-                    realmConfig.getUserStoreProperty(UserStoreConstants.RealmConfig.PROPERTY_JAVA_REG_EX);
-            if (regularExpression != null) {
-                if (isFormatCorrect(regularExpression, credentialObj.getChars())) {
-                    return true;
+    private void handleAdminRoleCreation(String adminRoleName, String adminUsername, boolean addAdmin) throws UserStoreException {
+        if (!addAdmin) {
+            log.error("Admin role cannot be created. 'Add-Admin' is set to false. Please use an existing role as the admin role.");
+            return;
+        }
+        if (isReadOnly() || !writeGroupsEnabled) {
+            return;
+        }
+        try {
+            doAddRole(adminRoleName, new String[]{adminUsername});
+        } catch (UserStoreException e) {
+            log.error("Admin role has not been created. Error occurred while creating admin role.", e);
+        }
+    }
+
+    private void assignUserToRole(String adminUsername, String adminRoleName, boolean addAdmin) throws UserStoreException {
+        if (isReadOnly() || !writeGroupsEnabled) {
+            return;
+        }
+        try {
+            if (!doCheckIsUserInRole(adminUsername, adminRoleName)) {
+                if (addAdmin) {
+                    doUpdateRoleListOfUser(adminUsername, null, new String[]{adminRoleName});
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Submitted password does not match with the regex " + regularExpression);
-                    }
-                    return false;
+                    log.error("Admin user cannot be assigned to admin role. Add-Admin is set to false. Please assign the role manually.");
                 }
             }
-            return true;
-        } finally {
-            credentialObj.clear();
-        }
-
-    }
-
-    /**
-     * @param regularExpression
-     * @param attribute
-     * @return
-     */
-    private boolean isFormatCorrect(String regularExpression, String attribute) {
-        Pattern p2 = Pattern.compile(regularExpression);
-        Matcher m2 = p2.matcher(attribute);
-        return m2.matches();
-    }
-
-    private boolean isFormatCorrect(String regularExpression, char[] attribute) {
-        boolean matches;
-        CharBuffer charBuffer = CharBuffer.wrap(attribute);
-
-        Pattern p2 = Pattern.compile(regularExpression);
-        Matcher m2 = p2.matcher(charBuffer);
-        matches = m2.matches();
-
-        return matches;
-    }
-
-    private UserStore getUserStore(final String user) throws DashboardUserStoreException {
-        try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<UserStore>() {
-                @Override
-                public UserStore run() throws Exception {
-                    return getUserStoreInternal(user);
-                }
-            });
-        } catch (PrivilegedActionException e) {
-            throw (DashboardUserStoreException) e.getException();
+        } catch (Exception e) {
+            log.error("Error while assigning admin user to admin role.", e);
         }
     }
-
-    /**
-     * @return
-     * @throws UserStoreException
-     */
-    private UserStore getUserStoreInternal(String user) throws UserStoreException {
-
-        int index;
-        index = user.indexOf(UserStoreConstants.DOMAIN_SEPARATOR);
-        UserStore userStore = new UserStore();
-        String domainFreeName = null;
-        String domain = getMyDomainName();
-        userStore.setUserStoreManager(this);
-        if (index > 0) {
-            userStore.setDomainAwareName(user);
-            userStore.setDomainFreeName(domainFreeName);
-        } else {
-            userStore.setDomainAwareName(domain + UserStoreConstants.DOMAIN_SEPARATOR + user);
-            userStore.setDomainFreeName(user);
-        }
-        userStore.setRecurssive(false);
-        userStore.setDomainName(domain);
-
-        return userStore;
-    }
-
-    /**
-     * @return
-     */
-    protected String getMyDomainName() {
-        return UserStoreManagerUtils.getDomainName(realmConfig);
-    }
-
-    /**
-     * Only gets the external roles of the user.
-     *
-     * @param userName Name of the user - who we need to find roles.
-     * @return
-     * @throws UserStoreException
-     */
-    protected abstract String[] doGetExternalRoleListOfUser(String userName, String filter)
-            throws DashboardUserStoreException;
-
-    /**
-     * Returns the shared roles list of the user
-     *
-     * @param userName
-     * @return
-     * @throws UserStoreException
-     */
-    protected abstract String[] doGetSharedRoleListOfUser(String userName, String tenantDomain, String filter)
-            throws DashboardUserStoreException;
-
-    /**
-     * Given the user name and a credential object, the implementation code must validate whether
-     * the user is authenticated.
-     *
-     * @param userName   The user name
-     * @param credential The credential of a user
-     * @return If the value is true the provided credential match with the user name. False is
-     * returned for invalid credential, invalid user name and mismatching credential with
-     * user name.
-     * @throws UserStoreException An unexpected exception has occurred
-     */
-    protected abstract boolean doAuthenticate(String userName, Object credential)
-            throws DashboardUserStoreException;
-
 }
