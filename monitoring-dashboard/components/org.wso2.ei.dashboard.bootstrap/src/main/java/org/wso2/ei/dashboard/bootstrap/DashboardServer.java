@@ -91,6 +91,10 @@ public class DashboardServer {
     private static final String TOML_BAL_SERVICE_PASSWORD = "bal_service_account.password";
     private static final String BAL_USERNAME = "bal_username";
     private static final String BAL_PASSWORD = "bal_password";
+    private static final String TOML_SI_SERVICE_USERNAME = "si_service_account.username";
+    private static final String TOML_SI_SERVICE_PASSWORD = "si_service_account.password";
+    private static final String SI_USERNAME = "si_username";
+    private static final String SI_PASSWORD = "si_password";
     private static final String TOML_CONF_HEARTBEAT_POOL_SIZE = "heartbeat_config.pool_size";
     private static final String SERVER_DIR = "server";
     private static final String WEBAPPS_DIR = "webapps";
@@ -322,6 +326,18 @@ public class DashboardServer {
         if (StringUtils.isEmpty(balPassword)) {
             balPassword = (String) parsedConfigs.get(TOML_BAL_SERVICE_PASSWORD);
             properties.put(BAL_PASSWORD, resolveSecret(balPassword));
+        }
+
+        String siUsername = System.getProperty(SI_USERNAME);
+        if (StringUtils.isEmpty(siUsername)) {
+            siUsername = (String) parsedConfigs.get(TOML_SI_SERVICE_USERNAME);
+            properties.put(SI_USERNAME, resolveSecret(siUsername));
+        }
+
+        String siPassword = System.getProperty(SI_PASSWORD);
+        if (StringUtils.isEmpty(siPassword)) {
+            siPassword = (String) parsedConfigs.get(TOML_SI_SERVICE_PASSWORD);
+            properties.put(SI_PASSWORD, resolveSecret(siPassword));
         }
 
         keyStorePassword = System.getProperty(KEYSTORE_PASSWORD);

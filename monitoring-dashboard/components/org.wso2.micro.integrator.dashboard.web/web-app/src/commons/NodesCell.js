@@ -38,6 +38,8 @@ import CarbonApplicationsSideDrawer from './sideDrawers/CarbonApplicationsSideDr
 import DataServicesSideDrawer from './sideDrawers/DataServicesSideDrawer';
 import DataSourcesSideDrawer from './sideDrawers/DataSourcesSideDrawer';
 import GenericDrawer from './sideDrawers/GenericDrawer';
+import QuerySideDrawer from './sideDrawers/QuerySideDrawer';
+import SiddhiApplicationSideDrawer from './sideDrawers/SiddhiApplicationSideDrawer';
 
 export default function NodesCell(props) {
     const classes = useStyles();
@@ -93,6 +95,10 @@ function SideDrawer(props) {
             return <DataSourcesSideDrawer nodeData={nodeData} />
         case 'nodesPage':
             return <HomePageSideDrawer nodeData={nodeData} />
+        case 'queries':
+            return <QuerySideDrawer nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
+        case 'siddhiapps':
+            return <SiddhiApplicationSideDrawer nodeData={nodeData} retrieveUpdatedArtifact={retrieveUpdatedArtifact}/>
         default :
             return <GenericDrawer nodeData={nodeData} />
     }

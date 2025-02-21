@@ -53,6 +53,13 @@ import AddRoles from '../pages/AddRoles';
 import AddLogConfig from '../pages/AddLogConfig'
 import DataSources from '../pages/Datasources';
 import Services from '../pages/Services';
+import SiddhiApplications from '../pages/SiddhiApplications';
+import Sources from '../pages/Sources';
+import Sinks from '../pages/Sinks';
+import Queries from '../pages/Queries';
+import Stores from '../pages/Stores';
+import Windows from '../pages/Windows';
+import Aggregations from '../pages/Aggregations';
 import AuthManager from '../auth/AuthManager';
 import { setIsRefreshed } from '../redux/Actions';
 import { useDispatch } from 'react-redux';
@@ -161,6 +168,13 @@ function Layout(props) {
                                 <Route exact path='/update-password' component={UpdatePassword}/>
                                 <Route exact path='/services' component={Services}/>
                                 <Route exact path='/listeners' component={Listeners}/>
+                                <Route exact path='/siddhi-applications' component={SiddhiApplications}/>
+                                <Route exact path='/sources' component={Sources}/>
+                                <Route exact path='/sinks' component={Sinks}/>
+                                <Route exact path='/queries' component={Queries}/>
+                                <Route exact path='/stores' component={Stores}/>
+                                <Route exact path='/windows' component={Windows}/>
+                                <Route exact path='/aggregations' component={Aggregations}/>
                             </Switch>
                         </Content>
                     </main>

@@ -36,9 +36,9 @@ loader.config({
  });
 
 export default function SourceViewSection(props) {
-    const {artifactType, artifactName, nodeId, designContent} = props;
+    const {artifactType, artifactName, nodeId, designContent, source: propSource, isXml } = props;
     const globalGroupId = useSelector(state => state.groupId);
-    const [source, setSource] = React.useState(null);
+    const [source, setSource] = React.useState(propSource || null);
     const hasSource = source !== null;
     const [selectedTab, setSelectedTab] = React.useState(0);
 
@@ -52,10 +52,12 @@ export default function SourceViewSection(props) {
     const [open] = React.useState(false);
 
     React.useEffect(() => {
-        HTTPClient.getConfiguration(params).then(response => {
-            setSource(response.data.configuration);
-        })
-    }, [])
+        if (!propSource) {
+            HTTPClient.getConfiguration(params).then(response => {
+                setSource(response.data.configuration);
+            })
+        }
+    }, [propSource])
 
     const descriptionElementRef = React.useRef(null);
     React.useEffect(() => {
@@ -82,8 +84,8 @@ export default function SourceViewSection(props) {
             {selectedTab === 1 && (<Box p={5} overflow='auto'>
                 <Editor
                     height="70vh"
-                    defaultLanguage="xml"
-                    defaultValue={format(source || "")}
+                    defaultLanguage={isXml == null || isXml ? "xml" : "sql"}
+                    defaultValue={isXml == null || isXml ? format(source || "") : source || ""}
                     options={{
                         readOnly: true
                     }}
