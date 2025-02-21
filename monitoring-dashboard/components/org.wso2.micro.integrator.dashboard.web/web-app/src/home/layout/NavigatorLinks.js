@@ -16,6 +16,12 @@ import LogFileIcon from '@material-ui/icons/Description';
 import LayersIcon from '@material-ui/icons/Layers';
 import DnsIcon from '@material-ui/icons/Dns';
 import RegistryIcon from '@material-ui/icons/Receipt';
+import FunctionsIcon from '@material-ui/icons/Functions';
+import StorageIcon from '@material-ui/icons/Storage';
+import ViewModuleIcon from '@material-ui/icons/ViewModule';
+import TimelineIcon from '@material-ui/icons/Timeline';
+import InputIcon from '@material-ui/icons/GetApp';
+import OutputIcon from '@material-ui/icons/Publish'; 
 
 export const miCategories = [
     {
@@ -59,6 +65,22 @@ export const balCategories = [
   }
 ];
 
+export const siCategories = [
+  {
+    id: 'General',
+    children: [
+      { id: 'Siddhi Applications', to: '/siddhi-applications', icon: <CappIcon /> },
+      { id: 'Sources', to: '/sources', icon: <InputIcon /> },
+      { id: 'Sinks', to: '/sinks', icon: <OutputIcon /> },
+      { id: 'Queries', to: '/queries', icon: <FunctionsIcon /> },
+      { id: 'Stores', to: '/stores', icon: <StorageIcon /> },
+      { id: 'Windows', to: '/windows', icon: <ViewModuleIcon /> },
+      { id: 'Aggregations', to: '/aggregations', icon: <TimelineIcon /> },
+      { id: 'Log Files', to: '/log-files', icon: <LogFileIcon /> }
+    ]
+  }
+];
+
  const nonDisplayItems = [ 
    {id: 'Add Users', to: '/users/add' }, 
    {id: 'Add Roles', to: '/roles/add' }, 
@@ -75,6 +97,9 @@ export const balCategories = [
       balCategories.map((cat) => {
           allChildren = [...allChildren, ...cat.children];
       })
+      siCategories.map((cat) => {
+        allChildren = [...allChildren, ...cat.children];
+    })
       let selected = allChildren.find(child => child.to === route);
       if (selected === undefined) {
           selected = nonDisplayItems.find(item => item.to === route);

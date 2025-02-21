@@ -11,7 +11,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Link as MUILink } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
-import { miCategories, balCategories } from './NavigatorLinks';
+import { miCategories, balCategories, siCategories } from './NavigatorLinks';
 import { currentGroupSelector } from '../../redux/Actions';
 import AuthManager from "../../auth/AuthManager";
 import { useSelector } from 'react-redux';
@@ -85,6 +85,8 @@ function Navigator(props) {
     const getCategories = () => {
         if (selectedType === 'bal') {
             return balCategories;
+        } else if (selectedType === 'si') {
+            return siCategories;
         }
         const userScope = AuthManager.getUser().scope;
         if(userScope !== "admin"){

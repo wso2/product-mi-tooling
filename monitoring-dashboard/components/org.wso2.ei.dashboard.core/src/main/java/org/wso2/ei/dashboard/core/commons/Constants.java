@@ -52,6 +52,13 @@ public final class Constants {
     public static final String ROLES = "roles";
     public static final String SERVICES = "services";
     public static final String LISTENERS = "listeners";
+    public static final String SIDDHI_APPLICATIONS = "siddhi-applications";
+    public static final String SOURCES = "sources";
+    public static final String SINKS = "sinks";
+    public static final String QUERIES = "queries";
+    public static final String STORES = "stores";
+    public static final String WINDOWS = "windows"; 
+    public static final String AGGREGATIONS = "aggregations";
     public static final String DOMAIN_SEPARATOR = "/";
 
     public static final String SUCCESS_STATUS = "success";
