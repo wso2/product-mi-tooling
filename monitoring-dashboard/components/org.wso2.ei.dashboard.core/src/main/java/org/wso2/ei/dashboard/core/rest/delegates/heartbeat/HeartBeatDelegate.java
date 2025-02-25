@@ -155,7 +155,7 @@ public class HeartBeatDelegate {
             ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
             artifactsManager.runDeleteAllExecutorService();
         } catch (DashboardServerException e) {
-            throw new DashboardServerException("Error occurred while deleting all the nodes: ");
+            throw new DashboardServerException("Error occurred while deleting all the nodes: " + e.getMessage());
         }
     }
 
