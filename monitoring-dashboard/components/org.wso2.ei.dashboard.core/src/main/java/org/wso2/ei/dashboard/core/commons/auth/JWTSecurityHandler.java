@@ -61,7 +61,7 @@ public class JWTSecurityHandler implements SecurityHandler {
             validator.validate(null);
             return true;
         } catch (DashboardServerException | ParseException | SSOAgentServerException e) {
-                logger.error("Error validating the access token", e);
+            logger.error("Error validating the access token", e);
         }
         return false;
     }
