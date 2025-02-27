@@ -72,9 +72,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager implements Us
                         + jdbcds.hashCode());
             }
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Loading JDBC datasource failed", e);
-            }
+            log.debug("Loading JDBC datasource failed", e);
         }
 
         dataSource = (DataSource) properties.get(UserStoreConstants.DATA_SOURCE);

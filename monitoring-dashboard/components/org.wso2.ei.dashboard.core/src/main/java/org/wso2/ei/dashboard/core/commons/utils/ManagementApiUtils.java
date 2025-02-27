@@ -25,6 +25,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
+import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class ManagementApiUtils {
 
     private static final DataManager DATA_MANAGER = DataManagerSingleton.getDataManager();
 
-    public static String getMgtApiUrl(String groupId, String nodeId) {
+    public static String getMgtApiUrl(String groupId, String nodeId) throws ManagementApiException {
         return DATA_MANAGER.getMgtApiUrl(groupId, nodeId);
     }
 
@@ -53,6 +54,8 @@ public class ManagementApiUtils {
 
     public static String getToken(String mgtApiUrl, String username, String password) throws ManagementApiException {
         String usernamePassword = username + ":" + password;
+        System.out.println(username);
+        System.out.println(password);
         String encodedUsernamePassword = Base64.getEncoder().encodeToString(usernamePassword.getBytes());
         String loginUrl = mgtApiUrl + "login";
 
@@ -74,7 +77,7 @@ public class ManagementApiUtils {
                 throw new ManagementApiException
                         ("Error occurred while retrieving access token from management api.", 500);
             }
-        } catch (IOException e) {
+        } catch (IOException | DashboardServerException e) {
             throw new ManagementApiException("Error occurred while retrieving access token from management api.", 500);
         }
     }

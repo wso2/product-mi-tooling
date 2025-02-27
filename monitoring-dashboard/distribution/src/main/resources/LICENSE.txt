@@ -27,7 +27,7 @@ jetty-io-9.4.54.v20240208.jar                                                   
 jetty-util-9.4.54.v20240208.jar                                                                     bundle         apache2             
 axiom-1.2.11-wso2v17.jar                                                                            bundle         apache2             
 jinjava-2.6.0.jar                                                                                   jar            apache2             
-io.asgardeo.java.oidc.sdk-0.1.13.jar                                                                jar            apache2             
+io.asgardeo.java.oidc.sdk-0.1.27.jar                                                                jar            apache2
 slf4j-api-1.7.36.jar                                                                                bundle         mit                 
 org.wso2.ei.dashboard.bootstrap-1.0.0.jar                                                           bundle         apache2             
 jetty-servlet-9.4.54.v20240208.jar                                                                  bundle         apache2             

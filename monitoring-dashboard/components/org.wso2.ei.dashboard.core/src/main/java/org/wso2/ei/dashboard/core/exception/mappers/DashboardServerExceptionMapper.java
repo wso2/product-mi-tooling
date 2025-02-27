@@ -40,7 +40,7 @@ public class DashboardServerExceptionMapper implements ExceptionMapper<Managemen
     @Override
     public Response toResponse(ManagementApiException error) {
 
-        logger.debug("Error: ", error);
+        logger.error("Error: ", error);
         String errorMessage = error.getMessage();
         switch (error.getErrorCode()) {
             case 400: {

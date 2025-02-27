@@ -75,7 +75,7 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
                 logger.error("Error validating the token using introspection endpoint. ",
                         httpResponse.getStatusLine().getReasonPhrase());
             }
-        } catch (IOException e) {
+        } catch (IOException | DashboardServerException e) {
             logger.error("Error validating the token using introspection endpoint. ", e);
         }
         return false;
@@ -142,7 +142,7 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
             throw new DashboardServerException("Cannot find " + Constants.USERINFO_URI + " in well known endpoint " +
                     "response. " +
                     httpResponse.getStatusLine().getReasonPhrase());
-        } catch (IOException e) {
+        } catch (IOException| DashboardServerException e) {
             throw new DashboardServerException("Error while retrieving userinfo endpoint"
                     + " from well known endpoint. ", e);
         }
@@ -164,7 +164,7 @@ public class OpaqueTokenSecurityHandler implements SecurityHandler {
                     + "response. " +
                     httpResponse.getStatusLine().getReasonPhrase());
 
-        } catch (IOException e) {
+        } catch (IOException | DashboardServerException e) {
             throw new DashboardServerException("Error while retrieving introspection endpoint"
                     + " from well known endpoint. ", e);
         }
