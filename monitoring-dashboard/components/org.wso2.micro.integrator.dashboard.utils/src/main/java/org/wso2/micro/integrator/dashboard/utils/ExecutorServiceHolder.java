@@ -27,6 +27,7 @@ public class ExecutorServiceHolder {
     private static final int heartbeatPoolSize = Integer.parseInt(System.getProperty(Constants.HEARTBEAT_POOL_SIZE));
     private static ExecutorService miArtifactsManagerExecutorService = Executors.newFixedThreadPool(heartbeatPoolSize);
     private static ExecutorService balArtifactsManagerExecutorService = Executors.newFixedThreadPool(heartbeatPoolSize);
+    private static ExecutorService siArtifactsManagerExecutorService = Executors.newFixedThreadPool(heartbeatPoolSize);
 
     private ExecutorServiceHolder() {
     }
@@ -37,5 +38,9 @@ public class ExecutorServiceHolder {
 
     public static ExecutorService getBalArtifactsManagerExecutorService() {
         return balArtifactsManagerExecutorService;
+    }
+
+    public static ExecutorService getSiArtifactsManagerExecutorService() {
+        return siArtifactsManagerExecutorService;
     }
 }
