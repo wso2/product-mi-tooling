@@ -67,7 +67,7 @@ function SiddhiApplicationDetailTable(props) {
         </TableRow>
         <TableRow>
             <TableCell>Age</TableCell>
-            <TableCell>{nodeData.details.age}</TableCell>
+            <TableCell>{nodeData.details.age}s</TableCell>
         </TableRow>
         <TableRow>
             <TableCell>Stats Enabled</TableCell>

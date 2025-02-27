@@ -26,7 +26,7 @@ export default function Queries() {
         pageId: "queries",
         title: "Queries",
         headCells: [
-            {id: 'name', label: 'Stream Name'},
+            {id: 'name', label: 'Query Name'},
             {id: 'appName', label: 'Application Name'},
             {id: 'nodes', label: 'Nodes'},
             {id: 'si_artifact_status', label: 'Enabled / Disabled'}
