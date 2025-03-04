@@ -14,8 +14,6 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *
- *
  */
 
 package org.wso2.ei.dashboard.core.commons;
@@ -26,7 +24,6 @@ package org.wso2.ei.dashboard.core.commons;
 public final class Constants {
 
     private Constants() {
-
     }
 
     public static final String PROXY_SERVICES = "proxy-services";
@@ -69,11 +66,7 @@ public final class Constants {
     public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
-    public static final String DASHBOARD_HOME = System.getProperty("dashboard.home");
-    public static final String HEARTBEAT_POOL_SIZE = System.getProperty("heartbeat_pool_size");
-
     public static final String EMPTY_STRING = "";
-    public static final String LIST_ATTRIBUTE = "list";
 
     public static final int TOKEN_CACHE_TIMEOUT = 60;
 
@@ -92,11 +85,14 @@ public final class Constants {
     public static final String COOKIE_HEADER = "SET-COOKIE";
 
     public static final String INTERNAL_EVERYONE = "Internal/everyone";
-    public static final String DEFAULT_LIST_KEY = "list";
 
     public static final String LOGIN_ERROR = "Error occurred while logging in to the dashboard.";
 
+    public static final String IS_ADMIN = "isAdmin";
+    public static final String USER_ID = "userId";
+
     public enum Product {
-        MI, BAL
+        MI,
+        BAL
     }
 }
