@@ -34,8 +34,9 @@ import org.wso2.ei.dashboard.core.exception.ManagementApiException;
 import org.wso2.ei.dashboard.core.rest.annotation.Secured;
 import org.wso2.ei.dashboard.core.rest.delegates.groups.GroupDelegate;
 import org.wso2.ei.dashboard.core.rest.delegates.nodes.NodesDelegate;
-import org.wso2.ei.dashboard.core.rest.model.Error;
 import org.wso2.ei.dashboard.core.rest.model.*;
+
+import org.wso2.ei.dashboard.micro.integrator.delegates.AggregationsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ApisDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.CarbonAppsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ConnectorsDelegate;
@@ -50,13 +51,19 @@ import org.wso2.ei.dashboard.micro.integrator.delegates.LogsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageProcessorsDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.MessageStoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ProxyServiceDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.QueriesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.RegistryResourceDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.RolesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.SequencesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.ServicesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.SiddhiAppsDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.SinksDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.SourcesDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.StoresDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TasksDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.TemplatesDelegate;
 import org.wso2.ei.dashboard.micro.integrator.delegates.UsersDelegate;
+import org.wso2.ei.dashboard.micro.integrator.delegates.WindowsDelegate;
 import org.wso2.micro.integrator.security.user.api.UserStoreException;
 
 import javax.validation.Valid;
@@ -577,6 +584,269 @@ public class GroupsApi {
         try {
             ArtifactsResourceResponse serviceList = listenersDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit, order, orderBy, isUpdate);
             responseBuilder = Response.ok().entity(serviceList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/siddhiapps")
+    @Produces({"application/json"})
+    @Operation(summary = "Get Siddhi apps by node ids", description = "", tags = {"siddhi-apps"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of Siddhi apps deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getSiddhiAppsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+        SiddhiAppsDelegate siddhiAppsDelegate = new SiddhiAppsDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get Siddhi apps");
+        try {
+            ArtifactsResourceResponse siddhiAppsList =
+                    siddhiAppsDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit,
+                            order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(siddhiAppsList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @PATCH
+    @Path("/{group-id}/siddhiapps")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    @Operation(summary = "Update Siddhi app active status", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Siddhi app active status updated",
+                    content = @Content(schema = @Schema(implementation = SuccessStatus.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Ack updateSiddhiApp(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @Valid ArtifactUpdateRequest request) throws ManagementApiException {
+        SiddhiAppsDelegate siddhiAppsDelegate = new SiddhiAppsDelegate();
+        return siddhiAppsDelegate.updateArtifact(groupId, request);
+    }
+
+    @GET
+    @Path("/{group-id}/sources")
+    @Produces({"application/json"})
+    @Operation(summary = "Get sources by node ids", description = "", tags = {"sources"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of sources deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getSourcesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+        SourcesDelegate sourcesDelegate = new SourcesDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get sources");
+        try {
+            ArtifactsResourceResponse sourcesList =
+                    sourcesDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit,
+                            order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(sourcesList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/sinks")
+    @Produces({"application/json"})
+    @Operation(summary = "Get sinks by node ids", description = "", tags = {"sinks"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of sinks deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getSinksByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+        SinksDelegate sinksDelegate = new SinksDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get sinks");
+        try {
+            ArtifactsResourceResponse sinkList =
+                    sinksDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit,
+                            order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(sinkList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/queries")
+    @Produces({"application/json"})
+    @Operation(summary = "Get queries by node ids", description = "", tags = {"queries"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of queries deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getQueriesByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+        QueriesDelegate queryDelegate = new QueriesDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get queries");
+        try {
+            ArtifactsResourceResponse queriesList =
+                    queryDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit,
+                            order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(queriesList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/stores")
+    @Produces({"application/json"})
+    @Operation(summary = "Get stores by node ids", description = "", tags = {"stores"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of stores deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getStoresByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+        StoresDelegate storesDelegate = new StoresDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get stores");
+        try {
+            ArtifactsResourceResponse storesList =
+                    storesDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit,
+                            order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(storesList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/windows")
+    @Produces({"application/json"})
+    @Operation(summary = "Get windows by node ids", description = "", tags = {"windows"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of aggregations deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getWindowsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+        WindowsDelegate windowsDelegate = new WindowsDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get windows");
+        try {
+            ArtifactsResourceResponse aggregationsList =
+                    windowsDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit, upperLimit,
+                            order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(aggregationsList);
+        } catch (ManagementApiException e) {
+            responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
+        }
+        HttpUtils.setHeaders(responseBuilder);
+        return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/{group-id}/aggregations")
+    @Produces({"application/json"})
+    @Operation(summary = "Get aggregations by node ids", description = "", tags = {"aggregations"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of aggregations deployed in provided nodes",
+                    content = @Content(schema = @Schema(implementation = ArtifactsResourceResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Unexpected error",
+                    content = @Content(schema = @Schema(implementation = Error.class)))
+    })
+    public Response getAggregationsByNodeIds(
+            @PathParam("group-id") @Parameter(description = "Group ID of the node") String groupId,
+            @NotNull @QueryParam("nodes") @Parameter(description = "ID/IDs of the nodes") List<String> nodes,
+            @QueryParam("searchKey") @Parameter(description = "Search key") String searchKey,
+            @NotNull @QueryParam("lowerLimit") @Parameter(description = "Lower Limit") String lowerLimit,
+            @NotNull @QueryParam("upperLimit") @Parameter(description = "Upper Limit") String upperLimit,
+            @QueryParam("order") @Parameter(description = "Order") String order,
+            @QueryParam("orderBy") @Parameter(description = "Order By") String orderBy,
+            @QueryParam("isUpdate") @Parameter(description = "Whether it is an update") String isUpdate
+    ) {
+        AggregationsDelegate aggregationsDelegate = new AggregationsDelegate();
+        Response.ResponseBuilder responseBuilder;
+        logger.debug("Invoking the Groups API to get aggregations");
+        try {
+            ArtifactsResourceResponse aggregationsList =
+                    aggregationsDelegate.getPaginatedArtifactsResponse(groupId, nodes, searchKey, lowerLimit,
+                            upperLimit, order, orderBy, isUpdate);
+            responseBuilder = Response.ok().entity(aggregationsList);
         } catch (ManagementApiException e) {
             responseBuilder = Response.status(e.getErrorCode()).entity(getError(e));
         }
@@ -1388,4 +1658,3 @@ public class GroupsApi {
         return sequencesDelegate.updateArtifact(groupId, request);
     }
 }
-

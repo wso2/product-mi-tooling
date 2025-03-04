@@ -79,8 +79,13 @@ public class DelegatesUtil {
                 String artifactName = artifact.get("name").getAsString();
                 ArtifactDetails artifactDetails;
 
+                boolean isSIArtifact = isSIArtifact(artifactType);
                 if (artifactType.equals(Constants.CARBON_APPLICATIONS)) {
                     artifactDetails = getArtifactDetails(nodeId, artifact);
+                } else if (isSIArtifact) {
+                    artifactDetails = new ArtifactDetails();
+                    artifactDetails.setNodeId(nodeId);
+                    artifactDetails.setDetails(artifact.get("details").toString());
                 } else {
                     String artifactDetailsUrl = Utils.getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
                     if (artifactType.equals(Constants.TEMPLATES)) {
@@ -93,13 +98,15 @@ public class DelegatesUtil {
                 }
 
                 AtomicBoolean isRecordExist = new AtomicBoolean(false);
-                ArtifactDetails finalArtifactDetails = artifactDetails;
-                artifacts.stream().filter(o -> o.getName().equals(artifactName)).forEach(
-                        o -> {
-                            o.getNodes().add(finalArtifactDetails);
-                            isRecordExist.set(true);
-                        });
-                if (!isRecordExist.get()) {
+                if (!isSIArtifact) {
+                    ArtifactDetails finalArtifactDetails = artifactDetails;
+                    artifacts.stream().filter(o -> o.getName().equals(artifactName)).forEach(
+                            o -> {
+                                o.getNodes().add(finalArtifactDetails);
+                                isRecordExist.set(true);
+                            });
+                }
+                if (!isRecordExist.get() || isSIArtifact) {
                     ArtifactsInner artifactsInner = new ArtifactsInner();
                     artifactsInner.setName(artifactName);
 
@@ -109,6 +116,7 @@ public class DelegatesUtil {
 
                     artifacts.add(artifactsInner);
                 }
+
             }
         }
 
@@ -289,5 +297,12 @@ public class DelegatesUtil {
     public static boolean isIcpManagement(String groupId) {
         String getIcpServerName = (String) ConfigParser.getParsedConfigs().getOrDefault(ICP_SERVER_NAME_CONFIG, ICP_DEFAULT_NAME);
         return getIcpServerName.equals(groupId);
+    }
+  
+    private static boolean isSIArtifact(String artifactType) {
+        return artifactType.equals(Constants.SOURCES) || artifactType.equals(Constants.SINKS) ||
+                artifactType.equals(Constants.QUERIES) || artifactType.equals(Constants.SIDDHI_APPLICATIONS) ||
+                artifactType.equals(Constants.WINDOWS) || artifactType.equals(Constants.AGGREGATIONS) ||
+                artifactType.equals(Constants.STORES);
     }
 }

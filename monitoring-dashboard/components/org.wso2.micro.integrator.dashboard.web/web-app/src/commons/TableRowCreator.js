@@ -129,7 +129,8 @@ export default function TableRowCreator(props) {
 
             case 'connector_status':
                 return <TableCell><table>{data.nodes.map(node=><ConnectorStatus status={node.details.status} />)}</table></TableCell>
-
+            case 'si_artifact_status':
+                return <TableCell><table>{data.nodes.map(node=><SiArtifactStatus status={node.details.status} />)}</table></TableCell>
             case 'capp_status':
                 return <TableCell><table>{data.nodes.map(node=><StatusIcon status={node.details.status} />)}</table></TableCell>
 
@@ -217,6 +218,14 @@ function ConnectorStatus(props) {
     return (
         <tr>
             {props.status === 'enabled' ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}
+        </tr>
+    )
+}
+
+function SiArtifactStatus(props) {
+    return (
+        <tr>
+            {props.status === 'Enabled' ? <EnabledIcon style={{color:"green"}}/> : <DisabledIcon style={{color:"red"}}/>}
         </tr>
     )
 }

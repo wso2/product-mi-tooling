@@ -46,6 +46,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
 import org.wso2.ei.dashboard.core.exception.ManagementApiException;
@@ -70,6 +72,7 @@ public class HttpUtils {
     private static volatile CloseableHttpClient httpClientInstance = null;
     private static PoolingHttpClientConnectionManager clientConnectionManager;
     private static final Lock lock = new ReentrantLock();
+    private static final Logger logger = LogManager.getLogger(HttpUtils.class);
 
     private HttpUtils() {
     }
@@ -109,8 +112,24 @@ public class HttpUtils {
         CloseableHttpClient httpClient = getHttpClient();
         try {
             return httpClient.execute(httpGet);
-        } catch (IOException e) {
-            throw new DashboardServerException("Error occurred while sending get http request.", e);
+        } catch (Throwable e) {
+            // Using the same lock object to avoid multiple clients being created.
+            // Also, this is ok since the lock is a reentrant lock, and it supports multiple lock calls with same
+            // thread.
+            lock.lock();
+            try {
+                return getHttpClient().execute(httpGet);
+            } catch (Throwable ex) {
+                handleConnectionError(ex);
+                httpClient = getHttpClient();
+                try {
+                    return httpClient.execute(httpGet);
+                } catch (Throwable exception) {
+                    throw new DashboardServerException("Retry with new client failed due to: ", ex);
+                }
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -207,8 +226,24 @@ public class HttpUtils {
         CloseableHttpClient httpClient = getHttpClient();
         try {
             return httpClient.execute(httpPost);
-        } catch (IOException e) {
-            throw new DashboardServerException("Error occurred while sending http post request.", e);
+        } catch (Throwable e) {
+            // Using the same lock object to avoid multiple clients being created.
+            // Also, this is ok since the lock is a reentrant lock, and it supports multiple lock calls with same
+            // thread.
+            lock.lock();
+            try {
+                return getHttpClient().execute(httpPost);
+            } catch (Throwable ex) {
+                handleConnectionError(ex);
+                httpClient = getHttpClient();
+                try {
+                    return httpClient.execute(httpPost);
+                } catch (Throwable exception) {
+                    throw new DashboardServerException("Retry with new client failed due to: ", ex);
+                }
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -216,8 +251,24 @@ public class HttpUtils {
         CloseableHttpClient httpClient = getHttpClient();
         try {
             return httpClient.execute(httpPatch);
-        } catch (IOException e) {
-            throw new DashboardServerException("Error occurred while sending http patch request.", e);
+        } catch (Throwable e) {
+            // Using the same lock object to avoid multiple clients being created.
+            // Also, this is ok since the lock is a reentrant lock, and it supports multiple lock calls with same
+            // thread.
+            lock.lock();
+            try {
+                return getHttpClient().execute(httpPatch);
+            } catch (Throwable ex) {
+                handleConnectionError(ex);
+                httpClient = getHttpClient();
+                try {
+                    return httpClient.execute(httpPatch);
+                } catch (Throwable exception) {
+                    throw new DashboardServerException("Retry with new client failed due to: ", ex);
+                }
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -225,8 +276,24 @@ public class HttpUtils {
         CloseableHttpClient httpClient = getHttpClient();
         try {
             return httpClient.execute(httpPut);
-        } catch (IOException e) {
-            throw new DashboardServerException("Error occurred while sending http put request.", e);
+        } catch (Throwable e) {
+            // Using the same lock object to avoid multiple clients being created.
+            // Also, this is ok since the lock is a reentrant lock, and it supports multiple lock calls with same
+            // thread.
+            lock.lock();
+            try {
+                return getHttpClient().execute(httpPut);
+            } catch (Throwable ex) {
+                handleConnectionError(ex);
+                httpClient = getHttpClient();
+                try {
+                    return httpClient.execute(httpPut);
+                } catch (Throwable exception) {
+                    throw new DashboardServerException("Retry with new client failed due to: ", ex);
+                }
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -234,8 +301,24 @@ public class HttpUtils {
         CloseableHttpClient httpClient = getHttpClient();
         try {
             return httpClient.execute(httpDelete);
-        } catch (IOException e) {
-            throw new DashboardServerException("Error occurred while sending delete http request.", e);
+        } catch (Throwable e) {
+            // Using the same lock object to avoid multiple clients being created.
+            // Also, this is ok since the lock is a reentrant lock, and it supports multiple lock calls with same
+            // thread.
+            lock.lock();
+            try {
+                return getHttpClient().execute(httpDelete);
+            } catch (Throwable ex) {
+                handleConnectionError(ex);
+                httpClient = getHttpClient();
+                try {
+                    return httpClient.execute(httpDelete);
+                } catch (Throwable exception) {
+                    throw new DashboardServerException("Retry with new client failed due to: ", ex);
+                }
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -269,7 +352,7 @@ public class HttpUtils {
                                     .build();
                     new ConnectionManagerCleanup(clientConnectionManager).start();
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 throw new DashboardServerException("Error occurred while creating http client.", e);
             } finally {
                 lock.unlock();
@@ -277,6 +360,48 @@ public class HttpUtils {
         }
         return httpClientInstance;
     }
+
+    /**
+     * Handle connection error by closing the existing connection manager and the old HttpClient instance.
+     */
+    public static void handleConnectionError(Throwable e) {
+        CloseableHttpClient oldHttpClientInstance = null;
+        PoolingHttpClientConnectionManager localClientConnectionManager = null;
+        try {
+            logger.error("HTTP request failed due to an error: ", e);
+            // Save the reference to the old instance
+            oldHttpClientInstance = httpClientInstance;
+            localClientConnectionManager = clientConnectionManager;
+
+            // Set the shared instance to null to prevent new connections from using it. Soon after this the new
+            // requests will create a new HttpClient instance. Also, in that process it will create new instance of
+            // connection manager. That is why we need to keep reference to old connection manager and close it
+            // gracefully.
+            httpClientInstance = null;
+
+            // Close the connection manager if it exists gracefully
+            logger.warn("Closing the existing connection manager and the HttpClient instance.");
+            if (localClientConnectionManager != null) {
+                try {
+                    localClientConnectionManager.close();
+                } catch (Exception ex) {
+                    //ignore
+                }
+            }
+
+            // Close the old HttpClient instance
+            if (oldHttpClientInstance != null) {
+                try {
+                    oldHttpClientInstance.close();
+                } catch (Exception ex) {
+                    //ignore
+                }
+            }
+        } catch (Exception ex) {
+            //Ignore
+        }
+    }
+
 
     /**
      * This class is used to clean up expired and idle connections.
