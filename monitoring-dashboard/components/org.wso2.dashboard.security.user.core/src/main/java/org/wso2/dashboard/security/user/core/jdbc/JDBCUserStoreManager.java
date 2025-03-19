@@ -132,7 +132,7 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager {
             properties.put(UserStoreConstants.DATA_SOURCE, jdbcDataSource);
             logDebug("The jdbcDataSource being used by JDBCUserStoreManager :: " + jdbcDataSource.hashCode());
         } catch (Exception e) {
-            log.error("Loading JDBC datasource failed", e);
+            log.error("Failed to load JDBC datasource", e);
         }
         dataSource = (DataSource) properties.get(UserStoreConstants.DATA_SOURCE);
         if (dataSource == null) {
