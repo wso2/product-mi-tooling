@@ -73,7 +73,7 @@ public class HeartBeatDelegate {
             }
             return ack;
         } catch (DashboardServerException e) {
-            throw new ManagementApiException (e.getMessage(), 404);
+            throw new ManagementApiException (e.getMessage(), 404, e.getCause());
         }
     }
 
@@ -91,7 +91,7 @@ public class HeartBeatDelegate {
         try {
             return dataManager.updateHeartbeat(heartbeat);
         } catch (DashboardServerException e) {
-            throw new ManagementApiException (e.getMessage(), 500);
+            throw new ManagementApiException (e.getMessage(), 500, e.getCause());
         }
     }
 
@@ -122,7 +122,7 @@ public class HeartBeatDelegate {
                     heartbeatInterval, 3 * heartbeatInterval, TimeUnit.SECONDS);
             return dataManager.insertHeartbeat(heartbeat, accessToken);
         } catch (DashboardServerException e) {
-            throw new ManagementApiException (e.getMessage(), 500);
+            throw new ManagementApiException (e.getMessage(), 500, e.getCause());
         }
     }
 
@@ -144,7 +144,7 @@ public class HeartBeatDelegate {
             }
         } catch (DashboardServerException e) {
             throw new DashboardServerException("Error occurred while deleting node where group_id : "
-                    + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId() + ".");
+                    + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId() + ".", e.getCause());
         }
     }
 
@@ -155,7 +155,8 @@ public class HeartBeatDelegate {
             ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
             artifactsManager.runDeleteAllExecutorService();
         } catch (DashboardServerException e) {
-            throw new DashboardServerException("Error occurred while deleting all the nodes: " + e.getMessage());
+            throw new DashboardServerException("Error occurred while deleting all the nodes: " + e.getMessage(),
+                    e.getCause());
         }
     }
 
