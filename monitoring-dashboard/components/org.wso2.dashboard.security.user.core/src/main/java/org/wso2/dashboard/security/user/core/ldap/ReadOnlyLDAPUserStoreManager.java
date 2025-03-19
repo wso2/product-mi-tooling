@@ -120,7 +120,7 @@ public class ReadOnlyLDAPUserStoreManager extends AbstractUserStoreManager {
             this.dataSource = DatabaseUtil.getRealmDataSource(realmConfig);
         } catch (Exception ex) {
             // datasource is not configured
-            log.error("Datasource is not configured for LDAP user store: " + ex.getMessage());
+            log.error("Datasource is not configured for LDAP user store: ", ex);
         }
     }
 
