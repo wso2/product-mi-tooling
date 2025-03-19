@@ -84,7 +84,7 @@ export default function EnhancedTable(props) {
                     response.data.resourceList.map(data => data.details = JSON.parse(data.details))
                     setData(response.data.resourceList)
                     setRowCount(response.data.count)
-                    dispatch(setIsRefreshed(false))
+                    dispatch(setIsRefreshed(true))
             }).catch(error => {
                 setError(error.response.data);
                 console.log(error.response.data.message);

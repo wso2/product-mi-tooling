@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.wso2.config.mapper.ConfigParser;
 import org.wso2.ei.dashboard.core.commons.Constants;
 import org.wso2.ei.dashboard.core.commons.utils.HttpUtils;
 import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
@@ -19,6 +20,7 @@ import org.wso2.ei.dashboard.core.rest.model.ArtifactUpdateRequest;
 import org.wso2.ei.dashboard.core.rest.model.Artifacts;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactsInner;
 import org.wso2.ei.dashboard.core.rest.model.ArtifactsResourceResponse;
+import org.wso2.ei.dashboard.micro.integrator.delegates.UsersDelegate;
 
 import java.io.IOException;
 
@@ -36,19 +38,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DelegatesUtil {
     private static final DataManager DATA_MANAGER = DataManagerSingleton.getDataManager();
-
+    private static final String ICP_DEFAULT_NAME = "Integration Control Plane";
+    private static final String ICP_SERVER_NAME_CONFIG = "server_config.name";
     private static final Logger logger = LogManager.getLogger(DelegatesUtil.class);
 
-    private static List<ArtifactsInner> searchedArtifacts;
     private static String prevResourceType = null;
-    private static int count;
 
     private DelegatesUtil() {
-
-    }
-
-    public static int getNodesCount (String groupId) {
-        return DATA_MANAGER.fetchNodes(groupId).size();
     }
 
     public static int getArtifactCount(List<ArtifactsInner> artifacts) {
@@ -84,8 +80,13 @@ public class DelegatesUtil {
                 String artifactName = artifact.get("name").getAsString();
                 ArtifactDetails artifactDetails;
 
+                boolean isSIArtifact = isSIArtifact(artifactType);
                 if (artifactType.equals(Constants.CARBON_APPLICATIONS)) {
                     artifactDetails = getArtifactDetails(nodeId, artifact);
+                } else if (isSIArtifact) {
+                    artifactDetails = new ArtifactDetails();
+                    artifactDetails.setNodeId(nodeId);
+                    artifactDetails.setDetails(artifact.get("details").toString());
                 } else {
                     String artifactDetailsUrl = Utils.getArtifactDetailsUrl(mgtApiUrl, artifactType, artifactName);
                     if (artifactType.equals(Constants.TEMPLATES)) {
@@ -98,13 +99,15 @@ public class DelegatesUtil {
                 }
 
                 AtomicBoolean isRecordExist = new AtomicBoolean(false);
-                ArtifactDetails finalArtifactDetails = artifactDetails;
-                artifacts.stream().filter(o -> o.getName().equals(artifactName)).forEach(
-                        o -> {
-                            o.getNodes().add(finalArtifactDetails);
-                            isRecordExist.set(true);
-                        });
-                if (!isRecordExist.get()) {
+                if (!isSIArtifact) {
+                    ArtifactDetails finalArtifactDetails = artifactDetails;
+                    artifacts.stream().filter(o -> o.getName().equals(artifactName)).forEach(
+                            o -> {
+                                o.getNodes().add(finalArtifactDetails);
+                                isRecordExist.set(true);
+                            });
+                }
+                if (!isRecordExist.get() || isSIArtifact) {
                     ArtifactsInner artifactsInner = new ArtifactsInner();
                     artifactsInner.setName(artifactName);
 
@@ -114,15 +117,14 @@ public class DelegatesUtil {
 
                     artifacts.add(artifactsInner);
                 }
+
             }
         }
 
         //ordering
         Comparator<ArtifactsInner> comparatorObject;
-        switch (orderBy.toLowerCase()) {
-            //for any other ordering options
-            default: comparatorObject = Comparator.comparing(ArtifactsInner::getNameIgnoreCase); break;
-        }
+        //for any other ordering options
+        comparatorObject = Comparator.comparing(ArtifactsInner::getNameIgnoreCase);
         if ("desc".equalsIgnoreCase(order)) {
             Collections.sort(artifacts, comparatorObject.reversed());
         } else {
@@ -141,8 +143,8 @@ public class DelegatesUtil {
         boolean isUpdatedContent = Boolean.parseBoolean(isUpdate);
 
         ArtifactsResourceResponse artifactsResourceResponse = new ArtifactsResourceResponse();
-        searchedArtifacts = getSearchedArtifactsFromMI(groupId, nodeList, artifactType, searchKey, order, orderBy);
-        count = getArtifactCount(searchedArtifacts);
+        List<ArtifactsInner> searchedArtifacts = getSearchedArtifactsFromMI(groupId, nodeList, artifactType, searchKey, order, orderBy);
+        int count = getArtifactCount(searchedArtifacts);
         Artifacts paginatedList = getPaginationResults(searchedArtifacts, fromIndex, toIndex);
         artifactsResourceResponse.setResourceList(paginatedList);
         artifactsResourceResponse.setCount(count);
@@ -293,4 +295,15 @@ public class DelegatesUtil {
         prevResourceType = resourceType;
     }
 
+    public static boolean isIcpManagement(String groupId) {
+        String getIcpServerName = (String) ConfigParser.getParsedConfigs().getOrDefault(ICP_SERVER_NAME_CONFIG, ICP_DEFAULT_NAME);
+        return getIcpServerName.equals(groupId);
+    }
+  
+    private static boolean isSIArtifact(String artifactType) {
+        return artifactType.equals(Constants.SOURCES) || artifactType.equals(Constants.SINKS) ||
+                artifactType.equals(Constants.QUERIES) || artifactType.equals(Constants.SIDDHI_APPLICATIONS) ||
+                artifactType.equals(Constants.WINDOWS) || artifactType.equals(Constants.AGGREGATIONS) ||
+                artifactType.equals(Constants.STORES);
+    }
 }

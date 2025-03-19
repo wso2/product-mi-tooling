@@ -99,6 +99,8 @@ public class ConfigurationDelegate {
                 return "taskName";
             case Constants.DATA_SERVICES:
                 return "dataServiceName";
+            case Constants.SIDDHI_APPLICATIONS:
+                return "siddhiApp";
             default:
                 throw new DashboardServerException("Artifact type " + artifactType + " is invalid.");        }
     }

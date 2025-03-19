@@ -17,6 +17,10 @@ password = "admin"
 username = "bal_admin"
 password = "bal_secret"
 
+[si_service_account]
+username = "admin"
+password = "admin"
+
 [truststore]
 file_name = "conf/security/client-truststore.jks"
 password = "wso2carbon"

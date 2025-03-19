@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import static org.wso2.ei.dashboard.core.commons.Constants.JWT_COOKIE;
+import static org.wso2.ei.dashboard.core.commons.auth.JwtUtil.isJWTToken;
 
 /**
  * Authenticate the request coming to the rest api.
@@ -48,69 +49,75 @@ import static org.wso2.ei.dashboard.core.commons.Constants.JWT_COOKIE;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
-
     private static final String AUTHENTICATION_SCHEME = "Bearer";
-    private static final List<String> adminOnlyPaths = Arrays.asList("/log-configs",
-                                                                     "/users");
+    private static final List<String> ADMIN_ONLY_PATHS = Arrays.asList("/log-configs", "/users", "/roles");
     private static final String MAKE_NON_ADMIN_USERS_READ_ONLY = "make_non_admin_users_read_only";
+    private static final String ACTION_PERFORMED_BY = "performedBy";
 
     @Context
     private HttpServletRequest servletRequest;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-
-        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-        Map<String, Cookie> cookies = requestContext.getCookies();
-        String token;
-        SecurityHandler securityHandler;
-        Boolean makeNonAdminUsersReadOnly = Boolean.valueOf(System.getProperty(MAKE_NON_ADMIN_USERS_READ_ONLY));
         String httpMethod = requestContext.getMethod();
-
-        if (isTokenBasedAuthentication(authorizationHeader)) {
-            token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
-            securityHandler = getSSOSecurityHandler(token);
-        } else if (isCookieBasedAuthentication(cookies)) {
-            token = cookies.get(JWT_COOKIE).getValue();
-            securityHandler = new InMemorySecurityHandler();
-        } else {
+        String token = extractToken(requestContext);
+        SecurityHandler securityHandler = getSecurityHandler(requestContext, token);
+        if (token == null || securityHandler == null) {
             abortWithUnauthorized(requestContext);
             return;
         }
 
-        SSOConfig config = null;
-        if (servletRequest.getServletContext()
-                .getAttribute(SSOConstants.CONFIG_BEAN_NAME) instanceof SSOConfig) {
-            config = (SSOConfig) servletRequest.getServletContext().getAttribute(SSOConstants.CONFIG_BEAN_NAME);
-        }
-
+        SSOConfig config = getSsoConfig();
         if (!securityHandler.isAuthenticated(config, token)) {
             abortWithUnauthorized(requestContext);
+            return;
         }
 
+        boolean makeNonAdminUsersReadOnly = Boolean.parseBoolean(System.getProperty(MAKE_NON_ADMIN_USERS_READ_ONLY));
         if (isAdminResource(requestContext) && !securityHandler.isAuthorized(config, token)) {
             abortWithUnauthorized(requestContext);
-        } else if (!"GET".equalsIgnoreCase(httpMethod) && makeNonAdminUsersReadOnly &&
-                !securityHandler.isAuthorized(config, token)) {
+            return;
+        }
+        if (!"GET".equalsIgnoreCase(httpMethod) && makeNonAdminUsersReadOnly
+                && !securityHandler.isAuthorized(config, token)) {
             // For non-admin resources, request except GET are blocked
             // if the 'makeNonAdminUsersReadOnly' is set to 'true'
             abortWithUnauthorized(requestContext);
+            return;
         }
+        String performedBy = extractPerformedBy(token);
+        requestContext.setProperty(ACTION_PERFORMED_BY, performedBy);
+    }
+
+    private SSOConfig getSsoConfig() {
+        Object config = this.servletRequest.getServletContext().getAttribute(SSOConstants.CONFIG_BEAN_NAME);
+        return config instanceof SSOConfig ? (SSOConfig) config : null;
     }
 
     private static boolean isAdminResource(ContainerRequestContext requestContext) {
-
         String path = ((ContainerRequest) requestContext).getPath(false);
         String resource = path.substring(path.lastIndexOf("/"));
-        return adminOnlyPaths.contains(resource);
+        return ADMIN_ONLY_PATHS.contains(resource);
     }
 
-    private static SecurityHandler getSSOSecurityHandler(String token) {
+    private void abortWithUnauthorized(ContainerRequestContext requestContext) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", "Unauthorized");
+        Response unauthorizedResponse = Response.status(Response.Status.UNAUTHORIZED).entity(responseBody)
+                .header("content-type", "application/json").build();
+        requestContext.abortWith(unauthorizedResponse);
+    }
 
-        if (isJWTToken(token)) {
-            return new JWTSecurityHandler();
+    private String extractToken(ContainerRequestContext requestContext) {
+        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        if (isTokenBasedAuthentication(authorizationHeader)) {
+            return authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
         }
-        return new OpaqueTokenSecurityHandler();
+        Map<String, Cookie> cookies = requestContext.getCookies();
+        if (isCookieBasedAuthentication(cookies)) {
+            return cookies.get(JWT_COOKIE).getValue();
+        }
+        return null;
     }
 
     private boolean isTokenBasedAuthentication(String authorizationHeader) {
@@ -119,25 +126,28 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     }
 
     private boolean isCookieBasedAuthentication(Map<String, Cookie> cookies) {
-
         return cookies != null && cookies.get(JWT_COOKIE) != null;
     }
 
-    private void abortWithUnauthorized(ContainerRequestContext requestContext) {
-
-        Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("message", "Unauthorized");
-
-        Response unauthorizedResponse = Response.status(Response.Status.UNAUTHORIZED)
-                .entity(responseBody)
-                .header("content" +
-                "-type", "application/json").build();
-        requestContext.abortWith(unauthorizedResponse);
+    private String extractPerformedBy(String token) {
+        return isJWTToken(token) ? JwtUtil.extractSubject(token) : null;
     }
 
-    private static boolean isJWTToken(String token) {
+    private SecurityHandler getSecurityHandler(ContainerRequestContext requestContext, String token) {
+        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        if (isTokenBasedAuthentication(authorizationHeader)) {
+            return getSSOSecurityHandler(token);
+        }
+        if (isCookieBasedAuthentication(requestContext.getCookies())) {
+            return new InMemorySecurityHandler();
+        }
+        return null;
+    }
 
-        String[] parts = token.split("\\.");
-        return parts.length >= 2;
+    private static SecurityHandler getSSOSecurityHandler(String token) {
+        if (JwtUtil.isJWTToken(token)) {
+            return new JWTSecurityHandler();
+        }
+        return new OpaqueTokenSecurityHandler();
     }
 }

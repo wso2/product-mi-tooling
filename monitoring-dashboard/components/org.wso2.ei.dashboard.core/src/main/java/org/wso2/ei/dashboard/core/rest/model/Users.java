@@ -14,26 +14,14 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *
- *
  */
 
 package org.wso2.ei.dashboard.core.rest.model;
 
 import java.util.ArrayList;
-import java.util.List;
-import org.wso2.ei.dashboard.core.rest.model.UsersInner;
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-
-
-import io.swagger.annotations.*;
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-
-public class Users extends ArrayList<UsersInner>  {
-
+public class Users extends ArrayList<UsersInner> {
 
   @Override
   public boolean equals(java.lang.Object o) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -14,26 +14,23 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *
+ *
  */
 
-package org.wso2.ei.dashboard.core.rest.model;
+import React from 'react';
+import EnhancedTable from '../commons/EnhancedTable';
 
-/**
- * Sample class used to de-serialize JSON response from management API.
- */
-public class User implements Comparable<User> {
-    private final String userId;
-
-    public User(String userId) {
-        this.userId = userId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    @Override
-    public int compareTo(User o) {
-        return this.userId.toLowerCase().compareTo(o.userId.toLowerCase());
-    }
+export default function SiddhiApplications() {
+    const [pageInfo] = React.useState({
+        pageId: "siddhiapps",
+        title: "Siddhi Applications",
+        headCells: [
+            {id: 'name', label: 'Siddhi Application'},
+            {id: 'nodes', label: 'Nodes'},
+            {id: 'status', label: 'Active / Faulty'}
+        ],
+        tableOrderBy: 'name'
+    });
+    return <EnhancedTable pageInfo={pageInfo}/>
 }
