@@ -132,34 +132,24 @@ public class HeartBeatDelegate {
         return !dataManager.checkIfTimestampExceedsInitial(heartbeat, initialTimestamp);
     }
 
-    private void deleteNode(String productName, HeartbeatObject heartbeat) {
-        try {
-            int rowCount = dataManager.deleteHeartbeat(heartbeat);
-            if (rowCount > 0) {
-                logger.info("Successfully deleted node where group_id : " + heartbeat.getGroupId() + " and node_id : "
-                        + heartbeat.getNodeId() + ".");
-                deleteAllNodeData(productName, heartbeat);
-            } else {
-                throw new DashboardServerException("Error occurred while deleting node where group_id : "
-                        + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId()
-                        + ".");
-            }
-        } catch (DashboardServerException e) {
+    private void deleteNode(String productName, HeartbeatObject heartbeat) throws DashboardServerException {
+        int rowCount = dataManager.deleteHeartbeat(heartbeat);
+        if (rowCount > 0) {
+            logger.info("Successfully deleted node where group_id : " + heartbeat.getGroupId() + " and node_id : "
+                    + heartbeat.getNodeId() + ".");
+            deleteAllNodeData(productName, heartbeat);
+        } else {
             throw new DashboardServerException("Error occurred while deleting node where group_id : "
-                    + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId() + ".", e.getCause());
+                    + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId()
+                    + ".");
         }
     }
 
-    private void deleteAllNodeData(String productName, HeartbeatObject heartbeat) {
-        try {
-            logger.info("Deleting all information in node : " + heartbeat.getNodeId() + " in group: "
-                    + heartbeat.getGroupId());
-            ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
-            artifactsManager.runDeleteAllExecutorService();
-        } catch (DashboardServerException e) {
-            throw new DashboardServerException("Error occurred while deleting all the nodes: " + e.getMessage(),
-                    e.getCause());
-        }
+    private void deleteAllNodeData(String productName, HeartbeatObject heartbeat) throws DashboardServerException {
+        logger.info("Deleting all information in node : " + heartbeat.getNodeId() + " in group: "
+                + heartbeat.getGroupId());
+        ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
+        artifactsManager.runDeleteAllExecutorService();
     }
 
     private ArtifactsManager getArtifactManager(String productName, HeartbeatObject heartbeat) {
