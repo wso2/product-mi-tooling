@@ -35,6 +35,8 @@ import java.util.List;
 public class SiddhiAppsDelegate implements ArtifactDelegate {
 
     private static final Logger logger = LogManager.getLogger(SiddhiAppsDelegate.class);
+    private static final String ACTIVATE = "activate";
+    private static final String DEACTIVATE = "deactivate";
 
     @Override
     public ArtifactsResourceResponse getPaginatedArtifactsResponse(String groupId, List<String> nodeList,
@@ -65,7 +67,7 @@ public class SiddhiAppsDelegate implements ArtifactDelegate {
     private JsonObject createPayload(ArtifactUpdateRequest request) {
         JsonObject payload = new JsonObject();
         payload.addProperty("name", request.getArtifactName());
-        payload.addProperty("activate", request.isValue());
+        payload.addProperty("action", request.isValue() ? ACTIVATE : DEACTIVATE);
         return payload;
     }
 }
