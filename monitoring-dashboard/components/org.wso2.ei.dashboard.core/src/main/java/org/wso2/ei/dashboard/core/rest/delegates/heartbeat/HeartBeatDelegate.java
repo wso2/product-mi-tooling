@@ -23,7 +23,6 @@ package org.wso2.ei.dashboard.core.rest.delegates.heartbeat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.wso2.ei.dashboard.core.commons.Constants;
-import org.wso2.ei.dashboard.core.commons.utils.ManagementApiUtils;
 import org.wso2.ei.dashboard.core.data.manager.DataManager;
 import org.wso2.ei.dashboard.core.data.manager.DataManagerSingleton;
 import org.wso2.ei.dashboard.core.exception.DashboardServerException;
@@ -50,30 +49,34 @@ public class HeartBeatDelegate {
     private final DataManager dataManager = DataManagerSingleton.getDataManager();
 
     public Ack processHeartbeat(HeartbeatRequest heartbeatRequest) throws ManagementApiException {
-        long currentTimestamp = System.currentTimeMillis();
-        Ack ack = new Ack(Constants.FAIL_STATUS);
-        HeartbeatObject heartbeat = new HeartbeatObject(
-                heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
-                heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Management API URL received is: " + heartbeat.getMgtApiUrl());
-        }
-        boolean isSuccess;
-        String productName = heartbeat.getProduct();
-        ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
-
-        if (isNodeRegistered(heartbeat)) {
-            isSuccess = updateHeartbeat(heartbeat);
-        } else {
-            isSuccess = registerNode(heartbeat, artifactsManager);
-            if (isSuccess) {
-                artifactsManager.runFetchAllExecutorService();
+        try {
+            long currentTimestamp = System.currentTimeMillis();
+            Ack ack = new Ack(Constants.FAIL_STATUS);
+            HeartbeatObject heartbeat = new HeartbeatObject(
+                    heartbeatRequest.getProduct(), heartbeatRequest.getGroupId(), heartbeatRequest.getNodeId(),
+                    heartbeatRequest.getInterval(), heartbeatRequest.getMgtApiUrl(), currentTimestamp);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Management API URL received is: " + heartbeat.getMgtApiUrl());
             }
+            boolean isSuccess;
+            String productName = heartbeat.getProduct();
+            ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
+
+            if (isNodeRegistered(heartbeat)) {
+                isSuccess = updateHeartbeat(heartbeat);
+            } else {
+                isSuccess = registerNode(heartbeat, artifactsManager);
+                if (isSuccess) {
+                    artifactsManager.runFetchAllExecutorService();
+                }
+            }
+            if (isSuccess) {
+                ack.setStatus(Constants.SUCCESS_STATUS);
+            }
+            return ack;
+        } catch (DashboardServerException e) {
+            throw new ManagementApiException (e.getMessage(), 404, e.getCause());
         }
-        if (isSuccess) {
-            ack.setStatus(Constants.SUCCESS_STATUS);
-        }
-        return ack;
     }
 
     private boolean isNodeRegistered(HeartbeatObject heartbeat) {
@@ -82,61 +85,69 @@ public class HeartBeatDelegate {
         return (null != timestamp && !timestamp.isEmpty());
     }
 
-    private boolean updateHeartbeat(HeartbeatObject heartbeat) {
+    private boolean updateHeartbeat(HeartbeatObject heartbeat) throws ManagementApiException {
         if (logger.isDebugEnabled()) {
             logger.debug("Updating heartbeat information of node " + heartbeat.getNodeId() + " in group : " +
                       heartbeat.getGroupId());
         }
-        return dataManager.updateHeartbeat(heartbeat);
+        try {
+            return dataManager.updateHeartbeat(heartbeat);
+        } catch (DashboardServerException e) {
+            throw new ManagementApiException (e.getMessage(), 500, e.getCause());
+        }
     }
 
-    private boolean registerNode(HeartbeatObject heartbeat, ArtifactsManager artifactsManager) throws ManagementApiException {
-        logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
-                 " Inserting heartbeat information");
-        String accessToken = artifactsManager.getAccessToken(heartbeat.getMgtApiUrl());
-        ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        long heartbeatInterval = heartbeat.getInterval();
-        String productName = heartbeat.getProduct();
-        Runnable runnableTask = () -> {
-            String timestampOfRegisteredNode =
-                    dataManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
-            long longTimestampOfRegisteredNode = Long.parseLong(timestampOfRegisteredNode);
-            long currentTimestamp = System.currentTimeMillis();
+    private boolean registerNode(HeartbeatObject heartbeat, ArtifactsManager artifactsManager) throws ManagementApiException  {
+        try {
+            logger.info("New node " + heartbeat.getNodeId() + " in group : " + heartbeat.getGroupId() + " is registered." +
+                    " Inserting heartbeat information");
+            String accessToken = artifactsManager.getAccessToken(heartbeat.getMgtApiUrl());
+            ScheduledExecutorService heartbeatScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            long heartbeatInterval = heartbeat.getInterval();
+            String productName = heartbeat.getProduct();
+            Runnable runnableTask = () -> {
+                String timestampOfRegisteredNode =
+                        dataManager.retrieveTimestampOfLastHeartbeat(heartbeat.getGroupId(), heartbeat.getNodeId());
+                long longTimestampOfRegisteredNode = Long.parseLong(timestampOfRegisteredNode);
+                long currentTimestamp = System.currentTimeMillis();
 
-            boolean isNodeDeregistered =
-                    (currentTimestamp - longTimestampOfRegisteredNode) > 3 * heartbeatInterval * 1000;
-            if (isNodeDeregistered) {
-                logger.info("Node : " + heartbeat.getNodeId() + " of group : " + heartbeat.getGroupId() + " has " +
-                        "de-registered. Hence deleting node information");
-                heartbeatScheduledExecutorService.shutdownNow();
-                deleteNode(productName, heartbeat);
-            }
-        };
-        heartbeatScheduledExecutorService.scheduleWithFixedDelay(runnableTask, 3 *
-                heartbeatInterval, 3 * heartbeatInterval, TimeUnit.SECONDS);
-        return dataManager.insertHeartbeat(heartbeat, accessToken);
+                boolean isNodeDeregistered =
+                        (currentTimestamp - longTimestampOfRegisteredNode) > 3 * heartbeatInterval * 1000;
+                if (isNodeDeregistered) {
+                    logger.info("Node : " + heartbeat.getNodeId() + " of group : " + heartbeat.getGroupId() + " has " +
+                            "de-registered. Hence deleting node information");
+                    heartbeatScheduledExecutorService.shutdownNow();
+                    deleteNode(productName, heartbeat);
+                }
+            };
+            heartbeatScheduledExecutorService.scheduleWithFixedDelay(runnableTask, 3 *
+                    heartbeatInterval, 3 * heartbeatInterval, TimeUnit.SECONDS);
+            return dataManager.insertHeartbeat(heartbeat, accessToken);
+        } catch (DashboardServerException e) {
+            throw new ManagementApiException (e.getMessage(), 500, e.getCause());
+        }
     }
 
     private boolean isNodeShutDown(HeartbeatObject heartbeat, String initialTimestamp) {
         return !dataManager.checkIfTimestampExceedsInitial(heartbeat, initialTimestamp);
     }
 
-    private void deleteNode(String productName, HeartbeatObject heartbeat) {
+    private void deleteNode(String productName, HeartbeatObject heartbeat) throws DashboardServerException {
         int rowCount = dataManager.deleteHeartbeat(heartbeat);
         if (rowCount > 0) {
             logger.info("Successfully deleted node where group_id : " + heartbeat.getGroupId() + " and node_id : "
-                     + heartbeat.getNodeId() + ".");
+                    + heartbeat.getNodeId() + ".");
             deleteAllNodeData(productName, heartbeat);
         } else {
             throw new DashboardServerException("Error occurred while deleting node where group_id : "
-                                               + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId()
-                                               + ".");
+                    + heartbeat.getGroupId() + " and node_id : " + heartbeat.getNodeId()
+                    + ".");
         }
     }
 
-    private void deleteAllNodeData(String productName, HeartbeatObject heartbeat) {
+    private void deleteAllNodeData(String productName, HeartbeatObject heartbeat) throws DashboardServerException {
         logger.info("Deleting all information in node : " + heartbeat.getNodeId() + " in group: "
-                 + heartbeat.getGroupId());
+                + heartbeat.getGroupId());
         ArtifactsManager artifactsManager = getArtifactManager(productName, heartbeat);
         artifactsManager.runDeleteAllExecutorService();
     }

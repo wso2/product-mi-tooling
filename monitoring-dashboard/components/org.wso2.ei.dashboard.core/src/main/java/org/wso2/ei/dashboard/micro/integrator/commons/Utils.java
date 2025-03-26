@@ -102,7 +102,7 @@ public class Utils {
 
     public static CloseableHttpResponse doGet(String groupId, String nodeId, String accessToken,
         String url, Map<String, String> params)
-            throws ManagementApiException {
+            throws ManagementApiException, DashboardServerException {
         CloseableHttpResponse response = HttpUtils.doGet(accessToken, url, params);
         int httpSc = response.getStatusLine().getStatusCode();
         if (response.getStatusLine().getStatusCode() == HTTP_SC_UNAUTHORIZED) {
