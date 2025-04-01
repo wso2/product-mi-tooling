@@ -1,8 +1,8 @@
 WSO2 Integration Control Plane
 ======================================================================
 
-Welcome to the Integration Control plane ${project.version} for WSO2 Micro Integrator ${mi.version}.
-This is a lightweight UI server that hosts a React application which is used to monitor the Micro Integrator runtime & Ballerina services.
+Welcome to the Integration Control plane ${project.version}.
+This is a lightweight UI server that hosts a React application which is used to monitor the Micro Integrator runtime, Streaming Integrator runtime & Ballerina services.
 
 Configure the MI servers
 ======================================================================
@@ -19,11 +19,6 @@ Running the Integration Control Plane
 1. Go to the ICP_HOME/bin directory and run the dashboard.sh file for Linux and Unix or the dashboard.bat file for Windows.
 2. Access the dashboard login page found at https://localhost:9743/login
 
-Known issues of WSO2 Micro Integrator ${mi.version}
-======================================================================
-
-     - https://github.com/wso2/micro-integrator/issues
-
 Support
 ======================================================================
 
@@ -36,4 +31,4 @@ For additional support information please refer to http://wso2.com/support/
 For more information on WSO2 Micro Integrator, visit the GitHub page (https://github.com/wso2/micro-integrator)
 
 --------------------------------------------------------------------------------
-(c) Copyright 2021 WSO2 Inc.
+(c) Copyright 2025 WSO2 Inc.
