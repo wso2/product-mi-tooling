@@ -637,10 +637,10 @@ public abstract class AbstractUserStoreManager implements UserStoreManager {
             log.error(message);
             throw new UserStoreException(message);
         }
-        if (!checkUserExistence(adminRoleName)) {
+        if (!checkUserExistence(adminUsername)) {
             handleAdminUserCreation(adminUsername, addAdmin);
         }
-        if (!checkRoleExistence(adminUsername)) {
+        if (!checkRoleExistence(adminRoleName)) {
             handleAdminRoleCreation(adminRoleName, adminUsername, addAdmin);
         }
         assignUserToRole(adminUsername, adminRoleName, addAdmin);
