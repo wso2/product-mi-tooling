@@ -143,6 +143,7 @@ public class DashboardServer {
 
             initSecureVault(parsedConfigs);
             loadConfigurations(parsedConfigs);
+            setJavaxSslTruststore(parsedConfigs);
             ssoConfig = generateSSOConfig(parsedConfigs);
         } catch (SSOConfigException e) {
             logger.error("Error reading SSO configs from TOML file", e);
@@ -446,7 +447,6 @@ public class DashboardServer {
             if (parseResult.get(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT) instanceof String) {
                 userInfoEndpoint = (String) parseResult.get(SSOConstants.TOML_SSO_USER_INFO_ENDPOINT);
             }
-            setJavaxSslTruststore(parseResult);
             return new SSOConfig(oidcAgentConfig, adminGroupAttribute, adminGroups, wellKnownEndpointPath, baseUrl,
                                  introspectionEndpoint, userInfoEndpoint);
         }
