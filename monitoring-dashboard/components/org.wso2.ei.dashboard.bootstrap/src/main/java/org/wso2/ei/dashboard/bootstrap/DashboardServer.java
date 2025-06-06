@@ -510,11 +510,16 @@ public class DashboardServer {
         String trustStoreLocation = (String) trustStoreFileLocationRes;
         trustStoreLocation = resolveSecret(trustStoreLocation);
         trustStoreLocation = DASHBOARD_HOME + File.separator + trustStoreLocation;
-        System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
-
-        String trustStorePassword = (String) truststorePasswordRes;
-        trustStorePassword = resolveSecret(trustStorePassword);
-        System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
+        // Add truststore location only if the file exists.
+        if (new File(trustStoreLocation).exists()) {
+            System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
+            String trustStorePassword = (String) truststorePasswordRes;
+            trustStorePassword = resolveSecret(trustStorePassword);
+            System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
+        } else {
+            logger.warn("Couldn't find the TrustStore file in: {}, proceeding with default truststore."
+                    , trustStoreLocation);
+        }
     }
 
     private void initSecureVault(Map<String, Object> parseResult) {
