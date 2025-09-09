@@ -100,10 +100,11 @@ export default function TableRowCreator(props) {
             case 'message_count':
                 return <TableCell>{data.nodes.map(node=><StringCell data={node.details.size === '-1' ? "Not Supported" : node.details.size}/>)}</TableCell>
 
-            // Message Processors
+            // Message Processors and inbound endpoints
+            // isDisabled : Add filter to disable the switch based on different criteria (pageId, protocol, etc.)
             case 'status':
                 return <TableCell>{data.nodes.map(node=><SwitchStatusCell pageId={pageId} artifactName={node.details.name} 
-                        nodeId={node.nodeId} status={node.details.status === 'active' ? true : false} retrieveData={retrieveData} isDisabled={pageId === 'inbound-endpoints' ? (node.details.protocol === 'file'? false: true) : false}/>)}</TableCell>
+                        nodeId={node.nodeId} status={node.details.status === 'active' ? true : false} retrieveData={retrieveData} isDisabled={false}/>)}</TableCell>
 
             // Apis
             case 'url':
