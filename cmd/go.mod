@@ -1,6 +1,6 @@
 module github.com/wso2/product-mi-tooling/cmd
 
-go 1.23
+go 1.25
 
 require (
 	github.com/lithammer/dedent v1.1.0
