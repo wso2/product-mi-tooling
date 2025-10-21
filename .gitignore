@@ -25,6 +25,7 @@ hs_err_pid*
 # ignore Intellij-IDEA files
 *.iml
 .idea/
+.vscode/
 .DS_Store
 
 # Eclipse files
