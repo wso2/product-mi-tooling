@@ -13,29 +13,9 @@ Name                                                                            
 _________________________________________________________________________________________________________________________________________________
 
 
-github.com/Jeffail/gabs                                                                             MIT
-
-github.com/aybabtme/orderedjson                                                                     MIT
-
 github.com/davecgh/go-spew                                                                          ISC
 
 github.com/inconshreveable/mousetrap                                                                Apache-2.0
-
-github.com/getkin/kin-openapi                                                                       MIT
-
-github.com/ghodss/yaml                                                                              MIT
-
-github.com/go-openapi/loads                                                                         Apache-2.0
-
-github.com/go-resty/resty/v2                                                                        MIT
-
-github.com/google/go-cmp                                                                            BSD-3-Clause
-
-github.com/google/uuid                                                                              BSD-3-Clause
-
-github.com/hashicorp/go-multierror                                                                  MPL-2.0
-
-github.com/json-iterator/go                                                                         MIT
 
 github.com/lithammer/dedent                                                                         MIT
 
@@ -43,27 +23,17 @@ github.com/magiconair/properties                                                
 
 github.com/mattn/go-runewidth                                                                       MIT
 
-github.com/mitchellh/mapstructure                                                                   MIT
-
 github.com/olekukonko/tablewriter                                                                   MIT
 
 github.com/pavel-v-chernykh/keystore-go/v4                                                          MIT
 
 github.com/pmezard/go-difflib                                                                       BSD-3-Clause
 
-github.com/renstrom/dedent                                                                          MIT
-
-github.com/savaki/jq                                                                                Apache-2.0
-
-github.com/spf13/cast                                                                               MIT
-
 github.com/spf13/cobra                                                                              Apache-2.0
 
 github.com/spf13/pflag                                                                              BSD-3-Clause
 
 github.com/stretchr/testify                                                                         MIT
-
-github.com/wso2/k8s-api-operator/api-operator                                                       Apache-2.0
 
 golang.org/x/crypto                                                                                 BSD-3-Clause
 
@@ -74,12 +44,6 @@ golang.org/x/sys                                                                
 gopkg.in/resty.v1                                                                                   MIT
 
 gopkg.in/yaml.v2                                                                                    Apache-2.0
-
-k8s.io/api                                                                                          Apache-2.0
-
-k8s.io/client-go                                                                                    Apache-2.0 
-
-sigs.k8s.io/yaml                                                                                    MIT
 
 
 The license types used by the above libraries and their information is given below:
@@ -98,6 +62,3 @@ ISC                         ISC License
 
 MIT                         MIT License
                             http://www.opensource.org/licenses/mit-license.php
-
-MPL-2.0                     Mozilla Public License Version 2.0
-                            https://www.mozilla.org/en-US/MPL/2.0
