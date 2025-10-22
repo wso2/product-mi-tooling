@@ -17,6 +17,10 @@ github.com/Jeffail/gabs                                                         
 
 github.com/aybabtme/orderedjson                                                                     MIT
 
+github.com/davecgh/go-spew                                                                          ISC
+
+github.com/inconshreveable/mousetrap                                                                Apache-2.0
+
 github.com/getkin/kin-openapi                                                                       MIT
 
 github.com/ghodss/yaml                                                                              MIT
@@ -33,11 +37,19 @@ github.com/hashicorp/go-multierror                                              
 
 github.com/json-iterator/go                                                                         MIT
 
+github.com/lithammer/dedent                                                                         MIT
+
 github.com/magiconair/properties                                                                    BSD-2-Clause
+
+github.com/mattn/go-runewidth                                                                       MIT
 
 github.com/mitchellh/mapstructure                                                                   MIT
 
+github.com/olekukonko/tablewriter                                                                   MIT
+
 github.com/pavel-v-chernykh/keystore-go/v4                                                          MIT
+
+github.com/pmezard/go-difflib                                                                       BSD-3-Clause
 
 github.com/renstrom/dedent                                                                          MIT
 
@@ -47,13 +59,19 @@ github.com/spf13/cast                                                           
 
 github.com/spf13/cobra                                                                              Apache-2.0
 
+github.com/spf13/pflag                                                                              BSD-3-Clause
+
 github.com/stretchr/testify                                                                         MIT
 
 github.com/wso2/k8s-api-operator/api-operator                                                       Apache-2.0
 
 golang.org/x/crypto                                                                                 BSD-3-Clause
 
+golang.org/x/net                                                                                    BSD-3-Clause
+
 golang.org/x/sys                                                                                    BSD-3-Clause
+
+gopkg.in/resty.v1                                                                                   MIT
 
 gopkg.in/yaml.v2                                                                                    Apache-2.0
 
@@ -74,6 +92,9 @@ BSD-2-Clause                Berkeley License - 2
 
 BSD-3-Clause                Berkeley License - 3
                             https://opensource.org/licenses/BSD-3-Clause
+
+ISC                         ISC License
+                            https://opensource.org/licenses/ISC
 
 MIT                         MIT License
                             http://www.opensource.org/licenses/mit-license.php
