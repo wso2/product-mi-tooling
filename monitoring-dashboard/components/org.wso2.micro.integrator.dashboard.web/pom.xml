@@ -41,7 +41,9 @@
                         <workingDirectory>${project.basedir}/web-app</workingDirectory>
                         <executable>npm</executable>
                         <arguments>
-                            <argument>install</argument>
+                            <argument>ci</argument>
+                            <argument>--legacy-peer-deps</argument>
+                            <!-- using legacy peer deps to avoid dependency conflicts with @asgardeo/auth-react -->
                         </arguments>
                     </configuration>
                     <goals>
