@@ -3,7 +3,9 @@
 ## Pre-requisites for running integration tests
 1. In order to run the integration tests you need to have the archive(zip) file of the Micro Integrator you need to test.
 
-2. To setup the Micro Integrator and the MySQL database needed for the tests you can use the `setup_MI.sh` script. You need to pass the zip file path of the Micro Integrator to it as shown in the below example.
+2. Ensure that the `mysql-connector-java-8.0.22.jar` file is available in the `/cmd/integration/testdata/mi` directory. If it is not present, download it from https://downloads.mysql.com/archives/c-j/ and place it in that directory.
+
+3. To setup the Micro Integrator and the MySQL database needed for the tests you can use the `setup_MI.sh` script. You need to pass the zip file path of the Micro Integrator to it as shown in the below example.
 
    `sh setup_MI.sh /home/micro-integrator/distribution/target/wso2mi-4.3.0.zip`
 
@@ -16,13 +18,13 @@
 
    To remove remove the containers, images and the network created to run MI CLI integration tests for MI, the `cleanup_MI.sh` script can be used.
 
-3. The `mi/integration/config.yaml` contains the global configurations of the integration tests for MI related commands. It currently governs the following,
+4. The `cmd/integration/config.yaml` contains the global configurations of the integration tests for MI related commands. It currently governs the following,
 
 - *MI Environment configs* 
 
   MI environment instances mentioned previously. Default configuration is local instance with port offset **0** as shown below. These must be changed to suite your MI instances if they vary.
   
-  **NOTE** You need to replace localhost with the MI container IP address you obtained from the above step.
+  **NOTE** Replace localhost with the MI container’s IP address obtained in the previous step. On macOS, use localhost instead, as the container IP may not be directly accessible.
 
  ```
    name: testing
@@ -30,8 +32,7 @@
    offset: 0
 ```
 
-3. Build the MI CLI source to create the archive distribution of your choice.
-
+5. Build the MI CLI source to create the archive distribution of your choice. For detailed instructions, see the `cmd/README.md` in the root directory.
 
 ## Executing command
 
