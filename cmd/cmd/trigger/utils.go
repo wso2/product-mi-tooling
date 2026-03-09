@@ -40,7 +40,7 @@ func generateTriggerCmdExamplesForArtifact(artifact, cmdLiteral, sampleResourceN
 }
 
 func printErrorForArtifact(artifactType, artifactName string, err error) {
-	fmt.Println(utils.LogPrefixError+"Activating "+artifactType+" [ "+artifactName+" ]", err)
+	fmt.Println(utils.LogPrefixError+"Triggering "+artifactType+" [ "+artifactName+" ]", err)
 }
 
 func printTriggerCmdVerboseLog(cmd string) {

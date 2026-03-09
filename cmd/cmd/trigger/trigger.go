@@ -28,7 +28,7 @@ const triggerCmdShortDesc = "Trigger artifacts deployed in a Micro Integrator in
 
 const triggerCmdLongDesc = "Trigger artifacts deployed in a Micro Integrator instance in the environment specified by the flag (--environment, -e)"
 
-var triggerCmdExamples = utils.MiCmdLiteral + " " + triggerCmdLiteral + " " + "endpoint" + " TestEP -e dev"
+var triggerCmdExamples = utils.MiCmdLiteral + " " + triggerCmdLiteral + " " + "task" + " TestTask -e dev"
 
 // TriggerCmd represents the trigger command
 var TriggerCmd = &cobra.Command{
