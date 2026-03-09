@@ -54,10 +54,10 @@ func handleTriggerTaskCmdArguments(args []string) {
 	executeTriggerTask(args[0])
 }
 
-func executeTriggerTask(inboundEndpointName string) {
-	resp, err := impl.TriggerTask(triggerTaskCmdEnvironment, inboundEndpointName)
+func executeTriggerTask(taskName string) {
+	resp, err := impl.TriggerTask(triggerTaskCmdEnvironment, taskName)
 	if err != nil {
-		printErrorForArtifact(artifactTask, inboundEndpointName, err)
+		printErrorForArtifact(artifactTask, taskName, err)
 	} else {
 		fmt.Println(resp)
 	}
