@@ -1557,6 +1557,35 @@ _mi_activate_proxy-service()
     noun_aliases=()
 }
 
+_mi_activate_task()
+{
+    last_command="mi_activate_task"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--environment=")
+    two_word_flags+=("--environment")
+    two_word_flags+=("-e")
+    local_nonpersistent_flags+=("--environment=")
+    flags+=("--insecure")
+    flags+=("-k")
+    flags+=("--verbose")
+
+    must_have_one_flag=()
+    must_have_one_flag+=("--environment=")
+    must_have_one_flag+=("-e")
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
 _mi_activate()
 {
     last_command="mi_activate"
@@ -1568,6 +1597,7 @@ _mi_activate()
     commands+=("inbound-endpoint")
     commands+=("message-processor")
     commands+=("proxy-service")
+    commands+=("task")
 
     flags=()
     two_word_flags=()
@@ -1700,6 +1730,35 @@ _mi_deactivate_proxy-service()
     noun_aliases=()
 }
 
+_mi_deactivate_task()
+{
+    last_command="mi_deactivate_task"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--environment=")
+    two_word_flags+=("--environment")
+    two_word_flags+=("-e")
+    local_nonpersistent_flags+=("--environment=")
+    flags+=("--insecure")
+    flags+=("-k")
+    flags+=("--verbose")
+
+    must_have_one_flag=()
+    must_have_one_flag+=("--environment=")
+    must_have_one_flag+=("-e")
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
 _mi_deactivate()
 {
     last_command="mi_deactivate"
@@ -1711,6 +1770,7 @@ _mi_deactivate()
     commands+=("inbound-endpoint")
     commands+=("message-processor")
     commands+=("proxy-service")
+    commands+=("task")
 
     flags=()
     two_word_flags=()
@@ -1810,6 +1870,59 @@ _mi_secret()
     noun_aliases=()
 }
 
+_mi_trigger_task()
+{
+    last_command="mi_trigger_task"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--environment=")
+    two_word_flags+=("--environment")
+    two_word_flags+=("-e")
+    local_nonpersistent_flags+=("--environment=")
+    flags+=("--insecure")
+    flags+=("-k")
+    flags+=("--verbose")
+
+    must_have_one_flag=()
+    must_have_one_flag+=("--environment=")
+    must_have_one_flag+=("-e")
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
+_mi_trigger()
+{
+    last_command="mi_trigger"
+
+    command_aliases=()
+
+    commands=()
+    commands+=("task")
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--insecure")
+    flags+=("-k")
+    flags+=("--verbose")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
 _mi_version()
 {
     last_command="mi_version"
@@ -1849,6 +1962,7 @@ _mi_root_command()
     commands+=("activate")
     commands+=("deactivate")
     commands+=("secret")
+    commands+=("trigger")
     commands+=("version")
 
     flags=()
