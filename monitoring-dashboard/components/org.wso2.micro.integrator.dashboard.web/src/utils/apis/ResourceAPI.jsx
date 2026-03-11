@@ -205,4 +205,11 @@ export default class ResourceAPI {
     getUserById(userId) {
        return this.getHTTPClient().get(`/users/${userId}`);
     }
+
+    downloadConsumptionData(startDate, endDate) {
+        const payload = {};
+        if (startDate) payload.startDate = startDate;
+        if (endDate) payload.endDate = endDate;
+        return this.getHTTPClient().post(`/consumption`, payload, { responseType: 'arraybuffer' });
+    }
 }
