@@ -49,6 +49,7 @@ import Users from "../resource-pages/Users";
 import UserDetailsPage from "../resource-pages/UserDetailsPage";
 import DataServicesListPage from "../resource-pages/DataservicesListPage"
 import DataServiceDetailsPage from "../resource-pages/DataserviceDetailsPage"
+import ConsumptionPage from "../resource-pages/ConsumptionPage";
 
 export default class SecuredRouter extends Component {
 
@@ -111,6 +112,7 @@ export default class SecuredRouter extends Component {
                 <Route path='/users/explore' component={UserDetailsPage}/>
                 <Route exact path='/dataservice' component={DataServicesListPage}/>
                 <Route path='/dataservice/explore' component={DataServiceDetailsPage}/>
+                <Route exact path='/consumption' component={ConsumptionPage}/>
             </Switch>
         );
     }

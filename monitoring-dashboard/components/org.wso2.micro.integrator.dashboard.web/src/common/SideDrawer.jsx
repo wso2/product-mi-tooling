@@ -25,6 +25,7 @@ import CappIcon from '@material-ui/icons/Dashboard';
 import UsersIcon from '@material-ui/icons/SupervisorAccount';
 import LogConfigIcon from '@material-ui/icons/Create';
 import DSSIcon from '@material-ui/icons/DeviceHub';
+import AssessmentIcon from '@material-ui/icons/Assessment';
 
 const drawerWidth = 240;
 
@@ -122,6 +123,10 @@ export default function SideDrawer() {
                     <ListItem button component={Link} to="/users">
                         <ListItemIcon><UsersIcon style={{color:'#065e9b'}}/></ListItemIcon>
                         <ListItemText primary="Users"/>
+                    </ListItem>
+                    <ListItem button component={Link} to="/consumption">
+                        <ListItemIcon><AssessmentIcon style={{color:'#065e9b'}}/></ListItemIcon>
+                        <ListItemText primary="Consumption"/>
                     </ListItem>
                 </List>
                 <Divider/>
