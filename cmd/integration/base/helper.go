@@ -232,6 +232,7 @@ func Fatal(v ...interface{}) {
 // in order to call Log(), such as code that is executed from TestMain(m *testing.M)
 func Log(v ...interface{}) {
 	if testing.Verbose() {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
 		log.Println(v...)
 	}
 }

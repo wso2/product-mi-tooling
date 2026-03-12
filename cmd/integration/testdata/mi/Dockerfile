@@ -17,7 +17,7 @@
 # ---------------------------------------------------------------------------
 
 # set base Docker image to AdoptOpenJDK Ubuntu Docker image
-FROM adoptopenjdk/openjdk11-openj9:x86_64-ubuntu-jre-11.0.11_9_openj9-0.26.0
+FROM eclipse-temurin:21.0.10_7-jre-noble
 LABEL maintainer="WSO2 Docker Maintainers <dev@wso2.org>"
 
 # set Docker image build arguments
