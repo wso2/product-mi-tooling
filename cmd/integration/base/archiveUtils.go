@@ -50,19 +50,23 @@ func ExtractArchiveFile(path string) {
 		Fatal("mi-cli archive not provided as a command line argument '-archive <archive_file_name>'")
 	}
 
-	relativePath := path
+	Log("Starting archive extraction:", archiveFileName)
 	extractedFolder := "extracted"
 
-	destPath := filepath.FromSlash(relativePath + extractedFolder)
-	srcPath := filepath.FromSlash(relativePath + archiveFileName)
+	destPath := filepath.FromSlash(path + extractedFolder)
+	srcPath := filepath.FromSlash(path + archiveFileName)
+	Log("Source archive path:", srcPath)
+	Log("Extraction destination:", destPath)
 
 	os.RemoveAll(destPath)
 
 	var err error
 	if strings.Contains(archiveFileName, ".zip") {
+		Log("Detected zip archive; using unzip flow")
 		err = Unzip(destPath, srcPath)
 		BinaryName = "mi.exe" // Windows binaries are archived using zip
 	} else { // tar.gz
+		Log("Detected tar.gz archive; using untar flow")
 		err = untar(destPath, srcPath)
 	}
 
@@ -72,9 +76,14 @@ func ExtractArchiveFile(path string) {
 
 	subFolder := "/mi/"
 	RelativeBinaryPath = filepath.FromSlash(destPath + subFolder)
+	Log("Relative binary path set to:", RelativeBinaryPath)
 }
 
 func untar(dstPath string, srcPath string) error {
+	Log("Starting tar.gz extraction")
+	Log("Source archive path:", srcPath)
+	Log("Extraction destination:", dstPath)
+
 	reader, err := os.Open(srcPath)
 	if err != nil {
 		Fatal(err)
@@ -83,6 +92,7 @@ func untar(dstPath string, srcPath string) error {
 
 	gzr, err := gzip.NewReader(reader)
 	if err != nil {
+		Log("Failed to create gzip reader:", err)
 		return err
 	}
 	defer gzr.Close()
@@ -93,28 +103,36 @@ func untar(dstPath string, srcPath string) error {
 		header, err := tr.Next()
 
 		switch {
-
 		// if no more files are found return
 		case err == io.EOF:
+			Log("Completed tar.gz extraction")
 			return nil
-
 		// return any other error
 		case err != nil:
+			Log("Error while reading tar entries:", err)
 			return err
-
 		// if the header is nil, just skip it (not sure how this happens)
 		case header == nil:
+			Log("Encountered nil tar header; skipping entry")
+			continue
+		case strings.HasPrefix(filepath.Base(header.Name), "._"):
+			Log("Skipping macOS metadata file:", header.Name)
 			continue
 		}
 
+		Log("Processing archive entry:", header.Name)
+
 		// the target location where the dir/file should be created
 		target := filepath.Join(dstPath, header.Name)
+
+		Log("Target path:", target)
 
 		// check the file type
 		switch header.Typeflag {
 
 		// if its a dir and it doesn't exist create it
 		case tar.TypeDir:
+			Log("Ensuring directory exists")
 			if _, err := os.Stat(target); err != nil {
 				if err := os.MkdirAll(target, 0755); err != nil {
 					return err
@@ -123,6 +141,7 @@ func untar(dstPath string, srcPath string) error {
 
 		// if it's a file create it
 		case tar.TypeReg:
+			Log("Creating file")
 			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
 				return err

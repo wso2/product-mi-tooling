@@ -114,10 +114,15 @@ func getResourceURLWithQueryParam(miURL, resource string, params map[string]stri
 	path.WriteString(getResourceURL(miURL, resource))
 	if params != nil {
 		path.WriteString("?")
+		first := true
 		for key, value := range params {
+			if !first {
+				path.WriteString("&")
+			}
 			path.WriteString(key)
 			path.WriteString("=")
 			path.WriteString(value)
+			first = false
 		}
 	}
 	return path.String()
