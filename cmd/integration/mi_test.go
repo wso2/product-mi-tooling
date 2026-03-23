@@ -38,6 +38,11 @@ func TestMain(m *testing.M) {
 	readConfigs()
 	base.ExtractArchiveFile("../build/target/")
 
+	if testutils.RemoveTestLogger("synapse-api") {
+		base.Log("Test logger removed from config file, waiting for hot-reload...")
+		testutils.WaitForLogConfigReload()
+	}
+
 	miClient = testutils.MiRESTClient{}
 	miClient.SetupMI(testutils.AdminUserName, testutils.AdminPassword, environment.Name, environment.Host, environment.Offset)
 	config = &testutils.MiConfig{

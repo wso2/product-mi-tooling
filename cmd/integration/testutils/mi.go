@@ -36,8 +36,11 @@ const AdminUserName = "admin"
 // AdminPassword default admin password
 const AdminPassword = "admin"
 
-const miContainer = "micontainer:/home/wso2carbon/wso2mi/repository/deployment/server/carbonapps"
+const miContainerName = "micontainer"
+const miContainer = miContainerName + ":/home/wso2carbon/wso2mi/repository/deployment/server/carbonapps"
+const miLog4jConfPath = "/home/wso2carbon/wso2mi/conf/log4j2.properties"
 const deploymentDelay = 10000
+const logConfigReloadDelay = 5000
 
 var cappList = []string{"./testdata/capps/HealthCareCompositeExporter_1.0.0.car",
 	"./testdata/capps/RESTDataServiceCompositeExporter_1.0.0.car"}
@@ -157,4 +160,24 @@ func execDockerCmd(args ...string) (string, error) {
 // WaitForDeployment wait for specified interval to allow MI to deploy the artifacts
 func WaitForDeployment() {
 	time.Sleep(time.Duration(deploymentDelay) * time.Millisecond)
+}
+
+// RemoveTestLogger removes a dynamically added logger from the MI log4j2 configuration file
+// inside the Docker container if it exists. Returns true if the logger was found and removed.
+func RemoveTestLogger(loggerName string) bool {
+	_, err := execDockerCmd("exec", miContainerName, "grep", "-q", "logger."+loggerName+".name", miLog4jConfPath)
+	if err != nil {
+		// Logger not found in config file
+		return false
+	}
+	base.Log("Test logger found in config file, removing:", loggerName)
+	execDockerCmd("exec", miContainerName, "sed", "-i", "/^logger\\."+loggerName+"\\./d", miLog4jConfPath)
+	execDockerCmd("exec", miContainerName, "sed", "-i", "s/, "+loggerName+"//g", miLog4jConfPath)
+	return true
+}
+
+// WaitForLogConfigReload waits for MI to hot-reload the log4j2 configuration file
+func WaitForLogConfigReload() {
+	base.Log("Waiting for MI to hot-reload log configuration...")
+	time.Sleep(time.Duration(logConfigReloadDelay) * time.Millisecond)
 }
