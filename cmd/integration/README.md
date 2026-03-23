@@ -3,7 +3,7 @@
 ## Pre-requisites for running integration tests
 1. In order to run the integration tests you need to have the archive(zip) file of the Micro Integrator you need to test.
 
-2. Ensure that the `mysql-connector-java-8.0.22.jar` file is available in the `/cmd/integration/testdata/mi` directory. If it is not present, download it from https://downloads.mysql.com/archives/c-j/ and place it in that directory.
+2. Place the `mysql-connector-java-8.0.22.jar` file in the `cmd/integration/testdata/mi` directory. If you don't have it, download the connector from the [MySQL Connector/J archive](https://downloads.mysql.com/archives/c-j/) and copy it to that directory.
 
 3. To setup the Micro Integrator and the MySQL database needed for the tests you can use the `setup_MI.sh` script. You need to pass the zip file path of the Micro Integrator to it as shown in the below example.
 
