@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 env: 
-  DEPENDENCY_SCOPE: integrator-mi # Change this value based on the repository. See https://github.com/wso2/engineering-governance/blob/main/dependency-registry/README.md#available-scopes
+  DEPENDENCY_SCOPE: integrator # Change this value based on the repository. See https://github.com/wso2/engineering-governance/blob/main/dependency-registry/README.md#available-scopes
 
 jobs:
   validate-go-dependencies:
