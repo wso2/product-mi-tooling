@@ -34,10 +34,15 @@ import (
 	"github.com/magiconair/properties"
 	"github.com/pavlo-v-chernykh/keystore-go/v4"
 	"gopkg.in/yaml.v2"
+	pkcs12 "software.sslmate.com/src/go-pkcs12"
 )
 
 const keystoreDirName = "keystore"
 const keyStoreConfigFileName = "keystore_info.yaml"
+
+// JKSKeyStoreType and PKCS12KeyStoreType are the supported keystore types
+const JKSKeyStoreType = "jks"
+const PKCS12KeyStoreType = "pkcs12"
 const encryptedSecretsPropertiesFileName = "wso2-secrets.properties"
 const encryptedSecretsYamlFileName = "wso2-secrets.yaml"
 
@@ -65,9 +70,10 @@ type SecretConfig struct {
 
 type KeyStoreConfig struct {
 	KeyStorePath     string `yaml:"keyStorePath"`
+	KeyStoreType     string `yaml:"keyStoreType,omitempty"`
 	KeyStorePassword string `yaml:"keyStorePassword"`
 	KeyAlias         string `yaml:"keyAlias"`
-	KeyPassword      string `yaml:"keyPassword"`
+	KeyPassword      string `yaml:"keyPassword,omitempty"`
 }
 
 type encryptFunc func(key *rsa.PublicKey, plainText string) (string, error)
@@ -75,10 +81,28 @@ type encryptFunc func(key *rsa.PublicKey, plainText string) (string, error)
 // IsValidKeyStoreConfig return true if the KeyStoreConfig is valid
 func IsValidKeyStoreConfig(config *KeyStoreConfig) bool {
 	if IsNonEmptyString(config.KeyStorePath) && IsNonEmptyString(config.KeyStorePassword) &&
-		IsNonEmptyString(config.KeyAlias) && IsNonEmptyString(config.KeyPassword) {
-		return true
+		IsNonEmptyString(config.KeyAlias) {
+		// PKCS12 keystores use the keystore password for the key as well
+		return IsPKCS12KeyStore(config.KeyStoreType) || IsNonEmptyString(config.KeyPassword)
 	}
 	return false
+}
+
+// IsPKCS12KeyStore return true if the keystore type is pkcs12
+func IsPKCS12KeyStore(keyStoreType string) bool {
+	return strings.EqualFold(keyStoreType, PKCS12KeyStoreType)
+}
+
+// GetKeyStoreType resolves the keystore type from the file extension of the keystore path
+func GetKeyStoreType(keyStorePath string) (string, error) {
+	switch strings.ToLower(filepath.Ext(strings.TrimSpace(keyStorePath))) {
+	case ".jks":
+		return JKSKeyStoreType, nil
+	case ".p12", ".pfx", ".pkcs12":
+		return PKCS12KeyStoreType, nil
+	default:
+		return "", errors.New("Invalid Key Store Type. Supports only JKS and PKCS12 Key Stores")
+	}
 }
 
 // EncryptSecrets encrypts the secrets using the keystore and write them to a file or console depending on the config map argument
@@ -147,6 +171,10 @@ func GetKeyStoreConfigFromFile(filePath string) (*KeyStoreConfig, error) {
 	if err := yaml.Unmarshal(data, config); err != nil {
 		return nil, errors.New("Parsing error.\nExecute 'mi secret init --help' for more information")
 	}
+	if !IsNonEmptyString(config.KeyStoreType) {
+		// keystore configs created before PKCS12 support have no type field
+		config.KeyStoreType = JKSKeyStoreType
+	}
 	if !IsValidKeyStoreConfig(config) {
 		return nil, errors.New("Missing required fields.\nExecute 'mi secret init --help' for more information")
 	}
@@ -154,9 +182,15 @@ func GetKeyStoreConfigFromFile(filePath string) (*KeyStoreConfig, error) {
 }
 
 func getEncryptionKey(keyStoreConfig *KeyStoreConfig) (*rsa.PublicKey, error) {
-	keyStorePath := keyStoreConfig.KeyStorePath
 	keyStorePassword, _ := base64.StdEncoding.DecodeString(keyStoreConfig.KeyStorePassword)
-	keyStore, err := readKeyStore(keyStorePath, keyStorePassword)
+	if IsPKCS12KeyStore(keyStoreConfig.KeyStoreType) {
+		return getEncryptionKeyFromPKCS12(keyStoreConfig.KeyStorePath, string(keyStorePassword))
+	}
+	return getEncryptionKeyFromJKS(keyStoreConfig, keyStorePassword)
+}
+
+func getEncryptionKeyFromJKS(keyStoreConfig *KeyStoreConfig, keyStorePassword []byte) (*rsa.PublicKey, error) {
+	keyStore, err := readKeyStore(keyStoreConfig.KeyStorePath, keyStorePassword)
 	if err != nil {
 		return nil, errors.New("Reading Key Store: " + err.Error())
 	}
@@ -167,11 +201,30 @@ func getEncryptionKey(keyStoreConfig *KeyStoreConfig) (*rsa.PublicKey, error) {
 		return nil, errors.New("Reading Key Entry: " + err.Error())
 	}
 	key, err := x509.ParsePKCS8PrivateKey(pke.PrivateKey)
-	rsaKey := key.(*rsa.PrivateKey)
 	if err != nil {
 		return nil, errors.New("Parsing Key Entry: " + err.Error())
 	}
+	rsaKey, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		return nil, errors.New("Parsing Key Entry: key entry is not an RSA key")
+	}
 	return &rsaKey.PublicKey, nil
+}
+
+func getEncryptionKeyFromPKCS12(keyStorePath string, keyStorePassword string) (*rsa.PublicKey, error) {
+	data, err := ioutil.ReadFile(keyStorePath)
+	if err != nil {
+		return nil, errors.New("Reading Key Store: " + err.Error())
+	}
+	_, cert, _, err := pkcs12.DecodeChain(data, keyStorePassword)
+	if err != nil {
+		return nil, errors.New("Reading Key Store: " + err.Error())
+	}
+	rsaKey, ok := cert.PublicKey.(*rsa.PublicKey)
+	if !ok {
+		return nil, errors.New("Reading Key Entry: certificate does not hold an RSA public key")
+	}
+	return rsaKey, nil
 }
 
 func encrypt(encryptionKey *rsa.PublicKey, plainTextSecrets map[string]string, encryptFunction encryptFunc) (map[string]string, error) {
