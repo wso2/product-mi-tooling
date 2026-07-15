@@ -64,6 +64,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -510,16 +512,22 @@ public class DashboardServer {
         String trustStoreLocation = (String) trustStoreFileLocationRes;
         trustStoreLocation = resolveSecret(trustStoreLocation);
         trustStoreLocation = DASHBOARD_HOME + File.separator + trustStoreLocation;
-        // Add truststore location only if the file exists.
-        if (new File(trustStoreLocation).exists()) {
-            System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
-            String trustStorePassword = (String) truststorePasswordRes;
-            trustStorePassword = resolveSecret(trustStorePassword);
-            System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
-        } else {
-            logger.warn("Couldn't find the TrustStore file in: {}, proceeding with default truststore."
-                    , trustStoreLocation);
+        File trustStoreFile = new File(trustStoreLocation);
+        if (!trustStoreFile.exists()) {
+            throw new SSOConfigException("Couldn't find the configured truststore file: " + trustStoreLocation);
         }
+
+        String trustStorePassword = (String) truststorePasswordRes;
+        trustStorePassword = resolveSecret(trustStorePassword);
+        try {
+            KeyStore.getInstance(trustStoreFile, trustStorePassword.toCharArray());
+        } catch (GeneralSecurityException | IOException e) {
+            throw new SSOConfigException("Unable to load the configured truststore: " + trustStoreLocation +
+                    ". Verify the truststore file and password.", e);
+        }
+
+        System.setProperty(JAVAX_SSL_TRUSTSTORE, trustStoreLocation);
+        System.setProperty(JAVAX_SSL_TRUSTSTORE_PASSWORD, trustStorePassword);
     }
 
     private void initSecureVault(Map<String, Object> parseResult) {
