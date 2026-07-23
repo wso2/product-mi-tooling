@@ -1,6 +1,6 @@
 module github.com/wso2/product-mi-tooling/cmd
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/lithammer/dedent v1.1.0
@@ -9,7 +9,7 @@ require (
 	github.com/pavlo-v-chernykh/keystore-go/v4 v4.5.0
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.2.2
-	golang.org/x/crypto v0.45.0
+	golang.org/x/crypto v0.52.0
 	gopkg.in/resty.v1 v1.12.0
 	gopkg.in/yaml.v2 v2.2.2
 	software.sslmate.com/src/go-pkcs12 v0.7.2
@@ -21,7 +21,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
-	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/net v0.54.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/term v0.43.0 // indirect
 )
