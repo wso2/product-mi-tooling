@@ -23,7 +23,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"syscall"
 
@@ -39,7 +38,7 @@ const secretInitCmdLongDesc = "Initialize the Key Store information required for
 
 var secretInitCmdExamples = "To initialize a Key Store information\n" +
 	"  " + utils.ProjectName + " " + utils.MiCmdLiteral + " " + secretCmdLiteral + " " + secretInitCmdLiteral + "\n" +
-	"NOTE: Secret encryption supports only JKS Key Stores"
+	"NOTE: Secret encryption supports JKS and PKCS12 Key Stores"
 
 var secretInitCmd = &cobra.Command{
 	Use:     secretInitCmdLiteral,
@@ -62,10 +61,12 @@ func startConsoleForKeyStore() {
 
 	fmt.Printf("Enter Key Store location: ")
 	path, _ := reader.ReadString('\n')
-	if !isJKSKeyStore(path) {
-		utils.HandleErrorAndExit("Invalid Key Store Type. Supports only JKS Key Stores", nil)
+	keyStoreType, err := utils.GetKeyStoreType(path)
+	if err != nil {
+		utils.HandleErrorAndExit(err.Error(), nil)
 	}
 	keyStoreConfig.KeyStorePath = strings.TrimSpace(path)
+	keyStoreConfig.KeyStoreType = keyStoreType
 
 	fmt.Printf("Enter Key Store password: ")
 	byteStorePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
@@ -77,11 +78,13 @@ func startConsoleForKeyStore() {
 	alias, _ := reader.ReadString('\n')
 	keyStoreConfig.KeyAlias = strings.TrimSpace(alias)
 
-	fmt.Printf("Enter Key password: ")
-	bytePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
-	keyPassword := string(bytePassword)
-	fmt.Println()
-	keyStoreConfig.KeyPassword = base64.StdEncoding.EncodeToString([]byte(strings.TrimSpace(keyPassword)))
+	if !utils.IsPKCS12KeyStore(keyStoreType) {
+		fmt.Printf("Enter Key password: ")
+		bytePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
+		keyPassword := string(bytePassword)
+		fmt.Println()
+		keyStoreConfig.KeyPassword = base64.StdEncoding.EncodeToString([]byte(strings.TrimSpace(keyPassword)))
+	}
 
 	if utils.IsValidKeyStoreConfig(keyStoreConfig) {
 		utils.CreateDirIfNotExist(utils.GetKeyStoreDirectoryPath())
@@ -95,8 +98,4 @@ func startConsoleForKeyStore() {
 
 func updateMap(params map[string]string, key, value string) {
 	params[key] = strings.TrimSpace(value)
-}
-
-func isJKSKeyStore(path string) bool {
-	return filepath.Ext(strings.TrimSpace(path)) == ".jks"
 }

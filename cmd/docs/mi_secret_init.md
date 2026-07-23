@@ -15,7 +15,7 @@ mi secret init [flags]
 ```
 To initialize a Key Store information
   mi mi secret init
-NOTE: Secret encryption supports only JKS Key Stores
+NOTE: Secret encryption supports JKS and PKCS12 Key Stores
 ```
 
 ### Options

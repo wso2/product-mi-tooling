@@ -12,6 +12,7 @@ require (
 	golang.org/x/crypto v0.45.0
 	gopkg.in/resty.v1 v1.12.0
 	gopkg.in/yaml.v2 v2.2.2
+	software.sslmate.com/src/go-pkcs12 v0.7.2
 )
 
 require (
