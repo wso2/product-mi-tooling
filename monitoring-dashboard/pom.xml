@@ -309,7 +309,7 @@
     <properties>
         <securevault.version>1.1.2</securevault.version>
         <carbon.kernel.version>4.8.1</carbon.kernel.version>
-        <org.jsoup.version>1.15.3</org.jsoup.version>
+        <org.jsoup.version>1.23.1</org.jsoup.version>
 
         <!-- Logging/SLF4J -->
         <slf4j.version>1.7.36</slf4j.version>
