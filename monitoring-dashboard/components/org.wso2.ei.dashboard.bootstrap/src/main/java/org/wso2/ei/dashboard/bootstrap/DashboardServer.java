@@ -501,11 +501,16 @@ public class DashboardServer {
 
         Object trustStoreFileLocationRes = parseResult.get(TOML_TRUSTSTORE_FILE_LOCATION);
         Object truststorePasswordRes = parseResult.get(TOML_TRUSTSTORE_PASSWORD);
+        if (trustStoreFileLocationRes == null && truststorePasswordRes == null) {
+            logger.warn("Truststore configuration is not present, proceeding with the default Java truststore.");
+            return;
+        }
         if (!(trustStoreFileLocationRes instanceof String)
                 || !(truststorePasswordRes instanceof String)
                 || ((String) truststorePasswordRes).isEmpty()
                 || ((String) trustStoreFileLocationRes).isEmpty()) {
-            throw new SSOConfigException("Truststore information is missing");
+            throw new SSOConfigException("Invalid [truststore] configuration in deployment.toml. "
+                    + "Both file_name and password must be specified");
         }
         String trustStoreLocation = (String) trustStoreFileLocationRes;
         trustStoreLocation = resolveSecret(trustStoreLocation);
