@@ -76,7 +76,7 @@ public class ManagementApiUtils {
                         ("Error occurred while retrieving access token from management api.", 500);
             }
         } catch (IOException | DashboardServerException e) {
-            throw new ManagementApiException("Error occurred while retrieving access token from management api.", 500);
+            throw new ManagementApiException("Error occurred while retrieving access token from management api.", 500, e);
         }
     }
 }
