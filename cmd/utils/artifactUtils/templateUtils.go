@@ -1,8 +1,37 @@
 package artifactUtils
 
+import "encoding/json"
+
 type TemplateList struct {
 	SequenceTemplates []Template `json:"sequenceTemplateList"`
 	EndpointTemplates []Template `json:"endpointTemplateList"`
+}
+
+func (l *TemplateList) UnmarshalJSON(data []byte) error {
+	type legacyTemplateList TemplateList
+	var response struct {
+		legacyTemplateList
+		List []struct {
+			Template
+			Type string `json:"type"`
+		} `json:"list"`
+	}
+	if err := json.Unmarshal(data, &response); err != nil {
+		return err
+	}
+	*l = TemplateList(response.legacyTemplateList)
+	if response.List != nil {
+		*l = TemplateList{}
+		for _, item := range response.List {
+			switch item.Type {
+			case "sequence":
+				l.SequenceTemplates = append(l.SequenceTemplates, item.Template)
+			case "endpoint":
+				l.EndpointTemplates = append(l.EndpointTemplates, item.Template)
+			}
+		}
+	}
+	return nil
 }
 
 type TemplateListByType struct {
